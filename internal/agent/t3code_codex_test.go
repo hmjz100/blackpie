@@ -88,13 +88,13 @@ func TestT3CodeCodexInstance(t *testing.T) {
 	cat := filepath.Join(base, "userdata", "blackpie-codex-models.json")
 	str := func(v string) string { return t3TOML(v) }
 	want := map[string]string{
-		"model_provider":                                   str(blackpieID),
+		"model_provider":                                     str(blackpieID),
 		"model_providers.blackpie.name":                      str("blackpie"),
 		"model_providers.blackpie.base_url":                  str(gateway.URL() + "/v1"),
 		"model_providers.blackpie.wire_api":                  str("responses"),
 		"model_providers.blackpie.experimental_bearer_token": str(gateway.Token),
 		"model_providers.blackpie.http_headers":              `{"x-openai-actor-authorization"="blackpie"}`,
-		"model_catalog_json":                               str(cat),
+		"model_catalog_json":                                 str(cat),
 	}
 	if got := t3Overrides(t, e.Config.LaunchArgs); !maps.Equal(got, want) {
 		t.Errorf("overrides:\n got %v\nwant %v", got, want)

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/tidwall/gjson"
 )
 
 // portableVSCode lays VS Code out under home as a portable build is: its

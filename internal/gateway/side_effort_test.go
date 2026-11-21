@@ -11,10 +11,10 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/catalog"
 	"github.com/hmjz100/blackpie/internal/provider"
 	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/tidwall/gjson"
 )
 
 // pickEfforts saves the levels picked in Settings for Image recognition's

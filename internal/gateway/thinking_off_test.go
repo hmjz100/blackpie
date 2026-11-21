@@ -9,8 +9,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/tidwall/gjson"
 )
 
 // #1454: Claude Code's auto mode classifier, through blackpie, asked

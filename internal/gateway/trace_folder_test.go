@@ -18,12 +18,12 @@ func TestShortFolder(t *testing.T) {
 		"/Users/someone/secret/workspace/blackpie/": "workspace/blackpie",
 		`C:\Users\someone\src\blackpie`:             "src/blackpie",
 		`D:\blackpie`:                               "blackpie",
-		`C:\`:                                     "",
+		`C:\`:                                       "",
 		`\\server\share\team\blackpie`:              "team/blackpie",
 		"/blackpie":                                 "blackpie",
-		"/":                                       "",
-		"":                                        "",
-		"/home/u/my project/中文 目录":                "my project/中文 目录",
+		"/":                                         "",
+		"":                                          "",
+		"/home/u/my project/中文 目录":                  "my project/中文 目录",
 	} {
 		if got := shortFolder(dir); got != want {
 			t.Errorf("shortFolder(%q) = %q, want %q", dir, got, want)

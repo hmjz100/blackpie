@@ -17,8 +17,6 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/jsonc"
 	"github.com/hmjz100/blackpie/internal/agentplug"
 	"github.com/hmjz100/blackpie/internal/catalog"
 	"github.com/hmjz100/blackpie/internal/edit"
@@ -26,6 +24,8 @@ import (
 	"github.com/hmjz100/blackpie/internal/plugin"
 	"github.com/hmjz100/blackpie/internal/provider"
 	"github.com/hmjz100/blackpie/internal/usage"
+	"github.com/tidwall/gjson"
+	"github.com/tidwall/jsonc"
 )
 
 func init() {

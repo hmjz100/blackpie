@@ -28,11 +28,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/jsonc"
 	"github.com/hmjz100/blackpie/internal/appdir"
 	"github.com/hmjz100/blackpie/internal/edit"
 	"github.com/hmjz100/blackpie/internal/netproxy"
+	"github.com/tidwall/gjson"
+	"github.com/tidwall/jsonc"
 )
 
 // claudeProxyAddr are the keys Claude Code takes its proxy from (Node's

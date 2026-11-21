@@ -14,10 +14,10 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/pelletier/go-toml/v2"
 	"github.com/hmjz100/blackpie/internal/agent"
 	"github.com/hmjz100/blackpie/internal/appdir"
 	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/pelletier/go-toml/v2"
 )
 
 // Subagents (#2283) are agents of their own the main agent hands a task

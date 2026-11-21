@@ -17,7 +17,7 @@ func TestArgsOf(t *testing.T) {
 		`"C:\Program Files\m\blackpie.com" "a b" c`: `"a b" c`,
 		`"C:\m\blackpie" x`:                         `x`,
 		`C:\m\blackpie.com	-v`:                      `-v`,
-		`"unclosed`:                               ``,
+		`"unclosed`:                                 ``,
 	} {
 		if got := argsOf(line); got != want {
 			t.Errorf("argsOf(%q) = %q, want %q", line, got, want)

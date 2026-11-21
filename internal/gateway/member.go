@@ -29,9 +29,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/provider"
 	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/tidwall/gjson"
 )
 
 const (

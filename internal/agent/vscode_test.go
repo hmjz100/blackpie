@@ -6,11 +6,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/jsonc"
 	"github.com/hmjz100/blackpie/internal/edit"
 	"github.com/hmjz100/blackpie/internal/provider"
 	"github.com/hmjz100/blackpie/internal/usage"
+	"github.com/tidwall/gjson"
+	"github.com/tidwall/jsonc"
 )
 
 // VS Code's chat: switched on, blackpie's group joins the user's in

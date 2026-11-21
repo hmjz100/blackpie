@@ -921,8 +921,8 @@ func (a *Agent) DisconnectOffline() error {
 // every field at.
 type reconnection struct {
 	Blackpie map[string]string `json:"blackpie"`
-	Routed []string          `json:"routed,omitempty"`
-	Left   map[string]string `json:"left"`
+	Routed   []string          `json:"routed,omitempty"`
+	Left     map[string]string `json:"left"`
 }
 
 // reconnect puts back the models an agent was on when it was disconnected

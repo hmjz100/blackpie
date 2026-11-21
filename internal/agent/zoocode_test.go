@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/edit"
 	"github.com/hmjz100/blackpie/internal/provider"
 	"github.com/hmjz100/blackpie/internal/usage"
+	"github.com/tidwall/gjson"
 )
 
 // zooCodeHere is Zoo Code in a VS Code User folder under home, the
@@ -63,7 +63,7 @@ func TestZooCode(t *testing.T) {
 	// a current profile that is one of apiConfigs, and a modelInfo with
 	// contextWindow and supportsPromptCache
 	for k, want := range map[string]string{
-		"providerProfiles.currentApiConfigName":                                        "blackpie",
+		"providerProfiles.currentApiConfigName":                                          "blackpie",
 		"providerProfiles.apiConfigs.blackpie.apiProvider":                               "openai",
 		"providerProfiles.apiConfigs.blackpie.openAiBaseUrl":                             gatewayV1(),
 		"providerProfiles.apiConfigs.blackpie.openAiApiKey":                              agentKey("zoo-code"),

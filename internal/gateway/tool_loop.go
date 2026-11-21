@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/provider"
 	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/tidwall/gjson"
 )
 
 // A model can also loop across turns: it asks for the same tool call, the

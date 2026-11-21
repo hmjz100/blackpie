@@ -33,13 +33,13 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/klauspost/compress/zstd"
 	"github.com/hmjz100/blackpie/internal/appdir"
 	"github.com/hmjz100/blackpie/internal/catalog"
 	"github.com/hmjz100/blackpie/internal/dirent"
 	"github.com/hmjz100/blackpie/internal/proc"
 	"github.com/hmjz100/blackpie/internal/provider"
 	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/klauspost/compress/zstd"
 )
 
 // Tokens is a count of tokens. Input excludes what was read from cache.

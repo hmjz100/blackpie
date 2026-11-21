@@ -58,7 +58,7 @@ func TestAirAddsBlackpieAgent(t *testing.T) {
 	}
 	cfg := filepath.Join(dir, "blackpie-opencode.json")
 	for k, v := range map[string]string{
-		"agent_servers.Goose.command":              "goose",
+		"agent_servers.Goose.command":                "goose",
 		"agent_servers.Blackpie.command":             "/opt/bin/opencode",
 		"agent_servers.Blackpie.args.0":              "acp",
 		"agent_servers.Blackpie.env.OPENCODE_CONFIG": cfg,
@@ -68,9 +68,9 @@ func TestAirAddsBlackpieAgent(t *testing.T) {
 		}
 	}
 	for k, v := range map[string]string{
-		"model":                           "blackpie/fake/m1",
-		"small_model":                     "blackpie/fake/m1",
-		"enabled_providers":               `["blackpie"]`,
+		"model":                             "blackpie/fake/m1",
+		"small_model":                       "blackpie/fake/m1",
+		"enabled_providers":                 `["blackpie"]`,
 		"provider.blackpie.options.baseURL": gatewayV1(),
 		"provider.blackpie.options.apiKey":  "blackpie",
 		"provider.blackpie.npm":             "@ai-sdk/openai-compatible",

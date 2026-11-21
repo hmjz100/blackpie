@@ -29,10 +29,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/edit"
 	"github.com/hmjz100/blackpie/internal/provider"
 	"github.com/hmjz100/blackpie/internal/steady"
+	"github.com/tidwall/gjson"
 )
 
 const (

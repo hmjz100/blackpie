@@ -3,8 +3,8 @@
 package gui
 
 import (
-	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 func (h *host) fontsChanged() {

@@ -417,12 +417,12 @@ func readTagged(pc context.Context, t Tagged, branch string) (Tagged, bool, bool
 		return t, false, false, err
 	}
 	var pj struct {
-		Name    string          `json:"name"`
-		Version string          `json:"version"`
-		Main    string          `json:"main"`
-		Exports json.RawMessage `json:"exports"`
-		License any             `json:"license"`
-		Blackpie  struct {
+		Name     string          `json:"name"`
+		Version  string          `json:"version"`
+		Main     string          `json:"main"`
+		Exports  json.RawMessage `json:"exports"`
+		License  any             `json:"license"`
+		Blackpie struct {
 			Middleware string `json:"middleware"`
 			Agent      string `json:"agent"`
 			Hooks      string `json:"hooks"`

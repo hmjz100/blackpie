@@ -14,11 +14,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/catalog"
 	"github.com/hmjz100/blackpie/internal/plugin"
 	"github.com/hmjz100/blackpie/internal/probelog"
 	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/tidwall/gjson"
 )
 
 // A plugin's provider (see internal/plugin) is a subscription like the

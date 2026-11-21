@@ -18,10 +18,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/pelletier/go-toml/v2"
 	"github.com/hmjz100/blackpie/internal/catalog"
 	"github.com/hmjz100/blackpie/internal/edit"
 	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/pelletier/go-toml/v2"
 )
 
 const reasonixKey = "BLACKPIE_REASONIX_API_KEY"

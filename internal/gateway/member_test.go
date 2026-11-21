@@ -13,9 +13,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/provider"
 	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/tidwall/gjson"
 )
 
 // A reply from a group says which member answered it (#822): its

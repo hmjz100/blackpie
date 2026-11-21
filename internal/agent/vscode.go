@@ -36,10 +36,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/appdir"
 	"github.com/hmjz100/blackpie/internal/edit"
 	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/tidwall/gjson"
 )
 
 // vscodeDefault is chat.defaultModel, a key with a dot in it, escaped for

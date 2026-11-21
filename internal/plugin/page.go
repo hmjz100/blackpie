@@ -164,9 +164,9 @@ func Window(target string) (w *WindowSpec, only bool) {
 		KeepAlive json.RawMessage `json:"keepAlive"`
 	}
 	var pkg struct {
-		Main    string          `json:"main"`
-		Exports json.RawMessage `json:"exports"`
-		Blackpie  struct {
+		Main     string          `json:"main"`
+		Exports  json.RawMessage `json:"exports"`
+		Blackpie struct {
 			Page        *part    `json:"page"`
 			Panels      []part   `json:"panels"`
 			Actions     []part   `json:"actions"`

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/tidwall/gjson"
 )
 
 // piDeferred is pi's request (openai-completions) after its tool_search

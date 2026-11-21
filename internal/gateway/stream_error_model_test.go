@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/tidwall/gjson"
 )
 
 // streamModels is every "model" the data lines of an SSE body hold, at

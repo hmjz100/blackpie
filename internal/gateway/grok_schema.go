@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/tidwall/gjson"
 )
 
 // grokToolPatterns is body with each "pattern" in its tools' schemas

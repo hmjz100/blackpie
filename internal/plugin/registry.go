@@ -21,13 +21,13 @@ import (
 
 // Where the npm registry in use came from (RegistryInUse.From).
 const (
-	FromBlackpie  = "blackpie"  // set on the Plugins page or with `blackpie plugin registry`
-	FromEnv     = "env"     // blackpie's environment: BUN_CONFIG_REGISTRY, NPM_CONFIG_REGISTRY
-	FromShell   = "shell"   // the login shell's, which blackpie opened from the Dock doesn't have
-	FromBunfig  = "bunfig"  // install.registry in a .bunfig.toml
-	FromNPMRC   = "npmrc"   // registry= in an .npmrc
-	FromChina   = "china"   // the 「国内镜像」 switch: npmmirror
-	FromDefault = "default" // npm's own
+	FromBlackpie = "blackpie" // set on the Plugins page or with `blackpie plugin registry`
+	FromEnv      = "env"      // blackpie's environment: BUN_CONFIG_REGISTRY, NPM_CONFIG_REGISTRY
+	FromShell    = "shell"    // the login shell's, which blackpie opened from the Dock doesn't have
+	FromBunfig   = "bunfig"   // install.registry in a .bunfig.toml
+	FromNPMRC    = "npmrc"    // registry= in an .npmrc
+	FromChina    = "china"    // the 「国内镜像」 switch: npmmirror
+	FromDefault  = "default"  // npm's own
 )
 
 // RegistryInUse is the npm registry plugins are installed from and npm's

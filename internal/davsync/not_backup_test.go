@@ -12,10 +12,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/klauspost/compress/zstd"
 	"github.com/hmjz100/blackpie/internal/backup"
 	"github.com/hmjz100/blackpie/internal/provider"
 	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/klauspost/compress/zstd"
 )
 
 // "not a blackpie backup" was all a sync said whatever the server sent where

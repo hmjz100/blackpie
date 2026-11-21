@@ -517,9 +517,9 @@ func dshJoin(items []dshItem) string {
 
 // dshItem is one entry of the patch list, as its lines.
 type dshItem struct {
-	id     string
+	id       string
 	blackpie bool
-	lines  []string
+	lines    []string
 }
 
 var dshIDLine = lazyre.New(`^(?:- |  )id:\s*['"]?([^'"#\s]+)['"]?\s*(#.*)?$`)

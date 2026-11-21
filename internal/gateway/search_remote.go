@@ -28,7 +28,7 @@ const SearchingHeader = "X-Blackpie-Searching"
 
 // Web search as a Remote blackpie's list says it.
 const (
-	searchNative = "native"
+	searchNative   = "native"
 	searchBlackpie = "blackpie"
 )
 

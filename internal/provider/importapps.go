@@ -21,12 +21,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/tidwall/jsonc"
 	"github.com/hmjz100/blackpie/internal/appdir"
 	"github.com/hmjz100/blackpie/internal/edit"
 	"github.com/hmjz100/blackpie/internal/plugin"
 	"github.com/hmjz100/blackpie/internal/settings"
 	_ "github.com/hmjz100/blackpie/internal/sqlitedb"
+	"github.com/tidwall/jsonc"
 )
 
 // AppSource is one app blackpie can import from, with what it holds.

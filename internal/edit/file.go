@@ -16,10 +16,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/tidwall/jsonc"
 	"github.com/hmjz100/blackpie/internal/appdir"
 	"github.com/hmjz100/blackpie/internal/filememo"
 	"github.com/hmjz100/blackpie/internal/steady"
+	"github.com/tidwall/jsonc"
 )
 
 // Read returns the file contents, or (nil, nil) when the file does not exist.

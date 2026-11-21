@@ -50,7 +50,7 @@ func TestHomebrew(t *testing.T) {
 	for exe, want := range map[string]bool{
 		"/opt/homebrew/Cellar/blackpie/0.1.126/bin/blackpie":              true,
 		"/home/linuxbrew/.linuxbrew/Cellar/blackpie/0.1.126/bin/blackpie": true,
-		"/usr/local/bin/blackpie":                                       false,
+		"/usr/local/bin/blackpie":                                         false,
 		"/Applications/blackpie.app/Contents/MacOS/blackpie":              false,
 	} {
 		if Homebrew(exe) != want {

@@ -3,8 +3,8 @@ package gateway
 import (
 	"github.com/hmjz100/blackpie/internal/lazyre"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/tidwall/gjson"
 )
 
 // thinkingNeededRefusal is an upstream turning away a Messages request

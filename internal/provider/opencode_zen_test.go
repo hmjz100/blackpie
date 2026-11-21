@@ -17,8 +17,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/tidwall/gjson"
 )
 
 // OpenCode Zen's free models are listed: blackpie asks them as OpenCode does

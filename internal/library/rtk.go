@@ -15,12 +15,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pelletier/go-toml/v2"
 	"github.com/hmjz100/blackpie/internal/agent"
 	"github.com/hmjz100/blackpie/internal/appdir"
 	"github.com/hmjz100/blackpie/internal/edit"
 	"github.com/hmjz100/blackpie/internal/filememo"
 	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
 )
 

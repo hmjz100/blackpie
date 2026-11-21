@@ -9,8 +9,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/tidwall/gjson"
 )
 
 // passthroughRefusalBody is the ChatGPT backend's 400 in xuanwo's

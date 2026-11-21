@@ -504,7 +504,7 @@ func hermesOffKey(p string) string { return "hermes:" + p + ":off" }
 
 type hermesOff struct {
 	Blackpie hermesModel `json:"blackpie"`
-	Left   hermesModel `json:"left"`
+	Left     hermesModel `json:"left"`
 }
 
 // hermesUnwireProfile takes blackpie's provider out of a profile's config. A

@@ -12,13 +12,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pelletier/go-toml/v2"
 	"github.com/hmjz100/blackpie/internal/catalog"
 	"github.com/hmjz100/blackpie/internal/edit"
 	"github.com/hmjz100/blackpie/internal/gateway"
 	"github.com/hmjz100/blackpie/internal/proc"
 	"github.com/hmjz100/blackpie/internal/provider"
 	"github.com/hmjz100/blackpie/internal/usage"
+	"github.com/pelletier/go-toml/v2"
 )
 
 func TestReasonixRegistered(t *testing.T) {

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/tidwall/gjson"
 )
 
 // ne9ko9 on Discord: a vendor that speaks the client's own API has its

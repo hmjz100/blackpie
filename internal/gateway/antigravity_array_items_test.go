@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tidwall/gjson"
 	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/tidwall/gjson"
 )
 
 // arrayItemsAsk is plugins#375's minimal reproduction, as gcq909893267

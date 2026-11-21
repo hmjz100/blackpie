@@ -19,9 +19,9 @@ const (
 
 // SharedGroup is the text a group is shared as.
 type SharedGroup struct {
-	Blackpie  string `json:"blackpie"`
-	Version int    `json:"version"`
-	Group   Group  `json:"group"`
+	Blackpie string `json:"blackpie"`
+	Version  int    `json:"version"`
+	Group    Group  `json:"group"`
 }
 
 // ShareGroup is group id as text to paste into another blackpie: its
@@ -110,9 +110,9 @@ func ReadShared(text string) (SharedGroup, error) {
 		return s, notOne
 	}
 	var probe struct {
-		Blackpie  string          `json:"blackpie"`
-		Version int             `json:"version"`
-		Group   json.RawMessage `json:"group"`
+		Blackpie string          `json:"blackpie"`
+		Version  int             `json:"version"`
+		Group    json.RawMessage `json:"group"`
 	}
 	if err := json.Unmarshal([]byte(text[start:end+1]), &probe); err != nil || probe.Blackpie != ShareMark {
 		return s, notOne
