@@ -11,7 +11,7 @@ import (
 
 func TestForkDisablesPartnerDiscoveryKeepsSavedPreset(t *testing.T) {
 	t.Setenv("XDG_CACHE_HOME", t.TempDir())
-	t.Setenv("MAGPIE_PARTNERS", "")
+	t.Setenv("BLACKPIE_PARTNERS", "")
 	resetPartners()
 	t.Cleanup(resetPartners)
 	p := Partner{PresetDef: PresetDef{ID: "saved-relay", Name: "Saved relay", Chat: "https://relay.example/v1"}}

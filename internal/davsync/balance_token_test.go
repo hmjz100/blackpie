@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/yetone/magpie/internal/backup"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/backup"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // A computer sending no keys leaves the server's balance token in place,
@@ -85,7 +85,7 @@ func TestSyncBalanceToken(t *testing.T) {
 			}
 			remote := func() backup.Bundle {
 				t.Helper()
-				got, err := backup.Open(f.objects["team x+y/magpie/magpie.magpie-backup"], cfg.Passphrase)
+				got, err := backup.Open(f.objects["team x+y/blackpie/blackpie.blackpie-backup"], cfg.Passphrase)
 				if err != nil {
 					t.Fatal(err)
 				}

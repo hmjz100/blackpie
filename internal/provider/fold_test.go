@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 func foldHome(t *testing.T) string {

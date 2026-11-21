@@ -1,18 +1,18 @@
 package gui
 
 import (
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/update"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/update"
 )
 
-// restartBeside answers the gateway's RestartPath: `magpie update`, run in
+// restartBeside answers the gateway's RestartPath: `blackpie update`, run in
 // a terminal (gaubeebangeel on X: an agent this gateway serves, at 4am),
-// put version in where this magpie runs from. Before, the app ran on as
+// put version in where this blackpie runs from. Before, the app ran on as
 // the old version until someone quit and reopened it, which cut what the
 // agents had in flight. It now restarts into it as Settings' AutoRestart
 // does: at once when the restart cuts nothing short (on a Mac or Linux it
 // hands the gateway over, so the agent's own requests go on), else once
-// that is done (waitIdle). A magpie that wasn't the one replaced (another
+// that is done (waitIdle). A blackpie that wasn't the one replaced (another
 // copy) stays as it is.
 func (u *updater) restartBeside(version string) gateway.RestartReply {
 	u.mu.Lock()

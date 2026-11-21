@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // fakeHub is the library's servers, as the gateway asks for them.
@@ -105,7 +105,7 @@ func TestHubMCPListsAndRoutes(t *testing.T) {
 	h := lanGuard(New().Handler())
 
 	init := readMCP(t, hubPost(h, "claude", here, `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}`))
-	if init.Error != nil || init.Result.ServerInfo.Name != "magpie" || init.Result.ProtocolVersion != "2025-06-18" {
+	if init.Error != nil || init.Result.ServerInfo.Name != "blackpie" || init.Result.ProtocolVersion != "2025-06-18" {
 		t.Fatalf("initialize: %+v", init)
 	}
 	m := readMCP(t, hubPost(h, "claude", here, toolsList))
@@ -157,8 +157,8 @@ func TestHubMCPListsAndRoutes(t *testing.T) {
 // word for a tool it doesn't have; an agent's path still lists only its own.
 func TestHubMCPForAnyApp(t *testing.T) {
 	fresh(t)
-	t.Setenv("MAGPIE_ADDR", "")
-	t.Setenv("MAGPIE_PUBLIC_URL", "")
+	t.Setenv("BLACKPIE_ADDR", "")
+	t.Setenv("BLACKPIE_PUBLIC_URL", "")
 	f := &fakeHub{on: true, tools: map[string][]HubTool{
 		"":       {{Server: "github", Tool: "create_issue", Spec: hubSpec("create_issue")}, {Server: "notes", Tool: "find", Spec: hubSpec("find")}},
 		"claude": {{Server: "github", Tool: "create_issue", Spec: hubSpec("create_issue")}},
@@ -167,10 +167,10 @@ func TestHubMCPForAnyApp(t *testing.T) {
 	h := lanGuard(New().Handler())
 
 	w := hubPostAt(h, HubMCPAll, here, `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}`)
-	if init := readMCP(t, w); init.Error != nil || init.Result.ServerInfo.Name != "magpie" {
+	if init := readMCP(t, w); init.Error != nil || init.Result.ServerInfo.Name != "blackpie" {
 		t.Fatalf("initialize: %+v", init)
 	}
-	if !strings.Contains(w.Body.String(), "The tools of every MCP server in magpie's Library") {
+	if !strings.Contains(w.Body.String(), "The tools of every MCP server in blackpie's Library") {
 		t.Errorf("another app's instructions: %s", w.Body)
 	}
 	var names []string
@@ -185,7 +185,7 @@ func TestHubMCPForAnyApp(t *testing.T) {
 		t.Fatalf("another app's call: %+v", m)
 	}
 	m = readMCP(t, hubPostAt(h, HubMCPAll, here, toolsCall("nope__x", `{}`)))
-	if m.Error == nil || m.Error.Code != -32602 || m.Error.Message != "unknown tool nope__x: no MCP server in magpie's Library gives it" {
+	if m.Error == nil || m.Error.Code != -32602 || m.Error.Message != "unknown tool nope__x: no MCP server in blackpie's Library gives it" {
 		t.Errorf("another app's unknown tool: %+v", m)
 	}
 	// claude's own path doesn't reach a server it isn't given
@@ -197,7 +197,7 @@ func TestHubMCPForAnyApp(t *testing.T) {
 		t.Errorf("ran %q", got)
 	}
 	// guarded as the agents' paths are: no web page, and no other computer
-	// while magpie isn't shared
+	// while blackpie isn't shared
 	if w := hubPostAt(h, HubMCPAll, here, toolsList, "Origin", "https://evil.example", "Sec-Fetch-Site", "cross-site", "Sec-Fetch-Mode", "cors"); w.Code != http.StatusForbidden {
 		t.Errorf("a foreign page's tools/list: %d %s", w.Code, w.Body)
 	}
@@ -265,14 +265,14 @@ func TestHubMCPOff(t *testing.T) {
 	}
 }
 
-// The hub is guarded as magpie's other MCP servers are: another computer
+// The hub is guarded as blackpie's other MCP servers are: another computer
 // only while shared and with a key, and no web page — a sandboxed frame's
 // null Origin, another site's, one on this computer, one rebound to
 // 127.0.0.1 — even from this computer. No tool runs for one turned away.
 func TestHubMCPGuarded(t *testing.T) {
 	fresh(t)
-	t.Setenv("MAGPIE_ADDR", "")
-	t.Setenv("MAGPIE_PUBLIC_URL", "")
+	t.Setenv("BLACKPIE_ADDR", "")
+	t.Setenv("BLACKPIE_PUBLIC_URL", "")
 	f := &fakeHub{on: true, tools: map[string][]HubTool{"claude": {{Server: "fs", Tool: "read", Spec: hubSpec("read")}}}}
 	withHub(t, f)
 	h := lanGuard(New().Handler())
@@ -281,11 +281,11 @@ func TestHubMCPGuarded(t *testing.T) {
 	if w := hubPost(h, "claude", there, call); w.Code != http.StatusForbidden {
 		t.Fatalf("not shared: %d %s", w.Code, w.Body)
 	}
-	_, secrets := newCaller(t, "Laptop") // shares magpie
+	_, secrets := newCaller(t, "Laptop") // shares blackpie
 	if w := hubPost(h, "claude", there, call); w.Code != http.StatusUnauthorized {
 		t.Fatalf("shared, no key: %d %s", w.Code, w.Body)
 	}
-	if w := hubPost(h, "claude", there, call, "Authorization", "Bearer sk-magpie-wrong"); w.Code != http.StatusUnauthorized {
+	if w := hubPost(h, "claude", there, call, "Authorization", "Bearer sk-blackpie-wrong"); w.Code != http.StatusUnauthorized {
 		t.Fatalf("shared, a wrong key: %d %s", w.Code, w.Body)
 	}
 	for _, hdr := range [][]string{
@@ -375,15 +375,15 @@ func whereReply(t *testing.T, h http.Handler, addr string, hdr ...string) (instr
 }
 
 // Two routers serving the same tools (packinggoodsllc_07668 on Discord:
-// one magpie in China, one in Los Angeles) are told apart by what each
+// one blackpie in China, one in Los Angeles) are told apart by what each
 // says of itself: the user's words (RouterNote) in initialize's
 // instructions and title and before each tool's description, to every
 // caller; with none, this computer's name to an agent on another
 // computer, and nothing to one on this computer.
 func TestHubMCPSaysWhere(t *testing.T) {
 	fresh(t)
-	t.Setenv("MAGPIE_ADDR", "")
-	t.Setenv("MAGPIE_PUBLIC_URL", "")
+	t.Setenv("BLACKPIE_ADDR", "")
+	t.Setenv("BLACKPIE_PUBLIC_URL", "")
 	old := hostName
 	hostName = func() string { return "la-box" }
 	t.Cleanup(func() { hostName = old })
@@ -399,12 +399,12 @@ func TestHubMCPSaysWhere(t *testing.T) {
 
 	// nothing set, this computer: as before
 	say, title, descs := whereReply(t, h, here)
-	if strings.Contains(say, "la-box") || title != "Magpie MCP hub" || strings.Join(descs, "|") != "Does fetch.|" {
+	if strings.Contains(say, "la-box") || title != "Blackpie MCP hub" || strings.Join(descs, "|") != "Does fetch.|" {
 		t.Fatalf("this computer, nothing set: %q %q %q", say, title, descs)
 	}
 	// nothing set, another computer: this computer's name
 	say, title, descs = whereReply(t, h, there, auth...)
-	if !strings.Contains(say, "This router: la-box.") || title != "Magpie MCP hub · la-box" || strings.Join(descs, "|") != "[la-box] Does fetch.|[la-box]" {
+	if !strings.Contains(say, "This router: la-box.") || title != "Blackpie MCP hub · la-box" || strings.Join(descs, "|") != "[la-box] Does fetch.|[la-box]" {
 		t.Fatalf("another computer, nothing set: %q %q %q", say, title, descs)
 	}
 	// the user's words, to every caller, one line and once
@@ -416,11 +416,11 @@ func TestHubMCPSaysWhere(t *testing.T) {
 		hdr  []string
 	}{{here, nil}, {there, auth}} {
 		say, title, descs = whereReply(t, h, c.addr, c.hdr...)
-		if !strings.Contains(say, "This router: Los Angeles (US).") || title != "Magpie MCP hub · Los Angeles (US)" || strings.Join(descs, "|") != "[Los Angeles (US)] Does fetch.|[Los Angeles (US)]" {
+		if !strings.Contains(say, "This router: Los Angeles (US).") || title != "Blackpie MCP hub · Los Angeles (US)" || strings.Join(descs, "|") != "[Los Angeles (US)] Does fetch.|[Los Angeles (US)]" {
 			t.Fatalf("%s, set: %q %q %q", c.addr, say, title, descs)
 		}
 	}
-	// a server whose descriptions say it already (another magpie's router
+	// a server whose descriptions say it already (another blackpie's router
 	// in this one's Library) isn't said twice
 	f.mu.Lock()
 	f.tools["claude"][0].Spec["description"] = json.RawMessage(`"[Los Angeles (US)] Does fetch."`)

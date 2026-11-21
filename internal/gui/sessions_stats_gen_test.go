@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/sessions"
+	"github.com/hmjz100/blackpie/internal/sessions"
 )
 
 // A stats read again behind that finds the same stats keeps their gen, so
@@ -39,7 +39,7 @@ func TestStatsTagKeptWhileTheSame(t *testing.T) {
 	get := func(had string) *httptest.ResponseRecorder {
 		r := httptest.NewRequest("GET", "/api/sessions/stats?days=0", nil)
 		if had != "" {
-			r.Header.Set("X-Magpie-Had", had)
+			r.Header.Set("X-Blackpie-Had", had)
 		}
 		w := httptest.NewRecorder()
 		mux.ServeHTTP(w, r)
@@ -72,17 +72,17 @@ func TestStatsTagKeptWhileTheSame(t *testing.T) {
 	}
 
 	first := get("")
-	tag := first.Header().Get("X-Magpie-Tag")
+	tag := first.Header().Get("X-Blackpie-Tag")
 	gen := settled()
 	age()
-	if w := get(tag); w.Header().Get("X-Magpie-Same") != "1" {
-		t.Fatalf("asked with its own tag: same %q", w.Header().Get("X-Magpie-Same"))
+	if w := get(tag); w.Header().Get("X-Blackpie-Same") != "1" {
+		t.Fatalf("asked with its own tag: same %q", w.Header().Get("X-Blackpie-Same"))
 	}
 	if got := settled(); got != gen {
 		t.Errorf("read again behind with nothing changed, gen %d, want %d kept", got, gen)
 	}
-	if w := get(tag); w.Header().Get("X-Magpie-Same") != "1" || w.Header().Get("X-Magpie-Tag") != tag {
-		t.Errorf("after the read behind, asked with its own tag: same %q, tag %q", w.Header().Get("X-Magpie-Same"), w.Header().Get("X-Magpie-Tag"))
+	if w := get(tag); w.Header().Get("X-Blackpie-Same") != "1" || w.Header().Get("X-Blackpie-Tag") != tag {
+		t.Errorf("after the read behind, asked with its own tag: same %q, tag %q", w.Header().Get("X-Blackpie-Same"), w.Header().Get("X-Blackpie-Tag"))
 	}
 
 	write("00000002-1111-2222-3333-444444444444", "2026-09-21T10:00:00.000Z")
@@ -93,7 +93,7 @@ func TestStatsTagKeptWhileTheSame(t *testing.T) {
 		t.Fatalf("a new session read behind kept gen %d", got)
 	}
 	w := get(tag)
-	if w.Header().Get("X-Magpie-Same") != "" || w.Body.Len() == 0 || w.Header().Get("X-Magpie-Tag") == tag {
-		t.Errorf("after the stats changed, asked with the old tag: same %q, %d bytes, tag %q", w.Header().Get("X-Magpie-Same"), w.Body.Len(), w.Header().Get("X-Magpie-Tag"))
+	if w.Header().Get("X-Blackpie-Same") != "" || w.Body.Len() == 0 || w.Header().Get("X-Blackpie-Tag") == tag {
+		t.Errorf("after the stats changed, asked with the old tag: same %q, %d bytes, tag %q", w.Header().Get("X-Blackpie-Same"), w.Body.Len(), w.Header().Get("X-Blackpie-Tag"))
 	}
 }

@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/sys/windows"
 
-	"github.com/yetone/magpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/appdir"
 )
 
 // isDownloadFolder: Downloads and Desktop, where they are kept (the

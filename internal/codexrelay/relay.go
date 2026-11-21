@@ -1,17 +1,17 @@
-// Package codexrelay keeps the Codex threads open when magpie quits
-// working until magpie is opened again or they end.
+// Package codexrelay keeps the Codex threads open when blackpie quits
+// working until blackpie is opened again or they end.
 //
-// Codex signed in to ChatGPT sends its turns to magpie's gateway while
-// magpie fails it over (agent.EndCodexFailover). At quit magpie takes that
+// Codex signed in to ChatGPT sends its turns to blackpie's gateway while
+// blackpie fails it over (agent.EndCodexFailover). At quit blackpie takes that
 // base URL out of Codex's config, but a thread already open, in the Codex
 // app above all, keeps the URL it started with, and every turn after went
 // to a closed port: "503 Service Unavailable: Unknown error" through a
-// system proxy, "Connection refused" without one, until magpie was opened
-// again (idkatbro on X). So at quit, with Codex running, magpie starts a
-// small process of its own (`magpie codex-relay`) that takes the port up
+// system proxy, "Connection refused" without one, until blackpie was opened
+// again (idkatbro on X). So at quit, with Codex running, blackpie starts a
+// small process of its own (`blackpie codex-relay`) that takes the port up
 // once the gateway lets go of it and passes those turns on to the ChatGPT
 // backend on Codex's own sign-in (gateway.CodexRelay). It ends once every
-// Codex process it was started for has, and leaves when the next magpie
+// Codex process it was started for has, and leaves when the next blackpie
 // starts (Leave), finishing the turns it is streaming first: no running
 // turn is cut.
 package codexrelay
@@ -35,24 +35,24 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/yetone/magpie/internal/proc"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
-// Command is the magpie command a relay runs as.
+// Command is the blackpie command a relay runs as.
 const Command = "codex-relay"
 
-// LeavePath is where the next magpie tells the relay to leave; with
+// LeavePath is where the next blackpie tells the relay to leave; with
 // TokenHeader holding the token the relay wrote in its state file.
 const (
-	LeavePath   = "/.magpie-codex-relay/leave"
-	TokenHeader = "X-Magpie-Relay-Token"
+	LeavePath   = "/.blackpie-codex-relay/leave"
+	TokenHeader = "X-Blackpie-Relay-Token"
 )
 
 // Timings, vars for tests.
 var (
 	// bindFor is how long the relay waits for the gateway's port: the
-	// quitting magpie holds it until its own requests have finished.
+	// quitting blackpie holds it until its own requests have finished.
 	bindFor = 60 * time.Second
 	// watchEvery is how often the relay looks for its Codex processes.
 	watchEvery = 15 * time.Second
@@ -90,7 +90,7 @@ func Start(addr string, pids []int) error {
 	return cmd.Process.Release()
 }
 
-// Main is `magpie codex-relay --addr host:port --pids 1,2`, serving h.
+// Main is `blackpie codex-relay --addr host:port --pids 1,2`, serving h.
 func Main(args []string, h http.Handler) error {
 	var addr string
 	var pids []int
@@ -116,11 +116,11 @@ func Main(args []string, h http.Handler) error {
 				i++
 			}
 		default:
-			return fmt.Errorf("codex-relay: unknown argument %q (magpie starts this itself when it quits)", args[i])
+			return fmt.Errorf("codex-relay: unknown argument %q (blackpie starts this itself when it quits)", args[i])
 		}
 	}
 	if addr == "" || len(pids) == 0 {
-		return errors.New("usage: magpie codex-relay --addr host:port --pids pid,… (magpie starts this itself when it quits)")
+		return errors.New("usage: blackpie codex-relay --addr host:port --pids pid,… (blackpie starts this itself when it quits)")
 	}
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
@@ -129,7 +129,7 @@ func Main(args []string, h http.Handler) error {
 	return Run(ctx, addr, pids, h)
 }
 
-// Run serves h at addr until ctx ends, the next magpie tells it to leave,
+// Run serves h at addr until ctx ends, the next blackpie tells it to leave,
 // or none of pids runs and nothing is in flight; then it finishes the
 // requests it has, for up to drainFor.
 func Run(ctx context.Context, addr string, pids []int, h http.Handler) error {
@@ -160,7 +160,7 @@ func Run(ctx context.Context, addr string, pids []int, h http.Handler) error {
 				http.Error(w, "forbidden", http.StatusForbidden)
 				return
 			}
-			// the port is free once this is answered: the next magpie
+			// the port is free once this is answered: the next blackpie
 			// binds it at once, while the streams here finish
 			srv.SetKeepAlivesEnabled(false)
 			ln.Close()
@@ -279,7 +279,7 @@ func dropState(token string) {
 }
 
 // Leave tells a relay serving at the gateway's port to let go of it,
-// for the magpie starting to serve there. It returns once the relay has
+// for the blackpie starting to serve there. It returns once the relay has
 // closed its listener (its streams go on finishing), or at once when
 // there is none.
 func Leave() {

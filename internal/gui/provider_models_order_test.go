@@ -6,9 +6,9 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/yetone/magpie/internal/agent"
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // Picks the vendor's list doesn't know are shown first, the last one

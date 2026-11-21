@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // slowUplink sits between the gateway and a vendor like a saturated

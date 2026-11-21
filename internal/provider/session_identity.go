@@ -9,8 +9,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/yetone/magpie/internal/filememo"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // SessionIdentity is an account's public identity, without its credentials.

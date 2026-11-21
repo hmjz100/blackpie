@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // leaveOut saves keys as the accounts left out of their daily check-in.

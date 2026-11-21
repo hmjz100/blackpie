@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/budget"
-	"github.com/yetone/magpie/internal/gwbudget"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/budget"
+	"github.com/hmjz100/blackpie/internal/gwbudget"
 )
 
 // The budget point with plugins/budget on and off, for a key held to a

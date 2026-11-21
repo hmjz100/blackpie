@@ -20,7 +20,7 @@ function server(lang) {
     dock: false, dockWindow: false, proxy: "", redact: false, redactPersonal: false, redactWords: [],
     codexWarmup: "", claudeWarmup: "", codexWarmAt: "", claudeWarmAt: "", workbuddyCheckin: false, noStats: false,
     trayUsage: "", trayUsageEvery: 3, vision: "", imageGen: "",
-    version: "0.1.900", dir: "/config/magpie", gateway: "http://127.0.0.1:3425",
+    version: "0.1.900", dir: "/config/blackpie", gateway: "http://127.0.0.1:3425",
     proxyNow: "none", proxySource: "none", login: false,
     visionModels: [], imageGenModels: [], workbuddyCheckins: [],
     lan: true, lanURLs: ["http://192.168.1.10:3425"], allowIPs: [], corsOrigins: [], bareModelIDs: false,
@@ -62,7 +62,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       await page.route("**/*", server(lang));
       const tr = (s) => page.evaluate((s) => t(s), s);
 
-      await page.goto("http://magpie.test/?view=gateway");
+      await page.goto("http://blackpie.test/?view=gateway");
       await page.locator("#gwSettings #portList .row").waitFor();
       await page.locator("#gwSettings #allowList .row").first().waitFor();
       for (const sel of MOVED) {
@@ -95,7 +95,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       assert.equal(await page.locator("#foldGwSettings").getAttribute("title"), await tr("Fold the settings away"));
 
       // Settings › Network and sharing: Proxy and GitHub only
-      await page.goto("http://magpie.test/?view=settings&tab=network");
+      await page.goto("http://blackpie.test/?view=settings&tab=network");
       await page.locator("#proxySegs .opt").first().waitFor();
       for (const sel of [...MOVED, "#lanList", "#webPageHead"]) assert.equal(await page.locator("#view-settings " + sel).count(), 0, sel + " not in Settings");
       // (its Gateway heading shows only with the page off: gateway-off-settings)
@@ -126,7 +126,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ['chromium',
   test(`${engine}: busy threshold changes redraw the Gateway controls`, async t => {
     const b=await(engine==='webkit'?webkit.launch():chromium.launch({channel:'chromium'}));t.after(()=>b.close());
     const p=await b.newPage({viewport:{width:1100,height:900}});p.setDefaultTimeout(5000);const errors=[];p.on('pageerror',e=>errors.push(e.message));
-    await p.route('**/*',server('en'));await p.goto('http://magpie.test/?view=gateway');await p.locator('#busyLoadSegs .opt').first().waitFor();
+    await p.route('**/*',server('en'));await p.goto('http://blackpie.test/?view=gateway');await p.locator('#busyLoadSegs .opt').first().waitFor();
     const choose=p.locator('#busyLoadSegs .opt').filter({hasText:/^Over 70%$/});await choose.dispatchEvent('click');
     await p.waitForFunction(()=>document.querySelector('#busyLoadSegs .opt.on')?.textContent==='Over 70%');
     await p.locator('#busyLoadSegs .opt').filter({hasText:'Custom'}).dispatchEvent('click');

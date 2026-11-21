@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // notice is the item Codex writes between one batch's tool results when the

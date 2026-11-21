@@ -5,12 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // The Kiro plugin's real replies (opencode-kiro-auth 0.1.16 against
 // Kiro, 10-24): Kiro caches but counts no tokens, cache included, so the
-// plugin says magpie_cache_unknown and the Routing page shows no hit rate
+// plugin says blackpie_cache_unknown and the Routing page shows no hit rate
 // where it showed 0% (zeewell on X).
 const (
 	kiroStream = "event: message_start\n" +
@@ -22,10 +22,10 @@ const (
 		"event: content_block_stop\n" +
 		`data: {"type":"content_block_stop","index":0}` + "\n\n" +
 		"event: message_delta\n" +
-		`data: {"type":"message_delta","delta":{"stop_reason":"end_turn","stop_sequence":null},"usage":{"input_tokens":0,"output_tokens":19,"magpie_cache_unknown":true}}` + "\n\n" +
+		`data: {"type":"message_delta","delta":{"stop_reason":"end_turn","stop_sequence":null},"usage":{"input_tokens":0,"output_tokens":19,"blackpie_cache_unknown":true}}` + "\n\n" +
 		"event: message_stop\n" +
 		`data: {"type":"message_stop"}` + "\n\n"
-	kiroJSON = `{"id":"msg_e6ad400ac6ed0f3febe5125d","type":"message","role":"assistant","model":"claude-sonnet-4.5","content":[{"type":"text","text":"OK."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":0,"output_tokens":1,"magpie_cache_unknown":true}}`
+	kiroJSON = `{"id":"msg_e6ad400ac6ed0f3febe5125d","type":"message","role":"assistant","model":"claude-sonnet-4.5","content":[{"type":"text","text":"OK."}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":0,"output_tokens":1,"blackpie_cache_unknown":true}}`
 	// a vendor that counts its cache and read none of it: a real 0%
 	missJSON = `{"id":"msg_1","type":"message","role":"assistant","model":"m1","content":[{"type":"text","text":"OK."}],"stop_reason":"end_turn","usage":{"input_tokens":1200,"output_tokens":1,"cache_read_input_tokens":0,"cache_creation_input_tokens":0}}`
 )
@@ -81,14 +81,14 @@ func TestCacheCountedIsNotUnknown(t *testing.T) {
 	}
 }
 
-// what Claude Code is told is Anthropic's usage: magpie never adds the
+// what Claude Code is told is Anthropic's usage: blackpie never adds the
 // field to a reply it writes itself
 func TestCacheUnknownNotTold(t *testing.T) {
 	u := aUsage{InputTokens: 5, OutputTokens: 1, CacheUnknown: true}.usage()
 	if u.anthropic().CacheUnknown {
 		t.Fatal("told")
 	}
-	if _, told := u.chat()["magpie_cache_unknown"]; told {
+	if _, told := u.chat()["blackpie_cache_unknown"]; told {
 		t.Fatal("chat usage told the internal marker")
 	}
 }
@@ -96,20 +96,20 @@ func TestCacheUnknownNotTold(t *testing.T) {
 // The Trae plugin's replies (opencode-trae-auth 0.2.26) to a token_usage
 // naming no cache field, chansee97's real one in plugins#455
 // ({"prompt_tokens":1717,"completion_tokens":2,"total_tokens":1719}): a
-// Chat usage saying magpie_cache_unknown, which magpie read as a counted
-// 0% miss on every Trae CN call (yetone/magpie#3991, #3979).
+// Chat usage saying blackpie_cache_unknown, which blackpie read as a counted
+// 0% miss on every Trae CN call (hmjz100/blackpie#3991, #3979).
 const (
 	traeStream = `data: {"id":"chatcmpl-1","object":"chat.completion.chunk","model":"deepseek-v3.1","choices":[{"index":0,"delta":{"role":"assistant","content":"OK"},"finish_reason":null}]}` + "\n\n" +
 		`data: {"id":"chatcmpl-1","object":"chat.completion.chunk","model":"deepseek-v3.1","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}` + "\n\n" +
-		`data: {"id":"chatcmpl-1","object":"chat.completion.chunk","model":"deepseek-v3.1","choices":[],"usage":{"prompt_tokens":1717,"completion_tokens":2,"total_tokens":1719,"magpie_cache_unknown":true}}` + "\n\n" +
+		`data: {"id":"chatcmpl-1","object":"chat.completion.chunk","model":"deepseek-v3.1","choices":[],"usage":{"prompt_tokens":1717,"completion_tokens":2,"total_tokens":1719,"blackpie_cache_unknown":true}}` + "\n\n" +
 		"data: [DONE]\n\n"
-	traeJSON = `{"id":"chatcmpl-1","object":"chat.completion","model":"deepseek-v3.1","choices":[{"index":0,"message":{"role":"assistant","content":"OK"},"finish_reason":"stop"}],"usage":{"prompt_tokens":1717,"completion_tokens":2,"total_tokens":1719,"magpie_cache_unknown":true}}`
+	traeJSON = `{"id":"chatcmpl-1","object":"chat.completion","model":"deepseek-v3.1","choices":[{"index":0,"message":{"role":"assistant","content":"OK"},"finish_reason":"stop"}],"usage":{"prompt_tokens":1717,"completion_tokens":2,"total_tokens":1719,"blackpie_cache_unknown":true}}`
 	// a Chat vendor that counts its cache and read none of it: a real 0%
 	chatMissJSON = `{"id":"chatcmpl-2","object":"chat.completion","model":"m1","choices":[{"index":0,"message":{"role":"assistant","content":"OK"},"finish_reason":"stop"}],"usage":{"prompt_tokens":1717,"completion_tokens":2,"total_tokens":1719,"prompt_tokens_details":{"cached_tokens":0}}}`
 )
 
 // TestChatCacheUnknownReachesTheRoute: a Chat vendor's (a plugin's)
-// magpie_cache_unknown reaches the route and the ledger, as Kiro's does.
+// blackpie_cache_unknown reaches the route and the ledger, as Kiro's does.
 func TestChatCacheUnknownReachesTheRoute(t *testing.T) {
 	chat := `{"model":"fake/m1","messages":[{"role":"user","content":"Say just OK."}]}`
 	streamed := strings.Replace(chat, `"messages"`, `"stream":true,"messages"`, 1)
@@ -122,7 +122,7 @@ func TestChatCacheUnknownReachesTheRoute(t *testing.T) {
 		{"pi, streamed", "", traeStream, "/v1/chat/completions", streamed, true},
 		{"translated for Claude Code", "", traeStream, "/v1/messages", messages, true},
 		{"a counted miss stays 0%", "application/json", chatMissJSON, "/v1/chat/completions", chat, false},
-		{"a reported cache hit overrides unknown", "application/json", strings.Replace(traeJSON, `"magpie_cache_unknown":true`, `"magpie_cache_unknown":true,"prompt_tokens_details":{"cached_tokens":17}`, 1), "/v1/chat/completions", chat, false},
+		{"a reported cache hit overrides unknown", "application/json", strings.Replace(traeJSON, `"blackpie_cache_unknown":true`, `"blackpie_cache_unknown":true,"prompt_tokens_details":{"cached_tokens":17}`, 1), "/v1/chat/completions", chat, false},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			setup(t, provider.Chat, &fake{ctype: c.ctype, reply: c.reply})

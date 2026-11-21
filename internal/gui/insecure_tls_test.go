@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // #2383: the editor's Certificate tick is saved on a provider of the

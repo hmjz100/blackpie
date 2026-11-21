@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Custom proxy remembered (Zane on Discord): a proxy of the user's own,

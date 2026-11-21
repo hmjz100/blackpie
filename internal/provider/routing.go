@@ -9,7 +9,7 @@ package provider
 import (
 	"context"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"slices"
 	"sort"
 	"strings"
@@ -17,7 +17,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/yetone/magpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/catalog"
 )
 
 // The routings besides the default, smart, in order.
@@ -121,7 +121,7 @@ func SetCountFree(id string, on bool) error {
 }
 
 // SetKeepLogin keeps Codex or Claude Code signed in to the account the
-// user made first (Provider.KeepLogin), or lets magpie move it on again.
+// user made first (Provider.KeepLogin), or lets blackpie move it on again.
 // Either way it is no longer kept on one of the user's choosing
 // (KeepLoginAs): it is signed in to the first again.
 func SetKeepLogin(id string, keep bool) error {
@@ -130,7 +130,7 @@ func SetKeepLogin(id string, keep bool) error {
 		return err
 	}
 	if p.Account == nil || p.Account.Agent != p.ID || !slices.Contains(switchedAgents, p.ID) {
-		return fmt.Errorf("magpie doesn't sign %s in to another of its accounts", p.Name)
+		return fmt.Errorf("blackpie doesn't sign %s in to another of its accounts", p.Name)
 	}
 	if keep && p.SwitchOnly {
 		return errSwitchOnly(*p)
@@ -146,7 +146,7 @@ func SetKeepLogin(id string, keep bool) error {
 	return nil
 }
 
-// SetSwitchOnly has magpie only move Codex's or Claude Code's own sign-in
+// SetSwitchOnly has blackpie only move Codex's or Claude Code's own sign-in
 // between its accounts (Provider.SwitchOnly): Codex's requests never sent
 // through the gateway for account failover, Claude's accounts serving no
 // request through the gateway (KeptToAgent). Off, both are as before.
@@ -156,16 +156,16 @@ func SetSwitchOnly(id string, on bool) error {
 		return err
 	}
 	if p.Account == nil || p.Account.Agent != p.ID || p.ID != "codex" && p.ID != "claude" {
-		return fmt.Errorf("magpie doesn't route %s's own requests for account failover", p.Name)
+		return fmt.Errorf("blackpie doesn't route %s's own requests for account failover", p.Name)
 	}
 	p.SwitchOnly = on
 	return Save(*p)
 }
 
-// SwitchOnly reports whether magpie only moves agent's own sign-in between
+// SwitchOnly reports whether blackpie only moves agent's own sign-in between
 // its accounts, sending none of its requests through the gateway for
 // account failover (Provider.SwitchOnly). While providers.json can't be
-// read the user's choice is unknown, and failover, magpie's own idea, is
+// read the user's choice is unknown, and failover, blackpie's own idea, is
 // not taken up on it.
 func SwitchOnly(agent string) bool {
 	f, err := read()
@@ -215,7 +215,7 @@ var usedCache struct {
 }
 
 // firstWait is how long a request waits for an agent's allowances the
-// first time they are asked for, so the first requests after magpie
+// first time they are asked for, so the first requests after blackpie
 // starts are routed by them too; later ones never wait.
 var firstWait = 3 * time.Second
 
@@ -227,7 +227,7 @@ var unwaited atomic.Int32
 // model is there, not which account a request goes to. Every agent's model
 // list asks the gateway whether a model sees images, and the migrations at
 // start read Pi's effort, which builds its list: each agent's first ask
-// waited firstWait for its accounts' usage over the network, and magpie's
+// waited firstWait for its accounts' usage over the network, and blackpie's
 // gateway listened ~9 s after start.
 func Unwaited() (release func()) {
 	unwaited.Add(1)
@@ -770,7 +770,7 @@ func Allowances(agent string) map[string]Allowance {
 
 // UsageRead is when user's allowance under agent was last read well, and
 // whether the last try to read it failed (or was held back); ok is false
-// when it hasn't been tried since magpie started. A careful provider holds
+// when it hasn't been tried since blackpie started. A careful provider holds
 // an account whose reading is too old or failed (Provider.CapCareful).
 func UsageRead(agent, user string) (at time.Time, failed, ok bool) {
 	c := &usedCache

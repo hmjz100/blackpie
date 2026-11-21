@@ -1,13 +1,13 @@
 package provider
 
 // A Claude account's allowance, as Claude Code's own /usage tells it:
-// magpie runs `claude -p /usage` (a command Claude Code answers itself,
+// blackpie runs `claude -p /usage` (a command Claude Code answers itself,
 // asking no model) and reads its lines, never asking Anthropic itself.
 
 import (
 	"context"
 	"errors"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"slices"
 	"strconv"
 	"strings"

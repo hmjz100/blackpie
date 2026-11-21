@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // What the Kiro plugin answers from 0.1.24 for a conversation past the

@@ -3,8 +3,8 @@ package provider
 import (
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // A provider's price rate (#819) scales the list price a call is counted

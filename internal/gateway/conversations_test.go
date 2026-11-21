@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/sessions"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/sessions"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 func TestGatewayConversationCapture(t *testing.T) {
@@ -24,7 +24,7 @@ func TestGatewayConversationCapture(t *testing.T) {
 	post := func(id string) {
 		r := httptest.NewRequest("POST", "/v1/chat/completions", strings.NewReader(`{"model":"fake/m1","messages":[{"role":"user","content":"hello"}]}`))
 		r.Header.Set("User-Agent", "claude-cli/2.1.0")
-		r.Header.Set("X-Magpie-Session", id)
+		r.Header.Set("X-Blackpie-Session", id)
 		w := httptest.NewRecorder()
 		s.Handler().ServeHTTP(w, r)
 		if w.Code != 200 || !strings.Contains(w.Body.String(), "done") {
@@ -78,7 +78,7 @@ func TestGatewayConversationCodexDirectRelay(t *testing.T) {
 
 // Text is recorded only under a session the client named, so every recorded
 // conversation is one the Sessions page lists and can open. A request with no
-// session is not recorded at all, and magpie makes up no id for it (#1355).
+// session is not recorded at all, and blackpie makes up no id for it (#1355).
 func TestGatewayConversationNeedsTheClientsSession(t *testing.T) {
 	fresh(t)
 	serveOn(t, "fake", "k", []string{"m1"}, archiveVendor{})

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // localIDHome is two relays of the user's own (zeewell on X): relay-a lists

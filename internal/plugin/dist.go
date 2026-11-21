@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io/fs"
 	"log"
 	"os"
@@ -19,8 +19,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/source"
-	"github.com/yetone/magpie/internal/update"
+	"github.com/hmjz100/blackpie/internal/source"
+	"github.com/hmjz100/blackpie/internal/update"
 )
 
 // The community repo's dist branch: every version of each
@@ -28,7 +28,7 @@ import (
 // (scripts/dist.mjs there) as soon as it is merged. npm can't take a new
 // package's first version without an owner's 2FA (trusted publishing sets
 // up only a package that exists), so a reviewed plugin used to wait,
-// unmerged, for someone to publish it by hand. magpie asks npm first, as
+// unmerged, for someone to publish it by hand. blackpie asks npm first, as
 // before, and turns here only for what npm doesn't give: a package or
 // version npm doesn't have, or npm not answering. A tarball is installed
 // only when its sha512 is the one index.json names.
@@ -390,7 +390,7 @@ func pruneDist() {
 }
 
 // distNamed is whether package.json b names the tarball plugins/dist/file
-// anywhere: "./dist/file" (the spec magpie hands Bun) or "file:dist/file".
+// anywhere: "./dist/file" (the spec blackpie hands Bun) or "file:dist/file".
 func distNamed(b []byte, file string) bool {
 	return bytes.Contains(b, []byte("dist/"+file+`"`))
 }

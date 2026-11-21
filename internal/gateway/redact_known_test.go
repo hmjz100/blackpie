@@ -10,8 +10,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // The vendor answers about a placeholder in words of its own, the agent

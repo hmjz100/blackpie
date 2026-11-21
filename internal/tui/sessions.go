@@ -19,10 +19,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/yetone/magpie/internal/agent"
-	"github.com/yetone/magpie/internal/proc"
-	"github.com/yetone/magpie/internal/sessions"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/sessions"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 // sessRange is a range the page offers: its name and days (0 for all).
@@ -58,10 +58,10 @@ func (m model) sessShown() []sessions.Session {
 }
 
 // sessNothing is what an empty range says: until the user allows an
-// agent (RustCats on X), magpie reads no agent's sessions, and says how.
+// agent (RustCats on X), blackpie reads no agent's sessions, and says how.
 func sessNothing() string {
 	if !sessions.SettleReads().Asked {
-		return "magpie reads no agent's session history until you allow it · magpie sessions read on all (or on <agent>), or the app's Sessions page"
+		return "blackpie reads no agent's session history until you allow it · blackpie sessions read on all (or on <agent>), or the app's Sessions page"
 	}
 	return "nothing in this range · Claude Code's, Codex's, OpenCode's and Pi's sessions on this computer show up here"
 }

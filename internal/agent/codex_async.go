@@ -7,11 +7,11 @@ package agent
 // table; one at the top level is not read), and takes the summary in at the
 // turn's next step. It starts one only on a provider whose
 // capabilities.remote_compaction is "v2", which Codex gives OpenAI's own and
-// Azure alone: on magpie's [model_providers.magpie] it never ran until that
-// was written there too. magpie's gateway answers the trigger as it does
+// Azure alone: on blackpie's [model_providers.blackpie] it never ran until that
+// was written there too. blackpie's gateway answers the trigger as it does
 // Codex's own compaction (codexCompact, or the provider's native one).
 //
-// What magpie writes is kept in the stash, so a value the user set there
+// What blackpie writes is kept in the stash, so a value the user set there
 // (by hand, or a value they changed since) is theirs: never written over,
 // and left when the setting is turned off.
 //
@@ -23,13 +23,13 @@ package agent
 // true every Codex reads: an older one ignores it, a newer one turns the
 // feature on at its own 65%. So the table, which the threshold needs, is
 // written only when every Codex that reads this config is known to be new
-// enough (codexReaders), and the bare key otherwise; a table magpie wrote
+// enough (codexReaders), and the bare key otherwise; a table blackpie wrote
 // before is taken back out where it no longer is.
 
 import (
 	"encoding/json"
 	"errors"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -38,7 +38,7 @@ import (
 
 	"github.com/pelletier/go-toml/v2"
 
-	"github.com/yetone/magpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/edit"
 )
 
 const (
@@ -59,7 +59,7 @@ type CodexReader struct {
 
 // codexReaders are the Codexes that read the config at at: the CLI on
 // PATH, the desktop app's own (its bundled codex-cli on a Mac; the Store
-// app's on Windows, whose version magpie can't read; on Linux the
+// app's on Windows, whose version blackpie can't read; on Linux the
 // package's resources/codex, which says its version as the CLI does:
 // codex-cli 0.166.0-alpha.5.1 in chatgpt 26.1027), the editor
 // extension's, or a WSL distro's CLI. A var so tests can name them.
@@ -118,7 +118,7 @@ func bundledCodexVersion(bundle, id string) (v string, ok bool) {
 
 // codexAsyncBlocked are the readers that keep the table out: one older
 // than codexAsyncTableFrom, or of no known version. None at all is
-// unknown as well: a Codex magpie can't see may read the config.
+// unknown as well: a Codex blackpie can't see may read the config.
 func codexAsyncBlocked(rs []CodexReader) []CodexReader {
 	if len(rs) == 0 {
 		return []CodexReader{{Kind: "cli"}}
@@ -159,7 +159,7 @@ func codexAsyncTableOK(at place) bool {
 	return len(held) == 0
 }
 
-// codexAsyncStash is what magpie wrote.
+// codexAsyncStash is what blackpie wrote.
 type codexAsyncStash struct {
 	Enabled bool `json:"enabled,omitempty"` // enabled = true
 	Percent int  `json:"percent,omitempty"` // the threshold
@@ -168,7 +168,7 @@ type codexAsyncStash struct {
 }
 
 // codexAsyncNow is how the config has them: the async_compaction value
-// (nil, a bool, or a table) and magpie's provider table, nil when absent.
+// (nil, a bool, or a table) and blackpie's provider table, nil when absent.
 func codexAsyncNow(path string) (feature any, provider map[string]any, err error) {
 	doc, err := codexTopOf(path)
 	if err != nil {
@@ -176,17 +176,17 @@ func codexAsyncNow(path string) (feature any, provider map[string]any, err error
 	}
 	features, _ := doc.Features.(map[string]any)
 	providers, _ := doc.ModelProviders.(map[string]any)
-	p, _ := providers[magpieID].(map[string]any)
+	p, _ := providers[blackpieID].(map[string]any)
 	return features["async_compaction"], p, nil
 }
 
 // codexAsyncSync puts the setting into the Codex config at path, where
-// Codex is routed through magpie or not: on is the setting, percent its
+// Codex is routed through blackpie or not: on is the setting, percent its
 // threshold (0 leaves Codex's own). key is the stash's. tableOK: every
 // Codex reading the config takes the table (codexAsyncTableOK); without
-// it the bare key is written, and a table of magpie's taken out. The
+// it the bare key is written, and a table of blackpie's taken out. The
 // capability is written for a feature the user turned on in the config
-// themselves too: on magpie's provider it would never run without it
+// themselves too: on blackpie's provider it would never run without it
 // (#2493).
 func codexAsyncSync(path, key string, routed, on bool, percent int, tableOK bool) error {
 	feature, provider, err := codexAsyncNow(path)
@@ -208,7 +208,7 @@ func codexAsyncSync(path, key string, routed, on bool, percent int, tableOK bool
 		percent = 0
 	}
 
-	// the bare async_compaction = true magpie wrote, where the table is
+	// the bare async_compaction = true blackpie wrote, where the table is
 	// to go instead or nothing is: still as written, it goes; changed, it
 	// is the user's
 	if st.Bool && (!want || useTable) {
@@ -248,7 +248,7 @@ func codexAsyncSync(path, key string, routed, on bool, percent int, tableOK bool
 			}
 			st.Enabled = true
 		case !useTable && st.Enabled:
-			// off, or a Codex here too old for the table: the table magpie
+			// off, or a Codex here too old for the table: the table blackpie
 			// wrote goes (a table left with nothing of the user's goes
 			// whole, so an old Codex loads its config again)
 			if err := edit.DelTOMLKey(path, codexAsyncTable, "enabled"); err != nil {
@@ -293,16 +293,16 @@ func codexAsyncSync(path, key string, routed, on bool, percent int, tableOK bool
 		st.Bool = false // changed since by the user
 	}
 
-	// capabilities on magpie's provider table, when there is one: one the
+	// capabilities on blackpie's provider table, when there is one: one the
 	// user gave it, whatever it says, stays as it is. remote_compaction =
-	// "v2" says magpie answers Codex's own compaction (codexCompact),
-	// which it does for every magpie model: a manual /compact and the
+	// "v2" says blackpie answers Codex's own compaction (codexCompact),
+	// which it does for every blackpie model: a manual /compact and the
 	// foreground compaction use it rather than Codex's local summary,
 	// whose whole history goes as ordinary input items a vendor may not
 	// take (#5259). It is the provider's capability, not the background
 	// compaction's, so it is written whenever Codex is routed through
-	// magpie; the setting above only adds [features.async_compaction].
-	// It stays with the provider table when magpie is disconnected, as the
+	// blackpie; the setting above only adds [features.async_compaction].
+	// It stays with the provider table when blackpie is disconnected, as the
 	// table does.
 	if feature, _, err = codexAsyncNow(path); err != nil {
 		return err
@@ -315,7 +315,7 @@ func codexAsyncSync(path, key string, routed, on bool, percent int, tableOK bool
 			st.Cap = false
 		}
 		if routed && provider["capabilities"] == nil {
-			if err := edit.SetTOMLKey(path, "model_providers."+magpieID, "capabilities", edit.Inline{{Path: "remote_compaction", Value: "v2"}}); err != nil {
+			if err := edit.SetTOMLKey(path, "model_providers."+blackpieID, "capabilities", edit.Inline{{Path: "remote_compaction", Value: "v2"}}); err != nil {
 				return err
 			}
 			st.Cap = true
@@ -333,9 +333,9 @@ func codexAsyncSync(path, key string, routed, on bool, percent int, tableOK bool
 	return nil
 }
 
-// codexProviderCaps is the capabilities magpie's provider table has, as an
+// codexProviderCaps is the capabilities blackpie's provider table has, as an
 // Inline to write it back with when the table is written again: one the
-// user gave it, or magpie's for the background compaction, isn't lost.
+// user gave it, or blackpie's for the background compaction, isn't lost.
 func codexProviderCaps(path string) edit.Inline {
 	_, provider, err := codexAsyncNow(path)
 	if err != nil {
@@ -361,10 +361,10 @@ func CodexAsyncHeldHere(home string) []CodexReader {
 }
 
 // codexAsyncOwn names what the user has in Codex's config.toml that
-// comes before magpie's background compaction threshold, as codexAsyncSync
+// comes before blackpie's background compaction threshold, as codexAsyncSync
 // leaves it: the feature as a bare key of theirs (true at Codex's own 65%,
 // or false), their table spelled inline or as dotted keys, enabled = false
-// in it, or a threshold of their own. "" when magpie's threshold is what
+// in it, or a threshold of their own. "" when blackpie's threshold is what
 // Codex would read.
 func codexAsyncOwn(home string) string {
 	at := here(tuneHome(home))

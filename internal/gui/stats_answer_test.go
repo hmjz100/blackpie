@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/yetone/magpie/internal/sessions"
+	"github.com/hmjz100/blackpie/internal/sessions"
 )
 
 // statsAnswer writes the stats answer a day at a time, and the answer is
@@ -68,7 +68,7 @@ func TestSameAnswerNotHeldWhole(t *testing.T) {
 	}
 	var before, after runtime.MemStats
 	w = httptest.NewRecorder()
-	w.Body.Grow(len(big) + 1<<20) // the recorder's copy isn't magpie's
+	w.Body.Grow(len(big) + 1<<20) // the recorder's copy isn't blackpie's
 	runtime.ReadMemStats(&before)
 	writeSame(w, httptest.NewRequest("GET", "/x", nil), write)
 	runtime.ReadMemStats(&after)
@@ -76,10 +76,10 @@ func TestSameAnswerNotHeldWhole(t *testing.T) {
 		t.Fatalf("writeSame allocated %d bytes for a %d-byte answer", got, len(big))
 	}
 	same := httptest.NewRequest("GET", "/x", nil)
-	same.Header.Set("X-Magpie-Had", tag)
+	same.Header.Set("X-Blackpie-Had", tag)
 	w = httptest.NewRecorder()
 	writeSame(w, same, write)
-	if w.Header().Get("X-Magpie-Same") != "1" || w.Body.Len() != 0 {
-		t.Fatalf("asked with its own tag: same %q, %d bytes", w.Header().Get("X-Magpie-Same"), w.Body.Len())
+	if w.Header().Get("X-Blackpie-Same") != "1" || w.Body.Len() != 0 {
+		t.Fatalf("asked with its own tag: same %q, %d bytes", w.Header().Get("X-Blackpie-Same"), w.Body.Len())
 	}
 }

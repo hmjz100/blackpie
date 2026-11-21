@@ -7,9 +7,9 @@ import { runInNewContext } from 'node:vm';
 const sha = 'a'.repeat(40);
 const other = 'b'.repeat(40);
 const assets = [
-  ...['arm64', 'amd64'].flatMap((a) => [`moepie-darwin-${a}.dmg`, `moepie-darwin-${a}.zip`]),
-  ...['darwin-arm64', 'darwin-amd64', 'linux-amd64', 'linux-arm64', 'android-arm64'].map((p) => `moepie-cli-${p}`),
-  ...['amd64', 'arm64'].flatMap((a) => [`moepie-cli-windows-${a}.exe`, `moepie-windows-${a}.exe`, `moepie-linux-${a}`]),
+  ...['arm64', 'amd64'].flatMap((a) => [`blackpie-darwin-${a}.dmg`, `blackpie-darwin-${a}.zip`]),
+  ...['darwin-arm64', 'darwin-amd64', 'linux-amd64', 'linux-arm64', 'android-arm64'].map((p) => `blackpie-cli-${p}`),
+  ...['amd64', 'arm64'].flatMap((a) => [`blackpie-cli-windows-${a}.exe`, `blackpie-windows-${a}.exe`, `blackpie-linux-${a}`]),
 ].sort();
 const files = [...assets, 'SHA256SUMS'].sort();
 // Exercise the real script with isolated command/file adapters, never gh or git.
@@ -44,7 +44,7 @@ function publish({ conflict = false, target = sha, annotated = false, moved = fa
   try {
     runInNewContext(script('release-publish.mjs'), {
       execFileSync, readdirSync: () => [...files, 'release-notes.md'],
-      process: { env: { GITHUB_REPOSITORY: 'lingqiqi5211/moepie', VERSION: '0.1.2000' } }, console: { log() {} },
+      process: { env: { GITHUB_REPOSITORY: 'hmjz100/blackpie', VERSION: '0.1.2000' } }, console: { log() {} },
     });
   } catch (e) { error = e; }
   return { calls, refs, error };
@@ -80,7 +80,7 @@ test('a ref moved during upload leaves the release draft', () => {
   assert.equal(released(r.calls), false);
 });
 
-test('asset manifest accepts all 15 moepie builds and rejects upstream names', () => {
+test('asset manifest accepts all 15 blackpie builds and rejects upstream names', () => {
   let written;
   const adapters = {
     createHash, readdirSync: () => assets, statSync: () => ({ size: 5 }), readFileSync: () => 'build',
@@ -89,5 +89,5 @@ test('asset manifest accepts all 15 moepie builds and rejects upstream names', (
   runInNewContext(script('release-assets.mjs'), adapters);
   assert.equal(written.path, 'dist/SHA256SUMS');
   assert.deepEqual(written.text.trim().split('\n').map((line) => line.split('  ')[1]), assets);
-  assert.throws(() => runInNewContext(script('release-assets.mjs'), { ...adapters, readdirSync: () => assets.map((a) => a.replace('moepie-', 'magpie-')) }), /Expected exactly 15/);
+  assert.throws(() => runInNewContext(script('release-assets.mjs'), { ...adapters, readdirSync: () => assets.map((a) => a.replace('blackpie-', 'blackpie-')) }), /Expected exactly 15/);
 });

@@ -11,9 +11,9 @@
 package rotation
 
 import (
-	"github.com/yetone/magpie/internal/pluginrt"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/routes"
+	"github.com/hmjz100/blackpie/internal/pluginrt"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/routes"
 )
 
 func init() {

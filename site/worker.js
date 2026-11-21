@@ -1,4 +1,4 @@
-// usemagpie.ai. Releases live on GitHub (yetone/magpie-releases); this
+// useblackpie.ai. Releases live on GitHub (hmjz100/blackpie-releases); this
 // worker turns the newest one into the update feed the app reads and into
 // download links that never go stale.
 //
@@ -40,19 +40,19 @@ import { LANGS } from "./i18n.js";
 import { PARTNERS } from "./partners.js";
 import { SPONSORS } from "./sponsors.js";
 
-const REPO = "yetone/magpie-releases";
+const REPO = "hmjz100/blackpie-releases";
 const TTL = 300; // seconds the newest release is remembered
 
 const SHORT = {
-  "mac-arm64": "magpie-darwin-arm64.dmg",
-  "mac-intel": "magpie-darwin-amd64.dmg",
-  "mac-amd64": "magpie-darwin-amd64.dmg",
-  windows: "magpie-windows-amd64.exe",
-  "windows-amd64": "magpie-windows-amd64.exe",
-  "windows-arm64": "magpie-windows-arm64.exe",
-  linux: "magpie-linux-amd64",
-  "linux-amd64": "magpie-linux-amd64",
-  "linux-arm64": "magpie-linux-arm64",
+  "mac-arm64": "blackpie-darwin-arm64.dmg",
+  "mac-intel": "blackpie-darwin-amd64.dmg",
+  "mac-amd64": "blackpie-darwin-amd64.dmg",
+  windows: "blackpie-windows-amd64.exe",
+  "windows-amd64": "blackpie-windows-amd64.exe",
+  "windows-arm64": "blackpie-windows-arm64.exe",
+  linux: "blackpie-linux-amd64",
+  "linux-amd64": "blackpie-linux-amd64",
+  "linux-arm64": "blackpie-linux-arm64",
 };
 
 // The bare docs paths open the getting-started guide.
@@ -83,15 +83,15 @@ export default {
     if (url.pathname === "/api/partners") {
       const now = Date.now();
       if (PARTNERS.some((p) => live(p, now)) && Math.random() < 1 / FETCH_SAMPLE)
-        ctx.waitUntil(capture("magpie partners fetch", { weight: FETCH_SAMPLE, country: country(req) }));
+        ctx.waitUntil(capture("blackpie partners fetch", { weight: FETCH_SAMPLE, country: country(req) }));
       return json({ partners: served(PARTNERS, now) }, 200, { "Cache-Control": "public, max-age=600" });
     }
     if (url.pathname.startsWith("/go/")) {
       let id, what, region, to, counted;
       try {
         [, , id, what, region] = url.pathname.split("/").map(decodeURIComponent);
-        if ((to = goTarget(PARTNERS, id, what, region))) counted = ["magpie partner go", { id, what, region: region || "" }];
-        else if (region === undefined && (to = sponsorTarget(SPONSORS, id, what))) counted = ["magpie sponsor go", { id, where: what }];
+        if ((to = goTarget(PARTNERS, id, what, region))) counted = ["blackpie partner go", { id, what, region: region || "" }];
+        else if (region === undefined && (to = sponsorTarget(SPONSORS, id, what))) counted = ["blackpie sponsor go", { id, where: what }];
       } catch {}
       if (!to) return new Response("not found\n", { status: 404 });
       if (req.method === "GET") ctx.waitUntil(capture(counted[0], { ...counted[1], country: country(req) }));
@@ -172,15 +172,15 @@ export default {
 // own counts (provider.CountPartner) go only from users who let the stats
 // go, and these are what the server sees anyway. /api/partners hands out
 // each partner's website and key page as a /go link, which counts the
-// click (event "magpie partner go") and sends the browser on. Each app
+// click (event "blackpie partner go") and sends the browser on. Each app
 // fetches the list every six hours, so the fetches tell how many apps a
-// partner can be seen in: one in FETCH_SAMPLE is sent, as "magpie partners
+// partner can be seen in: one in FETCH_SAMPLE is sent, as "blackpie partners
 // fetch" with weight FETCH_SAMPLE (sum it), and only while someone is
 // listed. No id, address or account goes: a country, at most.
 const FETCH_SAMPLE = 10;
-const GO = "https://usemagpie.ai/go/";
+const GO = "https://useblackpie.ai/go/";
 const POSTHOG = "https://us.i.posthog.com/i/v0/e/";
-// the Magpie project's PostHog key, as the app's (internal/stats): it can
+// the Blackpie project's PostHog key, as the app's (internal/stats): it can
 // send events and read nothing
 const POSTHOG_KEY = "phc_nyDyYyrUTRGvNq5U7FBesCyM2j4GdKeqGp8ko7DBerTC";
 
@@ -193,7 +193,7 @@ function live(p, now) {
 // ended one stays in partners.js, so the /go links of providers added from
 // it keep working), with their website and key page as /go links. A
 // website's own host goes beside it as siteHost, for the editor's link to
-// read (www.kimi.com, not usemagpie.ai).
+// read (www.kimi.com, not useblackpie.ai).
 export function served(list, now) {
   const go = (p, what, r) => GO + [p.id, what, r && r.id].filter(Boolean).map(encodeURIComponent).join("/");
   const host = (u) => { try { return new URL(u).host; } catch { return ""; } };
@@ -205,15 +205,15 @@ export function served(list, now) {
 
 // goTarget is where a /go link sends the browser: the partner's own key
 // page or website, the region's where it has one. Only partners.js's own
-// addresses, never one the link names. It says it came from magpie, as
-// ref=magpie, unless the address names a ref of its own (a referral code).
+// addresses, never one the link names. It says it came from blackpie, as
+// ref=blackpie, unless the address names a ref of its own (a referral code).
 export function goTarget(list, id, what, region) {
   const p = list.find((x) => x.id === id);
   const field = what === "keys" ? "keysUrl" : what === "site" ? "website" : "";
   if (!p || !field) return "";
-  if (!region) return fromMagpie(p[field] || "");
+  if (!region) return fromBlackpie(p[field] || "");
   const r = (p.regions || []).find((x) => x.id === region);
-  return r ? fromMagpie(r[field] || p[field] || "") : "";
+  return r ? fromBlackpie(r[field] || p[field] || "") : "";
 }
 
 // sponsorTarget is where a sponsor's /go link sends the browser: the link
@@ -225,11 +225,11 @@ export function sponsorTarget(list, id, where) {
   return s[where] || "";
 }
 
-function fromMagpie(to) {
+function fromBlackpie(to) {
   if (!to) return "";
   try {
     const u = new URL(to);
-    if (!u.searchParams.has("ref")) u.searchParams.set("ref", "magpie");
+    if (!u.searchParams.has("ref")) u.searchParams.set("ref", "blackpie");
     return u.toString();
   } catch {
     return to;
@@ -335,7 +335,7 @@ function cacheFor(got) {
 // cached and remember are the edge's cache (caches.default) by name. The
 // names carry a version: an entry an older worker kept in another shape is
 // never read as this one's. Anything unreadable is a miss.
-const CACHE = "https://usemagpie.ai/__v2/";
+const CACHE = "https://useblackpie.ai/__v2/";
 
 async function cached(name) {
   try {
@@ -381,7 +381,7 @@ async function latest(ctx, env) {
   return got;
 }
 
-const UA = { "User-Agent": "usemagpie.ai" };
+const UA = { "User-Agent": "useblackpie.ai" };
 
 // api asks GitHub's API, with the GITHUB_TOKEN secret where one is set.
 function api(path, env) {
@@ -484,7 +484,7 @@ async function releases(ctx, env) {
   return got;
 }
 
-// The Stable channel (Settings' Update channel, ssharpcc on X): magpie
+// The Stable channel (Settings' Update channel, ssharpcc on X): blackpie
 // releases many times a day, and someone who reads every changelog before
 // updating wants fewer, older ones. /api/latest?channel=stable is the
 // update feed for them, chosen here from the release list and never by
@@ -496,14 +496,14 @@ async function releases(ctx, env) {
 //     as soon as it is out, until a weekly pick passes it.
 //
 // A release is urgent when its notes have a line that starts with
-// URGENT_MARK: "**Urgent release:** why". magpie-releases' release run
+// URGENT_MARK: "**Urgent release:** why". blackpie-releases' release run
 // writes it from an `Urgent:` trailer on any commit since the version
 // before, and it can be added to a published release's notes by hand
 // (gh release edit) within a day, while the release is on the ledger's
 // first page. GitHub releases are never marked pre-release for this:
 // /download and the Latest mark go by them.
 //
-// A hundred releases are a day or so of magpie, so the list GitHub's API
+// A hundred releases are a day or so of blackpie, so the list GitHub's API
 // gives in one ask doesn't reach a week back. The ledger does: a KV
 // namespace (LEDGER) the cron fills every quarter hour, its "index" every
 // release of the last LEDGER_DAYS ({v, p: published, u: urgent}, newest
@@ -870,14 +870,14 @@ export async function icon(raw) {
   }
   if (u.protocol !== "https:" || u.username || u.password || (u.port && u.port !== "443"))
     return new Response("only a public https picture\n", { status: 400 });
-  // the app asks for usemagpie.ai's own pictures straight; asking here for
+  // the app asks for useblackpie.ai's own pictures straight; asking here for
   // one would only send the worker round to itself
-  if (u.hostname === "usemagpie.ai" || u.hostname.endsWith(".usemagpie.ai"))
-    return new Response("a usemagpie.ai picture is fetched as it is\n", { status: 400 });
+  if (u.hostname === "useblackpie.ai" || u.hostname.endsWith(".useblackpie.ai"))
+    return new Response("a useblackpie.ai picture is fetched as it is\n", { status: 400 });
   let res;
   try {
     res = await fetch(u.toString(), {
-      headers: { Accept: "image/*", "User-Agent": "magpie-icon/1 (+https://usemagpie.ai)" },
+      headers: { Accept: "image/*", "User-Agent": "blackpie-icon/1 (+https://useblackpie.ai)" },
       redirect: "follow",
       signal: AbortSignal.timeout(10000),
       // a missing or failing picture is asked for again soon, not in a day

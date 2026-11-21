@@ -10,10 +10,10 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/yetone/magpie/internal/gwmw"
-	"github.com/yetone/magpie/internal/masking"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/gwmw"
+	"github.com/hmjz100/blackpie/internal/masking"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // lc on Discord: a model on this machine or the local network the user set

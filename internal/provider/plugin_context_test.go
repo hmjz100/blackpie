@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // clinePlugin is Cline's plugin signed in, its models as its feed lists
@@ -17,7 +17,7 @@ import (
 func clinePlugin(t *testing.T) {
 	t.Helper()
 	claudeHome(t)
-	t.Setenv("MAGPIE_BUN", "")
+	t.Setenv("BLACKPIE_BUN", "")
 	os.MkdirAll(filepath.Dir(catalog.CachePath()), 0o755)
 	os.WriteFile(catalog.CachePath(), []byte(`{
 	  "zai":{"id":"zai","models":{"glm-5.3-flash":{"id":"glm-5.3-flash","limit":{"context":1000000,"output":131072}}}},

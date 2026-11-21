@@ -6,12 +6,12 @@ import (
 	"testing"
 
 	"github.com/tidwall/gjson"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // ne9ko9 on Discord: a vendor that speaks the client's own API has its
 // error reach the client as it came: its status, its own type, a numeric
-// code and the fields magpie knows nothing of, every byte but the message,
+// code and the fields blackpie knows nothing of, every byte but the message,
 // which names the provider. It was rebuilt from the status, with only a
 // string code kept.
 func TestSameAPIErrorKeptAsSent(t *testing.T) {

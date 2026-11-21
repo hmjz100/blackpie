@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/catalog"
 )
 
 func TestQianfanTokenPlan(t *testing.T) {

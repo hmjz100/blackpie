@@ -12,29 +12,29 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/sessions"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/sessions"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
-// The MCP hub (#2679): with the Library's switch on, magpie is the one MCP
+// The MCP hub (#2679): with the Library's switch on, blackpie is the one MCP
 // server an agent is given, at HubMCPPath<agent>, and it hands each call
 // on to the Library server behind it, as Composio does. Its tools are
 // those of the Library servers ticked for that agent, each named
 // <server>__<tool>; the servers themselves (a command started once for
-// every agent, a URL reached with magpie's sign-in) are the library's to
+// every agent, a URL reached with blackpie's sign-in) are the library's to
 // run (library/mcp_hub.go), which sets MCPHub. It is guarded as
-// magpie's other MCP servers are (serveMCP), and each call is held to the
+// blackpie's other MCP servers are (serveMCP), and each call is held to the
 // calling gateway key's limit (reserveFor). Tools only, for now: no
 // resources or prompts.
 
 // HubMCPPath is where the hub is served, the agent's id after it.
-const HubMCPPath = "/mcp/magpie/hub/"
+const HubMCPPath = "/mcp/blackpie/hub/"
 
 // HubMCPAll is the hub for any other app (Cursor, VS Code, a script): one
 // address with every server in the Library, ticked for an agent or not.
 // It is the agent "" to Hub.
-const HubMCPAll = "/mcp/magpie/hub"
+const HubMCPAll = "/mcp/blackpie/hub"
 
 // HubTool is one tool a Library server lists, as the hub gives it.
 type HubTool struct {
@@ -44,7 +44,7 @@ type HubTool struct {
 	// inputSchema and the rest go to the agent as they are, its name
 	// replaced
 	Spec map[string]json.RawMessage
-	// Roots: the server writes into the agent's project (magpie-image),
+	// Roots: the server writes into the agent's project (blackpie-image),
 	// so a call is made with the agent's folders (HubCaller)
 	Roots bool
 }
@@ -58,14 +58,14 @@ type HubCaller struct {
 	Client string
 }
 
-// The _meta keys a call of magpie's image server carries its caller in:
+// The _meta keys a call of blackpie's image server carries its caller in:
 // the roots, a list of file URIs (an empty one when the agent has none
 // here), and the client; and the one its result says the model it drew
 // with in (provider/model), for the hub's row of the call.
 const (
-	HubRootsMeta  = "magpie/roots"
-	HubClientMeta = "magpie/client"
-	HubModelMeta  = "magpie/model"
+	HubRootsMeta  = "blackpie/roots"
+	HubClientMeta = "blackpie/client"
+	HubModelMeta  = "blackpie/model"
 )
 
 type hubCallerKey struct{}
@@ -97,7 +97,7 @@ type Hub interface {
 	Stop()
 	// Prune ends each server the hub started that the Library no longer
 	// gives: the switch turned off, the server removed or edited, here or
-	// by another magpie (the window, the CLI)
+	// by another blackpie (the window, the CLI)
 	Prune()
 }
 
@@ -115,11 +115,11 @@ var (
 
 const hubBody = 4 << 20
 
-const errHubOff = "magpie's MCP hub is off, so it runs no server's tools: turn it on in magpie's Library → MCP"
+const errHubOff = "blackpie's MCP hub is off, so it runs no server's tools: turn it on in blackpie's Library → MCP"
 
 func (s *Server) hubMCP(w http.ResponseWriter, r *http.Request) {
 	agent := r.PathValue("agent")
-	serveMCP(w, r, "magpie's MCP hub", "magpie", hubBody, func(r *http.Request, m mcpMessage) (any, map[string]any) {
+	serveMCP(w, r, "blackpie's MCP hub", "blackpie", hubBody, func(r *http.Request, m mcpMessage) (any, map[string]any) {
 		return s.hubMCPCall(r, agent, m)
 	})
 }
@@ -163,11 +163,11 @@ func hubTools(ctx context.Context, agent string) []hubTool {
 func (s *Server) hubMCPCall(r *http.Request, agent string, m mcpMessage) (any, map[string]any) {
 	switch m.Method {
 	case "initialize":
-		say := "The tools of the MCP servers in magpie's Library that are switched on for this agent, each named <server>__<tool>. Add servers, or switch them on for an agent, in magpie's Library → MCP."
+		say := "The tools of the MCP servers in blackpie's Library that are switched on for this agent, each named <server>__<tool>. Add servers, or switch them on for an agent, in blackpie's Library → MCP."
 		if agent == "" {
-			say = "The tools of every MCP server in magpie's Library, each named <server>__<tool>. Add servers in magpie's Library → MCP."
+			say = "The tools of every MCP server in blackpie's Library, each named <server>__<tool>. Add servers in blackpie's Library → MCP."
 		}
-		title := "Magpie MCP hub"
+		title := "Blackpie MCP hub"
 		if w := hubWhere(r); w != "" {
 			say += " This router: " + w + ". Each of its tools' descriptions starts with [" + w + "]; when another MCP server gives the same tools, choose between them by this."
 			title += " · " + w
@@ -178,7 +178,7 @@ func (s *Server) hubMCPCall(r *http.Request, agent string, m mcpMessage) (any, m
 		return map[string]any{
 			"protocolVersion": mcpVersion(m),
 			"capabilities":    map[string]any{"tools": map[string]any{}},
-			"serverInfo":      map[string]any{"name": "magpie", "title": title, "version": Version},
+			"serverInfo":      map[string]any{"name": "blackpie", "title": title, "version": Version},
 			"instructions":    say,
 		}, nil
 	case "ping":
@@ -228,9 +228,9 @@ func (s *Server) hubMCPCall(r *http.Request, agent string, m mcpMessage) (any, m
 			}
 		}
 		if agent == "" {
-			return nil, map[string]any{"code": -32602, "message": "unknown tool " + p.Name + ": no MCP server in magpie's Library gives it"}
+			return nil, map[string]any{"code": -32602, "message": "unknown tool " + p.Name + ": no MCP server in blackpie's Library gives it"}
 		}
-		return nil, map[string]any{"code": -32602, "message": "unknown tool " + p.Name + ": no MCP server switched on for " + agent + " in magpie's Library gives it"}
+		return nil, map[string]any{"code": -32602, "message": "unknown tool " + p.Name + ": no MCP server switched on for " + agent + " in blackpie's Library gives it"}
 	}
 	return nil, map[string]any{"code": -32601, "message": "method not found: " + m.Method}
 }
@@ -262,11 +262,11 @@ func (s *Server) hubMCPRun(r *http.Request, agent string, t hubTool, args json.R
 		return toolResult("The MCP server "+t.Server+" couldn't run "+t.Tool+": "+why, true)
 	}
 	if t.Roots {
-		// magpie's image server draws through the gateway on its own
+		// blackpie's image server draws through the gateway on its own
 		// connection, so its result names the model for this call's row
 		var m struct {
 			Meta struct {
-				Model string `json:"magpie/model"`
+				Model string `json:"blackpie/model"`
 			} `json:"_meta"`
 		}
 		json.Unmarshal(res, &m)
@@ -386,7 +386,7 @@ func keepHubPruned(ctx context.Context) {
 	}
 }
 
-// StopHub ends the servers the hub started: magpie is stopping.
+// StopHub ends the servers the hub started: blackpie is stopping.
 func StopHub() {
 	if MCPHub != nil {
 		MCPHub.Stop()

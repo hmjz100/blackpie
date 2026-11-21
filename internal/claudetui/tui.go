@@ -1,5 +1,5 @@
-// Package claudetui runs Claude Code's interactive mode for magpie's Claude
-// subscription bridge, as `magpie claude-tui-helper`: the bridge talks to
+// Package claudetui runs Claude Code's interactive mode for blackpie's Claude
+// subscription bridge, as `blackpie claude-tui-helper`: the bridge talks to
 // it as it talks to `claude -p --input-format stream-json --output-format
 // stream-json`, and it runs the real interactive Claude Code in a
 // pseudo-terminal of its own. A user message is pasted into Claude Code's
@@ -35,8 +35,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/lazyre"
-	"github.com/yetone/magpie/internal/wslrun"
+	"github.com/hmjz100/blackpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/wslrun"
 )
 
 // ReadyWait is how long Claude Code may take to show its prompt before
@@ -108,7 +108,7 @@ type shim struct {
 // ends, saying why.
 func Run(args []string) error {
 	if len(args) < 1 {
-		return errors.New("usage: magpie " + Command + " <claude> [claude -p's arguments]")
+		return errors.New("usage: blackpie " + Command + " <claude> [claude -p's arguments]")
 	}
 	path, pargs := args[0], args[1:]
 	var wsl *WSL
@@ -125,7 +125,7 @@ func Run(args []string) error {
 	fallBack := func(why string) error {
 		if only {
 			fmt.Fprintf(os.Stderr, "claude-tui: %s; the interactive mode only is set, so this run doesn't fall back to -p\n", why)
-			return fmt.Errorf("Claude Code's interactive mode didn't run, and magpie is set to use only it: %s", why)
+			return fmt.Errorf("Claude Code's interactive mode didn't run, and blackpie is set to use only it: %s", why)
 		}
 		fmt.Fprintf(os.Stderr, "claude-tui: %s; this run is -p\n", why)
 		return printMode(path, pargs)
@@ -553,7 +553,7 @@ func (s *shim) dropImages() {
 
 // imagesPrefix names the folders images are written to, the helper's pid
 // after it.
-const imagesPrefix = "magpie-claude-images-"
+const imagesPrefix = "blackpie-claude-images-"
 
 // imagesLeft is how long an image or tap folder is left before another
 // helper removes it: one killed, as Windows ends a run, can't remove its
@@ -841,11 +841,11 @@ func newUUID() string {
 // interactiveArgs are `claude -p` arguments made the interactive mode's:
 // the same model, tools, MCP servers, settings, effort, system prompt and
 // session, without what only -p takes; its permission prompts kept, and
-// magpie's MCP tools (and the web search -p was given) allowed without
+// blackpie's MCP tools (and the web search -p was given) allowed without
 // one, where -p skipped them all.
 func interactiveArgs(pargs []string) []string {
 	var out []string
-	allowed := []string{"mcp__magpie"}
+	allowed := []string{"mcp__blackpie"}
 	for i := 0; i < len(pargs); i++ {
 		a := pargs[i]
 		switch a {
@@ -875,7 +875,7 @@ func broken() string {
 	if err != nil {
 		return ""
 	}
-	return filepath.Join(dir, "magpie", "claude-tui-broken")
+	return filepath.Join(dir, "blackpie", "claude-tui-broken")
 }
 
 // brokenFor is how long runs go to -p after the interactive mode failed

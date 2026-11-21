@@ -10,10 +10,10 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/yetone/magpie/internal/agentenv"
+	"github.com/hmjz100/blackpie/internal/agentenv"
 )
 
-// A remote magpie that offers fewer models, one of its providers renamed:
+// A remote blackpie that offers fewer models, one of its providers renamed:
 // a Refresh here drops the picks made from its old list, keeps the one
 // typed in by hand, and a Refresh that fails changes nothing (akic404 on
 // Discord).
@@ -48,7 +48,7 @@ func TestRefreshDropsPicksTheListNoLongerHas(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	if err := Save(Provider{ID: "remote", Name: "Remote", Preset: RemoteMagpiePreset, Chat: srv.URL, Key: "sk-remote"}); err != nil {
+	if err := Save(Provider{ID: "remote", Name: "Remote", Preset: RemoteBlackpiePreset, Chat: srv.URL, Key: "sk-remote"}); err != nil {
 		t.Fatal(err)
 	}
 	fetch := func() error {

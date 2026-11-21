@@ -8,7 +8,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/yetone/magpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/agent"
 )
 
 // claudeOwnSignIn is Claude Code's .credentials.json after /mcp signed in
@@ -25,7 +25,7 @@ func claudeOwnSignIn(name, url string) string {
 }
 
 // CyberCaius on Discord: a remote server signed in to in Claude Code in
-// WSL was "needs sign-in" in the Library, as magpie's check connects
+// WSL was "needs sign-in" in the Library, as blackpie's check connects
 // without the agent's tokens. The check reads each Claude Code's own
 // sign-ins where it keeps them, the WSL distro's home for one there, and
 // names the agents signed in; a server no agent signed in to, and a

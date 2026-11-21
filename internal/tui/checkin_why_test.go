@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // plugins#304: an inactive or ineligible check-in says the plugin's (or
@@ -28,7 +28,7 @@ func TestCheckinSaysWhyNoneWasOffered(t *testing.T) {
 	}
 	a := r
 	a.Again = true
-	if w := checkinWords(a); !strings.HasSuffix(w, "magpie asks again later · "+why) {
+	if w := checkinWords(a); !strings.HasSuffix(w, "blackpie asks again later · "+why) {
 		t.Errorf("again: %q", w)
 	}
 	r.Msg = ""

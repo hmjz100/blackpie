@@ -11,13 +11,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 func TestMain(m *testing.M) { testenv.Main(m) }
 
-// exe is a magpie in a folder of its own, in the test's isolated home.
+// exe is a blackpie in a folder of its own, in the test's isolated home.
 func exe(t *testing.T) string {
 	t.Helper()
 	t.Setenv("APPIMAGE", "")
@@ -32,7 +32,7 @@ func exe(t *testing.T) string {
 	t.Setenv("XDG_CACHE_HOME", filepath.Join(home, ".cache"))
 	t.Setenv("APPDATA", filepath.Join(home, "AppData", "Roaming"))
 	t.Setenv("LOCALAPPDATA", filepath.Join(home, "AppData", "Local"))
-	e := filepath.Join(dir, "app", "moepie.exe")
+	e := filepath.Join(dir, "app", "blackpie.exe")
 	write(t, e, "binary")
 	return e
 }
@@ -65,8 +65,8 @@ func TestPairsMapTheTwoPlaces(t *testing.T) {
 	data := filepath.Join(filepath.Dir(e), "data")
 	home := os.Getenv("HOME")
 	installed := []Pair{
-		{From: filepath.Join(home, ".config", "magpie"), To: data},
-		{From: filepath.Join(home, ".cache", "magpie"), To: filepath.Join(data, "cache")},
+		{From: filepath.Join(home, ".config", "blackpie"), To: data},
+		{From: filepath.Join(home, ".cache", "blackpie"), To: filepath.Join(data, "cache")},
 	}
 	sys, err := appdir.InstalledSystemCache()
 	if err != nil {
@@ -76,7 +76,7 @@ func TestPairsMapTheTwoPlaces(t *testing.T) {
 		installed = append(installed, Pair{From: sys, To: filepath.Join(data, "system-cache")})
 	}
 	if runtime.GOOS == "windows" {
-		installed = append(installed, Pair{From: filepath.Join(home, "AppData", "Roaming", "moepie.exe"), To: filepath.Join(data, "webview2"), Web: true})
+		installed = append(installed, Pair{From: filepath.Join(home, "AppData", "Roaming", "blackpie.exe"), To: filepath.Join(data, "webview2"), Web: true})
 	}
 	got, err := Pairs(e, appdir.ModeInstalled, appdir.ModePortable)
 	if err != nil {
@@ -125,7 +125,7 @@ func TestWebSkipKeepsStorage(t *testing.T) {
 	}
 }
 
-// installedData writes an installed magpie's files: settings, a cache, a
+// installedData writes an installed blackpie's files: settings, a cache, a
 // profile with storage and caches, and the runtime folder.
 func installedData(t *testing.T, e string) Places {
 	t.Helper()
@@ -159,7 +159,7 @@ func runMove(t *testing.T, e, from, to string) error {
 
 // A move to the portable place copies everything but caches the browser
 // makes again, writes the mode file, removes verified source files, and closes
-// the old place to a magpie still pointed at it.
+// the old place to a blackpie still pointed at it.
 func TestMoveToPortable(t *testing.T) {
 	e := exe(t)
 	src := installedData(t, e)
@@ -233,7 +233,7 @@ func TestMoveBacksUpTarget(t *testing.T) {
 		t.Fatal("the portable cache folder went into the config folder")
 	}
 	if appdir.Resolve(e) != "" {
-		t.Fatal("the data folder left beside magpie is taken for its data again")
+		t.Fatal("the data folder left beside blackpie is taken for its data again")
 	}
 }
 
@@ -312,9 +312,9 @@ func TestMoveKeepsOldFolderWithNewFile(t *testing.T) {
 	}
 }
 
-// The helper waits for every magpie on either place to exit, and gives up
+// The helper waits for every blackpie on either place to exit, and gives up
 // when one doesn't, the source kept.
-func TestRunWaitsForEveryMagpie(t *testing.T) {
+func TestRunWaitsForEveryBlackpie(t *testing.T) {
 	e := exe(t)
 	src := installedData(t, e)
 	lease, err := Enter(context.Background(), []string{src.Config})
@@ -325,11 +325,11 @@ func TestRunWaitsForEveryMagpie(t *testing.T) {
 	ExitWait = 300 * time.Millisecond
 	defer func() { ExitWait = old }()
 	if err := runMove(t, e, appdir.ModeInstalled, appdir.ModePortable); err == nil {
-		t.Fatal("the move ran while a magpie held its lease")
+		t.Fatal("the move ran while a blackpie held its lease")
 	}
 	lease()
 	if exists(filepath.Join(filepath.Dir(e), "data", "settings.json")) {
-		t.Fatal("copied while a magpie ran")
+		t.Fatal("copied while a blackpie ran")
 	}
 	if tx, _ := Status(e); tx.State != StateFailed {
 		t.Fatalf("state %s", tx.State)
@@ -363,7 +363,7 @@ func TestSettle(t *testing.T) {
 	defer func() { settleGrace = old }()
 	lease, err := Start(e)
 	if err != nil {
-		t.Fatalf("an abandoned move kept magpie from starting: %v", err)
+		t.Fatalf("an abandoned move kept blackpie from starting: %v", err)
 	}
 	lease()
 	if tx, _ := Status(e); tx.State != StateFailed || !strings.Contains(tx.Error, "interrupted") {
@@ -417,7 +417,7 @@ func TestCancelAndDismiss(t *testing.T) {
 	}
 }
 
-// Preflight refuses a place magpie can't write.
+// Preflight refuses a place blackpie can't write.
 func TestPreflightNeedsAWritableFolder(t *testing.T) {
 	e := exe(t)
 	old := Writable

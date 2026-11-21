@@ -5,7 +5,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { test } = require('node:test');
 const { chromium, webkit } = require('playwright');
-const assets = process.env.MAGPIE_REPAIR_ASSETS || path.resolve(__dirname, '../assets');
+const assets = process.env.BLACKPIE_REPAIR_ASSETS || path.resolve(__dirname, '../assets');
 const provider = { id: 'alpha', name: 'Alpha', icon: 'generic', chat: 'https://alpha.example/v1', url: 'https://alpha.example/v1', host: 'alpha.example',
   models: Array.from({length: 12}, (_, i) => ({id: 'model-' + i, on: true})), agents: [], fallback: [], headers: {}, keyList: [], proxy: '', key: {set: true, masked: 'sk-test'}, ready: true };
 async function serve(route) {
@@ -16,7 +16,7 @@ async function serve(route) {
   if (u.pathname === '/api/providers') return json({providers: [provider], presets: [], excluded: [], gateway: {running: true, window: true}});
   if (u.pathname === '/api/groups') return json({groups: [], pools: []});
   if (u.pathname.startsWith('/api/')) return json({});
-  if (u.host !== 'magpie.test' || !/^\/[\w./-]*$/.test(u.pathname)) return route.fulfill({status: 404});
+  if (u.host !== 'blackpie.test' || !/^\/[\w./-]*$/.test(u.pathname)) return route.fulfill({status: 404});
   const file = path.join(assets, u.pathname === '/' ? 'index.html' : u.pathname);
   try { return route.fulfill({body: await fs.readFile(file), contentType: {'.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png'}[path.extname(file)]}); }
   catch { return route.fulfill({status: 404}); }
@@ -38,7 +38,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ['chromium',
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
     await page.route('**/*', serve);
-    await page.goto('http://magpie.test/?view=providers');
+    await page.goto('http://blackpie.test/?view=providers');
     await page.locator('.row.provider[data-id="alpha"]').click();
     await settled(page);
     const before = await geometry(page), stages = [];

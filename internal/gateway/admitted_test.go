@@ -5,11 +5,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/yetone/magpie/internal/datamove"
+	"github.com/hmjz100/blackpie/internal/datamove"
 )
 
 // A data move waiting for idle turns new work away and lets the rest on:
-// reads and magpie's own calls; MCP, whose servers it stops, is refused
+// reads and blackpie's own calls; MCP, whose servers it stops, is refused
 // without being counted, its streams held open for an agent's whole run.
 func TestAdmittedWhileADataMoveWaits(t *testing.T) {
 	datamove.Business.Close()
@@ -20,10 +20,10 @@ func TestAdmittedWhileADataMoveWaits(t *testing.T) {
 		code         int
 	}{
 		{"GET", "/v1/models", 200},
-		{"POST", "/_magpie/claude-mcp/x", 200},
+		{"POST", "/_blackpie/claude-mcp/x", 200},
 		{"POST", "/v1/chat/completions", http.StatusServiceUnavailable},
 		{"POST", "/v1/messages", http.StatusServiceUnavailable},
-		{"GET", "/mcp/magpie/hub", http.StatusServiceUnavailable},
+		{"GET", "/mcp/blackpie/hub", http.StatusServiceUnavailable},
 	} {
 		rec := httptest.NewRecorder()
 		h.ServeHTTP(rec, httptest.NewRequest(c.method, c.path, nil))
@@ -33,7 +33,7 @@ func TestAdmittedWhileADataMoveWaits(t *testing.T) {
 	}
 	datamove.Business.Open()
 	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, httptest.NewRequest("GET", "/mcp/magpie/hub", nil))
+	h.ServeHTTP(rec, httptest.NewRequest("GET", "/mcp/blackpie/hub", nil))
 	if rec.Code != 200 {
 		t.Errorf("MCP after the move gave up: %d", rec.Code)
 	}

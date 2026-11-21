@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/tidwall/gjson"
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // thinkUp is a vendor answering the routing classifier "1" on Chat,

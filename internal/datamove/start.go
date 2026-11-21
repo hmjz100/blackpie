@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/yetone/magpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/appdir"
 )
 
-// Mode is the place magpie run from exe uses now.
+// Mode is the place blackpie run from exe uses now.
 func Mode() string {
 	if appdir.Portable() != "" {
 		return appdir.ModePortable
@@ -15,8 +15,8 @@ func Mode() string {
 	return appdir.ModeInstalled
 }
 
-// Start is every start's barrier, before anything reads or writes magpie's
-// data: a move left unfinished is settled, a mode file magpie can't use
+// Start is every start's barrier, before anything reads or writes blackpie's
+// data: a move left unfinished is settled, a mode file blackpie can't use
 // stops it, and the process takes its lease in its place for as long as it
 // lives. A lease that is let go while the process can still write lets a
 // move copy too early, so the caller keeps it.

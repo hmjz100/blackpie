@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // keys/import adds the keys pasted at once (361 on Discord), says how many

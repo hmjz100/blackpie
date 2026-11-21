@@ -10,12 +10,12 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/jsonc"
 
-	"github.com/yetone/magpie/internal/agent"
-	"github.com/yetone/magpie/internal/agentplug"
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/desktopdir"
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/agentplug"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/desktopdir"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/plugin"
 )
 
 // Target is where one agent keeps each of the three: an empty path is
@@ -47,7 +47,7 @@ type Target struct {
 	// Settings is Claude Code's settings.json, whose permissions.deny
 	// leaves out the tools of a server turned off (mcp_tools_off.go)
 	Settings string
-	// Gone is an agent no longer installed here that still has what magpie
+	// Gone is an agent no longer installed here that still has what blackpie
 	// gave it (held): a sync only takes things out of it, as they are
 	// unticked, and gives it nothing.
 	Gone bool
@@ -56,7 +56,7 @@ type Target struct {
 	// version here; the others that always do are in readsShared
 	SharedToo bool
 	// Profile says the instructions file is the user's profile to the
-	// agent, not instructions alone (Alma's USER.md): magpie adds its part
+	// agent, not instructions alone (Alma's USER.md): blackpie adds its part
 	// after the user's, but never moves the user's own lines out of it
 	// (ImportInstructions), as the agent reads who its owner is there.
 	Profile bool
@@ -127,7 +127,7 @@ func codebuddyMCPIn(dir, base string) string {
 
 func codexDir() string { return appdir.CodexHomeIn(home()) }
 
-// targetOf is where a known agent keeps them, or nil for one magpie can't
+// targetOf is where a known agent keeps them, or nil for one blackpie can't
 // give any of them to.
 func targetOf(a *agent.Agent) *Target {
 	if a.WSL != "" {
@@ -258,7 +258,7 @@ func targetOf(a *agent.Agent) *Target {
 		t.Skills = filepath.Join(d, "skills")
 	case "crush":
 		// Crush reads CRUSH.md from its config folder, ~/.config/crush on
-		// Windows too since Crush 0.14; the crush.json magpie edits there is
+		// Windows too since Crush 0.14; the crush.json blackpie edits there is
 		// %LOCALAPPDATA%\crush's, where Crush keeps its own picks and reads
 		// skills but no CRUSH.md
 		cfg := appdir.Getenv("XDG_CONFIG_HOME")
@@ -310,7 +310,7 @@ func targetOf(a *agent.Agent) *Target {
 		// USER.md, on every system, in its system prompt as its owner's
 		// profile ("name, preferences, habits"), unless the thread's
 		// workspace has a USER.md of its own (0.4.164's out/main/index.js,
-		// #2315): magpie's part goes after what the user has there. The
+		// #2315): blackpie's part goes after what the user has there. The
 		// file's YAML front matter is where Alma's Telegram and Discord
 		// bots read who the owner is, so it is a Profile: the user's own
 		// lines are never moved out of it
@@ -324,7 +324,7 @@ func targetOf(a *agent.Agent) *Target {
 		t.Skills = sharedSkillsDir()
 	case "hermes":
 		// Hermes Agent reads mcp_servers from $HERMES_HOME/config.yaml, the
-		// file magpie sets its model in too (tools/mcp_tool.py), and skills
+		// file blackpie sets its model in too (tools/mcp_tool.py), and skills
 		// from $HERMES_HOME/skills
 		t.MCP = &mcpFile{Path: a.Path, Format: fmtHermes}
 		t.Skills = filepath.Join(a.Dir, "skills")
@@ -368,7 +368,7 @@ func targetOf(a *agent.Agent) *Target {
 		t.Skills = filepath.Join(a.Dir, "skills")
 	case "qoder", "qoder-cn":
 		// Qoder's user-wide servers are its settings.json's mcpServers
-		// (docs.qoder.com/cli/mcp-reference), beside magpie's provider
+		// (docs.qoder.com/cli/mcp-reference), beside blackpie's provider
 		t.MCP = &mcpFile{Path: a.Path, Format: fmtOmp}
 		t.Skills = filepath.Join(a.Dir, "skills")
 		// and AGENTS.md in its folder before every conversation, which its
@@ -401,7 +401,7 @@ func targetOf(a *agent.Agent) *Target {
 		// WorkBuddy connects one only once it is trusted there: a server
 		// mcp-approvals.json has no approval for (its command, args and env
 		// names, or its URL's origin) is listed as needing approval until it
-		// is switched on in WorkBuddy, which magpie leaves to the user
+		// is switched on in WorkBuddy, which blackpie leaves to the user
 		// (#1266). Its skills are in skills/ there.
 		t.MCP = &mcpFile{Path: filepath.Join(a.Dir, "mcp.json"), Format: fmtClaude}
 		t.Skills = filepath.Join(a.Dir, "skills")
@@ -424,7 +424,7 @@ func targetOf(a *agent.Agent) *Target {
 		// ~/.fx — each said by its docs or source. No MCP servers:
 		// OpenHanako runs one only once switched on for each agent and
 		// tool, and fx's mcp.json, which one entry it refuses makes it read
-		// none of, isn't one magpie could try.
+		// none of, isn't one blackpie could try.
 		t.Skills = filepath.Join(a.Dir, "skills")
 		if a.ID == "fx" {
 			// fx reads ~/.fx/AGENTS.md before a project's own
@@ -485,15 +485,15 @@ func targetOf(a *agent.Agent) *Target {
 		t.Instructions = filepath.Join(reasonixState(a), "REASONIX.md")
 	case "zed":
 		// Zed reads its MCP servers from context_servers in the settings.json
-		// magpie sets its model in (~/.config/zed, $XDG_CONFIG_HOME/zed,
-		// %APPDATA%\Zed or $MAGPIE_ZED_CONFIG_DIR: agent.zed), and reloads
+		// blackpie sets its model in (~/.config/zed, $XDG_CONFIG_HOME/zed,
+		// %APPDATA%\Zed or $BLACKPIE_ZED_CONFIG_DIR: agent.zed), and reloads
 		// the file as it changes (crates/settings_content/src/project.rs
 		// ProjectSettingsContent.context_servers, zed-industries/zed
 		// 2c99f547; lc on Discord)
 		t.MCP = &mcpFile{Path: a.Path, Format: fmtZed}
 	case "claude-desktop":
 		// Claude Desktop reads only commands from its file: a remote server
-		// is added in its own Connectors settings. In its 3p mode (magpie's
+		// is added in its own Connectors settings. In its 3p mode (blackpie's
 		// gateway, or any other) it reads the file in Claude-3p instead, so
 		// where that folder is the servers go into both: each mode finds
 		// them, a switch between the two leaves nothing behind in either
@@ -710,7 +710,7 @@ func wslTargetOf(a *agent.Agent) *Target {
 	return t
 }
 
-// wslOpen is path, one of t's in a WSL distro, where magpie can open it
+// wslOpen is path, one of t's in a WSL distro, where blackpie can open it
 // (agent.WSLOpen): below a link the distro has, where the link leads,
 // since nothing below one can be opened through \\wsl.localhost. A link
 // that couldn't be resolved leaves path as it is and t unreached.
@@ -731,7 +731,7 @@ func wslOpen(t *Target, path string) string {
 	return o
 }
 
-// wslOpened opens each of t's paths where magpie can (wslOpen): a link
+// wslOpened opens each of t's paths where blackpie can (wslOpen): a link
 // below the agent's folder, its skills folder one, as well as the folder.
 func wslOpened(t *Target) {
 	for _, p := range []*string{&t.Instructions, &t.Override, &t.Skills, &t.Settings} {
@@ -749,7 +749,7 @@ func wslOpened(t *Target) {
 
 // ownFolder are the agents that keep all the library gives them in their
 // own folder (a.Dir, or beside a.Path), read from no variable of this
-// machine's and from nothing under its home: one magpie found in a distro
+// machine's and from nothing under its home: one blackpie found in a distro
 // has that folder at the distro's home already, so its target there is
 // the one targetOf makes on this machine, given copies (#1323).
 var ownFolder = map[string]bool{
@@ -785,7 +785,7 @@ func wslOwnFolder(a *agent.Agent) *Target {
 }
 
 // apps are what the library can give MCP servers to that aren't agents
-// magpie sets up: known by the folder they keep their settings in.
+// blackpie sets up: known by the folder they keep their settings in.
 func apps() []*agent.Agent {
 	// Desktop's own folder (%APPDATA%\Claude on Windows, the MSIX
 	// package's for a packaged Desktop, which doesn't see a file written
@@ -801,8 +801,8 @@ func apps() []*agent.Agent {
 	}
 }
 
-// Targets are the agents on this machine that magpie can give any of the
-// three to, in the order the rest of magpie lists them.
+// Targets are the agents on this machine that blackpie can give any of the
+// three to, in the order the rest of blackpie lists them.
 func Targets() []*Target { return targets(false) }
 
 // everyTarget is Targets with the agents gone for their CLI too: a folder
@@ -833,7 +833,7 @@ func targetsAsleep(gone bool) ([]*Target, []*agent.Agent) {
 		if !a.Detected() && !a.SharedHere() {
 			continue
 		}
-		// an app magpie also sets up as an agent (Claude Desktop) keeps its
+		// an app blackpie also sets up as an agent (Claude Desktop) keeps its
 		// MCP servers where apps says, once
 		if own[a.ID] {
 			continue
@@ -872,7 +872,7 @@ func targetsAsleep(gone bool) ([]*Target, []*agent.Agent) {
 
 // held are the agents not among have (Targets) — uninstalled, or gone for
 // their CLI — that the library still gives something, or that hold a skill,
-// server or hook magpie put there: each is listed on the rows of what it
+// server or hook blackpie put there: each is listed on the rows of what it
 // has, for that to be unticked and taken out of it, and on no other row
 // (@jiahao_jayden on X: an agent that isn't installed was on every row). A
 // sync gives them nothing new (Gone).
@@ -913,7 +913,7 @@ var readsShared = []string{"codex", "gemini", "opencode", "deveco", "crush", "ds
 // dist/core/package-manager.js, @earendil-works/pi-coding-agent 1.5.0),
 // and omp from 11.0.0 (src/discovery/agents.ts, "Load skills from
 // ~/.agents/skills"; 10.6.2 has no such provider). A Pi or omp whose
-// version isn't known is taken for one before, as magpie took every Pi:
+// version isn't known is taken for one before, as blackpie took every Pi:
 // it is given its own link, which a Pi from 0.68 reads once with the
 // shared folder's (it dedupes skills by their real path).
 const (
@@ -936,7 +936,7 @@ func (t *Target) readsSharedDir() bool {
 // readsWith adds to each agent's SkillsAlso the agents whose folder it
 // reads skills from too: one that is the very same folder (Kimi Code's,
 // Goose's and Cindy's, all ~/.agents/skills), or ~/.agents/skills for one
-// that reads it besides its own — a skill magpie gives there once, for
+// that reads it besides its own — a skill blackpie gives there once, for
 // any of them, every one of them has.
 func readsWith(ts []*Target) {
 	real := make([]string, len(ts))
@@ -1010,7 +1010,7 @@ func Takes(q, kind string) (string, error) {
 	t := targetOf(a)
 	var has bool
 	if t == nil && isAsleep(a) {
-		// one magpie saw it give instructions, MCP servers or skills a
+		// one blackpie saw it give instructions, MCP servers or skills a
 		// place to is recorded, and given them when the distro next runs
 		// (Woken)
 		if sh := shapeOf(a); sh != nil && (kind == "instructions" && sh.Instructions != "" || kind == "mcp" && sh.MCP != "" || kind == "skills" && sh.Skills != "") {
@@ -1048,11 +1048,11 @@ func noPlace(a *agent.Agent, kind, what string) string {
 		// Desktop's chat takes its instructions in its own settings, kept
 		// with the Claude account, not in a file; its Code tab is Claude
 		// Code, which reads Claude Code's CLAUDE.md
-		return "Claude Desktop keeps its instructions in its own settings, with your Claude account, not in a file magpie can write; its Code tab runs Claude Code, which reads Claude Code's · give them to claude"
+		return "Claude Desktop keeps its instructions in its own settings, with your Claude account, not in a file blackpie can write; its Code tab runs Claude Code, which reads Claude Code's · give them to claude"
 	case a.Plugin != "":
 		return fmt.Sprintf("%s's plugin (%s) says no place for %s: its agent.library.%s names none", a.Name, plugin.Name(a.Plugin), what, kind)
 	}
-	return fmt.Sprintf("%s has no user-wide place for %s that magpie knows of", a.Name, what)
+	return fmt.Sprintf("%s has no user-wide place for %s that blackpie knows of", a.Name, what)
 }
 
 // takenBy lists the agents here that kind can be given to.

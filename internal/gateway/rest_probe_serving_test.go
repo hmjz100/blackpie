@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // Exercise the serving entry point: importing the probe helper alone must
@@ -20,7 +20,7 @@ func TestRestProbeServingLifecycle(t *testing.T) {
 		}
 		t.Run(name, func(t *testing.T) {
 			fresh(t)
-			t.Setenv("MAGPIE_ADDR", "127.0.0.1:0")
+			t.Setenv("BLACKPIE_ADDR", "127.0.0.1:0")
 			steps, was := restProbeSteps, listForProbe
 			restProbeSteps = []time.Duration{time.Millisecond}
 			started, cancelled := make(chan struct{}), make(chan struct{})

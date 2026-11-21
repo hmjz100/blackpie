@@ -21,7 +21,7 @@ func RetryCleanup(ctx context.Context, exe string) (*Transaction, error) {
 	if tx == nil || tx.State != StateCleanup {
 		return nil, ErrNoMove
 	}
-	if err := block(ctx, append(sources(tx), targets(tx)...), "magpie is retrying old data cleanup"); err != nil {
+	if err := block(ctx, append(sources(tx), targets(tx)...), "blackpie is retrying old data cleanup"); err != nil {
 		unblock(targets(tx))
 		return nil, err
 	}

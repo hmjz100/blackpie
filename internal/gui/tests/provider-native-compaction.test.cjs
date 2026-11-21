@@ -59,7 +59,7 @@ function serve(lang, posts) {
 
 const strings = [
   "Compaction", "Codex compacts on this provider",
-  "Codex's compaction is sent to this provider unchanged and its encrypted checkpoint is returned as-is. Off, magpie writes the summary. Official Codex accounts can continue on another eligible account in the pool; other providers remain bound to the original writer. The checkpoint is never dropped.",
+  "Codex's compaction is sent to this provider unchanged and its encrypted checkpoint is returned as-is. Off, blackpie writes the summary. Official Codex accounts can continue on another eligible account in the pool; other providers remain bound to the original writer. The checkpoint is never dropped.",
 ];
 const words = {
   en: { tick: "Codex compacts on this provider", save: "Save" },
@@ -89,7 +89,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         page.on("pageerror", (e) => errors.push(e.message));
         const posts = [];
         await page.route("**/*", serve(lang, posts));
-        await page.goto("http://magpie.test/?view=providers");
+        await page.goto("http://blackpie.test/?view=providers");
         await page.locator(".row.provider", { hasText: name }).click();
         await unfold(page);
         await page.locator(".editor .bar").waitFor();

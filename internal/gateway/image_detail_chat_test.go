@@ -5,7 +5,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // chatImageDetails is the detail of every image_url in a Chat body, in
@@ -138,7 +138,7 @@ func TestTakesOriginalDetail(t *testing.T) {
 			t.Errorf("%q: %v, want %v", base, got, want)
 		}
 	}
-	if !takesOriginalDetail(provider.Provider{ID: "x", Preset: provider.RemoteMagpiePreset, Responses: "http://10.0.0.2:3425/v1"}) {
-		t.Error("a remote magpie decides for its own upstream")
+	if !takesOriginalDetail(provider.Provider{ID: "x", Preset: provider.RemoteBlackpiePreset, Responses: "http://10.0.0.2:3425/v1"}) {
+		t.Error("a remote blackpie decides for its own upstream")
 	}
 }

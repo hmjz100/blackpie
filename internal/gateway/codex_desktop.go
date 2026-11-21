@@ -8,16 +8,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/codexcat"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/codexcat"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // The Codex app's picker shows only the models of Codex's list that a
 // flag of OpenAI's names, for Codex on its built-in provider, unless Codex
 // reads its list from a file (model_catalog_json): beside the ChatGPT
-// sign-in it showed GPT alone, magpie's models in the list it was handed
+// sign-in it showed GPT alone, blackpie's models in the list it was handed
 // all the same (laddieyao on Discord). The CLI shows the whole list. So
-// where the Codex app is installed, magpie writes the list it hands Codex
+// where the Codex app is installed, blackpie writes the list it hands Codex
 // into a file for Codex to read (agent.CodexDesktopList), and Codex asks
 // for no list then: the backend's part of it is asked for here, with
 // Codex's sign-in, and kept.
@@ -51,17 +51,17 @@ var codexDesk struct {
 // CodexDesktopCatalog is the list a Codex beside its ChatGPT sign-in is
 // handed (/backend-api/codex/models), as a file Codex reads with
 // model_catalog_json: the backend's entries as it sent them, narrowed and
-// set as the codex provider has them, magpie's after them. ok is false
+// set as the codex provider has them, blackpie's after them. ok is false
 // while the backend's list is not known: none asked for yet, or none it
 // gave. That is unknown, never an empty list, and the file as it was
 // stands. The backend is asked again in the background when its list is
 // old, CodexDesktopChanged told when it changed.
 //
 // A sign-in the backend calls revoked, with no list of its from before,
-// is handed Codex's last list of its own and magpie's models, as
+// is handed Codex's last list of its own and blackpie's models, as
 // codexModels answers Codex then (#4308): the backend has said all it
 // will for that sign-in, and without it the app's picker had none of
-// magpie's models until the user signed in again.
+// blackpie's models until the user signed in again.
 func CodexDesktopCatalog() (b []byte, ok bool) {
 	codexDesk.Lock()
 	body, revoked := codexDesk.body, codexDesk.revoked

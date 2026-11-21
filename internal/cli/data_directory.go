@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/yetone/magpie/internal/datamove"
-	"github.com/yetone/magpie/internal/update"
+	"github.com/hmjz100/blackpie/internal/datamove"
+	"github.com/hmjz100/blackpie/internal/update"
 )
 
 // processDataLease is this process's lease on its data place, held until it
@@ -34,7 +34,7 @@ func needsData(args []string) bool {
 }
 
 // leaseFree are what agents run for a session or a message, and the
-// commands that only ask the running magpie: they check for a move but
+// commands that only ask the running blackpie: they check for a move but
 // take no lease, which an agent's whole session would hold, keeping a move
 // waiting on it.
 func leaseFree(args []string) bool {
@@ -52,7 +52,7 @@ func windowEntry(args []string) bool {
 	if !hasGUI {
 		return false
 	}
-	if len(args) == 0 || strings.HasPrefix(strings.ToLower(args[0]), "magpie:") {
+	if len(args) == 0 || strings.HasPrefix(strings.ToLower(args[0]), "blackpie:") {
 		return true
 	}
 	switch args[0] {
@@ -62,9 +62,9 @@ func windowEntry(args []string) bool {
 	return false
 }
 
-const dataDirectoryUsage = "usage: magpie data-directory status|cancel"
+const dataDirectoryUsage = "usage: blackpie data-directory status|cancel"
 
-// dataStartup runs before anything reads or writes magpie's data: it
+// dataStartup runs before anything reads or writes blackpie's data: it
 // settles a move left unfinished and takes this process's lease.
 func dataStartup(args []string) error {
 	if !needsData(args) {
@@ -82,7 +82,7 @@ func dataStartup(args []string) error {
 	}
 	processDataLease, err = datamove.Start(exe)
 	if err != nil && windowEntry(args) {
-		notice("magpie", err.Error())
+		notice("blackpie", err.Error())
 	}
 	return err
 }
@@ -123,7 +123,7 @@ func migrate(exe string) error {
 		lerr = update.StartBeside(exe, true, "settings")
 	}
 	if lerr != nil {
-		notice("magpie", fmt.Sprintf("magpie couldn't open again after moving its data: %v", lerr))
+		notice("blackpie", fmt.Sprintf("blackpie couldn't open again after moving its data: %v", lerr))
 	}
 	return err
 }

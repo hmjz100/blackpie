@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/catalog"
 )
 
 const (

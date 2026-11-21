@@ -6,11 +6,11 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/backup"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/backup"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Sharing the gateway on the local network is this computer's own (Lullaby

@@ -7,7 +7,7 @@ import (
 )
 
 // LoadFresh is how long a model's load counts from the plugin's call that
-// reported it (magpie.load in host.js). Past it the load is unknown: a
+// reported it (blackpie.load in host.js). Past it the load is unknown: a
 // plugin that stopped reporting says nothing of how busy the vendor is
 // now, and routing never takes its silence for idle.
 const LoadFresh = 5 * time.Minute

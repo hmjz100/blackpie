@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 // observed is a request the registered observers watch (usage.Observer,
@@ -25,7 +25,7 @@ func observeRequest(r *http.Request, kind string, body []byte) (*http.Request, *
 	if len(observers) == 0 {
 		return r, nil
 	}
-	// the agent it is recorded as, another magpie's own (callerFrom)
+	// the agent it is recorded as, another blackpie's own (callerFrom)
 	agent := callerOf(r).agent
 	q := usage.Request{Header: r.Header, Agent: agent, Session: observedSession(r.Header), Kind: observedKind(agent, kind, body),
 		Plain: local(r) && access.Caller(r.Context()).KeyID == "" && callerOf(r).via == ""}

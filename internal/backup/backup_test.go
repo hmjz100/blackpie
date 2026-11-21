@@ -13,13 +13,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/agentenv"
-	"github.com/yetone/magpie/internal/library"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/pluginrt"
-	"github.com/yetone/magpie/internal/profile"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/agentenv"
+	"github.com/hmjz100/blackpie/internal/library"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/pluginrt"
+	"github.com/hmjz100/blackpie/internal/profile"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 func TestRestoreKeepsCorruptSettings(t *testing.T) {
@@ -48,7 +48,7 @@ func TestRestoreKeepsCorruptSettings(t *testing.T) {
 	}
 }
 
-// home gives the test a machine of its own: no agents, no magpie files.
+// home gives the test a machine of its own: no agents, no blackpie files.
 func home(t *testing.T) {
 	t.Helper()
 	h := t.TempDir()
@@ -379,7 +379,7 @@ func TestLibrary(t *testing.T) {
 }
 
 func TestNotABackup(t *testing.T) {
-	for _, data := range []string{"", "{}", `{"format":"magpie-backup","version":9,"kdf":"x"}`} {
+	for _, data := range []string{"", "{}", `{"format":"blackpie-backup","version":9,"kdf":"x"}`} {
 		if _, err := Open([]byte(data), "pw"); err == nil || errors.Is(err, ErrPassphrase) {
 			t.Fatalf("%q: %v", data, err)
 		}
@@ -491,7 +491,7 @@ func TestRestorePluginsAndSignIn(t *testing.T) {
 		t.Fatalf("result: %+v, want claude to sign in to, the plugin added, the failure said, acme to key", r)
 	}
 
-	// a backup from a magpie before plugins installs nothing
+	// a backup from a blackpie before plugins installs nothing
 	asked = nil
 	got.Plugins = nil
 	if _, err := Restore(got, All); err != nil || asked != nil {
@@ -566,7 +566,7 @@ func TestBackupCarriesBuiltinPlugins(t *testing.T) {
 		}
 	}
 
-	// a backup from a magpie before plugins.yml leaves this machine's alone
+	// a backup from a blackpie before plugins.yml leaves this machine's alone
 	home(t)
 	if err := pluginrt.Put(pluginrt.File{Preset: pluginrt.PresetAll}); err != nil {
 		t.Fatal(err)
@@ -581,7 +581,7 @@ func TestBackupCarriesBuiltinPlugins(t *testing.T) {
 	}
 }
 
-// A plugins.yml this magpie can't write, as a newer one's preset, keeps
+// A plugins.yml this blackpie can't write, as a newer one's preset, keeps
 // this machine's and lets the rest of the settings in: refused after the
 // settings were written, it left them half put back, and failed every
 // sync that brought it.

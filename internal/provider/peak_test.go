@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // ccPlugin is the Command Code plan as its plugin serves it: its
@@ -160,7 +160,7 @@ func TestPriceOfPeak(t *testing.T) {
 	}
 }
 
-// commandCodeCatalog is models.dev's api.json as magpie had it on
+// commandCodeCatalog is models.dev's api.json as blackpie had it on
 // 2026-10-30, these entries byte for byte (descriptions and the like left
 // out). DeepSeek lists V4.1 Flash only as deepseek-flash, by a dated
 // canonical id, so no maker price is found for Command Code's undated

@@ -7,11 +7,11 @@ import (
 )
 
 // math_milian: a skill given to every agent was in ~/.agents/skills (the
-// user's own copy) and in ~/.pi/agent/skills (magpie's link to the
+// user's own copy) and in ~/.pi/agent/skills (blackpie's link to the
 // library's own copy of the same files). Pi reads both folders and drops
 // a skill read twice only when both paths are one file (realpath,
 // dist/core/skills.js), so it warned "hunk-review" collision. An agent
-// that reads ~/.agents/skills itself gets no second tree there: magpie's
+// that reads ~/.agents/skills itself gets no second tree there: blackpie's
 // link or copy in its own folder goes, the user's copy stays as it is.
 func TestSharedCopyNotGivenTwice(t *testing.T) {
 	for _, how := range []string{HowLink, HowCopy} {

@@ -9,8 +9,8 @@ import (
 
 	"github.com/pelletier/go-toml/v2"
 
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // setAsyncCompact sets Codex's background compaction as the Settings row
@@ -48,7 +48,7 @@ func codexReadersAre(t *testing.T, versions ...string) {
 }
 
 // asyncOf is the config's async_compaction value and the capability on
-// magpie's provider table.
+// blackpie's provider table.
 func asyncOf(t *testing.T, config string) (feature any, capability any) {
 	t.Helper()
 	var doc map[string]any
@@ -57,15 +57,15 @@ func asyncOf(t *testing.T, config string) (feature any, capability any) {
 	}
 	features, _ := doc["features"].(map[string]any)
 	providers, _ := doc["model_providers"].(map[string]any)
-	p, _ := providers[magpieID].(map[string]any)
+	p, _ := providers[blackpieID].(map[string]any)
 	caps, _ := p["capabilities"].(map[string]any)
 	return features["async_compaction"], caps["remote_compaction"]
 }
 
-// The switch on, Codex routed through magpie as its provider (no ChatGPT
+// The switch on, Codex routed through blackpie as its provider (no ChatGPT
 // sign-in) gets [features.async_compaction] with the threshold in that
 // table, where Codex 0.163 reads it, and remote_compaction = "v2" on
-// magpie's provider table: without it Codex never starts a background
+// blackpie's provider table: without it Codex never starts a background
 // compaction on a provider other than OpenAI's (tried with Codex 0.163:
 // none in a whole turn past the threshold; with it, one per step, its
 // summary taken in). A model switch writing the table again keeps it; the
@@ -84,9 +84,9 @@ func TestCodexAsyncCompactionWritten(t *testing.T) {
 		t.Fatalf("async_compaction = %v:\n%s", feature, read())
 	}
 	if capability != "v2" {
-		t.Fatalf("no remote_compaction = \"v2\" on magpie's provider:\n%s", read())
+		t.Fatalf("no remote_compaction = \"v2\" on blackpie's provider:\n%s", read())
 	}
-	// a model switch writes magpie's provider table again
+	// a model switch writes blackpie's provider table again
 	if err := cx.Fields[0].Set("fake/m1"); err != nil {
 		t.Fatal(err)
 	}
@@ -121,8 +121,8 @@ func TestCodexAsyncCompactionWritten(t *testing.T) {
 
 // #5259: remote compaction is the provider's capability, not the
 // background compaction's. With the switch off, Codex routed through
-// magpie still gets remote_compaction = "v2", so a manual /compact asks
-// the protocol magpie answers (codexCompact) rather than Codex's local
+// blackpie still gets remote_compaction = "v2", so a manual /compact asks
+// the protocol blackpie answers (codexCompact) rather than Codex's local
 // summary, whose whole conversation goes as ordinary input items a vendor
 // like Command Code refuses.
 func TestCodexRemoteCompactionCapabilityWithoutBackgroundCompaction(t *testing.T) {
@@ -139,13 +139,13 @@ func TestCodexRemoteCompactionCapabilityWithoutBackgroundCompaction(t *testing.T
 
 // A value the user set is theirs: on, it is never written over; off, it
 // stays. The feature the user turned on by hand gets the capability it
-// needs on magpie's provider, the switch on or not (#2493).
+// needs on blackpie's provider, the switch on or not (#2493).
 func TestCodexAsyncCompactionKeepsTheUsers(t *testing.T) {
 	for _, tc := range []struct {
 		name, config string
 		on           bool
 		want         string // the config holds this after
-		capability   any    // on magpie's provider once routed
+		capability   any    // on blackpie's provider once routed
 	}{
 		{"enabled false, threshold", "[features.async_compaction]\nenabled = false\nmodel_async_compact_threshold_percent = 50\n", true,
 			"[features.async_compaction]\nenabled = false\nmodel_async_compact_threshold_percent = 50\n", "v2"},
@@ -178,7 +178,7 @@ func TestCodexAsyncCompactionKeepsTheUsers(t *testing.T) {
 	}
 }
 
-// A capability the user gave magpie's provider stays as they wrote it.
+// A capability the user gave blackpie's provider stays as they wrote it.
 func TestCodexAsyncCompactionKeepsUsersCapability(t *testing.T) {
 	quietCodex(t, false, provider.CodexDaemonCheck{})
 	home, read := codexHome(t, "", "model = \"gpt-5.5\"\n")
@@ -250,8 +250,8 @@ func TestCodexAsyncCompactionOldCodexGetsTheBareKey(t *testing.T) {
 	}
 }
 
-// A config an earlier magpie broke for an old Codex — the table it wrote
-// with every Codex taken to read it — is mended on the next sync: magpie's
+// A config an earlier blackpie broke for an old Codex — the table it wrote
+// with every Codex taken to read it — is mended on the next sync: blackpie's
 // table goes, whole, and the bare key takes its place. Once every Codex
 // is new enough again, the table comes back.
 func TestCodexAsyncCompactionTableTakenBackForOldCodex(t *testing.T) {
@@ -269,7 +269,7 @@ func TestCodexAsyncCompactionTableTakenBackForOldCodex(t *testing.T) {
 		t.Fatal(err)
 	}
 	if feature, _ := asyncOf(t, read()); feature != true || strings.Contains(read(), "[features.async_compaction]") || strings.Contains(read(), "model_async_compact_threshold_percent") {
-		t.Fatalf("magpie's table not mended to the bare key: %v\n%s", feature, read())
+		t.Fatalf("blackpie's table not mended to the bare key: %v\n%s", feature, read())
 	}
 	codexReadersAre(t, "0.164.0")
 	if err := cx.Sync(); err != nil {
@@ -339,15 +339,15 @@ func TestBundledCodexVersion(t *testing.T) {
 	}
 }
 
-// What magpie writes is loaded by real Codex binaries, old and new: each
-// path in MAGPIE_TEST_CODEX_BINS (separated by the system's list
+// What blackpie writes is loaded by real Codex binaries, old and new: each
+// path in BLACKPIE_TEST_CODEX_BINS (separated by the system's list
 // separator) runs `codex features list` against the config a sync wrote
 // for it, in a CODEX_HOME of the test's own. Skipped without it: a test
 // fetches no binary.
 func TestCodexAsyncConfigLoadsInRealCodex(t *testing.T) {
-	bins := filepath.SplitList(os.Getenv("MAGPIE_TEST_CODEX_BINS"))
+	bins := filepath.SplitList(os.Getenv("BLACKPIE_TEST_CODEX_BINS"))
 	if len(bins) == 0 {
-		t.Skip("MAGPIE_TEST_CODEX_BINS names no codex binaries")
+		t.Skip("BLACKPIE_TEST_CODEX_BINS names no codex binaries")
 	}
 	for _, bin := range bins {
 		out, err := exec.Command(bin, "--version").Output()

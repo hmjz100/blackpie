@@ -8,17 +8,17 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/appdir"
 )
 
 func TestStartThroughACurrentJunction(t *testing.T) {
-	e := exe(t) // <root>/app/moepie.exe
+	e := exe(t) // <root>/app/blackpie.exe
 	app := filepath.Dir(e)
 	version := filepath.Join(app, "0.1.4")
 	if err := os.MkdirAll(version, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Rename(e, filepath.Join(version, "moepie.exe")); err != nil {
+	if err := os.Rename(e, filepath.Join(version, "blackpie.exe")); err != nil {
 		t.Fatal(err)
 	}
 	current := filepath.Join(app, "current")
@@ -29,7 +29,7 @@ func TestStartThroughACurrentJunction(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	exeViaCurrent := filepath.Join(current, "moepie.exe")
+	exeViaCurrent := filepath.Join(current, "blackpie.exe")
 	appdir.UseExecutable(exeViaCurrent)
 	t.Cleanup(func() { appdir.UseExecutable("") })
 

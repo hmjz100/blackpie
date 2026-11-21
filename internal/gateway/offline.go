@@ -5,7 +5,7 @@ package gateway
 // group's providers failed one after another, each rested, and the first
 // stayed behind the others once the network was back). When a request
 // never got a reply — a name that didn't resolve, a connection that
-// couldn't be made — and nothing has answered magpie lately, the network
+// couldn't be made — and nothing has answered blackpie lately, the network
 // is asked: no interface up with an address means none, and otherwise
 // the other providers' hosts are dialled, and none taking the connection
 // means this computer can't reach the network. Then the next one is
@@ -16,7 +16,7 @@ package gateway
 
 import (
 	"context"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"net"
 	"net/http"
 	"net/url"
@@ -26,7 +26,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // connFailed is the error Go (and Bun, for a plugin's fetch) gives when no

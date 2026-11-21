@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/agentenv"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/agentenv"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // One account's daily check-in is turned off and on by itself (#1902,

@@ -13,9 +13,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/agent"
-	"github.com/yetone/magpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/gateway"
 )
 
 // hubSandbox is a sandbox with the hub's servers ended when the test is.
@@ -89,7 +89,7 @@ func TestHubToolsAndCalls(t *testing.T) {
 	if res, err := h.Call(ctx, "", "lone", "b", json.RawMessage(`{}`)); err != nil || !strings.HasPrefix(hubText(t, res), "remote ") {
 		t.Fatalf("lone's b for another app: %s %v", res, err)
 	}
-	if _, err := h.Call(ctx, "", "nope", "a", json.RawMessage(`{}`)); err == nil || err.Error() != "it isn't in magpie's Library" {
+	if _, err := h.Call(ctx, "", "nope", "a", json.RawMessage(`{}`)); err == nil || err.Error() != "it isn't in blackpie's Library" {
 		t.Errorf("a server not in the library, for another app: %v", err)
 	}
 	if _, err := h.Call(ctx, "", "fake", "b", json.RawMessage(`{}`)); err == nil || !strings.Contains(err.Error(), "turned off") {
@@ -216,15 +216,15 @@ func TestHubServerDiesAndIdles(t *testing.T) {
 	}
 }
 
-// With the hub on, an agent is given magpie's one entry in place of the
+// With the hub on, an agent is given blackpie's one entry in place of the
 // servers behind it; off, each server's own again. An agent with a
-// "magpie" of its own, or one that can't reach a URL, keeps each server's.
+// "blackpie" of its own, or one that can't reach a URL, keeps each server's.
 func TestHubEntrySwap(t *testing.T) {
 	h := hubSandbox(t)
 	claude := filepath.Join(h, ".claude.json")
 	write(t, claude, `{"numStartups": 3, "mcpServers": {"mine": {"command": "x"}}}`)
 	codex := filepath.Join(h, ".codex/config.toml")
-	write(t, codex, "[mcp_servers.magpie]\ncommand = \"their-own\"\n")
+	write(t, codex, "[mcp_servers.blackpie]\ncommand = \"their-own\"\n")
 	ok(t)(SaveServer("", Server{Name: "fs", Transport: "stdio", Command: "npx", Args: []string{"-y", "fs"}, Agents: []string{"claude", "codex"}}))
 	ok(t)(SaveServer("", Server{Name: "web", Transport: "http", URL: "https://example.com/mcp", Agents: []string{"claude"}}))
 	entries := func(id string) map[string]map[string]any {
@@ -256,14 +256,14 @@ func TestHubEntrySwap(t *testing.T) {
 			t.Errorf("problem: %+v", p)
 		}
 	}
-	if got := names("claude"); !slices.Equal(got, []string{"magpie", "mine"}) {
+	if got := names("claude"); !slices.Equal(got, []string{"blackpie", "mine"}) {
 		t.Fatalf("claude with the hub on: %v\n%s", got, read(t, claude))
 	}
-	if u, _ := entries("claude")["magpie"]["url"].(string); !strings.HasSuffix(u, gateway.HubMCPPath+"claude") {
-		t.Errorf("claude's magpie entry: %v", entries("claude")["magpie"])
+	if u, _ := entries("claude")["blackpie"]["url"].(string); !strings.HasSuffix(u, gateway.HubMCPPath+"claude") {
+		t.Errorf("claude's blackpie entry: %v", entries("claude")["blackpie"])
 	}
-	// codex has a magpie of its own: left as it is, its servers kept
-	if got := names("codex"); !slices.Equal(got, []string{"fs", "magpie"}) || entries("codex")["magpie"]["command"] != "their-own" {
+	// codex has a blackpie of its own: left as it is, its servers kept
+	if got := names("codex"); !slices.Equal(got, []string{"fs", "blackpie"}) || entries("codex")["blackpie"]["command"] != "their-own" {
 		t.Fatalf("codex with the hub on: %v\n%s", got, read(t, codex))
 	}
 	v, err := Read(nil)
@@ -293,12 +293,12 @@ func TestHubEntrySwap(t *testing.T) {
 	if !strings.Contains(read(t, claude), `"numStartups": 3`) {
 		t.Errorf("claude's own keys lost:\n%s", read(t, claude))
 	}
-	if got := names("codex"); !slices.Equal(got, []string{"fs", "magpie"}) || entries("codex")["magpie"]["command"] != "their-own" {
+	if got := names("codex"); !slices.Equal(got, []string{"fs", "blackpie"}) || entries("codex")["blackpie"]["command"] != "their-own" {
 		t.Fatalf("codex with the hub off: %v\n%s", got, read(t, codex))
 	}
 }
 
-// An agent given none of the hub's servers has no magpie entry and no
+// An agent given none of the hub's servers has no blackpie entry and no
 // state; the Connect sheet's Connect gives it every server
 // (EveryServerAgents, servers/agents-all), and it then has the hub's one
 // entry and says on.
@@ -325,8 +325,8 @@ func TestHubConnectAnAgent(t *testing.T) {
 	if got := hub(); got != "" {
 		t.Fatalf("claude given nothing: hub %q", got)
 	}
-	if strings.Contains(read(t, claude), `"magpie"`) {
-		t.Fatalf("claude given nothing has magpie:\n%s", read(t, claude))
+	if strings.Contains(read(t, claude), `"blackpie"`) {
+		t.Fatalf("claude given nothing has blackpie:\n%s", read(t, claude))
 	}
 	ok(t)(EveryServerAgents([]string{"claude"}, true))
 	if got := hub(); got != "on" {
@@ -336,23 +336,23 @@ func TestHubConnectAnAgent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if u, _ := e["magpie"]["url"].(string); !strings.HasSuffix(u, gateway.HubMCPPath+"claude") || e["fs"] != nil {
+	if u, _ := e["blackpie"]["url"].(string); !strings.HasSuffix(u, gateway.HubMCPPath+"claude") || e["fs"] != nil {
 		t.Fatalf("claude connected:\n%s", read(t, claude))
 	}
 }
 
-// A library server called magpie keeps every agent on each server's own
+// A library server called blackpie keeps every agent on each server's own
 // entry, said why.
 func TestHubNameTaken(t *testing.T) {
 	hubSandbox(t)
-	ok(t)(SaveServer("", Server{Name: "magpie", Transport: "stdio", Command: "npx", Args: []string{"x"}, Agents: []string{"claude"}}))
+	ok(t)(SaveServer("", Server{Name: "blackpie", Transport: "stdio", Command: "npx", Args: []string{"x"}, Agents: []string{"claude"}}))
 	ok(t)(SetMCPHub(true))
 	e, err := targetByID("claude").MCP.entries()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if e["magpie"]["command"] != "npx" {
-		t.Errorf("the library's own magpie was replaced: %v", e["magpie"])
+	if e["blackpie"]["command"] != "npx" {
+		t.Errorf("the library's own blackpie was replaced: %v", e["blackpie"])
 	}
 	v, err := Read(nil)
 	if err != nil {
@@ -367,7 +367,7 @@ func TestHubNameTaken(t *testing.T) {
 
 // A server the library no longer gives is ended by the next prune, though
 // no agent asks the hub again: ticked for no agent, edited, or the switch
-// turned off by another magpie (here a change that doesn't end them
+// turned off by another blackpie (here a change that doesn't end them
 // itself, as the CLI's doesn't end the gateway's).
 func TestHubPrune(t *testing.T) {
 	hubSandbox(t)
@@ -490,7 +490,7 @@ func TestHubLink(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	const cursor = "cursor://anysphere.cursor-deeplink/mcp/install?name=magpie&config="
+	const cursor = "cursor://anysphere.cursor-deeplink/mcp/install?name=blackpie&config="
 	if !strings.HasPrefix(link, cursor) {
 		t.Fatalf("cursor's link %q", link)
 	}
@@ -516,8 +516,8 @@ func TestHubLink(t *testing.T) {
 		t.Fatal(err)
 	}
 	var v map[string]string
-	if err := json.Unmarshal([]byte(q), &v); err != nil || v["name"] != "magpie" || v["type"] != "http" || v["url"] != want || len(v) != 3 {
-		t.Fatalf("vscode's config %s (%v), want magpie at %s", q, err, want)
+	if err := json.Unmarshal([]byte(q), &v); err != nil || v["name"] != "blackpie" || v["type"] != "http" || v["url"] != want || len(v) != 3 {
+		t.Fatalf("vscode's config %s (%v), want blackpie at %s", q, err, want)
 	}
 
 	if _, err := HubLink("javascript:alert(1)"); err == nil {
@@ -526,7 +526,7 @@ func TestHubLink(t *testing.T) {
 }
 
 // A server kept direct (#4382, cuipengcx90) stays each agent's own entry
-// with the hub on, written as with the hub off, beside magpie's for the
+// with the hub on, written as with the hub off, beside blackpie's for the
 // rest; switching it either way writes the agents again, the entry it had
 // the other way gone, and the hub neither lists nor runs it.
 func TestHubDirectServer(t *testing.T) {
@@ -563,7 +563,7 @@ func TestHubDirectServer(t *testing.T) {
 	}
 
 	ok(t)(SetMCPHub(true))
-	for id, want := range map[string][]string{"claude": {"index", "magpie", "mine"}, "codex": {"index", "magpie"}} {
+	for id, want := range map[string][]string{"claude": {"index", "blackpie", "mine"}, "codex": {"index", "blackpie"}} {
 		if got := names(id); !slices.Equal(got, want) {
 			t.Fatalf("%s with the hub on: %v, want %v\n%s\n%s", id, got, want, read(t, claude), read(t, codex))
 		}
@@ -584,7 +584,7 @@ func TestHubDirectServer(t *testing.T) {
 	// shared again: behind the hub, its own entry gone
 	ok(t)(ServerHub("index", false))
 	for _, id := range []string{"claude", "codex"} {
-		if got := names(id); slices.Contains(got, "index") || !slices.Contains(got, "magpie") {
+		if got := names(id); slices.Contains(got, "index") || !slices.Contains(got, "blackpie") {
 			t.Fatalf("%s with index shared: %v\n%s\n%s", id, got, read(t, claude), read(t, codex))
 		}
 	}
@@ -605,12 +605,12 @@ func TestHubDirectServer(t *testing.T) {
 	}
 }
 
-// magpie's own image server is in the hub too: listed as a tool that
+// blackpie's own image server is in the hub too: listed as a tool that
 // writes into the agent's project (Roots), and each call made with the
 // agent's roots and name in _meta, an empty list when it has none here,
 // so it saves into that agent's project. The agent's file has the hub's
 // entry and not the server's own.
-func TestHubGivesMagpieImage(t *testing.T) {
+func TestHubGivesBlackpieImage(t *testing.T) {
 	h := hubSandbox(t)
 	claude := filepath.Join(h, ".claude.json")
 	write(t, claude, `{"mcpServers": {}}`)
@@ -622,8 +622,8 @@ func TestHubGivesMagpieImage(t *testing.T) {
 	ctx := context.Background()
 
 	tools := hub.Tools(ctx, "claude")
-	if got := hubNames(tools); !slices.Equal(got, []string{"magpie-image/a", "magpie-image/b", "magpie-image/c"}) {
-		t.Fatalf("claude's tools %v, want magpie-image's", got)
+	if got := hubNames(tools); !slices.Equal(got, []string{"blackpie-image/a", "blackpie-image/b", "blackpie-image/c"}) {
+		t.Fatalf("claude's tools %v, want blackpie-image's", got)
 	}
 	for _, x := range tools {
 		if !x.Roots {
@@ -634,7 +634,7 @@ func TestHubGivesMagpieImage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if e["magpie"] == nil || e[selfServerName] != nil {
+	if e["blackpie"] == nil || e[selfServerName] != nil {
 		t.Fatalf("claude's file:\n%s", read(t, claude))
 	}
 
@@ -642,14 +642,14 @@ func TestHubGivesMagpieImage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := hubText(t, res); !strings.Contains(got, `meta={"magpie/client":"claude-code/2.1.314","magpie/roots":["file:///work/proj"]}`) {
+	if got := hubText(t, res); !strings.Contains(got, `meta={"blackpie/client":"claude-code/2.1.314","blackpie/roots":["file:///work/proj"]}`) {
 		t.Errorf("called as %q", got)
 	}
 	res, err = hub.Call(ctx, "claude", selfServerName, "a", json.RawMessage(`{}`))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := hubText(t, res); !strings.Contains(got, `meta={"magpie/roots":[]}`) {
+	if got := hubText(t, res); !strings.Contains(got, `meta={"blackpie/roots":[]}`) {
 		t.Errorf("no roots: called as %q", got)
 	}
 }

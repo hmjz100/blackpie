@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"cmp"
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -14,7 +14,7 @@ import (
 
 	"github.com/tidwall/gjson"
 
-	"github.com/yetone/magpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/appdir"
 )
 
 // Grok Build keeps a session in a folder of its own under its sessions
@@ -145,7 +145,7 @@ type grokUsage struct {
 	CacheWrite int `json:"cacheCreationTokens"`
 }
 
-// tokens are Grok's counts as magpie keeps them: input without the cache.
+// tokens are Grok's counts as blackpie keeps them: input without the cache.
 func (u grokUsage) tokens() Tokens {
 	return Tokens{Input: max(0, u.Input-u.CacheRead-u.CacheWrite), Output: u.Output, CacheRead: u.CacheRead, CacheWrite: u.CacheWrite}
 }

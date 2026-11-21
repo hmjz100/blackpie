@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 )
 
 // TestAllLazyPatternsCompile compiles every regexp the binary's packages
@@ -23,7 +23,7 @@ func TestAllLazyPatternsCompile(t *testing.T) {
 
 // TestNoEagerPackageRegexps fails on a package-level regexp.MustCompile
 // (or regexp.Compile) outside a function: every package's init runs on
-// every launch, `magpie statusline` on each Claude Code message included,
+// every launch, `blackpie statusline` on each Claude Code message included,
 // so such a pattern is compiled for a path most launches never take. Use
 // lazyre.New, which compiles on first use.
 func TestNoEagerPackageRegexps(t *testing.T) {

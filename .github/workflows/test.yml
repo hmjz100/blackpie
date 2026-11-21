@@ -124,8 +124,8 @@ jobs:
         timeout-minutes: 10
         run: |
           make app VERSION=ci
-          plutil -lint moepie.app/Contents/Info.plist
-          moepie.app/Contents/MacOS/moepie --version
+          plutil -lint blackpie.app/Contents/Info.plist
+          blackpie.app/Contents/MacOS/blackpie --version
 
       # Windows skips the Test step above, so the two plugin stderr tests run
       # here. The end-to-end one needs bun on PATH; without it it skips.
@@ -140,7 +140,7 @@ jobs:
         if: runner.os == 'Linux' && matrix.check == 'test'
         timeout-minutes: 10
         env:
-          MAGPIE_FLOW_BIG: '1'
+          BLACKPIE_FLOW_BIG: '1'
         run: |
           bun --version
           go test -timeout 10m -tags "${{ steps.tags.outputs.tags }}" ./internal/plugin/... -run '^TestFlowBigReplyProd$' -count=1

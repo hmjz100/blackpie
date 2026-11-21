@@ -4,7 +4,7 @@ package provider
 // vendor's meter tells only what the cycle has used so far against what it
 // grants ("500.52 / 5600"), so each reading of it is kept beside the one
 // before, and what was used in between is counted on the day of the later
-// one. That is the whole of it while magpie reads the meter (whenever the
+// one. That is the whole of it while blackpie reads the meter (whenever the
 // Usage page, the tray or routing asks, a minute apart at most); what is
 // used while it doesn't is counted on the day it next does.
 //
@@ -33,7 +33,7 @@ package provider
 
 import (
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"math"
 	"os"
 	"path/filepath"
@@ -43,14 +43,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/filememo"
-	"github.com/yetone/magpie/internal/lastgood"
+	"github.com/hmjz100/blackpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/lastgood"
 )
 
 // DailyCredits is what one of an account's credits windows went to day
 // by day.
 type DailyCredits struct {
-	// Since is the day magpie first read the account's credits: the days
+	// Since is the day blackpie first read the account's credits: the days
 	// before it aren't known, not unused.
 	Since string `json:"since"`
 	// Days are the days of the last creditsShown with credits used, oldest
@@ -86,8 +86,8 @@ type creditsAccount struct {
 	Days  map[string]float64 `json:"days,omitempty"`
 }
 
-// creditsMu keeps two readings in one magpie from writing the file at once;
-// each reads it afresh, so another magpie's (the CLI's) is kept too.
+// creditsMu keeps two readings in one blackpie from writing the file at once;
+// each reads it afresh, so another blackpie's (the CLI's) is kept too.
 var creditsMu sync.Mutex
 
 func creditsPath() string { return filepath.Join(filepath.Dir(Path()), "credits-daily.json") }

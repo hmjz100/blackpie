@@ -4,9 +4,9 @@ package gateway
 // (internal/browserext/ext/background.js), whose argument names these
 // schemas give.
 
-const browserInstructions = `These tools use the user's own browser (Chrome, Edge or another Chromium browser with Magpie Browser installed): its real tabs, signed in to the sites the user is signed in to. Use it when a task needs the user's sessions or a real browser.
+const browserInstructions = `These tools use the user's own browser (Chrome, Edge or another Chromium browser with Blackpie Browser installed): its real tabs, signed in to the sites the user is signed in to. Use it when a task needs the user's sessions or a real browser.
 How to work:
-- Start with browser_tabs or browser_snapshot. Calls go to the tab the user is looking at until you open or select another; tabs you open go in the "Magpie" tab group.
+- Start with browser_tabs or browser_snapshot. Calls go to the tab the user is looking at until you open or select another; tabs you open go in the "Blackpie" tab group.
 - browser_snapshot shows the page as an accessibility tree. Elements you can act on carry a ref (e12); pass it to browser_click, browser_type and the rest. Refs stay the element's while the page keeps it. Every action answers with the page after it, so you rarely need another snapshot.
 - Prefer refs to browser_evaluate. Use browser_screenshot when the layout or an image matters.
 - This is the user's browser: don't close tabs you didn't open, don't change their settings, and ask before sending, buying, posting or deleting anything on their behalf. When a site wants a sign-in, a captcha or a 2FA code, ask the user to do it in the tab, then go on.`
@@ -42,7 +42,7 @@ func browserTools() []any {
 		return map[string]any{"type": "array", "items": map[string]any{"type": "string"}, "description": desc}
 	}
 	return []any{
-		browserTool("browser_tabs", "Tabs", "List the browser's tabs, open a new one (in the Magpie tab group), switch the tab calls go to, or close one.", false, map[string]any{
+		browserTool("browser_tabs", "Tabs", "List the browser's tabs, open a new one (in the Blackpie tab group), switch the tab calls go to, or close one.", false, map[string]any{
 			"action":     enum("list (default), new, select or close", "list", "new", "select", "close"),
 			"url":        str("For new: the page to open in it."),
 			"background": boolean("For new: open it without bringing it to the front."),
@@ -112,7 +112,7 @@ func browserTools() []any {
 		browserTool("browser_text", "Page text", "Read the page's visible text, without the tree.", true, map[string]any{
 			"maxChars": num("The most characters to return (default 40000)."),
 		}),
-		browserTool("browser_console", "Console", "Read the tab's console messages, script errors and failed requests since magpie started watching it.", true, map[string]any{
+		browserTool("browser_console", "Console", "Read the tab's console messages, script errors and failed requests since blackpie started watching it.", true, map[string]any{
 			"level": enum("all (default), errors or network", "all", "errors", "network"),
 			"limit": num("The most recent messages to return (default 50)."),
 		}),

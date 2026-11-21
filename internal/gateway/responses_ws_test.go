@@ -15,10 +15,10 @@ import (
 	"github.com/coder/websocket"
 	"github.com/tidwall/gjson"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/budget"
-	"github.com/yetone/magpie/internal/codexcat"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/budget"
+	"github.com/hmjz100/blackpie/internal/codexcat"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // respUp is a Responses provider that answers each turn with one message
@@ -183,7 +183,7 @@ func create(prev, input string, extra ...string) string {
 // Responses route; a turn naming the reply before it, with only what
 // came after, reaches the provider as the whole conversation, the reply
 // in its place, and none of the socket's own members. Over HTTP Codex
-// sends the conversation whole each turn; magpie answered the upgrade
+// sends the conversation whole each turn; blackpie answered the upgrade
 // 426 (a87dc1ff2), so it never sent less.
 func TestResponsesSocketContinues(t *testing.T) {
 	fresh(t)
@@ -442,8 +442,8 @@ func TestResponsesSocketCutReplyFails(t *testing.T) {
 // one at all.
 func TestResponsesSocketGuards(t *testing.T) {
 	fresh(t)
-	t.Setenv("MAGPIE_ADDR", "")
-	t.Setenv("MAGPIE_PUBLIC_URL", "")
+	t.Setenv("BLACKPIE_ADDR", "")
+	t.Setenv("BLACKPIE_PUBLIC_URL", "")
 	budget.Forget()
 	pinLimitClock(t)
 	u := &respUp{}
@@ -472,7 +472,7 @@ func TestResponsesSocketGuards(t *testing.T) {
 	}
 	before := u.calls()
 	refused("a remote caller without a key", remote(""))
-	refused("a remote caller with a wrong key", remote("sk-magpie-wrong"))
+	refused("a remote caller with a wrong key", remote("sk-blackpie-wrong"))
 	for _, origin := range []string{"https://evil.example", "null", "http://evil.localhost:3425"} {
 		refused("Origin "+origin, http.Header{"Origin": {origin}})
 	}
@@ -567,7 +567,7 @@ func TestResponsesSocketDrains(t *testing.T) {
 // backend as Codex's HTTP turn would, the sign-in, the turn state and the
 // whole conversation with it, and the reply's headers come back as the
 // frames Codex reads them from on a socket (response.metadata,
-// codex.response.metadata with magpie's model-list tag, codex.rate_limits).
+// codex.response.metadata with blackpie's model-list tag, codex.rate_limits).
 func TestCodexSocketServed(t *testing.T) {
 	setup(t, provider.Chat, &fake{t: t})
 	var mu sync.Mutex

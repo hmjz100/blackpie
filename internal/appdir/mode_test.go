@@ -7,17 +7,17 @@ import (
 )
 
 // The mode file comes before Resolve's guess: a data folder left beside
-// magpie after a move to the installed place isn't taken for its data, and
+// blackpie after a move to the installed place isn't taken for its data, and
 // a portable mode needs no data guess in a shared folder.
 func TestModeFileComesFirst(t *testing.T) {
 	t.Setenv("APPIMAGE", "")
 	r := root(t)
-	exe := touch(t, filepath.Join(r, "magpie"))
+	exe := touch(t, filepath.Join(r, "blackpie"))
 	data := filepath.Join(r, DataName)
 	mkdir(t, data)
 	touch(t, filepath.Join(data, "settings.json"))
 	if Resolve(exe) != data {
-		t.Fatalf("without a mode file the data folder is magpie's: %q", Resolve(exe))
+		t.Fatalf("without a mode file the data folder is blackpie's: %q", Resolve(exe))
 	}
 	if err := WriteMode(exe, ModeInstalled); err != nil {
 		t.Fatal(err)
@@ -39,13 +39,13 @@ func TestModeFileComesFirst(t *testing.T) {
 	}
 }
 
-// A portable mode whose data folder is gone, or a mode file magpie can't
+// A portable mode whose data folder is gone, or a mode file blackpie can't
 // read, is an error, and resolves to the data folder: never to the
 // installed accounts.
 func TestModeFileBroken(t *testing.T) {
 	t.Setenv("APPIMAGE", "")
 	r := root(t)
-	exe := touch(t, filepath.Join(r, "magpie"))
+	exe := touch(t, filepath.Join(r, "blackpie"))
 	if err := WriteMode(exe, ModePortable); err != nil {
 		t.Fatal(err)
 	}

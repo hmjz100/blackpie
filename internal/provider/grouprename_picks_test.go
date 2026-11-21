@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // A routing group picked for an agent shown only its picks stays picked

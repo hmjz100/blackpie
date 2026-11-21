@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/yetone/magpie/internal/beat"
-	"github.com/yetone/magpie/internal/filememo"
-	"github.com/yetone/magpie/internal/redact"
-	"github.com/yetone/magpie/internal/sessions"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/beat"
+	"github.com/hmjz100/blackpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/redact"
+	"github.com/hmjz100/blackpie/internal/sessions"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 type sessionAvailability struct {
@@ -121,7 +121,7 @@ func (e *otelExporter) watchSessions(ctx context.Context, started time.Time, eve
 	}
 	// while sessions aren't exported, a save here turns them on at once
 	// (Written), and OthersEvery only catches the CLI's (#3185: a 2s tick
-	// woke an idle magpie that exports nothing)
+	// woke an idle blackpie that exports nothing)
 	wait := every
 	for {
 		select {

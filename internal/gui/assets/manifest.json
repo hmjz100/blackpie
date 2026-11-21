@@ -1,6 +1,6 @@
 {
-  "name": "moepie",
-  "short_name": "moepie",
+  "name": "blackpie",
+  "short_name": "blackpie",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

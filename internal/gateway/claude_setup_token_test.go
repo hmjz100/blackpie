@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 const gwSetupToken = "sk-ant-oat01-gatewaysetuptoken-0123456789abcdefghijklmnop"

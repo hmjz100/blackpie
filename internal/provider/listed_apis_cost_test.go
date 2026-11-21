@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/catalog"
 )
 
 // A provider's model list is weighed model by model (Exposed's NoAPIFor

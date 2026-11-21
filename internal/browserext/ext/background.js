@@ -1,5 +1,5 @@
-// Magpie Browser: magpie's gateway hands this extension the browser tool
-// calls of the agents it serves (magpie mcp browser), and it carries them
+// Blackpie Browser: blackpie's gateway hands this extension the browser tool
+// calls of the agents it serves (blackpie mcp browser), and it carries them
 // out in this browser's own tabs, signed in to whatever the user is.
 
 import { GATEWAY } from "./config.js";
@@ -30,7 +30,7 @@ async function connect() {
   const base = await gatewayURL();
   let s;
   try {
-    s = new WebSocket(base.replace(/\/$/, "") + "/v1/magpie/browser/extension");
+    s = new WebSocket(base.replace(/\/$/, "") + "/v1/blackpie/browser/extension");
   } catch (e) {
     connecting = false;
     setStatus({ connected: false, gateway: base, error: String(e.message || e) });
@@ -77,7 +77,7 @@ function setStatus(s) {
 // a message every 20s keeps the service worker alive while connected;
 // the alarm brings it back to reconnect when Chrome stopped it
 setInterval(() => { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: "ping" })); }, 20000);
-chrome.alarms.create("magpie-reconnect", { periodInMinutes: 0.5 });
+chrome.alarms.create("blackpie-reconnect", { periodInMinutes: 0.5 });
 chrome.alarms.onAlarm.addListener(() => connect());
 chrome.runtime.onStartup.addListener(() => connect());
 chrome.runtime.onInstalled.addListener(() => connect());
@@ -155,10 +155,10 @@ async function tabFor(session, args) {
 // the tab group agents' tabs are opened in, one per window
 async function group(tabId, windowId) {
   try {
-    const [g] = await chrome.tabGroups.query({ windowId, title: "Magpie" });
+    const [g] = await chrome.tabGroups.query({ windowId, title: "Blackpie" });
     if (g) return await chrome.tabs.group({ tabIds: [tabId], groupId: g.id });
     const id = await chrome.tabs.group({ tabIds: [tabId], createProperties: { windowId } });
-    await chrome.tabGroups.update(id, { title: "Magpie", color: "grey" });
+    await chrome.tabGroups.update(id, { title: "Blackpie", color: "grey" });
   } catch {}
 }
 
@@ -170,7 +170,7 @@ const fail = (s) => ({ content: [text(s)], isError: true });
 async function run(m) {
   try {
     const tool = TOOLS[m.tool];
-    if (!tool) return fail(`magpie's browser extension has no tool ${m.tool}: update it (magpie writes it again on start; reload it in chrome://extensions)`);
+    if (!tool) return fail(`blackpie's browser extension has no tool ${m.tool}: update it (blackpie writes it again on start; reload it in chrome://extensions)`);
     return await tool(m.session || "default", m.args || {});
   } catch (e) {
     return fail(String((e && e.message) || e));
@@ -182,7 +182,7 @@ async function ready(session, args) {
   const t = state(tabId);
   if (t.stoppedByUser) {
     t.stoppedByUser = false;
-    throw new Error("the user stopped Magpie Browser in this tab (Cancel on Chrome's bar): ask them before going on. The next call attaches to it again.");
+    throw new Error("the user stopped Blackpie Browser in this tab (Cancel on Chrome's bar): ask them before going on. The next call attaches to it again.");
   }
   await attach(tabId);
   await send(tabId, "Emulation.setFocusEmulationEnabled", { enabled: true }).catch(() => {});
@@ -544,7 +544,7 @@ const TOOLS = {
       const isInput = await call(t, el, 'function(){ return this.tagName === "INPUT" && this.type === "file" }');
       const set = (backendNodeId) => send(t.tabId, "DOM.setFileInputFiles", { files, backendNodeId }).catch((e) => {
         const m = String(e.message || e);
-        if (/not allowed|permission|denied/i.test(m)) throw new Error("Chrome didn't let Magpie Browser choose files: turn on \"Allow access to file URLs\" for Magpie Browser in chrome://extensions");
+        if (/not allowed|permission|denied/i.test(m)) throw new Error("Chrome didn't let Blackpie Browser choose files: turn on \"Allow access to file URLs\" for Blackpie Browser in chrome://extensions");
         throw e;
       });
       if (isInput) return void (await set(el.backend));
@@ -663,7 +663,7 @@ const TOOLS = {
     let logs = t.logs.filter((l) => !levels || levels.includes(l.level));
     const n = Math.min(Number(args.limit) || 50, 300);
     logs = logs.slice(-n);
-    if (!logs.length) return { content: [text("Nothing logged since Magpie Browser started watching this tab.")] };
+    if (!logs.length) return { content: [text("Nothing logged since Blackpie Browser started watching this tab.")] };
     return { content: [text(logs.map((l) => `[${new Date(l.at).toISOString().slice(11, 19)}] ${l.level}: ${l.text}`).join("\n"))] };
   },
 

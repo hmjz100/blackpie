@@ -3,11 +3,11 @@ package gateway
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 
 	"github.com/tidwall/gjson"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // Format is the shape a client asked the answer to come in (structured

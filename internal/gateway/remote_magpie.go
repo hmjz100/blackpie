@@ -9,50 +9,50 @@ import (
 	"sync"
 	"unicode"
 
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
-// A request passed on to another computer's magpie (a Remote magpie
-// provider) goes as magpie's own, with magpie's User-Agent and the other
-// magpie's key, so that magpie knew it only as "magpie" (Jorben on Discord).
+// A request passed on to another computer's blackpie (a Remote blackpie
+// provider) goes as blackpie's own, with blackpie's User-Agent and the other
+// blackpie's key, so that blackpie knew it only as "blackpie" (Jorben on Discord).
 // It now names the agent it came from (AgentHeader) and the computer
-// (ViaHeader), and the other magpie keeps them in its usage, as "Claude
-// Code · via <computer>". They are a label and nothing more: what magpie
+// (ViaHeader), and the other blackpie keeps them in its usage, as "Claude
+// Code · via <computer>". They are a label and nothing more: what blackpie
 // does with the request — the models an agent is shown, its stand-ins, a
 // routing group's rules — still goes by who sent it, and they are taken
-// only from a magpie's request (its User-Agent), one a client on the
+// only from a blackpie's request (its User-Agent), one a client on the
 // network could send only with the key anyway, and could name itself any
 // agent by its User-Agent as well. No vendor is ever sent them: they come
-// off every request as it arrives, and go on only to a remote magpie.
+// off every request as it arrives, and go on only to a remote blackpie.
 const (
-	AgentHeader = "X-Magpie-Agent"
-	ViaHeader   = "X-Magpie-Via"
+	AgentHeader = "X-Blackpie-Agent"
+	ViaHeader   = "X-Blackpie-Via"
 	// ClaudeCacheTTLHeader is how long the prompt cache of a Claude Code
 	// request is to be kept, as the user of the computer Claude Code runs
 	// on picked it: "5m", "1h", or "default" for no pick. Claude Code
 	// marks a five-minute cache with no ttl, picked or not, so the other
-	// magpie's Claude relay can't tell a pick from its marks
-	// (claudeTTLOf, runTTLFor; linkaww). Taken only from a magpie's
+	// blackpie's Claude relay can't tell a pick from its marks
+	// (claudeTTLOf, runTTLFor; linkaww). Taken only from a blackpie's
 	// request.
-	ClaudeCacheTTLHeader = "X-Magpie-Claude-Cache-TTL"
+	ClaudeCacheTTLHeader = "X-Blackpie-Claude-Cache-TTL"
 )
 
 // caller is who a request is recorded as: its agent, and the computer it
 // was passed on from, "" for this one. session and native are the session
-// the caller named (sessionOf's X-Magpie-Session, and the agent's own
-// header nativeSessionOf takes, by its name), passed on to a remote magpie
+// the caller named (sessionOf's X-Blackpie-Session, and the agent's own
+// header nativeSessionOf takes, by its name), passed on to a remote blackpie
 // with the request (#672).
 type caller struct {
 	agent, via string
 	session    string
 	native     [2]string // header, value
 	// compact is DSH's compaction mark as it came, passed on with the
-	// session so the other magpie records the call as one (#2505)
+	// session so the other blackpie records the call as one (#2505)
 	compact string
 	// ua is the User-Agent the request came with, as it came: the one a
 	// provider that passes the agent's on is sent (userAgentFor)
 	ua string
-	// cacheTTL is the Claude Code cache lifetime another magpie named
+	// cacheTTL is the Claude Code cache lifetime another blackpie named
 	// (ClaudeCacheTTLHeader); claudeHere, that the request is Claude
 	// Code's on this computer, whose user's pick is read here
 	// (claudeTTLOf)
@@ -68,7 +68,7 @@ func withCaller(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), callerCtx{}, callerFrom(r))
 		if searchingFrom(r) {
-			// another magpie's search: only the model itself searches
+			// another blackpie's search: only the model itself searches
 			ctx = context.WithValue(ctx, searchingKey{}, true)
 		}
 		r.Header.Del(AgentHeader)
@@ -80,11 +80,11 @@ func withCaller(next http.Handler) http.Handler {
 }
 
 // callerFrom reads who r is recorded as from its headers, before withCaller
-// takes magpie's own off: the one rule for every place that names a
+// takes blackpie's own off: the one rule for every place that names a
 // request's agent (usage, sessions, the routing trace, the masking log,
-// the requests in flight), so another magpie's request is shown as the
-// agent that made it there, never as "magpie" (linkaww on Discord: the
-// masking log named magpie where usage named Pi).
+// the requests in flight), so another blackpie's request is shown as the
+// agent that made it there, never as "blackpie" (linkaww on Discord: the
+// masking log named blackpie where usage named Pi).
 func callerFrom(r *http.Request) caller {
 	c := caller{agent: agentOf(r), session: boundedSession(r.Header.Get(SessionHeader)), ua: r.Header.Get("User-Agent")}
 	if dshCompacts(r.Header) {
@@ -96,7 +96,7 @@ func callerFrom(r *http.Request) caller {
 			break
 		}
 	}
-	if strings.HasPrefix(r.Header.Get("User-Agent"), "magpie/") {
+	if strings.HasPrefix(r.Header.Get("User-Agent"), "blackpie/") {
 		switch v := r.Header.Get(ClaudeCacheTTLHeader); v {
 		case "5m", "1h", "default":
 			c.cacheTTL = v
@@ -119,7 +119,7 @@ func callerFrom(r *http.Request) caller {
 // claudeTTLOf is how long the prompt cache of c's request is to be kept,
 // as the user of the computer its Claude Code runs on picked it: "5m",
 // "1h", "default" for no pick, "" when unknown (not Claude Code's, from
-// a magpie that didn't say, or Claude Code's settings.json unreadable).
+// a blackpie that didn't say, or Claude Code's settings.json unreadable).
 // Claude Code on this computer: this computer's pick, as claudeRunTTL
 // reads it.
 func claudeTTLOf(c caller) string {
@@ -153,23 +153,23 @@ func label(v string) string {
 	return v
 }
 
-// boundedSession is a session header's value as magpie keeps it: trimmed,
+// boundedSession is a session header's value as blackpie keeps it: trimmed,
 // at most 128 bytes, as sessionOf takes it.
 func boundedSession(v string) string {
 	v = strings.TrimSpace(v)
 	return v[:min(len(v), 128)]
 }
 
-// passOnCaller names, on a request to a remote magpie, the agent it is for
+// passOnCaller names, on a request to a remote blackpie, the agent it is for
 // and the computer it comes from: the one it was passed on from, else this.
-// The session the caller named goes on too, as it named it — magpie's
-// X-Magpie-Session and the agent's own header (session_id, …) — so the
-// other magpie records the call under it and keeps a conversation on its
+// The session the caller named goes on too, as it named it — blackpie's
+// X-Blackpie-Session and the agent's own header (session_id, …) — so the
+// other blackpie records the call under it and keeps a conversation on its
 // account by it rather than by its first message (#672). Only a remote
-// magpie is sent them; a vendor never is. It is asked, too, to name the
+// blackpie is sent them; a vendor never is. It is asked, too, to name the
 // vendor's model in its reply, as it did before a reply named the model
-// asked for: this magpie records what served the call from it (served,
-// swapped, routed; TestRemoteMagpieGroupNotSwapped), and gives its own
+// asked for: this blackpie records what served the call from it (served,
+// swapped, routed; TestRemoteBlackpieGroupNotSwapped), and gives its own
 // agent the name it asked for itself.
 func passOnCaller(ctx context.Context, req *http.Request) {
 	req.Header.Set(responseModelHeader, "vendor")

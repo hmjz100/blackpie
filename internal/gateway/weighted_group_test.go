@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/routes"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/routes"
 )
 
 // A group routed by weight (#1910, DD on Discord): members weighing 3, 1

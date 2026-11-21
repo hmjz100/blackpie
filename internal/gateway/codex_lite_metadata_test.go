@@ -9,7 +9,7 @@ import (
 
 	"github.com/tidwall/gjson"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 func TestFromLiteRemovesOnlyTheWebsocketLiteMarker(t *testing.T) {

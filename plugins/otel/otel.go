@@ -9,10 +9,10 @@
 package otel
 
 import (
-	"github.com/yetone/magpie/internal/otlp"
-	"github.com/yetone/magpie/internal/pluginrt"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/otlp"
+	"github.com/hmjz100/blackpie/internal/pluginrt"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 func init() {
@@ -21,7 +21,7 @@ func init() {
 		Name: "Observability", Sub: "Send each request's traces and metrics to an OpenTelemetry collector, such as Langfuse",
 		Group: pluginrt.GroupIntegrations, Order: 1, Where: []string{"Settings › Observability"},
 		One: "Sending to a collector", Many: "Sending to a collector",
-		// on while settings.json or MAGPIE_OTEL_ENABLED says to send: off,
+		// on while settings.json or BLACKPIE_OTEL_ENABLED says to send: off,
 		// nothing would
 		InUse: func() (int, error) {
 			if _, err := settings.LoadChecked(); err != nil {

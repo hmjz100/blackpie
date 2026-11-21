@@ -10,8 +10,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/yetone/magpie/internal/agentenv"
-	"github.com/yetone/magpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/agentenv"
+	"github.com/hmjz100/blackpie/internal/catalog"
 )
 
 // A provider whose protocols are served at bases of their own is asked

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/gateway"
 )
 
 // The tray panel's Routing tab opens the window's Routing page on the

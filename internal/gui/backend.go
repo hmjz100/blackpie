@@ -7,16 +7,16 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/yetone/magpie/internal/agent"
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/codexrelay"
-	"github.com/yetone/magpie/internal/filememo"
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/codexrelay"
+	"github.com/hmjz100/blackpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
-// served is the gateway this process serves, nil while another magpie
+// served is the gateway this process serves, nil while another blackpie
 // has it.
 var served atomic.Pointer[gateway.Server]
 
@@ -34,9 +34,9 @@ func stopServing() {
 }
 
 // startBackend starts what serves the page and the agents: the gateway,
-// unless another magpie has it (then that one serves and this one only
-// shows its status, and gw is nil — until that one is gone: a magpie left
-// running from before an update, a magpie serve in a terminal), and the
+// unless another blackpie has it (then that one serves and this one only
+// shows its status, and gw is nil — until that one is gone: a blackpie left
+// running from before an update, a blackpie serve in a terminal), and the
 // model lists kept warm.
 func startBackend() (gw *gateway.Server) {
 	gateway.Window = true // the routing this process serves is shown on its page
@@ -52,7 +52,7 @@ func startBackend() (gw *gateway.Server) {
 	// Codex's background app-server, restarted when it has the list from
 	// before a change and no codex session is on it (luci)
 	go agent.KeepCodexDaemonCurrent(backendCtx)
-	// the compactions magpie made in Codex's threads written as Codex's
+	// the compactions blackpie made in Codex's threads written as Codex's
 	// own, so a thread goes on when Codex talks to OpenAI itself
 	go agent.KeepCodexRolloutsPortable(backendCtx)
 	// Model lists are fetched, never compiled in: whatever the agents can see
@@ -69,7 +69,7 @@ func startBackend() (gw *gateway.Server) {
 		// A signed-in agent's list exists only at the vendor; fill it in the
 		// first time so the picker never shows a stale snapshot.
 		provider.FetchNew(20 * time.Second)
-		// lists an older magpie wrote into agents' files, without what
+		// lists an older blackpie wrote into agents' files, without what
 		// it has learnt since (context windows, providers added)
 		agent.SyncCatalog()
 		// and fetched again each day it stays open, for new models' prices
@@ -78,10 +78,10 @@ func startBackend() (gw *gateway.Server) {
 	return gw
 }
 
-// gatewayWatch is how often a magpie without the gateway looks for it gone.
+// gatewayWatch is how often a blackpie without the gateway looks for it gone.
 const gatewayWatch = 15 * time.Second
 
-// watchGateway takes the gateway up once the magpie that had it is gone,
+// watchGateway takes the gateway up once the blackpie that had it is gone,
 // looking every so often until ctx ends: a watch that outlived it would
 // start a gateway after this one has stopped serving.
 func watchGateway(ctx context.Context, every time.Duration) {
@@ -118,7 +118,7 @@ var servedRun struct {
 	done chan struct{}
 }
 
-// serveGateway starts the gateway here when no magpie has it: the one
+// serveGateway starts the gateway here when no blackpie has it: the one
 // started, or nil.
 func serveGateway() *gateway.Server {
 	gatewayMu.Lock()
@@ -132,10 +132,10 @@ func serveGatewayLocked() *gateway.Server {
 	// so is the one that handed this one its socket, still finishing its
 	// requests on it (gui/handover.go)
 	if !gateway.Handover && !gateway.Inherited() {
-		// the Codex relay a magpie quitting left at the port (codexrelay)
+		// the Codex relay a blackpie quitting left at the port (codexrelay)
 		// lets go of it, finishing the turns it streams
 		codexrelay.Leave()
-		// another magpie serving it: said on the page when its version
+		// another blackpie serving it: said on the page when its version
 		// isn't this one's, and quit when it is an older copy of the app
 		// with nothing in flight (gateway_older.go)
 		if o := gateway.ServedBy(); o.Running {
@@ -145,13 +145,13 @@ func serveGatewayLocked() *gateway.Server {
 			// the relay the one quit may have left at the port
 			codexrelay.Leave()
 		}
-		// a magpie too busy to answer the question in time (a small
+		// a blackpie too busy to answer the question in time (a small
 		// server, one starting), or another program, has the port: a
-		// second listen only fails (K.Liu on Discord: magpie web beside
+		// second listen only fails (K.Liu on Discord: blackpie web beside
 		// the service logged "bind: address already in use")
 		if gateway.Taken() {
 			if !takenSaid.Swap(true) {
-				log.Printf("gateway: %s is taken but doesn't answer as magpie yet; this magpie serves the gateway once it is free", gateway.URL())
+				log.Printf("gateway: %s is taken but doesn't answer as blackpie yet; this blackpie serves the gateway once it is free", gateway.URL())
 			}
 			return nil
 		}

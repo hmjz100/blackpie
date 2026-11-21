@@ -3,12 +3,12 @@ package provider
 import (
 	"cmp"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"slices"
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // A template is a routing group made of the user's own models for a need

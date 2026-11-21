@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/tidwall/gjson"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // clineUnwrapped is a Cline reply with the {success, data} envelope its API

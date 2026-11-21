@@ -48,7 +48,7 @@ function serve(lang, feed) {
     if (url.pathname === "/api/providers") return json({ providers, excluded: [], gateway: { running: true, window: true, url: "http://127.0.0.1:3999" } });
     if (url.pathname === "/api/usage/quotas") return json([]);
     if (url.pathname.startsWith("/api/")) return json({});
-    const file = process.env.MAGPIE_ROUTING_CLIENT && url.pathname === "/plugins/routing/client.js" ? process.env.MAGPIE_ROUTING_CLIENT : path.join(assets, url.pathname === "/" ? "index.html" : url.pathname);
+    const file = process.env.BLACKPIE_ROUTING_CLIENT && url.pathname === "/plugins/routing/client.js" ? process.env.BLACKPIE_ROUTING_CLIENT : path.join(assets, url.pathname === "/" ? "index.html" : url.pathname);
     const contentType = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png" }[path.extname(file)];
     await route.fulfill({ body: await fs.readFile(file), contentType });
   };
@@ -104,7 +104,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       const feed = { q: [], closed: false };
       await page.route("**/*", serve(lang, feed));
       t.after(async () => { feed.closed = true; await browser.close(); });
-      await page.goto("http://magpie.test/?view=routing");
+      await page.goto("http://blackpie.test/?view=routing");
       await page.locator("#view-routing .rt-req").nth(5).waitFor();
       await page.waitForTimeout(600);
       const cardWidth = () => page.locator('.rt-accts > li').first().evaluate((e) => e.getBoundingClientRect().width);
@@ -154,7 +154,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       assert(Math.abs(grown.reqs - was.reqs - (grown.rest - was.rest)) < 1, `the requests stay where they were: ${JSON.stringify([was, grown])}`);
       assert.equal(grown.viewTop, was.viewTop, "the page doesn't scroll");
       assert.deepEqual((await unwired(page)).off, [], "a wire ends at each account in sight");
-      // the agent and magpie, beside the first accounts, in sight unscrolled
+      // the agent and blackpie, beside the first accounts, in sight unscrolled
       const cards = await page.evaluate(() => {
         const v = document.querySelector("#view-routing"), c = v.querySelector(".rt-canvas"), r = c.getBoundingClientRect();
         const box = { top: r.top + c.clientTop, bottom: r.top + c.clientTop + c.clientHeight, left: r.left, right: r.left + c.clientWidth };
@@ -162,7 +162,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         return { wide: !v.querySelector(".rt-stage").classList.contains("max560"), scrollTop: c.scrollTop, out: [...v.querySelectorAll(".rt-srcs > .rt-node, .rt-stage > .rt-hub")].filter(out).map((e) => e.textContent.trim().slice(0, 20)), n: v.querySelectorAll(".rt-srcs > .rt-node, .rt-stage > .rt-hub").length };
       });
       assert(cards.wide && cards.scrollTop > 0 && cards.n >= 2, `wide with pan room: ${JSON.stringify(cards)}`);
-      assert.deepEqual(cards.out, [], "the agent and magpie are in the window's sight");
+      assert.deepEqual(cards.out, [], "the agent and blackpie are in the window's sight");
       // A resize can measure a key mid-shake. Its wire must return to the
       // settled card without another request or scroll to redraw it.
       await page.locator('.rt-accts > li:not(.rt-fold):not(.rt-sub):not(.rt-gap)').first().evaluate((e) => {
@@ -249,7 +249,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       await zAt.click();
 
       // 150%, its wires at its accounts, scrolled down the window too
-      await page.evaluate(() => localStorage.removeItem("magpie.routingStageZoom"));
+      await page.evaluate(() => localStorage.removeItem("blackpie.routingStageZoom"));
       await zIn.click(); await zIn.click(); await zIn.click();
       z = await k();
       assert.equal(z.said, "150%");
@@ -260,7 +260,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       assert(mid.rows > 0 && !mid.off.length, `at 150% scrolled, a wire ends at each account: ${JSON.stringify(mid)}`);
 
       // kept across a reload
-      assert.equal(await page.evaluate(() => localStorage.getItem("magpie.routingStageZoom")), "1.5");
+      assert.equal(await page.evaluate(() => localStorage.getItem("blackpie.routingStageZoom")), "1.5");
       await page.reload();
       await page.locator("#view-routing .rt-req").nth(5).waitFor();
       await page.waitForTimeout(600);
@@ -316,7 +316,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       let sizedView = await k();
       assert.equal(sizedView.h, Math.round(Math.max(240, sizedView.view * .45)), 'compact viewport gives room back to the request details');
       assert.equal(sizedView.said, zoomBeforeSize, 'height never changes zoom');
-      assert.equal(await page.evaluate(() => localStorage.getItem('magpie.routingStageSize')), 'compact');
+      assert.equal(await page.evaluate(() => localStorage.getItem('blackpie.routingStageSize')), 'compact');
       await page.reload();
       await page.locator('#view-routing .rt-req').nth(5).waitFor();
       await frames(page);
@@ -350,11 +350,11 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ['chromium',
     const browser=await(engine==='webkit'?webkit.launch():chromium.launch({channel:'chromium'}));t.after(()=>browser.close());
     const context=await browser.newContext({viewport:{width:1200,height:1000}}),p=await context.newPage(),feed={q:[],closed:false};
     t.after(()=>{feed.closed=true;});p.setDefaultTimeout(5000);
-    await p.addInitScript(()=>{if(!sessionStorage.getItem('seeded')){localStorage.setItem('magpie.routingStageZoom','.75');localStorage.removeItem('magpie.routingStageView');sessionStorage.setItem('seeded','1');}});
+    await p.addInitScript(()=>{if(!sessionStorage.getItem('seeded')){localStorage.setItem('blackpie.routingStageZoom','.75');localStorage.removeItem('blackpie.routingStageView');sessionStorage.setItem('seeded','1');}});
     await p.route('**/*',serve('en',feed));
     const ready=async()=>{await p.locator('.rt-req').nth(5).waitFor();await p.waitForTimeout(500);};
     const view=()=>p.locator('.rt-canvas').evaluate(c=>{const s=c.querySelector('.rt-stage'),a=c.getBoundingClientRect(),b=s.getBoundingClientRect();return {x:b.x-a.x,y:b.y-a.y,w:b.width,h:b.height,cw:c.clientWidth,ch:c.clientHeight,label:document.querySelector('.rt-zoom-at').textContent};});
-    await p.goto('http://magpie.test/?view=routing');await ready();
+    await p.goto('http://blackpie.test/?view=routing');await ready();
     const first=await view();assert(Math.abs(first.x+first.w/2-first.cw/2)<2,'scene starts horizontally centered at saved zoom');
     assert(first.h<first.ch);assert(Math.abs(first.y+first.h/2-first.ch/2)<2,'small scene starts vertically centered');
     const c=await p.locator('.rt-canvas').boundingBox();await p.mouse.move(c.x+c.width-20,c.y+c.height-20);await p.mouse.down();await p.mouse.move(c.x+c.width-100,c.y+c.height-70,{steps:8});await p.mouse.up();await p.waitForTimeout(250);

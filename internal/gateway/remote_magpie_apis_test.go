@@ -12,15 +12,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 // Discover decision models through a real gateway, including names that
 // aren't Jev's, then ask them through another gateway with caller attribution.
-func TestRemoteMagpieSystemOne(t *testing.T) {
+func TestRemoteBlackpieSystemOne(t *testing.T) {
 	fresh(t)
 	type hit struct {
 		path, body string
@@ -52,7 +52,7 @@ func TestRemoteMagpieSystemOne(t *testing.T) {
 		remoteHandler.ServeHTTP(w, r)
 	}))
 	t.Cleanup(remote.Close)
-	if err := provider.Save(provider.Provider{ID: "office", Name: "Office", Preset: provider.RemoteMagpiePreset, Chat: remote.URL, Key: "remote-key"}); err != nil {
+	if err := provider.Save(provider.Provider{ID: "office", Name: "Office", Preset: provider.RemoteBlackpiePreset, Chat: remote.URL, Key: "remote-key"}); err != nil {
 		t.Fatal(err)
 	}
 	p, _ := provider.Find("office")
@@ -118,7 +118,7 @@ func TestRemoteMagpieSystemOne(t *testing.T) {
 		if h.path != "/v1/systemone" {
 			continue
 		}
-		if h.head.Get("Authorization") != "Bearer remote-key" || h.head.Get(AgentHeader) != "pi" || h.head.Get(ViaHeader) == "" || h.head.Get(SessionHeader) != "decision-session" || h.head.Get("session_id") != "native-session" || !strings.HasPrefix(h.head.Get("User-Agent"), "magpie/") {
+		if h.head.Get("Authorization") != "Bearer remote-key" || h.head.Get(AgentHeader) != "pi" || h.head.Get(ViaHeader) == "" || h.head.Get(SessionHeader) != "decision-session" || h.head.Get("session_id") != "native-session" || !strings.HasPrefix(h.head.Get("User-Agent"), "blackpie/") {
 			t.Errorf("remote caller: %v", h.head)
 		}
 	}
@@ -146,7 +146,7 @@ func TestRemoteMagpieSystemOne(t *testing.T) {
 
 // Decision discovery applies the gateway key's model restrictions, while
 // an ordinary /models request continues to contain conversation models only.
-func TestRemoteMagpieDecisionListPermissions(t *testing.T) {
+func TestRemoteBlackpieDecisionListPermissions(t *testing.T) {
 	fresh(t)
 	if err := provider.Save(provider.Provider{ID: "judge", Decide: "http://127.0.0.1:1/v1", Key: "k", Models: []string{"custom-a", "custom-b"}}); err != nil {
 		t.Fatal(err)
@@ -164,7 +164,7 @@ func TestRemoteMagpieDecisionListPermissions(t *testing.T) {
 		Data []struct {
 			ID, Kind string
 			Name     string `json:"display_name"`
-			Label    string `json:"magpie_label"`
+			Label    string `json:"blackpie_label"`
 		}
 	}
 	if rec.Code != 200 || json.Unmarshal(rec.Body.Bytes(), &list) != nil || len(list.Data) != 1 || list.Data[0].ID != "judge/custom-a" || list.Data[0].Kind != "decision" {
@@ -177,11 +177,11 @@ func TestRemoteMagpieDecisionListPermissions(t *testing.T) {
 
 // A remote's exposed retrieval models survive discovery, and their requests
 // keep the input and options through both gateways.
-func TestRemoteMagpieRetrieval(t *testing.T) {
+func TestRemoteBlackpieRetrieval(t *testing.T) {
 	s, lib := shelved(t)
 	remote := httptest.NewServer(s.Handler())
 	t.Cleanup(remote.Close)
-	if err := provider.Save(provider.Provider{ID: "office", Preset: provider.RemoteMagpiePreset, Chat: remote.URL, Key: "remote-key"}); err != nil {
+	if err := provider.Save(provider.Provider{ID: "office", Preset: provider.RemoteBlackpiePreset, Chat: remote.URL, Key: "remote-key"}); err != nil {
 		t.Fatal(err)
 	}
 	p, _ := provider.Find("office")
@@ -202,7 +202,7 @@ func TestRemoteMagpieRetrieval(t *testing.T) {
 	}
 	for _, tc := range []struct{ path, body, result, model string }{
 		{"/v1/embeddings", `{"model":"office/lib/embed-1","input":["hello","world"],"dimensions":2,"encoding_format":"float"}`, `"embedding":[0.1,-0.2]`, "embed-1"},
-		{"/v1/rerank", `{"model":"office/lib/rerank-1","query":"magpie","documents":["a crow","a magpie"],"top_n":2,"return_documents":true}`, `"relevance_score":0.9`, "rerank-1"},
+		{"/v1/rerank", `{"model":"office/lib/rerank-1","query":"blackpie","documents":["a crow","a blackpie"],"top_n":2,"return_documents":true}`, `"relevance_score":0.9`, "rerank-1"},
 	} {
 		req := httptest.NewRequest("POST", tc.path, strings.NewReader(tc.body))
 		req.Header.Set("User-Agent", "pi/1.0")

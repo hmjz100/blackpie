@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // manyEyes is a key of a router listing n models that see, the cheapest a
@@ -82,7 +82,7 @@ func TestAutoVisionDoesNotBuildListsAgain(t *testing.T) {
 
 // What AutoVision keeps is built again when what it was built of changes:
 // a provider saved (its picks), a vendor's list fetched, an account signed
-// in, the settings and the providers' file written by another magpie.
+// in, the settings and the providers' file written by another blackpie.
 func TestAutoVisionSeesEachChange(t *testing.T) {
 	routerUp(t, "text")
 	if m := AutoVision(); m != "" {
@@ -114,7 +114,7 @@ func TestAutoVisionSeesEachChange(t *testing.T) {
 		t.Fatalf("AutoVision = %q after the list priced Haiku the cheaper", m)
 	}
 
-	// the providers' file written by another magpie (magpie provider
+	// the providers' file written by another blackpie (blackpie provider
 	// edit in a terminal): Haiku taken out
 	b, err := os.ReadFile(provider.Path())
 	if err != nil {
@@ -128,7 +128,7 @@ func TestAutoVisionSeesEachChange(t *testing.T) {
 		t.Fatal(err)
 	}
 	if m := AutoVision(); m != "router/google/gemini-3-flash" {
-		t.Fatalf("AutoVision = %q after another magpie took Haiku out", m)
+		t.Fatalf("AutoVision = %q after another blackpie took Haiku out", m)
 	}
 
 	// a setting saved moves what it is kept by

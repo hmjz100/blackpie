@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io/fs"
 	"log"
 	"os"
@@ -13,18 +13,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/agentenv"
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/proc"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/agentenv"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // Before an agent is disconnected the user is shown what changes in its
 // files, line by line (the owner's 断开 design: 删除、改回、保留), not a
 // sentence about it. What Disconnect does depends on the stash, the record
 // and each agent's own unwiring, so rather than a second account of it that
-// could say otherwise, magpie runs Disconnect itself on a copy: the agent's
-// config folder and magpie's own files under a temporary home, in a process
+// could say otherwise, blackpie runs Disconnect itself on a copy: the agent's
+// config folder and blackpie's own files under a temporary home, in a process
 // of its own (DryRunArg), and compares the copy with the files as they are.
 
 // DryRunArg is the command line's first word for the process that
@@ -32,12 +32,12 @@ import (
 const DryRunArg = "agent-disconnect-dry-run"
 
 const (
-	dryProvidersVar  = "MAGPIE_DRY_PROVIDERS"
-	dryProvidersFile = ".magpie-dry-providers"
+	dryProvidersVar  = "BLACKPIE_DRY_PROVIDERS"
+	dryProvidersFile = ".blackpie-dry-providers"
 )
 
 // dryProviders is, in the process DryRun runs, the ids of the providers the
-// magpie that asked for the preview has on.
+// blackpie that asked for the preview has on.
 var dryProviders map[string]bool
 
 // disconnectDryRun is confined to the preview subprocess. Its temporary
@@ -100,7 +100,7 @@ func DisconnectPreview(a *Agent, exe string) ([]FileChange, error) {
 		return nil, errors.New("no preview for this agent")
 	}
 	if appdir.Portable() != "" {
-		return nil, errors.New("no preview for a portable magpie")
+		return nil, errors.New("no preview for a portable blackpie")
 	}
 	// A portable VS Code's folder is found through its launcher, on the
 	// PATH the preview's process keeps, not through home: that process
@@ -124,7 +124,7 @@ func DisconnectPreview(a *Agent, exe string) ([]FileChange, error) {
 		return nil, errors.New("the agent's files are outside home")
 	}
 	sweepPreviews()
-	tmp, err := os.MkdirTemp("", "magpie-preview-")
+	tmp, err := os.MkdirTemp("", "blackpie-preview-")
 	if err != nil {
 		return nil, err
 	}
@@ -135,14 +135,14 @@ func DisconnectPreview(a *Agent, exe string) ([]FileChange, error) {
 	if err := copyTop(dir, filepath.Join(tmp, dirRel), before, false); err != nil {
 		return nil, err
 	}
-	// magpie's: its files copied (the stash, the record, the providers),
+	// blackpie's: its files copied (the stash, the record, the providers),
 	// its folders (plugins) only read, so linked
 	if err := copyTop(cfg, filepath.Join(tmp, cfgRel), nil, true); err != nil {
 		return nil, err
 	}
-	// magpie's providers as this magpie has them: some come from another
+	// blackpie's providers as this blackpie has them: some come from another
 	// agent's sign-in (Codex's auth.json) the copy doesn't hold, and a
-	// model of theirs is magpie's all the same (dryProviders)
+	// model of theirs is blackpie's all the same (dryProviders)
 	var ids []string
 	for _, p := range provider.All() {
 		if p.On() {
@@ -209,14 +209,14 @@ func DisconnectPreview(a *Agent, exe string) ([]FileChange, error) {
 
 // previewStale is how old a sandbox in the temporary dir must be for the
 // sweep to take it: a live preview lasts seconds (the dry run is bounded
-// at 20 seconds), so an hour-old one is a sandbox an earlier magpie was
+// at 20 seconds), so an hour-old one is a sandbox an earlier blackpie was
 // killed holding (#3136).
 const previewStale = time.Hour
 
-// sweepPreviews removes sandboxes an earlier magpie was killed holding,
-// as sweepCursorSnaps does for its magpie-cursor-* copies.
+// sweepPreviews removes sandboxes an earlier blackpie was killed holding,
+// as sweepCursorSnaps does for its blackpie-cursor-* copies.
 func sweepPreviews() {
-	old, _ := filepath.Glob(filepath.Join(os.TempDir(), "magpie-preview-*"))
+	old, _ := filepath.Glob(filepath.Join(os.TempDir(), "blackpie-preview-*"))
 	for _, d := range old {
 		if fi, err := os.Stat(d); err == nil && fi.IsDir() && time.Since(fi.ModTime()) > previewStale {
 			removePreview(d)
@@ -330,7 +330,7 @@ func previewEnv(home, tmp string) []string {
 	// The test binary recognizes this marker and keeps the fixture HOME
 	// instead of creating a second isolated home. Production binaries ignore
 	// the variable.
-	return append(out, "HOME="+tmp, "USERPROFILE="+tmp, "TMPDIR="+tmp, "MAGPIE_TEST_SANDBOX="+tmp)
+	return append(out, "HOME="+tmp, "USERPROFILE="+tmp, "TMPDIR="+tmp, "BLACKPIE_TEST_SANDBOX="+tmp)
 }
 
 // diffLines is the lines that differ between two texts, in the order of the
@@ -338,7 +338,7 @@ func previewEnv(home, tmp string) []string {
 // value changed (model = "x" → model = "y") as one going back. Values that
 // read as secrets are masked. Between the lines both start and end with,
 // texts too far apart to compare line by line (OpenCode's table of
-// thousands of magpie models taken out) keep the lines of the new one
+// thousands of blackpie models taken out) keep the lines of the new one
 // found in order in the old.
 func diffLines(a, b string) []LineDiff {
 	x, y := splitLines(a), splitLines(b)
@@ -435,7 +435,7 @@ func diffLines(a, b string) []LineDiff {
 
 // sameLines is which lines of x and of y a shortest edit keeps (Myers'
 // diff: time and memory grow with the edits, not the files — an agent's
-// config can be 30,000 lines, and magpie changes a few). Not ok past most
+// config can be 30,000 lines, and blackpie changes a few). Not ok past most
 // edits.
 func sameLines(x, y []string, most int) (keepX, keepY []bool, ok bool) {
 	n, m := len(x), len(y)
@@ -516,7 +516,7 @@ func indent(l string) string { return l[:len(l)-len(strings.TrimLeft(l, " \t"))]
 
 var secretKey = lazyre.New(`(?i)(key|token|secret|password|auth)`)
 
-// mask hides the value of a line whose key reads as a secret's; magpie's
+// mask hides the value of a line whose key reads as a secret's; blackpie's
 // own token, which is no secret, stays.
 func mask(l string) string {
 	k := lineKey(l)
@@ -530,7 +530,7 @@ func mask(l string) string {
 	}
 	val := strings.TrimSpace(l[m[1]:])
 	bare := strings.Trim(val, `"', `)
-	if bare == "" || bare == "magpie" || strings.HasPrefix(bare, "{") || strings.HasPrefix(bare, "$") {
+	if bare == "" || bare == "blackpie" || strings.HasPrefix(bare, "{") || strings.HasPrefix(bare, "$") {
 		return l
 	}
 	return l[:m[1]] + " ••••"

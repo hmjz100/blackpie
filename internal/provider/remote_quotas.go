@@ -13,75 +13,75 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/catalog"
 )
 
-// A remote magpie's quotas (莫 on Discord): a computer whose providers are
-// another's magpie (remote-magpie) has the accounts signed in there, not
-// here, so its Usage page, menu bar and magpie quota had nothing to show.
-// They now show the other magpie's cards as it last read them, each named
-// with that magpie ("Codex · office") and its provider id put after the
+// A remote blackpie's quotas (莫 on Discord): a computer whose providers are
+// another's blackpie (remote-blackpie) has the accounts signed in there, not
+// here, so its Usage page, menu bar and blackpie quota had nothing to show.
+// They now show the other blackpie's cards as it last read them, each named
+// with that blackpie ("Codex · office") and its provider id put after the
 // remote's ("office/codex"), so they never meet this computer's own.
 //
-// Only the magpie holding the sign-ins asks the vendors. It answers
+// Only the blackpie holding the sign-ins asks the vendors. It answers
 // RemoteCardsPath from what it has kept (CachedCards: its page's cards and
 // what was read behind the requests since, cards_kept.go) and asks nobody;
 // a card's refresh here asks it to read that card again
 // (RemoteRefreshPath), which is the one time a vendor is asked for us.
 
 // RemoteCardsPath is the gateway's answer of its kept cards.
-const RemoteCardsPath = "/v1/magpie/quotas/cards"
+const RemoteCardsPath = "/v1/blackpie/quotas/cards"
 
 // RemoteRefreshPath has the gateway read a card (?provider=, &user=)
 // again, or every card when no provider is named, then answer as
 // RemoteCardsPath.
-const RemoteRefreshPath = "/v1/magpie/quotas/refresh"
+const RemoteRefreshPath = "/v1/blackpie/quotas/refresh"
 
-// remoteCardsFor is how long another magpie's cards are kept here before
+// remoteCardsFor is how long another blackpie's cards are kept here before
 // they are asked for again: reading its cache costs it nothing from the
 // vendors, but the menu bar and alerts ask often.
 const remoteCardsFor = 30 * time.Second
 
-// errRemoteNothingRead is a remote magpie that has read no card since it
+// errRemoteNothingRead is a remote blackpie that has read no card since it
 // started: it is asked to only when a card is refreshed here.
-const errRemoteNothingRead = "nothing read on that magpie yet; refresh to have it read"
+const errRemoteNothingRead = "nothing read on that blackpie yet; refresh to have it read"
 
-// errRemoteNoShare is a remote magpie too old to answer RemoteCardsPath.
-const errRemoteNoShare = "remote magpie doesn't share its quotas; update magpie on that computer"
+// errRemoteNoShare is a remote blackpie too old to answer RemoteCardsPath.
+const errRemoteNoShare = "remote blackpie doesn't share its quotas; update blackpie on that computer"
 
-// errRemoteNotShared is a remote magpie that answers models but not its
-// quotas (403): it isn't shared on its local network, as an older magpie's
-// gateway that MAGPIE_ADDR opened (Docker's) wasn't until it was (Fim980 on
+// errRemoteNotShared is a remote blackpie that answers models but not its
+// quotas (403): it isn't shared on its local network, as an older blackpie's
+// gateway that BLACKPIE_ADDR opened (Docker's) wasn't until it was (Fim980 on
 // X: the card said only "Allowance unavailable"). A newer one asks a key of
 // every other machine and, given one, answers the quotas too.
-const errRemoteNotShared = "remote magpie isn't shared; turn on Share on local network on that computer"
+const errRemoteNotShared = "remote blackpie isn't shared; turn on Share on local network on that computer"
 
-// errRemoteKey is a remote magpie that didn't take this provider's key (401).
-const errRemoteKey = "remote magpie didn't take this key; use one of its enabled gateway keys"
+// errRemoteKey is a remote blackpie that didn't take this provider's key (401).
+const errRemoteKey = "remote blackpie didn't take this key; use one of its enabled gateway keys"
 
 // KeyHeldCode is the error code a gateway answers a key held to a budget,
 // models or accounts with, where its own accounts would be told (#1981):
 // the key is someone else's to use, and is told its own limit alone.
 const KeyHeldCode = "gateway_key_held"
 
-// errKeyHeld is a remote magpie that holds this provider's key to a
+// errKeyHeld is a remote blackpie that holds this provider's key to a
 // budget, models or accounts: it tells the key's own card (remoteKeyCards)
 // and none of its accounts', so none is shown, not even one kept from
 // before the key was held.
-var errKeyHeld = errors.New("remote magpie holds this key to a budget, models or accounts")
+var errKeyHeld = errors.New("remote blackpie holds this key to a budget, models or accounts")
 
-// errRemoteUnreachable starts the error of a remote magpie that couldn't
+// errRemoteUnreachable starts the error of a remote blackpie that couldn't
 // be reached at all.
-const errRemoteUnreachable = "couldn't reach the remote magpie"
+const errRemoteUnreachable = "couldn't reach the remote blackpie"
 
-// CachedCards is the Usage page's cards as this magpie last read them,
-// each with its kind, for another magpie to show: no vendor is asked,
-// whatever their age, and another magpie's cards shown here aren't
+// CachedCards is the Usage page's cards as this blackpie last read them,
+// each with its kind, for another blackpie to show: no vendor is asked,
+// whatever their age, and another blackpie's cards shown here aren't
 // passed on.
 //
 // The cards are the page's with what was read of the same accounts and
-// keys behind it since (cards_kept.go): a magpie serving only other
-// magpies has nobody on its page (#1313).
+// keys behind it since (cards_kept.go): a blackpie serving only other
+// blackpies has nobody on its page (#1313).
 func CachedCards(now time.Time) []SubscriptionQuota {
 	c := &subscriptionUsageCache
 	c.Lock()
@@ -125,7 +125,7 @@ func CachedCards(now time.Time) []SubscriptionQuota {
 }
 
 // ReadAllCards has every card read again, the page's Refresh asked by
-// another magpie whose card of this one's said nothing was read yet.
+// another blackpie whose card of this one's said nothing was read yet.
 func ReadAllCards(ctx context.Context) {
 	AskUsage()
 	ForgetBalances()
@@ -152,7 +152,7 @@ func remoteCardsID(p Provider) string {
 	return p.ID + "\x00" + keyID(p.Key)
 }
 
-// ForgetRemoteCardsForTest drops the remote magpies' cards kept here, for
+// ForgetRemoteCardsForTest drops the remote blackpies' cards kept here, for
 // a test run again (-count) to ask its own fake remote afresh.
 func ForgetRemoteCardsForTest() {
 	c := &remoteCardCache
@@ -174,20 +174,20 @@ func ForgetKeptCardsForTest() {
 	c.Unlock()
 }
 
-// remoteMagpies are the remote magpies this magpie uses.
-func remoteMagpies() []Provider {
+// remoteBlackpies are the remote blackpies this blackpie uses.
+func remoteBlackpies() []Provider {
 	var out []Provider
 	for _, p := range All() {
-		if p.IsRemoteMagpie() && !p.Hidden && !p.Off && p.Key != "" && p.Anthropic != "" {
+		if p.IsRemoteBlackpie() && !p.Hidden && !p.Off && p.Key != "" && p.Anthropic != "" {
 			out = append(out, p)
 		}
 	}
 	return out
 }
 
-// RemoteCards is every remote magpie's cards, named for this computer.
+// RemoteCards is every remote blackpie's cards, named for this computer.
 func RemoteCards(ctx context.Context) []SubscriptionQuota {
-	ps := remoteMagpies()
+	ps := remoteBlackpies()
 	got := make([][]SubscriptionQuota, len(ps))
 	var wg sync.WaitGroup
 	for i, p := range ps {
@@ -227,7 +227,7 @@ func remoteCards(ctx context.Context, p Provider, fresh bool) []SubscriptionQuot
 		if msg == "" {
 			msg = errRemoteNothingRead
 		}
-		return []SubscriptionQuota{{Provider: p.ID, Name: name, Icon: "magpie", Kind: "subscription", From: name, Windows: []QuotaWindow{}, Error: msg}}
+		return []SubscriptionQuota{{Provider: p.ID, Name: name, Icon: "blackpie", Kind: "subscription", From: name, Windows: []QuotaWindow{}, Error: msg}}
 	}
 	out := make([]SubscriptionQuota, 0, len(r.cards))
 	for _, q := range r.cards {
@@ -238,7 +238,7 @@ func remoteCards(ctx context.Context, p Provider, fresh bool) []SubscriptionQuot
 		q.Name += " · " + name
 		q.From = name
 		// what is pressed on a card acts on this computer's accounts:
-		// a Codex reset or a check-in is the other magpie's to do
+		// a Codex reset or a check-in is the other blackpie's to do
 		q.Resets, q.Checkins, q.CheckinBy, q.Checkin, q.CheckinOff = nil, false, "", nil, false
 		if q.Windows == nil {
 			q.Windows = []QuotaWindow{}
@@ -255,11 +255,11 @@ func remoteName(p Provider) string {
 	return p.ID
 }
 
-// remoteOf is the remote magpie a card's provider id names, and the id of
+// remoteOf is the remote blackpie a card's provider id names, and the id of
 // the card there ("" for the card that stands for the remote itself).
 func remoteOf(id string) (Provider, string, bool) {
 	rid, card, _ := strings.Cut(id, "/")
-	for _, p := range remoteMagpies() {
+	for _, p := range remoteBlackpies() {
 		if p.ID == rid {
 			return p, card, true
 		}
@@ -267,14 +267,14 @@ func remoteOf(id string) (Provider, string, bool) {
 	return Provider{}, "", false
 }
 
-// IsRemoteCard is whether id is a card this magpie has from a remote
-// magpie, or the card standing for the remote itself.
+// IsRemoteCard is whether id is a card this blackpie has from a remote
+// blackpie, or the card standing for the remote itself.
 func IsRemoteCard(id string) bool {
 	_, _, ok := remoteOf(id)
 	return ok
 }
 
-// refreshRemote has the remote magpie read its card again (every card,
+// refreshRemote has the remote blackpie read its card again (every card,
 // for the remote's own), then keeps what it now has.
 func refreshRemote(ctx context.Context, p Provider, card, user string) {
 	// a key's limit card is read again with that key (or every key's)
@@ -329,11 +329,11 @@ func keepRemoteCards(id string, asked time.Time, cards []SubscriptionQuota, err 
 	return r
 }
 
-// RemoteQuotaHistories is every remote magpie's quota history since days
-// ago, as its own GET /v1/magpie/quotas/history has it (read from its
+// RemoteQuotaHistories is every remote blackpie's quota history since days
+// ago, as its own GET /v1/blackpie/quotas/history has it (read from its
 // disk, no vendor asked), the providers named as RemoteCards names them.
 func RemoteQuotaHistories(ctx context.Context, days string) []QuotaHistory {
-	ps := remoteMagpies()
+	ps := remoteBlackpies()
 	got := make([][]QuotaHistory, len(ps))
 	var wg sync.WaitGroup
 	for i, p := range ps {
@@ -341,7 +341,7 @@ func RemoteQuotaHistories(ctx context.Context, days string) []QuotaHistory {
 		go func() {
 			defer wg.Done()
 			var hs []QuotaHistory
-			if err := remoteJSON(ctx, p, http.MethodGet, "/v1/magpie/quotas/history?days="+url.QueryEscape(days), &hs); err != nil {
+			if err := remoteJSON(ctx, p, http.MethodGet, "/v1/blackpie/quotas/history?days="+url.QueryEscape(days), &hs); err != nil {
 				return
 			}
 			for j := range hs {
@@ -362,7 +362,7 @@ func askRemote(ctx context.Context, p Provider, method, path string) ([]Subscrip
 	return cards, nil
 }
 
-// signRemote puts on req, a request of magpie's own to the remote magpie
+// signRemote puts on req, a request of blackpie's own to the remote blackpie
 // p (its cards, a refresh, its quota history, a key's limit), key and p's
 // Headers, as its model list and its API requests carry them (Yirasumi on
 // Discord: the Usage page's read of the remote went without the headers a
@@ -379,7 +379,7 @@ func (p Provider) signRemote(req *http.Request, key string) {
 }
 
 // remoteKey writes key as x-api-key, in place of the header in any case:
-// to a remote magpie that header is magpie's key, which a gateway reads
+// to a remote blackpie that header is blackpie's key, which a gateway reads
 // beside Authorization, so a user's header (a proxy's Authorization) never
 // leaves the request without it, and a key's limit is read with that key.
 func remoteKey(h http.Header, key string) {

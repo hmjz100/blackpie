@@ -3,8 +3,8 @@ package gateway
 import (
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // The image models a Google sign-in can draw with come from the model list

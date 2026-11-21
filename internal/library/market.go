@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"html"
 	"io"
 	"maps"
@@ -21,12 +21,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/iconproxy"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/iconproxy"
 )
 
 // The market is where the page finds MCP servers and skills to add in one
-// click: servers magpie picked and checked itself, then the MCP Registry's;
+// click: servers blackpie picked and checked itself, then the MCP Registry's;
 // skills from skills.sh, which counts how often each is installed.
 
 // ---- servers ----------------------------------------------------------------
@@ -62,7 +62,7 @@ type MarketServer struct {
 	Featured bool `json:"featured,omitempty"`
 	// OptIn is one no agent is given unless it is picked for it
 	OptIn bool `json:"optIn,omitempty"`
-	// Unready is why one of magpie's own can't answer yet (nothing it
+	// Unready is why one of blackpie's own can't answer yet (nothing it
 	// needs is set up, or Settings turned it off), from the GUI, which
 	// knows: its tools still answer, with the same words
 	Unready string  `json:"unready,omitempty"`
@@ -92,7 +92,7 @@ func secretEnv(key, label, where string) Input {
 	return Input{Key: key, Where: "env", Label: label, Description: where, Secret: true, Required: true}
 }
 
-// featured are the servers magpie offers first. Every one was checked: its
+// featured are the servers blackpie offers first. Every one was checked: its
 // package is published, its endpoint answers.
 var featured = []MarketServer{
 	selfServer(),
@@ -162,92 +162,92 @@ var featured = []MarketServer{
 		secretEnv("TAVILY_API_KEY", "API key", "app.tavily.com")),
 }
 
-// magpieCommand stands for this magpie's own binary in a featured server's
+// blackpieCommand stands for this blackpie's own binary in a featured server's
 // command, which InstallServer puts in when it is added, and in a library
 // carried to another computer, which reads it as its own (self_here.go).
-const magpieCommand = "magpie"
+const blackpieCommand = "blackpie"
 
-// selfServerName is the name magpie's own image generation server is written
+// selfServerName is the name blackpie's own image generation server is written
 // under, in every agent's config.
-const selfServerName = "magpie-image"
+const selfServerName = "blackpie-image"
 
-// selfServer is magpie's own image generation server: generate_image makes
+// selfServer is blackpie's own image generation server: generate_image makes
 // an image with the model Settings → Images → Image generation names, saved
 // in the project. It costs what the model does, so it is given only to the
 // agents picked for it.
 func selfServer() MarketServer {
-	m := localServer(selfServerName, "Magpie Image", "Magpie", "https://usemagpie.ai/favicon.png", "https://usemagpie.ai",
-		"Generate and edit images with the image model set in Magpie (Settings → Images), and make short videos with a video model set up in Magpie (Grok Imagine, Seedance), saved in the project.", magpieCommand, []string{"mcp", "image"})
+	m := localServer(selfServerName, "Blackpie Image", "Blackpie", "https://useblackpie.ai/favicon.png", "https://useblackpie.ai",
+		"Generate and edit images with the image model set in Blackpie (Settings → Images), and make short videos with a video model set up in Blackpie (Grok Imagine, Seedance), saved in the project.", blackpieCommand, []string{"mcp", "image"})
 	m.OptIn = true
 	return m
 }
 
-// browserServerName is the name Magpie Browser's server is written under.
-const browserServerName = "magpie-browser"
+// browserServerName is the name Blackpie Browser's server is written under.
+const browserServerName = "blackpie-browser"
 
-// browserServer is Magpie Browser: the agent uses the user's own browser,
-// its tabs signed in to the sites they use, through the extension magpie
+// browserServer is Blackpie Browser: the agent uses the user's own browser,
+// its tabs signed in to the sites they use, through the extension blackpie
 // sets up (gateway/browser.go). It acts as the user wherever they are
 // signed in, so it is given only to the agents picked for it.
 func browserServer() MarketServer {
-	m := localServer(browserServerName, "Magpie Browser", "Magpie", "https://usemagpie.ai/favicon.png", "https://usemagpie.ai",
-		"Use your own browser: your tabs, signed in to the sites you use. Open pages, click, type, upload, read and take screenshots, through the Magpie Browser extension.", magpieCommand, []string{"mcp", "browser"})
+	m := localServer(browserServerName, "Blackpie Browser", "Blackpie", "https://useblackpie.ai/favicon.png", "https://useblackpie.ai",
+		"Use your own browser: your tabs, signed in to the sites you use. Open pages, click, type, upload, read and take screenshots, through the Blackpie Browser extension.", blackpieCommand, []string{"mcp", "browser"})
 	m.OptIn = true
 	return m
 }
 
-// searchServerName is the name Magpie Web Search's server is written
+// searchServerName is the name Blackpie Web Search's server is written
 // under, the name the gateway's own search server goes by (ownMCP).
-const searchServerName = "magpie-web-search"
+const searchServerName = "blackpie-web-search"
 
-// searchServer is Magpie Web Search: magpie's web search (Settings ›
+// searchServer is Blackpie Web Search: blackpie's web search (Settings ›
 // Models › Web search) as a web_search and a web_fetch tool, through
-// `magpie mcp search`, which passes each call to the gateway's
+// `blackpie mcp search`, which passes each call to the gateway's
 // SearchMCPPath. Settings named it, by its address only, and the Library
 // didn't have it (lutra_fs on Discord). A search costs what the searcher
 // or the search API it asks charges, and an agent mostly has a search of
 // its own, so it is given only to the agents picked for it.
 func searchServer() MarketServer {
-	m := localServer(searchServerName, "Magpie Web Search", "Magpie", "https://usemagpie.ai/favicon.png", "https://usemagpie.ai",
-		"Search the web with the search set in Magpie (Settings → Models → Web search), and read a page by its URL.", magpieCommand, []string{"mcp", "search"})
+	m := localServer(searchServerName, "Blackpie Web Search", "Blackpie", "https://useblackpie.ai/favicon.png", "https://useblackpie.ai",
+		"Search the web with the search set in Blackpie (Settings → Models → Web search), and read a page by its URL.", blackpieCommand, []string{"mcp", "search"})
 	m.OptIn = true
 	return m
 }
 
-// visionServerName is the name Magpie Image Recognition's server is
+// visionServerName is the name Blackpie Image Recognition's server is
 // written under, the name the gateway's own image recognition server goes
 // by (ownMCP).
-const visionServerName = "magpie-vision"
+const visionServerName = "blackpie-vision"
 
-// visionServer is Magpie Image Recognition: magpie's image recognition
+// visionServer is Blackpie Image Recognition: blackpie's image recognition
 // (Settings › Models › Images › Image recognition) as an analyze_image
-// tool, through `magpie mcp vision`, which passes each call to the
+// tool, through `blackpie mcp vision`, which passes each call to the
 // gateway's VisionMCPPath. Settings named it by its address only, and the
 // Library had image generation and search but not it (matrix0487 on
 // Discord, #4653). A look costs what the model that sees charges, and
 // most agents' models see for themselves, so it is given only to the
 // agents picked for it.
 func visionServer() MarketServer {
-	m := localServer(visionServerName, "Magpie Image Recognition", "Magpie", "https://usemagpie.ai/favicon.png", "https://usemagpie.ai",
-		"Read an image (a file, a URL, a screenshot) with the image recognition model set in Magpie (Settings → Models → Images), for a model that can't see.", magpieCommand, []string{"mcp", "vision"})
+	m := localServer(visionServerName, "Blackpie Image Recognition", "Blackpie", "https://useblackpie.ai/favicon.png", "https://useblackpie.ai",
+		"Read an image (a file, a URL, a screenshot) with the image recognition model set in Blackpie (Settings → Models → Images), for a model that can't see.", blackpieCommand, []string{"mcp", "vision"})
 	m.OptIn = true
 	return m
 }
 
-// selfCommand is the server's command and env for this magpie: its binary
+// selfCommand is the server's command and env for this blackpie: its binary
 // by full path, and the gateway's address when it isn't the default one.
 func selfCommand(s *Server) {
-	if s.Command != magpieCommand {
+	if s.Command != blackpieCommand {
 		return
 	}
 	if exe, err := selfExe(); err == nil {
 		s.Command = exe
 	}
-	if a := os.Getenv("MAGPIE_ADDR"); a != "" {
+	if a := os.Getenv("BLACKPIE_ADDR"); a != "" {
 		if s.Env == nil {
 			s.Env = map[string]string{}
 		}
-		s.Env["MAGPIE_ADDR"] = a
+		s.Env["BLACKPIE_ADDR"] = a
 	}
 }
 
@@ -345,7 +345,7 @@ func serverKey(s *Server) string {
 		return strings.TrimSuffix(strings.ToLower(s.URL), "/")
 	}
 	if len(s.Args) == 2 && s.Args[0] == "mcp" && (s.Args[1] == "image" || s.Args[1] == "browser" || s.Args[1] == "search" || s.Args[1] == "vision") {
-		return "magpie mcp " + s.Args[1] // magpie's own, wherever its binary is
+		return "blackpie mcp " + s.Args[1] // blackpie's own, wherever its binary is
 	}
 	for _, a := range s.Args {
 		if a == "" || strings.HasPrefix(a, "-") || a == "run" {
@@ -669,7 +669,7 @@ func fromRegistry(r *registryServer) (MarketServer, bool) {
 					}
 					m.Inputs = append(m.Inputs, Input{Key: fmt.Sprintf("arg%d", i), Where: "arg", Label: label, Description: a.Description, Required: true})
 				case a.IsRequired:
-					return MarketServer{}, false // a named argument magpie can't fill
+					return MarketServer{}, false // a named argument blackpie can't fill
 				}
 			}
 			return m, true
@@ -839,7 +839,7 @@ type MarketSkill struct {
 	Name     string `json:"name"`
 	Installs int    `json:"installs"`
 	Official bool   `json:"official,omitempty"`
-	// Featured is magpie's own, not one skills.sh lists
+	// Featured is blackpie's own, not one skills.sh lists
 	Featured bool   `json:"featured,omitempty"`
 	Icon     string `json:"icon"`
 	// Description is known once it has been fetched
@@ -847,17 +847,17 @@ type MarketSkill struct {
 	Have        string `json:"have,omitempty"`
 }
 
-// featuredSkills are magpie's own skills, first in the market: in
-// magpie-community/plugins, beside its plugins. magpie-setup has an agent
-// set magpie up as the user asks, through its commands (Leyuu_5 on X: so
-// many features that an AI could do the setting up); magpie-quota reads
-// what magpie quota tells (ttmouse on X).
+// featuredSkills are blackpie's own skills, first in the market: in
+// magpie-community/plugins, beside its plugins. blackpie-setup has an agent
+// set blackpie up as the user asks, through its commands (Leyuu_5 on X: so
+// many features that an AI could do the setting up); blackpie-quota reads
+// what blackpie quota tells (ttmouse on X).
 var featuredSkills = []MarketSkill{{
-	Source: "magpie-community/plugins", SkillID: "magpie-setup", Name: "magpie-setup", Official: true, Featured: true,
-	Description: "Set magpie up as you ask, through its own commands: add keys and subscriptions, point agents at models, build routing groups with fallbacks and time-of-day rules, give devices gateway keys with budgets, and share MCP servers and instructions with every agent.",
+	Source: "magpie-community/plugins", SkillID: "blackpie-setup", Name: "blackpie-setup", Official: true, Featured: true,
+	Description: "Set blackpie up as you ask, through its own commands: add keys and subscriptions, point agents at models, build routing groups with fallbacks and time-of-day rules, give devices gateway keys with budgets, and share MCP servers and instructions with every agent.",
 }, {
-	Source: "magpie-community/plugins", SkillID: "magpie-quota", Name: "magpie-quota", Official: true, Featured: true,
-	Description: "Check how much is left of the user's AI subscriptions, coding plans and API key balances through magpie: each usage window's percent used and when it resets, each key's balance, and wait until a subscription has allowance again.",
+	Source: "magpie-community/plugins", SkillID: "blackpie-quota", Name: "blackpie-quota", Official: true, Featured: true,
+	Description: "Check how much is left of the user's AI subscriptions, coding plans and API key balances through blackpie: each usage window's percent used and when it resets, each key's balance, and wait until a subscription has allowance again.",
 }}
 
 type skillsShEntry struct {
@@ -892,7 +892,7 @@ func marketCache(name string) string {
 
 // popularSkills are skills.sh's most installed, read off its front page,
 // which lists them for itself; kept for six hours, and on disk for when
-// it can't be reached, else what magpie shipped with.
+// it can't be reached, else what blackpie shipped with.
 func popularSkills() []skillsShEntry {
 	popular.Lock()
 	defer popular.Unlock()
@@ -945,7 +945,7 @@ func searchSkillsSh(q string) ([]skillsShEntry, error) {
 	return slices.DeleteFunc(body.Skills, func(e skillsShEntry) bool { return !repoRe.MatchString(e.Source) || e.SkillID == "" }), nil
 }
 
-// MarketSkills is what the market shows for a search: magpie's own skills
+// MarketSkills is what the market shows for a search: blackpie's own skills
 // that match it, the most installed skills that do, then what skills.sh
 // finds for it.
 func MarketSkills(q string) ([]MarketSkill, error) {
@@ -1138,7 +1138,7 @@ func InstallMarketSkill(source, id string, agents []string) (*Result, error) {
 // ---- icons ------------------------------------------------------------------
 
 // Icon is a market icon, fetched once and kept on disk: only an icon the
-// market gave out is fetched, so the page can't have magpie fetch anything else.
+// market gave out is fetched, so the page can't have blackpie fetch anything else.
 func Icon(u string) ([]byte, string, error) {
 	sum := sha256.Sum256([]byte(u))
 	file := marketCache(filepath.Join("icons", hex.EncodeToString(sum[:16])))
@@ -1186,7 +1186,7 @@ func offered(u string) bool {
 	return false
 }
 
-// fetchImage downloads an icon through usemagpie.ai's icon proxy, so the
+// fetchImage downloads an icon through useblackpie.ai's icon proxy, so the
 // host a server's author picked never sees the user's IP.
 func fetchImage(u string) ([]byte, string, error) {
 	b, err := get(iconproxy.URL(u), "image/*", 1<<20)
@@ -1254,7 +1254,7 @@ func getBy(c *http.Client, u, accept string, limit int64) ([]byte, error) {
 		return nil, err
 	}
 	// skills.sh answers a client it doesn't know with a page of its own
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 magpie")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 blackpie")
 	req.Header.Set("Accept", accept)
 	resp, err := c.Do(req)
 	if err != nil {

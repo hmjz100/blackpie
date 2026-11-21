@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 // helperEnv makes the test binary the helper itself, as an agent starts

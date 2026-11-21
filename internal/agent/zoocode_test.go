@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/tidwall/gjson"
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 // zooCodeHere is Zoo Code in a VS Code User folder under home, the
@@ -22,10 +22,10 @@ func zooCodeHere(t *testing.T, home string) (*Agent, string) {
 	return zooCodeAt(dir, exts), dir
 }
 
-// switched on, magpie's file is what zoo-code.autoImportSettingsPath names,
+// switched on, blackpie's file is what zoo-code.autoImportSettingsPath names,
 // in the shape Zoo Code's importSettingsFromPath takes, its profile on the
 // gateway with Zoo Code's key; switched off, settings.json is as it was,
-// the user's own import path back, and magpie's file gone
+// the user's own import path back, and blackpie's file gone
 func TestZooCode(t *testing.T) {
 	home := syncHome(t)
 	a, _ := zooCodeHere(t, home)
@@ -44,7 +44,7 @@ func TestZooCode(t *testing.T) {
 		t.Fatal(err)
 	}
 	file := zooCodeImportPath(filepath.Dir(a.Path))
-	if f.Get() != "magpie/relay/glm-4.6" || !a.Wired() || a.Check() != "" || a.Notice() == "" {
+	if f.Get() != "blackpie/relay/glm-4.6" || !a.Wired() || a.Check() != "" || a.Notice() == "" {
 		t.Fatalf("connected: %q %v %q %q", f.Get(), a.Wired(), a.Check(), a.Notice())
 	}
 	if v, _ := edit.GetJSON(a.Path, zooImport); v != file {
@@ -63,42 +63,42 @@ func TestZooCode(t *testing.T) {
 	// a current profile that is one of apiConfigs, and a modelInfo with
 	// contextWindow and supportsPromptCache
 	for k, want := range map[string]string{
-		"providerProfiles.currentApiConfigName":                                        "magpie",
-		"providerProfiles.apiConfigs.magpie.apiProvider":                               "openai",
-		"providerProfiles.apiConfigs.magpie.openAiBaseUrl":                             gatewayV1(),
-		"providerProfiles.apiConfigs.magpie.openAiApiKey":                              agentKey("zoo-code"),
-		"providerProfiles.apiConfigs.magpie.openAiModelId":                             "relay/glm-4.6",
-		"providerProfiles.apiConfigs.magpie.openAiCustomModelInfo.contextWindow":       "204800",
-		"providerProfiles.apiConfigs.magpie.openAiCustomModelInfo.supportsPromptCache": "false",
+		"providerProfiles.currentApiConfigName":                                        "blackpie",
+		"providerProfiles.apiConfigs.blackpie.apiProvider":                               "openai",
+		"providerProfiles.apiConfigs.blackpie.openAiBaseUrl":                             gatewayV1(),
+		"providerProfiles.apiConfigs.blackpie.openAiApiKey":                              agentKey("zoo-code"),
+		"providerProfiles.apiConfigs.blackpie.openAiModelId":                             "relay/glm-4.6",
+		"providerProfiles.apiConfigs.blackpie.openAiCustomModelInfo.contextWindow":       "204800",
+		"providerProfiles.apiConfigs.blackpie.openAiCustomModelInfo.supportsPromptCache": "false",
 	} {
 		if got := gjson.Get(b, k).String(); got != want {
 			t.Errorf("%s = %q, want %q", k, got, want)
 		}
 	}
 	if gjson.Get(b, "globalSettings").Exists() {
-		t.Fatalf("magpie's import sets Zoo Code's own settings:\n%s", b)
+		t.Fatalf("blackpie's import sets Zoo Code's own settings:\n%s", b)
 	}
 	// the catalog gives glm-4.6 no output limit: Zoo Code's own default
 	// stands, not a 0 that would cap every reply
-	if r := gjson.Get(b, "providerProfiles.apiConfigs.magpie.openAiCustomModelInfo.maxTokens"); r.Exists() {
+	if r := gjson.Get(b, "providerProfiles.apiConfigs.blackpie.openAiCustomModelInfo.maxTokens"); r.Exists() {
 		t.Fatalf("maxTokens %s with no output limit known", r.Raw)
 	}
 
-	// another model: the file follows, the setting stays magpie's
+	// another model: the file follows, the setting stays blackpie's
 	if err := provider.Save(provider.Provider{ID: "relay", Name: "Relay", Key: "k", Chat: "http://127.0.0.1:1/v1", Models: []string{"glm-4.6", "other"}}); err != nil {
 		t.Fatal(err)
 	}
-	if err := a.Apply("model", "magpie/relay/other"); err != nil {
+	if err := a.Apply("model", "blackpie/relay/other"); err != nil {
 		t.Fatal(err)
 	}
-	if f.Get() != "magpie/relay/other" {
+	if f.Get() != "blackpie/relay/other" {
 		t.Fatalf("other: %q\n%s", f.Get(), readFile(file))
 	}
 
 	// the key in the file written over: Sync writes it again, as Zoo Code
 	// reads the file on each start
 	writeFile(t, file, strings.ReplaceAll(readFile(file), agentKey("zoo-code"), "stale"))
-	if c := a.Check(); !strings.Contains(c, "magpie-import.json") {
+	if c := a.Check(); !strings.Contains(c, "blackpie-import.json") {
 		t.Fatalf("check: %q", c)
 	}
 	if err := a.Sync(); err != nil {
@@ -115,18 +115,18 @@ func TestZooCode(t *testing.T) {
 		t.Fatalf("disconnected: %v %q\n%s", a.Wired(), f.Get(), readFile(a.Path))
 	}
 	if _, err := os.Stat(file); !os.IsNotExist(err) {
-		t.Fatalf("magpie's import file left: %v", err)
+		t.Fatalf("blackpie's import file left: %v", err)
 	}
 }
 
-// with no settings.json: made, and emptied of magpie's setting again
+// with no settings.json: made, and emptied of blackpie's setting again
 func TestZooCodeFresh(t *testing.T) {
 	home := syncHome(t)
 	a, _ := zooCodeHere(t, home)
 	if err := a.Connect(); err != nil {
 		t.Fatal(err)
 	}
-	if a.Field("model").Get() != "magpie/relay/glm-4.6" || a.Check() != "" {
+	if a.Field("model").Get() != "blackpie/relay/glm-4.6" || a.Check() != "" {
 		t.Fatalf("fresh: %q\n%s", a.Field("model").Get(), readFile(a.Path))
 	}
 	if err := a.Disconnect(); err != nil {
@@ -168,7 +168,7 @@ func TestZooCodeProfiles(t *testing.T) {
 		t.Fatalf("work profile not as it was:\n%s", readFile(filepath.Join(work, "settings.json")))
 	}
 	if _, ok := edit.GetJSON(newSettings, zooImport); ok {
-		t.Fatalf("new profile kept magpie's import path:\n%s", readFile(newSettings))
+		t.Fatalf("new profile kept blackpie's import path:\n%s", readFile(newSettings))
 	}
 }
 

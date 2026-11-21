@@ -40,7 +40,7 @@ function server(theme, posts) {
     if (p.schema) Object.assign(f, { schema: SCHEMA, config });
     return f;
   });
-  const cur = () => ({ theme, lang: "en", tray: "panel", currency: "usd", textSize: 100, redactWords: [], version: "0.1.400", dir: "/config/home/.config/magpie", gateway: "http://127.0.0.1:3999", proxyNow: "none", proxySource: "none", lanURLs: [], builtins: list() });
+  const cur = () => ({ theme, lang: "en", tray: "panel", currency: "usd", textSize: 100, redactWords: [], version: "0.1.400", dir: "/config/home/.config/blackpie", gateway: "http://127.0.0.1:3999", proxyNow: "none", proxySource: "none", lanURLs: [], builtins: list() });
   return async (route) => {
     const req = route.request(), url = new URL(req.url());
     const json = (data) => route.fulfill({ json: data });
@@ -64,7 +64,7 @@ function server(theme, posts) {
     if (url.pathname === "/api/plugins") return json({ bun: true, bunVersion: "1.4.2", plugins: [], picker: false, movable: [] });
     if (url.pathname === "/api/window/fit") return route.fulfill({ status: 204 });
     if (url.pathname.startsWith("/api/")) return json({});
-    if (url.host !== "magpie.test") return route.fulfill({ status: 404, body: "" });
+    if (url.host !== "blackpie.test") return route.fulfill({ status: 404, body: "" });
     const file = path.join(assets, url.pathname === "/" ? "index.html" : url.pathname);
     const contentType = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png" }[path.extname(file)];
     try { await route.fulfill({ body: await fs.readFile(file), contentType }); } catch { await route.fulfill({ status: 404, body: "" }); }
@@ -88,9 +88,9 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       page.setDefaultTimeout(5000);
       const errors = [], posts = [];
       page.on("pageerror", (e) => errors.push(e.message));
-      await page.addInitScript(() => localStorage.setItem("magpie.pluginTab", "builtin"));
+      await page.addInitScript(() => localStorage.setItem("blackpie.pluginTab", "builtin"));
       await page.route("**/*", server(theme, posts));
-      await page.goto("http://magpie.test/?view=plugins");
+      await page.goto("http://blackpie.test/?view=plugins");
       await card(page, "stray").waitFor();
 
       // the groups and their cards, as the API says them

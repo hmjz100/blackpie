@@ -8,7 +8,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"hash/fnv"
 	"io"
 	"net/http"
@@ -245,9 +245,9 @@ func letterIcon(name string) (string, error) {
 	return StoreIcon([]byte(svg))
 }
 
-// iconUA names magpie to the sites icons are fetched from: some (deepseek.com)
+// iconUA names blackpie to the sites icons are fetched from: some (deepseek.com)
 // turn Go's own User-Agent away with a 429.
-const iconUA = "magpie"
+const iconUA = "blackpie"
 
 var (
 	linkTag  = lazyre.New(`(?is)<link\b[^>]*>`)

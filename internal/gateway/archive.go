@@ -3,11 +3,11 @@ package gateway
 // The request archive: with it on (settings' RequestArchive), each call the
 // gateway serves is kept — the headers and bodies both ways, every secret
 // taken out first — in the user's own S3 bucket, the one sync keeps its
-// backup in, at <prefix>/magpie/archive/<date>/<id>.json, or, while sync
+// backup in, at <prefix>/blackpie/archive/<date>/<id>.json, or, while sync
 // has no bucket and RequestArchiveLocal is on, in the same file on this
 // computer (archive_local.go): the call's date,
 // in UTC, and an id of its own, sent back on the response as
-// X-Magpie-Archive-Id. The call, and its rows in the usage log, carry
+// X-Blackpie-Archive-Id. The call, and its rows in the usage log, carry
 // "<date>/<id>", for the Gateway and Usage pages to read it back by.
 //
 // The bodies are kept whole, not as Recent calls has them (the first 256
@@ -32,8 +32,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/redact"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/redact"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Putter is a bucket the archive is written to.
@@ -47,7 +47,7 @@ type Putter interface {
 var ArchiveBucket func() (Putter, bool)
 
 // ArchiveHeader carries a call's archive id on its response.
-const ArchiveHeader = "X-Magpie-Archive-Id"
+const ArchiveHeader = "X-Blackpie-Archive-Id"
 
 // archiveQueue is how many calls wait for their upload at most: their
 // bodies wait in files, so only their headers are held, however fast calls
@@ -135,8 +135,8 @@ func discardArchive(res *captureResponseWriter) {
 }
 
 // ArchiveName is where the archive keeps the call named "<date>/<id>",
-// under the bucket's magpie folder; false for a name not of that shape,
-// which is never one magpie made.
+// under the bucket's blackpie folder; false for a name not of that shape,
+// which is never one blackpie made.
 func ArchiveName(date, id string) (string, bool) {
 	if _, err := time.Parse("2006-01-02", date); err != nil || len(id) == 0 || len(id) > 64 {
 		return "", false

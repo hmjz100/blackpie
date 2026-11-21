@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 type forkTransport struct {
@@ -24,7 +24,7 @@ func (f forkTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	if r.URL.Host != "api.github.com" && r.URL.Host != "github.com" {
 		f.t.Fatalf("unexpected external request: %s", r.URL)
 	}
-	if !strings.HasPrefix(r.URL.Path, "/repos/lingqiqi5211/moepie/releases") && !strings.HasPrefix(r.URL.Path, "/lingqiqi5211/moepie/releases/") {
+	if !strings.HasPrefix(r.URL.Path, "/repos/hmjz100/blackpie/releases") && !strings.HasPrefix(r.URL.Path, "/hmjz100/blackpie/releases/") {
 		f.t.Fatalf("request escaped fork: %s", r.URL)
 	}
 	clone := r.Clone(r.Context())
@@ -36,20 +36,20 @@ func (f forkTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 }
 
 func TestForkReleasesAndNotes(t *testing.T) {
-	t.Setenv("MAGPIE_UPDATE_FEED", "")
-	t.Setenv("MAGPIE_NOTES_FEED", "")
+	t.Setenv("BLACKPIE_UPDATE_FEED", "")
+	t.Setenv("BLACKPIE_NOTES_FEED", "")
 	stableFor(t, "")
-	const sumsURL = "https://github.com/lingqiqi5211/moepie/releases/download/v0.1.2000/SHA256SUMS"
-	const binaryURL = "https://github.com/lingqiqi5211/moepie/releases/download/v0.1.2000/moepie-cli-linux-amd64"
+	const sumsURL = "https://github.com/hmjz100/blackpie/releases/download/v0.1.2000/SHA256SUMS"
+	const binaryURL = "https://github.com/hmjz100/blackpie/releases/download/v0.1.2000/blackpie-cli-linux-amd64"
 	missing := false
 	latest := map[string]any{"tag_name": "v0.1.2000", "body": twoNotes, "html_url": ReleasePage("0.1.2000"), "published_at": time.Now().Add(-time.Hour), "assets": []map[string]any{
 		{"name": "SHA256SUMS", "browser_download_url": sumsURL},
-		{"name": "moepie-cli-linux-amd64", "browser_download_url": binaryURL, "size": 42},
+		{"name": "blackpie-cli-linux-amd64", "browser_download_url": binaryURL, "size": 42},
 	}}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case strings.HasSuffix(r.URL.Path, "/SHA256SUMS"):
-			fmt.Fprintf(w, "%s  moepie-cli-linux-amd64\n", strings.Repeat("a", 64))
+			fmt.Fprintf(w, "%s  blackpie-cli-linux-amd64\n", strings.Repeat("a", 64))
 		case strings.HasSuffix(r.URL.Path, "/latest"):
 			if missing {
 				copy := map[string]any{}
@@ -73,7 +73,7 @@ func TestForkReleasesAndNotes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if r.Version != "0.1.2000" || r.Notes != zhNotes || r.Assets["moepie-cli-linux-amd64"].SHA256 != strings.Repeat("a", 64) || r.Assets["moepie-cli-linux-amd64"].URL != binaryURL {
+	if r.Version != "0.1.2000" || r.Notes != zhNotes || r.Assets["blackpie-cli-linux-amd64"].SHA256 != strings.Repeat("a", 64) || r.Assets["blackpie-cli-linux-amd64"].URL != binaryURL {
 		t.Fatalf("unexpected fork release: %+v", r)
 	}
 	notes, err := NotesBack(context.Background(), "0.1.2000", 10, "zh")
@@ -100,8 +100,8 @@ func (f forkRoundTrip) RoundTrip(r *http.Request) (*http.Response, error) { retu
 
 // Metadata and its checksums are the trust anchor, not mirrorable files.
 func TestForkTrustAnchorNeverUsesMirrors(t *testing.T) {
-	t.Setenv("MAGPIE_MIRRORS", "on")
-	t.Setenv("MAGPIE_GITHUB_MIRROR", "https://untrusted.example")
+	t.Setenv("BLACKPIE_MIRRORS", "on")
+	t.Setenv("BLACKPIE_GITHUB_MIRROR", "https://untrusted.example")
 	for _, kind := range []string{"metadata", "checksums"} {
 		t.Run(kind, func(t *testing.T) {
 			before := client
@@ -137,8 +137,8 @@ func TestForkTrustAnchorNeverUsesMirrors(t *testing.T) {
 // GitHub's creation order can put a newer version on a later page: enough
 // notes or an old-enough Stable candidate on page one is not a stopping rule.
 func TestForkHistoryScansBeforeSelecting(t *testing.T) {
-	t.Setenv("MAGPIE_UPDATE_FEED", "")
-	t.Setenv("MAGPIE_NOTES_FEED", "")
+	t.Setenv("BLACKPIE_UPDATE_FEED", "")
+	t.Setenv("BLACKPIE_NOTES_FEED", "")
 	stableFor(t, "")
 	pages := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

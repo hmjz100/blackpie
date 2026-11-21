@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/tidwall/gjson"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // piRetryable is Pi's isRetryableError (agent-session.ts, 1.2.0), as

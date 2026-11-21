@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/tidwall/gjson"
-	"github.com/yetone/magpie/internal/claudeseal"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/claudeseal"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // ---- OpenAI Responses -------------------------------------------------------
@@ -91,7 +91,7 @@ type rFormat struct {
 // the models its catalog puts in code mode (gpt-6.1-sol, gpt-6-luna…),
 // exec, through which every other tool of Codex's is called (#534: offered
 // none, the model said it had only the collaboration and wait tools). A
-// model magpie translates for is offered it as a function taking the text
+// model blackpie translates for is offered it as a function taking the text
 // as its one argument, and its call goes back to Codex as the
 // custom_tool_call Codex runs, the text as its input.
 
@@ -136,7 +136,7 @@ func customInput(args string) string {
 // ChatGPT apps' among them) and its sub-agent tools only in the search's
 // description, and hands the model the ones it searched for in a
 // tool_search_output, instead of every schema on every request (#258).
-// Codex runs the search itself ("execution": "client"): a model magpie
+// Codex runs the search itself ("execution": "client"): a model blackpie
 // translates for is offered it as the function it is, and its call goes
 // back to Codex as the tool_search_call Codex runs.
 const toolSearch = "tool_search"
@@ -455,7 +455,7 @@ func readResponsesFor(body []byte, facts, keepInstructions bool) (*Request, erro
 				r.Messages = append(r.Messages, Message{Role: "user", Parts: []Part{part}})
 			case it.Type == "reasoning":
 				// the reasoning itself when the item carries it, else its
-				// summary (all magpie gives a client of a translated reply)
+				// summary (all blackpie gives a client of a translated reply)
 				var b strings.Builder
 				var content []rText
 				_ = decodeJSON(it.Content, &content)
@@ -471,7 +471,7 @@ func readResponsesFor(body []byte, facts, keepInstructions bool) (*Request, erro
 				}
 				part := Part{Kind: Thinking, Text: b.String()}
 				if block, ours := claudeseal.Open(it.EncryptedContent); ours {
-					// Claude's block, which magpie gave the client to carry
+					// Claude's block, which blackpie gave the client to carry
 					// back: as Claude wrote it, and never to a Responses API
 					// (withoutClaudeSeals). One that can't be read is its
 					// summary, as before.
@@ -490,7 +490,7 @@ func readResponsesFor(body []byte, facts, keepInstructions bool) (*Request, erro
 					r.Messages = append(r.Messages, Message{Role: "assistant", Parts: []Part{part}})
 				}
 			case it.Type == "web_search_call" && it.Action != nil && strings.TrimSpace(it.Action.Query) != "":
-				// where a search ran in the turn: magpie's own search round
+				// where a search ran in the turn: blackpie's own search round
 				// for a Claude reply is put back (searchRoundsBack), and
 				// otherwise it goes, as before
 				var hits []Hit
@@ -606,10 +606,10 @@ func readResponsesFor(body []byte, facts, keepInstructions bool) (*Request, erro
 	return r, nil
 }
 
-// searchRoundsBack puts back the search rounds magpie ran for a Claude
+// searchRoundsBack puts back the search rounds blackpie ran for a Claude
 // reply (searchRounds), which its client keeps only as web_search_call
 // items. Claude wrote the thinking before a search in a message that
-// ended with magpie's web_search call, and what it wrote after the
+// ended with blackpie's web_search call, and what it wrote after the
 // result in a message of its own; told as one message, the thinking
 // blocks of the latest assistant message aren't where Claude wrote them,
 // and an upstream that checks them refuses the turn: Claude on Bedrock
@@ -985,13 +985,13 @@ func pairToolItems(body []byte) []byte {
 // request into chat for its model, and a web_search_call becomes an
 // assistant tool call that no tool message answers: Command Code's
 // Provider API answered Codex's summary request for a thread that had
-// searched (52 function calls and their outputs, 8 web searches magpie
+// searched (52 function calls and their outputs, 8 web searches blackpie
 // ran for the model) 400 "An assistant message with 'tool_calls' must be
 // followed by tool messages responding to each 'tool_call_id'"
 // (mxmllln on Discord, deepseek-v4-flash-vision-exp). A turn offering
-// web_search is translated for magpie's search and leaves them out there
+// web_search is translated for blackpie's search and leaves them out there
 // already (searchedForIt, searchRoundsBack); a request with no web_search
-// offered — Codex's compaction, magpie's summary request, a turn with
+// offered — Codex's compaction, blackpie's summary request, a turn with
 // search off — was relayed with them. The item holds the query and the
 // pages, never what they said, and the reply after it says what was
 // found, so nothing the model read is lost.
@@ -1121,7 +1121,7 @@ func replaysReasoning(model, host string) bool {
 // carries no reasoning_text its summary as one, else noReasoning, and has
 // each step that needs one lead with a reasoning item (reasonFirst), for an
 // upstream that wants the reasoning back (replaysReasoning). Codex sends an
-// item back as it got it: one from a turn magpie translated has only a
+// item back as it got it: one from a turn blackpie translated has only a
 // summary, one the ChatGPT backend sealed has only encrypted_content, and a
 // turn another model in a mixed group served may have no reasoning item at
 // all. DeepSeek refuses the whole request over any of them, and over an
@@ -1236,7 +1236,7 @@ func noReasoningItem() map[string]any {
 // back to the API") when a step of the turn being continued starts with
 // anything else: a call (#1592), or what the model said, as Codex sends a
 // step that said something before its call with its reasoning between them,
-// or with none, which magpie put between them (#1822). Checked against
+// or with none, which blackpie put between them (#1822). Checked against
 // api.deepseek.com on 2026-10-12: [text, reasoning, call] and [output,
 // text] are refused, [reasoning, text, call] and [output, reasoning, text]
 // are taken. ok is false, and items comes back as it is, when every such
@@ -1501,10 +1501,10 @@ func buildResponses(r *Request, model, host string, rejectTemp bool) []byte {
 		out["reasoning"] = map[string]any{"summary": "auto"}
 	}
 	// the client's include goes on as the request would have without
-	// magpie. Sealed reasoning is asked for only with reasoning, as Codex
+	// blackpie. Sealed reasoning is asked for only with reasoning, as Codex
 	// asks for it: OpenAI refuses it of a model that doesn't reason. What
 	// comes back sealed goes to a Responses client as it came, and the
-	// input's goes back to a Responses upstream, as it would without magpie
+	// input's goes back to a Responses upstream, as it would without blackpie
 	// (#1445); an account or vendor that can't read another's turns it away,
 	// and is asked again without it (foreignReasoning, withoutRefused).
 	// Output token replay's include is OpenAI's alone, as Codex sends it
@@ -2006,7 +2006,7 @@ func (d *responsesDecoder) decode(data string, emit func(Event)) error {
 // Responses stream's error event or failed response says the request
 // itself is at fault (type invalid_request_error): the ChatGPT backend
 // answers an access program the workspace doesn't have with a 200 stream
-// whose error event is access_program_not_enabled (magpie-releases#18).
+// whose error event is access_program_not_enabled (blackpie-releases#18).
 // Asked again, on this account or another, it is refused the same way, so
 // it is neither retried nor resumed, and a client answered whole gets its
 // code and param. Read by the error object's type, never by its words.
@@ -2023,8 +2023,8 @@ func requestRefused(data string) (int, json.RawMessage) {
 // saidError puts the type, code and param of the vendor's own error (an
 // Event's Said) on the error a stream encoder writes, so a request the
 // vendor refused reads as refused (invalid_request_error) to the agent and
-// to the hold that decides whether to ask again, not as magpie's api_error
-// (magpie-releases#18). Without Said it is left as it was.
+// to the hold that decides whether to ask again, not as blackpie's api_error
+// (blackpie-releases#18). Without Said it is left as it was.
 func saidError(failed map[string]any, said json.RawMessage) {
 	e := gjson.GetBytes(said, "error")
 	for _, k := range []string{"type", "code", "param"} {
@@ -2343,12 +2343,12 @@ func (e *responsesEncoder) event(ev Event) {
 			// the item streamed so far, done as the upstream wrote it,
 			// made over when it carries its text (another vendor's,
 			// #2855); its events name it by the id they already carried
-			e.closeAs(magpieMadeReasoningRaw(raw, e.itemID))
+			e.closeAs(blackpieMadeReasoningRaw(raw, e.itemID))
 			break
 		}
 		// none of it streamed (no summary): added and done whole, made
 		// over when the item carries its text (#2855)
-		raw = magpieMadeReasoningRaw(raw, "")
+		raw = blackpieMadeReasoningRaw(raw, "")
 		e.closeItem()
 		e.item++
 		e.thinkNew, e.thinkID = false, ""
@@ -2473,7 +2473,7 @@ func renderResponses(res Result, model string, named map[string]nsTool) []byte {
 				// as the upstream wrote it: id, summary, encrypted_content;
 				// made over when it carries its text (another vendor's,
 				// #2855)
-				output = append(output, magpieMadeReasoningRaw(p.Sealed, ""))
+				output = append(output, blackpieMadeReasoningRaw(p.Sealed, ""))
 				continue
 			}
 			if p.sealedBy(sealAnthropic) {

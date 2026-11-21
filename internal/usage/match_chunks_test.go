@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/sessions"
+	"github.com/hmjz100/blackpie/internal/sessions"
 )
 
 // Matching the gateway's calls to the session files' decodes only the

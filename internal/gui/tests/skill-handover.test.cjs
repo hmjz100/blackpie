@@ -1,7 +1,7 @@
 // Run with Node's test runner and Playwright on the module path; see README.md.
 // tnt1223 on Discord: skills kept in ~/.agents/skills, which some agents
 // read themselves whatever is ticked, are handed over to the library. A
-// row of one says "Manage in magpie" in its source line; the skills'
+// row of one says "Manage in blackpie" in its source line; the skills'
 // heading moves all of them at once. Each asks first, in the page, saying
 // where the folder goes (or that only a link goes), who keeps it and how
 // to put it back; Cancel posts nothing; the move posts
@@ -19,7 +19,7 @@ const HOME = "/Users/tnt";
 const SH = `${HOME}/.agents/skills`;
 const agent = (id, name) => ({ id, name, icon: "", skills: `${HOME}/.${id}/skills` });
 const lib = (st) => ({
-  dir: `${HOME}/.magpie/library`, backups: `${HOME}/.magpie/backups`, home: HOME,
+  dir: `${HOME}/.blackpie/library`, backups: `${HOME}/.blackpie/backups`, home: HOME,
   agents: [agent("claude", "Claude Code"), agent("codex", "Codex"), agent("gemini", "Gemini CLI")],
   instructions: { agents: [] }, servers: [], foundServers: [], projects: [], foundSkills: [], newSkills: [],
   checkDue: false,
@@ -61,16 +61,16 @@ function server(lang, posts, st) {
 const scrolls = (page) => page.evaluate(() => [...document.querySelectorAll("*")].filter((e) => e.scrollTop).map((e) => (e.id || e.className) + ":" + e.scrollTop).concat("doc:" + document.scrollingElement.scrollTop).join(" "));
 
 const words = {
-  en: { one: "Manage in magpie", all: "Manage 2 in magpie", ask: "Manage orca in magpie?", askAll: "Manage 2 skills in magpie?", go: "Move into the library", cancel: "Cancel",
-    where: "~/.agents/skills/orca", lib: "~/.magpie/library/skills/orca", link: "~/aimer/grill", done: "orca is in magpie's library now", doneAll: "2 skills are in magpie's library now" },
-  zh: { one: "交给 magpie 管理", all: "将 2 个交给 magpie 管理", ask: "将 orca 交给 magpie 管理？", askAll: "将 2 个技能交给 magpie 管理？", go: "移入资源库", cancel: "取消",
-    where: "~/.agents/skills/orca", lib: "~/.magpie/library/skills/orca", link: "~/aimer/grill", done: "orca 已交给 magpie 的资源库管理", doneAll: "2 个技能已交给 magpie 的资源库管理" },
-  "zh-TW": { one: "交給 magpie 管理", all: "將 2 個交給 magpie 管理", ask: "將 orca 交給 magpie 管理？", askAll: "將 2 個技能交給 magpie 管理？", go: "移入資源庫", cancel: "取消",
-    where: "~/.agents/skills/orca", lib: "~/.magpie/library/skills/orca", link: "~/aimer/grill", done: "orca 已交給 magpie 的資源庫管理", doneAll: "2 個技能已交給 magpie 的資源庫管理" },
-  ja: { one: "magpie で管理", all: "2 件を magpie で管理", ask: "orca を magpie で管理しますか？", askAll: "2 件のスキルを magpie で管理しますか？", go: "ライブラリへ移す", cancel: "キャンセル",
-    where: "~/.agents/skills/orca", lib: "~/.magpie/library/skills/orca", link: "~/aimer/grill", done: "orca は magpie のライブラリで管理されています", doneAll: "2 件のスキルが magpie のライブラリで管理されています" },
-  de: { one: "In magpie verwalten", all: "2 in magpie verwalten", ask: "orca in magpie verwalten?", askAll: "2 Skills in magpie verwalten?", go: "In die Bibliothek verschieben", cancel: "Abbrechen",
-    where: "~/.agents/skills/orca", lib: "~/.magpie/library/skills/orca", link: "~/aimer/grill", done: "orca wird jetzt in der Bibliothek von magpie verwaltet", doneAll: "2 Skills werden jetzt in der Bibliothek von magpie verwaltet" },
+  en: { one: "Manage in blackpie", all: "Manage 2 in blackpie", ask: "Manage orca in blackpie?", askAll: "Manage 2 skills in blackpie?", go: "Move into the library", cancel: "Cancel",
+    where: "~/.agents/skills/orca", lib: "~/.blackpie/library/skills/orca", link: "~/aimer/grill", done: "orca is in blackpie's library now", doneAll: "2 skills are in blackpie's library now" },
+  zh: { one: "交给 blackpie 管理", all: "将 2 个交给 blackpie 管理", ask: "将 orca 交给 blackpie 管理？", askAll: "将 2 个技能交给 blackpie 管理？", go: "移入资源库", cancel: "取消",
+    where: "~/.agents/skills/orca", lib: "~/.blackpie/library/skills/orca", link: "~/aimer/grill", done: "orca 已交给 blackpie 的资源库管理", doneAll: "2 个技能已交给 blackpie 的资源库管理" },
+  "zh-TW": { one: "交給 blackpie 管理", all: "將 2 個交給 blackpie 管理", ask: "將 orca 交給 blackpie 管理？", askAll: "將 2 個技能交給 blackpie 管理？", go: "移入資源庫", cancel: "取消",
+    where: "~/.agents/skills/orca", lib: "~/.blackpie/library/skills/orca", link: "~/aimer/grill", done: "orca 已交給 blackpie 的資源庫管理", doneAll: "2 個技能已交給 blackpie 的資源庫管理" },
+  ja: { one: "blackpie で管理", all: "2 件を blackpie で管理", ask: "orca を blackpie で管理しますか？", askAll: "2 件のスキルを blackpie で管理しますか？", go: "ライブラリへ移す", cancel: "キャンセル",
+    where: "~/.agents/skills/orca", lib: "~/.blackpie/library/skills/orca", link: "~/aimer/grill", done: "orca は blackpie のライブラリで管理されています", doneAll: "2 件のスキルが blackpie のライブラリで管理されています" },
+  de: { one: "In blackpie verwalten", all: "2 in blackpie verwalten", ask: "orca in blackpie verwalten?", askAll: "2 Skills in blackpie verwalten?", go: "In die Bibliothek verschieben", cancel: "Abbrechen",
+    where: "~/.agents/skills/orca", lib: "~/.blackpie/library/skills/orca", link: "~/aimer/grill", done: "orca wird jetzt in der Bibliothek von blackpie verwaltet", doneAll: "2 Skills werden jetzt in der Bibliothek von blackpie verwaltet" },
 };
 
 for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium", "webkit"])) {
@@ -85,13 +85,13 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       await t.test(`${lang} at ${width}px`, async () => {
         const w = words[lang], posts = [], st = { moved: [] };
         const ctx = await browser.newContext({ viewport: { width, height: 900 } });
-        await ctx.addInitScript(() => { try { localStorage.setItem("magpie.libTab", "skills"); } catch {} });
+        await ctx.addInitScript(() => { try { localStorage.setItem("blackpie.libTab", "skills"); } catch {} });
         const page = await ctx.newPage();
         page.setDefaultTimeout(5000);
         page.setDefaultNavigationTimeout(60000);
         page.on("pageerror", (e) => errors.push(e.message));
         await page.route("**/*", server(lang, posts, st));
-        await page.goto("http://magpie.test/");
+        await page.goto("http://blackpie.test/");
         await page.locator('button[data-view="library"]').click();
         const v = page.locator("#view-library");
         const row = (n) => v.locator(".lib-skill", { has: page.locator(".name", { hasText: new RegExp("^" + n) }) });
@@ -116,7 +116,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await sheet.waitFor();
         assert.equal((await sheet.locator(".ehead b").textContent()).trim(), w.ask);
         const said = (await sheet.locator(".lib-confirm").allTextContents()).join(" ");
-        for (const x of [w.where, w.lib, "Codex", "Gemini CLI", "magpie library skill hand-back orca"]) assert(said.includes(x), `the sheet doesn't say ${x}: ${said}`);
+        for (const x of [w.where, w.lib, "Codex", "Gemini CLI", "blackpie library skill hand-back orca"]) assert(said.includes(x), `the sheet doesn't say ${x}: ${said}`);
         await sheet.locator(".bar button", { hasText: w.cancel }).click();
         await sheet.waitFor({ state: "detached" });
         assert.deepEqual(posts, [], "Cancel posts nothing");
@@ -146,13 +146,13 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
     await t.test("all at once", async () => {
       const w = words.en, posts = [], st = { moved: [] };
       const ctx = await browser.newContext({ viewport: { width: 860, height: 900 } });
-      await ctx.addInitScript(() => { try { localStorage.setItem("magpie.libTab", "skills"); } catch {} });
+      await ctx.addInitScript(() => { try { localStorage.setItem("blackpie.libTab", "skills"); } catch {} });
       const page = await ctx.newPage();
       page.setDefaultTimeout(5000);
       page.setDefaultNavigationTimeout(60000);
       page.on("pageerror", (e) => errors.push(e.message));
       await page.route("**/*", server("en", posts, st));
-      await page.goto("http://magpie.test/");
+      await page.goto("http://blackpie.test/");
       await page.locator('button[data-view="library"]').click();
       const all = page.locator("#view-library .lib-skillshead button.lib-handover");
       await all.waitFor();

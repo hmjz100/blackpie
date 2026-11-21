@@ -1,6 +1,6 @@
 // The add sheet's Partners: the services that pay to be listed first in
-// magpie's "Add provider" sheet, under a heading that says they sponsor
-// magpie. The app fetches this list from /api/partners every six hours and
+// blackpie's "Add provider" sheet, under a heading that says they sponsor
+// blackpie. The app fetches this list from /api/partners every six hours and
 // keeps it (internal/provider/partners.go), so a change here reaches users
 // with `npx wrangler deploy`, no release. At most 12 whose term hasn't
 // ended are listed, in this order.
@@ -27,7 +27,7 @@
 //
 // Every URL is https. An entry that breaks a rule is left out by the app.
 //
-// The app gets keysUrl and website (a region's too) as usemagpie.ai/go/…
+// The app gets keysUrl and website (a region's too) as useblackpie.ai/go/…
 // links, which count the click and send the browser on (worker.js). The
 // providers users add keep those links, so an entry stays here after its
 // term ends: /api/partners leaves it out, /go still finds it. Remove one
@@ -38,15 +38,15 @@ export const PARTNERS = [
     name: "Kimi Code",
     regionLabel: "Plan",
     regions: [
-      { id: "cn", name: "China", chat: "https://api.kimi.com/coding/v1", anthropic: "https://api.kimi.com/coding", catalog: "kimi-code-plan-cn", keysUrl: "https://www.kimi.com/code?aff=magpie", website: "https://www.kimi.com/code?aff=magpie" },
-      { id: "global", name: "Global", chat: "https://api.kimi.ai/coding/v1", anthropic: "https://api.kimi.ai/coding", catalog: "kimi-code-plan-global", keysUrl: "https://www.kimi.ai/code?aff=magpie", website: "https://www.kimi.ai/code?aff=magpie" },
-      { id: "api-cn", name: "Pay as you go · China", chat: "https://api.moonshot.cn/v1", anthropic: "https://api.moonshot.cn/anthropic", catalog: "moonshotai", keysUrl: "https://platform.kimi.com?aff=magpie", website: "https://platform.kimi.com?aff=magpie" },
-      { id: "api", name: "Pay as you go · Global", chat: "https://api.moonshot.ai/v1", anthropic: "https://api.moonshot.ai/anthropic", catalog: "moonshotai", keysUrl: "https://platform.kimi.ai?aff=magpie", website: "https://platform.kimi.ai?aff=magpie" },
+      { id: "cn", name: "China", chat: "https://api.kimi.com/coding/v1", anthropic: "https://api.kimi.com/coding", catalog: "kimi-code-plan-cn", keysUrl: "https://www.kimi.com/code?aff=blackpie", website: "https://www.kimi.com/code?aff=blackpie" },
+      { id: "global", name: "Global", chat: "https://api.kimi.ai/coding/v1", anthropic: "https://api.kimi.ai/coding", catalog: "kimi-code-plan-global", keysUrl: "https://www.kimi.ai/code?aff=blackpie", website: "https://www.kimi.ai/code?aff=blackpie" },
+      { id: "api-cn", name: "Pay as you go · China", chat: "https://api.moonshot.cn/v1", anthropic: "https://api.moonshot.cn/anthropic", catalog: "moonshotai", keysUrl: "https://platform.kimi.com?aff=blackpie", website: "https://platform.kimi.com?aff=blackpie" },
+      { id: "api", name: "Pay as you go · Global", chat: "https://api.moonshot.ai/v1", anthropic: "https://api.moonshot.ai/anthropic", catalog: "moonshotai", keysUrl: "https://platform.kimi.ai?aff=blackpie", website: "https://platform.kimi.ai?aff=blackpie" },
     ],
     catalog: "kimi-code-plan-cn",
-    keysUrl: "https://www.kimi.com/code?aff=magpie",
-    website: "https://www.kimi.com/code?aff=magpie",
-    iconUrl: "https://usemagpie.ai/img/partner-kimi.png",
+    keysUrl: "https://www.kimi.com/code?aff=blackpie",
+    website: "https://www.kimi.com/code?aff=blackpie",
+    iconUrl: "https://useblackpie.ai/img/partner-kimi.png",
     notes: {
       en: "One subscription, one K3 quota shared by every agent",
       zh: "一份订阅，所有 agent 共享 K3 额度",
@@ -66,9 +66,9 @@ export const PARTNERS = [
     chat: "https://api.apikey.fan/v1",
     responses: "https://api.apikey.fan/v1",
     anthropic: "https://api.apikey.fan",
-    keysUrl: "https://apikey.fan/?aff=magpie",
-    website: "https://apikey.fan/?aff=magpie",
-    iconUrl: "https://usemagpie.ai/img/partner-apikeyfan.png",
+    keysUrl: "https://apikey.fan/?aff=blackpie",
+    website: "https://apikey.fan/?aff=blackpie",
+    iconUrl: "https://useblackpie.ai/img/partner-apikeyfan.png",
     notes: {
       en: "Enterprise-grade AI API gateway to the world's leading models",
       zh: "企业级 AI 中转站，连接全球主流大模型",
@@ -84,9 +84,9 @@ export const PARTNERS = [
     chat: "https://api.wandapi.ai/v1",
     responses: "https://api.wandapi.ai/v1",
     anthropic: "https://api.wandapi.ai",
-    keysUrl: "https://wandapi.ai/r/magpieapp",
+    keysUrl: "https://wandapi.ai/r/blackpieapp",
     website: "https://wandapi.ai",
-    iconUrl: "https://usemagpie.ai/img/partner-wandapi.png",
+    iconUrl: "https://useblackpie.ai/img/partner-wandapi.png",
     notes: {
       en: "Enterprise-grade AI gateway, seamless access to global AI models",
       zh: "企业级 AI 网关，畅连全球 AI 大模型",
@@ -101,7 +101,7 @@ export const PARTNERS = [
     anthropic: "https://corecode.live",
     keysUrl: "https://corecode.live/keys",
     website: "https://corecode.live/",
-    iconUrl: "https://usemagpie.ai/img/partner-corecode.png",
+    iconUrl: "https://useblackpie.ai/img/partner-corecode.png",
     notes: {
       en: "Full-strength Claude, undiluted",
       zh: "纯血 Claude，一滴不掺",
@@ -116,9 +116,9 @@ export const PARTNERS = [
     chat: "https://sidrune.ai/v1",
     responses: "https://sidrune.ai/v1",
     anthropic: "https://sidrune.ai",
-    keysUrl: "https://sidrune.ai/register?promo=MAGPIE3",
+    keysUrl: "https://sidrune.ai/register?promo=BLACKPIE3",
     website: "https://sidrune.ai/",
-    iconUrl: "https://usemagpie.ai/img/partner-sidrune.png",
+    iconUrl: "https://useblackpie.ai/img/partner-sidrune.png",
     notes: {
       en: "Stable Claude API Access with 85% off; $3 free credit upon registration",
       zh: "低至1.5折，稳定使用满血Claude；注册送$3，可开发票。",
@@ -134,9 +134,9 @@ export const PARTNERS = [
     chat: "https://www.fastaitoken.com/v1",
     responses: "https://www.fastaitoken.com/v1",
     anthropic: "https://www.fastaitoken.com",
-    keysUrl: "https://www.fastaitoken.com/register?aff=MAGPIE&utm=soft",
-    website: "https://www.fastaitoken.com/register?aff=MAGPIE&utm=soft",
-    iconUrl: "https://usemagpie.ai/img/partner-fastai.png",
+    keysUrl: "https://www.fastaitoken.com/register?aff=BLACKPIE&utm=soft",
+    website: "https://www.fastaitoken.com/register?aff=BLACKPIE&utm=soft",
+    iconUrl: "https://useblackpie.ai/img/partner-fastai.png",
     notes: {
       en: "One-stop access to Claude, GPT and DeepSeek, from 6% of list price",
       zh: "Claude / GPT / Deepseek 一站式接入方案，最低0.6折，支持对公",

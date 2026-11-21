@@ -6,7 +6,7 @@ package provider
 
 import (
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"os"
 	"path"
 	"runtime"

@@ -2,8 +2,8 @@ import { GATEWAY } from "./config.js";
 
 const zh = /^zh/i.test(navigator.language);
 const say = zh
-  ? { on: "已连接 Magpie", off: "未连接 Magpie", onHint: "通过 Magpie 运行的智能体可以使用这个浏览器里的标签页。它们打开的标签页放在 “Magpie” 分组里。", offHint: "请确认 Magpie 正在运行。扩展会自动重连。" }
-  : { on: "Connected to Magpie", off: "Not connected to Magpie", onHint: "Agents you run through Magpie can use this browser's tabs. Tabs they open go in the \"Magpie\" group.", offHint: "Check that Magpie is running. The extension reconnects by itself." };
+  ? { on: "已连接 Blackpie", off: "未连接 Blackpie", onHint: "通过 Blackpie 运行的智能体可以使用这个浏览器里的标签页。它们打开的标签页放在 “Blackpie” 分组里。", offHint: "请确认 Blackpie 正在运行。扩展会自动重连。" }
+  : { on: "Connected to Blackpie", off: "Not connected to Blackpie", onHint: "Agents you run through Blackpie can use this browser's tabs. Tabs they open go in the \"Blackpie\" group.", offHint: "Check that Blackpie is running. The extension reconnects by itself." };
 
 async function show() {
   const { status } = await chrome.storage.session.get("status");

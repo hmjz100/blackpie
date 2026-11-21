@@ -3,7 +3,7 @@ package gateway
 import (
 	"context"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // claudeFastBeta is the beta Claude's fast mode (speed "fast") is asked

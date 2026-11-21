@@ -12,19 +12,19 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/datamove"
-	"github.com/yetone/magpie/internal/library"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/update"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/datamove"
+	"github.com/hmjz100/blackpie/internal/library"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/update"
 )
 
-// Settings › General moves magpie's data between its two places: the
-// installed one (~/.config/magpie, ~/.cache/magpie and, on Windows,
+// Settings › General moves blackpie's data between its two places: the
+// installed one (~/.config/blackpie, ~/.cache/blackpie and, on Windows,
 // WebView2's own default profile) and the one beside the app (data/). The
 // window can't copy what it is using, so it stops its work and quits, and
 // a helper of the same program copies once it has exited, then opens the
-// window again (internal/datamove, magpie data-directory migrate).
+// window again (internal/datamove, blackpie data-directory migrate).
 
 // moving is set while a move takes this window down: an update is neither
 // put in nor handed over on the way out, nor restarted into meanwhile.
@@ -69,7 +69,7 @@ type dataPlace struct {
 	Cache       string `json:"cache"`
 	SystemCache string `json:"systemCache,omitempty"`
 	Web         string `json:"web,omitempty"`
-	// why magpie can't move its data there now, "" when it can
+	// why blackpie can't move its data there now, "" when it can
 	Blocked string `json:"blocked,omitempty"`
 }
 
@@ -290,7 +290,7 @@ func waitIdle(ctx context.Context) error {
 		select {
 		case <-ctx.Done():
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-				return errors.New("magpie's agents didn't stop working in time; the data stayed where it was")
+				return errors.New("blackpie's agents didn't stop working in time; the data stayed where it was")
 			}
 			return errors.New("the data move was cancelled")
 		case <-time.After(waitTick):

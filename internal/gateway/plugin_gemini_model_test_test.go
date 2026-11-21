@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 // A plugin's Gemini model (@ai-sdk/google) is tested as the gateway asks
@@ -25,7 +25,7 @@ import (
 func TestPluginGeminiModelTestedOnGenerateContent(t *testing.T) {
 	bun := testenv.Bun(t)
 	fresh(t)
-	t.Setenv("MAGPIE_BUN", bun)
+	t.Setenv("BLACKPIE_BUN", bun)
 	t.Cleanup(plugin.Settle)
 
 	type seen struct{ path, body string }

@@ -6,9 +6,9 @@ Settings → General → **Data directory** offers exactly two locations: **Orig
 
 | Data | Original location | Beside the app |
 | --- | --- | --- |
-| Magpie configuration, accounts, providers, plugins and application-owned files | `$XDG_CONFIG_HOME/magpie`, otherwise `~/.config/magpie` | `data/` beside the resolved executable |
-| Ordinary regenerable caches | `$XDG_CACHE_HOME/magpie`, otherwise `~/.cache/magpie` | `data/cache/` |
-| OS cache used for marketplace lists and update staging | `os.UserCacheDir()/magpie` | `data/cache/` when the two original cache paths coincide; otherwise `data/system-cache/` |
+| Blackpie configuration, accounts, providers, plugins and application-owned files | `$XDG_CONFIG_HOME/blackpie`, otherwise `~/.config/blackpie` | `data/` beside the resolved executable |
+| Ordinary regenerable caches | `$XDG_CACHE_HOME/blackpie`, otherwise `~/.cache/blackpie` | `data/cache/` |
+| OS cache used for marketplace lists and update staging | `os.UserCacheDir()/blackpie` | `data/cache/` when the two original cache paths coincide; otherwise `data/system-cache/` |
 | Windows WebView2 profile | WebView2's default `%AppData%/<executable name>` | `data/webview2/` |
 
 On macOS, “beside the app” means beside the application bundle. An AppImage uses the actual AppImage location. Executable links are resolved. Non-Windows system WebView storage remains in its system location and is not migrated. The marketplace and update caches can be regenerated; older portable versions may have kept these in `data/cache`, and those old cache entries remain ordinary cache entries rather than being reclassified.
@@ -28,11 +28,11 @@ The five UI languages are English, Simplified Chinese, Traditional Chinese, Japa
 
 ## Deletion and recovery contract
 
-The durable transaction is `moepie-data-migration.json` beside the executable; the durable mode pointer is `moepie-data.json`. Do not remove these files to recover a move. An explicit installed-mode pointer takes precedence over a remaining portable `data` folder or `.portable` marker, so returning to the original location does not accidentally reopen stale portable data.
+The durable transaction is `blackpie-data-migration.json` beside the executable; the durable mode pointer is `blackpie-data.json`. Do not remove these files to recover a move. An explicit installed-mode pointer takes precedence over a remaining portable `data` folder or `.portable` marker, so returning to the original location does not accidentally reopen stale portable data.
 
 The commit boundary is the mode-pointer switch. Before it, failure rolls back publication and restores the old destination. After it, cleanup errors and interruptions **never roll back to the partly deleted source**. Startup settles interrupted records; a published record is reverified before cleanup, rather than treating a mode pointer as proof of a good copy. Once cleanup has started, missing old files are expected and a retry resumes deletion from the persisted manifest. The new root remains usable when cleanup cannot finish, and the transaction retains errors naming retained data. Retry uses the same helper and quiescence sequence, without copying or switching back.
 
-Deletion is bound to the two fixed directory mappings, the executable, source-root identity, a transaction identity marker, and the persisted file hashes/types. Source and destination overlap, unsafe nesting, executable-directory overlap, redirected roots/ancestors, and filesystem aliases are refused. Root and entry walks reject links rather than following them. Source deletion uses individual checked removals, not a recursive deletion of an external root. New files, changed files, changed identities, and a destination file that no longer matches are retained and reported. Empty source roots and the necessary `.moepie-runtime` coordination markers may remain; the ordinary source data is removed after a successful move.
+Deletion is bound to the two fixed directory mappings, the executable, source-root identity, a transaction identity marker, and the persisted file hashes/types. Source and destination overlap, unsafe nesting, executable-directory overlap, redirected roots/ancestors, and filesystem aliases are refused. Root and entry walks reject links rather than following them. Source deletion uses individual checked removals, not a recursive deletion of an external root. New files, changed files, changed identities, and a destination file that no longer matches are retained and reported. Empty source roots and the necessary `.blackpie-runtime` coordination markers may remain; the ordinary source data is removed after a successful move.
 
 Windows browser cache, crash/metrics files and lock files are omitted from the copy because WebView2 regenerates them. They are included in the source cleanup manifest and can be removed only after the browser has stopped. Cookies, Local Storage, IndexedDB, preferences and other persistent profile storage are copied and verified. Old destination backups are retained, including their unique contents; the implementation does not automatically prune those backups. A backup can therefore contain an intentionally protected older copy even after ordinary source cleanup succeeds.
 

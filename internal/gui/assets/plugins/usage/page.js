@@ -24,7 +24,7 @@ function headersPanel(label, first, headers) {
   return panel;
 }
 
-// The archived file, whole, however large: to the browser in magpie web,
+// The archived file, whole, however large: to the browser in blackpie web,
 // to Downloads in the app (#447).
 async function downloadArchive(name, b) {
   const [date, aid] = name.split("/");
@@ -110,10 +110,10 @@ function archivePanel(name, id, redraw) {
 
 const PERIODS = [["today", "Today"], ["7d", "7 days"], ["30d", "30 days"], ["all", "All"]];
 
-// The reader's time zone, which magpie reads the period's days, the chart's
-// hours and a picked day in: magpie web may be read from another zone than
+// The reader's time zone, which blackpie reads the period's days, the chart's
+// hours and a picked day in: blackpie web may be read from another zone than
 // the computer's, whose days put a call at 9:00 in UTC+8 under 1:00 (Outvi V
-// on Discord). None, and magpie reads its own.
+// on Discord). None, and blackpie reads its own.
 function usageZone() {
   try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { return ""; }
 }
@@ -411,8 +411,8 @@ function costHead(c, note, title) {
   cost.append(el("span", note ? "unpriced" : "", note || t("effective prices")));
   cost.title = title;
 }
-// a request magpie sent a provider by itself to test it (SourceProbe)
-const probeWhy = () => t("magpie sent this itself to test the provider (Test, Detect APIs or a model list), not for an agent. It is not counted in any total.");
+// a request blackpie sent a provider by itself to test it (SourceProbe)
+const probeWhy = () => t("blackpie sent this itself to test the provider (Test, Detect APIs or a model list), not for an agent. It is not counted in any total.");
 const unpricedCalls = (n) => t(n === 1 ? "{n} call unpriced" : "{n} calls unpriced", { n: ledNum(n) });
 const unpricedCallsWhy = (n) => n ? t(n === 1 ? "{n} call had no known price and is not counted" : "{n} calls had no known price and are not counted", { n }) : t("Estimated using effective model prices, including custom prices");
 // renderCosts redraws whatever on the Usage page shows a cost, once the
@@ -423,7 +423,7 @@ function renderCosts() {
   if (ledger && usageTab === "requests") renderLedger();
   if (sessions) renderSessions();
 }
-// sharedBalances (keyCards): the keys magpie found to read one account's
+// sharedBalances (keyCards): the keys blackpie found to read one account's
 // balance (sharedBalance, the first one's name) as one card, the first's,
 // with the keys it stands for (sharedKeys): mimi on Discord, a site's three
 // keys each showing the account's $8.39 and its curve. Keys that read
@@ -483,7 +483,7 @@ function quotaWho(q) {
 }
 
 function ownCalls(n) {
-  return t("{n} by magpie itself", { n: fmtN(n) });
+  return t("{n} by blackpie itself", { n: fmtN(n) });
 }
 // The allowances' arrangement, picked in their head and kept: wide cards,
 // a provider a row with its charts beside the meters, or columns. A card's
@@ -491,7 +491,7 @@ function ownCalls(n) {
 // one in full and the others in brief where they are in the list.
 let quotaLayout = "multi";
 try {
-  if (localStorage.getItem("magpie.quotaLayout") === "wide") quotaLayout = "wide";
+  if (localStorage.getItem("blackpie.quotaLayout") === "wide") quotaLayout = "wide";
 } catch {}
 function renderQuotaLook() {
   const list = $("#subscriptionUsage");
@@ -511,7 +511,7 @@ function renderQuotaLook() {
     }));
     slide(box, id);
   };
-  const pick = (key, v) => { try { localStorage.setItem("magpie." + key, v); } catch {} renderQuotas(); };
+  const pick = (key, v) => { try { localStorage.setItem("blackpie." + key, v); } catch {} renderQuotas(); };
   segs("quotaLayout", !!quotas?.length, [["wide", "Wide cards", "A card a row, its charts beside the meters"], ["multi", "Columns", "Cards in columns, the charts under the meters"]],
     quotaLayout, (v) => { quotaLayout = v; pick("quotaLayout", v); });
 }
@@ -727,7 +727,7 @@ function quotaChart(sub) {
   return box;
 }
 
-// balanceChart: a balance as magpie read it (TJHHHH on Discord), over the
+// balanceChart: a balance as blackpie read it (TJHHHH on Discord), over the
 // range the allowances' charts have ("2 days", or all it has: two weeks),
 // dotted on at its fitted pace to the day it runs out when that is no
 // further off than twice what is shown; none with one reading only
@@ -773,10 +773,10 @@ function balanceChart(sub) {
 }
 
 // creditChart: the credits (or money, in its unit's currency) one of an
-// account's windows used each day of the period, as magpie counted them
+// account's windows used each day of the period, as blackpie counted them
 // from its readings of the vendor's meter (#568): a thin bar a day, today's
 // light as it is not over, the most and today's figures on them, and the
-// dashed average of the days before today; a day before magpie first read
+// dashed average of the days before today; a day before blackpie first read
 // it is not known rather than nothing. named: the window's name in the
 // head, for a card with several.
 function creditChart(daily, named) {
@@ -804,7 +804,7 @@ function creditChart(daily, named) {
   const sum = list.reduce((a, d) => a + d.used, 0);
   const head = el("div", "cd-head");
   const name = el("span", "", t(unit ? "Spent per day" : "Credits used per day") + (named && pool ? " · " + t(pool) : ""));
-  name.title = t("Counted from magpie's readings of the vendor's meter, since {date}: what is used while magpie isn't reading it is counted on the day it next does", { date: dayName(new Date(since + "T12:00:00")) });
+  name.title = t("Counted from blackpie's readings of the vendor's meter, since {date}: what is used while blackpie isn't reading it is counted on the day it next does", { date: dayName(new Date(since + "T12:00:00")) });
   const total = n > 1 ? t("{n} in {days} days", { n: num(sum), days: n }) : range && range.to !== key(today) ? t("{n} on {date}", { n: num(sum), date: dayName(last) }) : t("{n} today", { n: num(sum) });
   head.append(name, el("b", "", total));
   box.append(head);
@@ -838,7 +838,7 @@ function creditChart(daily, named) {
       qvText(f.g, Math.min(Math.max(p.x, f.left + w / 2), QV.right - w / 2), Math.max(QV.top + 2, p.y), p.text, "middle", "qv-v qv-top");
     });
     qvAxis(f, labels);
-    qvHits(f, list.map((d, i) => ({ x: f.X(i) + band / 2, tip: !d.known ? t("{date}: not counted — magpie began counting on {since}", { date: dayName(d.date), since: dayName(new Date(since + "T12:00:00")) })
+    qvHits(f, list.map((d, i) => ({ x: f.X(i) + band / 2, tip: !d.known ? t("{date}: not counted — blackpie began counting on {since}", { date: dayName(d.date), since: dayName(new Date(since + "T12:00:00")) })
       : d.today ? t("{n} today", { n: num(d.used) }) : t(unit ? "{date}: {n} spent" : "{date}: {n} credits", { date: dayName(d.date), n: num(d.used) }) })));
     // to a screen reader: the sum, the most, today's and the average
     f.g.setAttribute("aria-label", [name.textContent, total, most?.used > 0 && t("Most on {date}: {n}", { date: dayName(most.date), n: num(most.used) }),
@@ -872,9 +872,9 @@ new ResizeObserver(fitChartLabels).observe($("#view-usage"));
 
 // The Overview's lists — Agents, Models, Accounts, Gateway keys — each fold
 // away under their heading (#2378: 日常看账号维度较多，都要拉到最底下), and
-// stay folded across a reload (magpie.usageFolded, the folded ones' names).
+// stay folded across a reload (blackpie.usageFolded, the folded ones' names).
 let usageFolded = new Set();
-try { usageFolded = new Set(JSON.parse(localStorage.getItem("magpie.usageFolded") || "[]")); } catch {}
+try { usageFolded = new Set(JSON.parse(localStorage.getItem("blackpie.usageFolded") || "[]")); } catch {}
 const USAGE_FOLDS = { agents: ["usageAgents", "usageAgentsHid"], models: ["usageModels"], accounts: ["usageAccounts"], keys: ["usageKeys"] };
 const USAGE_FOLD_TITLES = {
   agents: ["Show the agents", "Fold the agents away"],
@@ -888,7 +888,7 @@ function mountUsageFolds() {
     b.onclick = () => {
       const id = b.dataset.fold;
       if (usageFolded.has(id)) usageFolded.delete(id); else usageFolded.add(id);
-      try { localStorage.setItem("magpie.usageFolded", JSON.stringify([...usageFolded])); } catch {}
+      try { localStorage.setItem("blackpie.usageFolded", JSON.stringify([...usageFolded])); } catch {}
       showUsageFolds();
       backToReader($("#view-usage"));
     };
@@ -917,9 +917,9 @@ function usageParts(texts) {
 // The Overview's token totals count what went in and out; the cache's
 // tokens, read and written, can be counted in them too (#2378), as the
 // Requests tab's total always has them. Kept as the reader left it
-// (magpie.usageWithCache).
+// (blackpie.usageWithCache).
 let usageWithCache = false;
-try { usageWithCache = localStorage.getItem("magpie.usageWithCache") === "1"; } catch {}
+try { usageWithCache = localStorage.getItem("blackpie.usageWithCache") === "1"; } catch {}
 const cacheOf = (x) => (x.cache_read || 0) + (x.cache_write || 0);
 const usageTokens = (x) => tokensOf(x) + (usageWithCache ? cacheOf(x) : 0);
 // the tokens tile's label: a pop-up of the two ways to count
@@ -937,7 +937,7 @@ function usageTokensPick() {
       { v: "1", name: "With cache", note: "Cache read and written counted too" },
     ], usageWithCache ? "1" : "", (v) => {
       usageWithCache = v === "1";
-      try { localStorage.setItem("magpie.usageWithCache", usageWithCache ? "1" : "0"); } catch {}
+      try { localStorage.setItem("blackpie.usageWithCache", usageWithCache ? "1" : "0"); } catch {}
       renderUsage();
     }, "Token totals", "sess-menu");
   };
@@ -1038,13 +1038,13 @@ function renderUsage() {
       const sub = [];
       if (g.sub) sub.push(g.sub);
       sub.push(t(g.calls === 1 ? "{n} call" : "{n} calls", { n: g.calls }));
-      // magpie's own calls apart from the agents' (#1839): magpie's row
+      // blackpie's own calls apart from the agents' (#1839): blackpie's row
       // says it is, and a model's, a key's or an account's how many of
       // its calls were
-      if (id === "usageAgents" && g.id === "magpie") who.firstChild.append(ownBadge());
+      if (id === "usageAgents" && g.id === "blackpie") who.firstChild.append(ownBadge());
       else if (g.own?.calls) sub.push(ownCalls(g.own.calls));
       if (g.errors) sub.push(t("{n} failed", { n: g.errors }));
-      // of those, the replies magpie ended stuck in a loop (#1858)
+      // of those, the replies blackpie ended stuck in a loop (#1858)
       if (g.loops) sub.push(t("{n} looped", { n: g.loops }));
       if (g.retried) sub.push(t("{n} answered on a retry", { n: g.retried }));
       // how long the streamed replies took to begin, and how fast they
@@ -1090,7 +1090,7 @@ function renderUsage() {
     b.setAttribute("aria-haspopup", "menu");
     b.setAttribute("aria-label", t("Actions for {name}", { name: g.name || g.id }));
     b.append(svg(DOTS, 14, 2.2));
-    // a client magpie doesn't know can be counted as one of the agents
+    // a client blackpie doesn't know can be counted as one of the agents
     // it does (#1958, NorethSea): a bridge that starts Codex under a name
     // of its own; the agent counting one has it put back on its own
     const counted = Object.entries(state.settings?.clientAgents || {}).filter(([, as]) => as === g.id).map(([c]) => c);
@@ -1155,7 +1155,7 @@ function renderUsage() {
   clear.hidden = false;
   clear.onclick = () => clearUsage();
   // the account cards say how many of this period's requests were
-  // magpie's own (ownLine), which they could only once the summary came
+  // blackpie's own (ownLine), which they could only once the summary came
   if (quotas && (u.accounts?.some((g) => g.own?.calls) || $("#subscriptionUsage .quota-own"))) renderQuotas();
 }
 
@@ -1187,16 +1187,16 @@ async function clearUsage(g) {
 }
 
 // countable is whether the Usage page's Agents list offers to count a
-// client as an agent: one magpie doesn't know, not magpie's own (#1839)
+// client as an agent: one blackpie doesn't know, not blackpie's own (#1839)
 // nor the calls that named no client.
 const COUNT_AS = "M3 3v3.5A3.5 3.5 0 0 0 6.5 10H13M10 7l3 3-3 3";
 function countable(id) {
-  return !!id && id !== "other" && !/^magpie/i.test(id) && !(state.clients || []).some((a) => a.id === id);
+  return !!id && id !== "other" && !/^blackpie/i.test(id) && !(state.clients || []).some((a) => a.id === id);
 }
 // pickCountAs opens the agents a client can be counted as, under its menu
 // button.
 function pickCountAs(anchor, g) {
-  const opts = (state.clients || []).filter((a) => a.id !== "magpie").map((a) => ({ v: a.id, name: a.name, literalName: true, note: "" }));
+  const opts = (state.clients || []).filter((a) => a.id !== "blackpie").map((a) => ({ v: a.id, name: a.name, literalName: true, note: "" }));
   openProtoMenu(anchor, opts, "", (v) => countClientAs(g.id, v), "Count this client's calls as", "", "left", false, opts.length > 8 ? "Search agents…" : "");
 }
 // countClientAs counts a client's calls as an agent's on the Usage and
@@ -1247,8 +1247,8 @@ async function hideUsageAgent(id, hide) {
 // the counting never hear of it, the tray panel's Allowances tab has its
 // own (Arrange), and a menu bar cell asking for a hidden card shows it
 // until the page is left. Each is kept by its tray card id and its kind
-// (cardHideKey), in magpie's settings (usageCardsHidden), so every window
-// and magpie web agree; one line at the section's end says how many, and
+// (cardHideKey), in blackpie's settings (usageCardsHidden), so every window
+// and blackpie web agree; one line at the section's end says how many, and
 // has them back.
 let quotaHidOpen = false; // the hidden cards listed under their line
 let usagePeek = ""; // a card a menu bar cell asked for, shown though hidden
@@ -1393,7 +1393,7 @@ let ledMis = false, ledSession = "", ledRequested = "", ledReqName = "";
 // period (usage.RowGroup), kept per viewer as the metric is
 let ledGroup = "agent";
 try {
-  const g = localStorage.getItem("magpie.ledGroup");
+  const g = localStorage.getItem("blackpie.ledGroup");
   if (["", "agent", "model", "session"].includes(g)) ledGroup = g;
 } catch {}
 // the one request a route lists is never grouped, nor rows a filter keeps to
@@ -1406,13 +1406,13 @@ const LED_PAGE = 100;
 // Remember the chart metric; start each app load split by model.
 let ledMetric = "tokens", ledSplit = "model";
 try {
-  const m = localStorage.getItem("magpie.ledMetric");
+  const m = localStorage.getItem("blackpie.ledMetric");
   if (["tokens", "cost", "calls", "speed"].includes(m)) ledMetric = m;
 } catch {}
 // Columns or lines (molvqingtai on Discord), kept per viewer as the metric
 // is; anything but "line", or a read that fails, is columns.
 let ledLine = false;
-try { ledLine = localStorage.getItem("magpie.ledChart") === "line"; } catch {}
+try { ledLine = localStorage.getItem("blackpie.ledChart") === "line"; } catch {}
 
 // The filters a click set for the reader rather than one they picked in a
 // filter's menu: someone in the chart's ranking or a day of its columns
@@ -1509,7 +1509,7 @@ function ledParams(extra) {
 // asked again while it is read (the refresh button, the timer) waits for
 // that read, and another page or filter cancels it. Each pick and press
 // used to send one more, and a long history's reads, all still running,
-// took the browser's few connections to magpie, so the page never came.
+// took the browser's few connections to blackpie, so the page never came.
 // flight: { want, ctl, p }
 const ledFlights = { page: null, heat: null };
 function ledRead(kind, path, want) {
@@ -1740,7 +1740,7 @@ function ledPopBody(r) {
   add(t("Served model"), served, as === "swapped" ? "mis" : "");
   if (r.upstream) add(t("Actual provider"), r.upstream);
   const local = r.source === "log";
-  const why = as === "swapped" ? t("The model name the upstream returned doesn't match the upstream request model, under any spelling magpie recognizes. An alias or a dated version can also differ, so this warning alone doesn't prove the model was replaced.")
+  const why = as === "swapped" ? t("The model name the upstream returned doesn't match the upstream request model, under any spelling blackpie recognizes. An alias or a dated version can also differ, so this warning alone doesn't prove the model was replaced.")
     : as === "renamed" ? t("The reply names the same model another way, such as with a date or version suffix: counted as the same model.")
     : as === "picked" ? t("auto was asked for, and the vendor picked this model.")
     : as === "routed" ? (window.routedWhy ? window.routedWhy({ model: r.model, served }) : "")
@@ -1752,7 +1752,7 @@ function ledPopBody(r) {
   if (local && r.model) out.push(el("p", "", t("Model recorded in the local session log; the outbound HTTP request was not captured.")));
   const field = as && LED_SERVED_FIELD[ledProtos(r)?.to];
   if (field) out.push(el("p", "rule", t("The served model is read from the reply's {field} ({protocol}).", { field: field[0], protocol: field[1] })));
-  out.push(el("p", "rule", t("Not counted as a mismatch: only a date or version suffix, a vendor's own serving name, a relay's renaming, an alias listed in the provider's model list, the member a magpie group picked, auto.")));
+  out.push(el("p", "rule", t("Not counted as a mismatch: only a date or version suffix, a vendor's own serving name, a relay's renaming, an alias listed in the provider's model list, the member a blackpie group picked, auto.")));
   return out;
 }
 
@@ -1851,17 +1851,17 @@ function ledDetail(r, cols) {
   if (r.kind) add("Called for", window.kindName ? window.kindName(r.kind) : r.kind);
   if (r.ttft_ms) add("First token", ledTook(r.ttft_ms));
   // of it, what came before the request went to the vendor, and the
-  // vendor's wait from then to its first token. Before it, magpie's own
+  // vendor's wait from then to its first token. Before it, blackpie's own
   // time is told apart from the tries that failed first, a wait for a
   // slot and connecting and sending the body (#1532: a vendor that held a
-  // try ~100 s before its 503 read as 104 s in magpie); a record from
+  // try ~100 s before its 503 read as 104 s in blackpie); a record from
   // before they were kept has only the whole
   if (r.ttft_ms && r.sent_ms) {
     const split = r.own_ms != null;
-    // of magpie's own, what went on masking it (Settings → Privacy)
+    // of blackpie's own, what went on masking it (Settings → Privacy)
     const masking = split && r.masking_ms > 0 ? Math.min(r.masking_ms, r.own_ms) : 0;
     if (masking) add("Masking", ledTook(masking));
-    add("In magpie", ledTook((split ? r.own_ms : r.sent_ms) - masking));
+    add("In blackpie", ledTook((split ? r.own_ms : r.sent_ms) - masking));
     if (split) {
       if (r.retried_ms > 0) add("Tries that failed first", ledTook(r.retried_ms));
       if (r.queued_ms > 0) add("Waiting for a slot", ledTook(r.queued_ms));
@@ -1931,7 +1931,7 @@ function ledBodies(id, bx) {
     ledBodiesGot.set(id, got);
   }
   const draw = (b) => {
-    if (b.gone) return bx.replaceChildren(el("p", "cx-none", t("magpie keeps the request and response of only the last 40 requests, until it quits. To keep every request's, turn on Request archive at the top of Usage › Requests.")));
+    if (b.gone) return bx.replaceChildren(el("p", "cx-none", t("blackpie keeps the request and response of only the last 40 requests, until it quits. To keep every request's, turn on Request archive at the top of Usage › Requests.")));
     if (b.error) {
       const again = el("button", "text", t("Try again"));
       again.onclick = () => { ledBodiesGot.delete(id); ledBodies(id, bx); };
@@ -1951,7 +1951,7 @@ function ledBodies(id, bx) {
 
 // What was said in a request — what its agent was given, and what came back —
 // is in the agent's own session file, and read from it when a row is opened
-// (the server finds the call by its session and time); magpie keeps no copy.
+// (the server finds the call by its session and time); blackpie keeps no copy.
 // What came is kept here while the list is looked at, so a row opened again, or
 // drawn again as the list is read anew, doesn't ask again.
 const ledContent = new Map();
@@ -1977,7 +1977,7 @@ function ledLoadContent(r) {
 }
 const LED_WHY = {
   session: "No session was named with this request, so its session file can't be found",
-  agent: "magpie reads the session files of Claude Code, Claude Desktop and Codex only",
+  agent: "blackpie reads the session files of Claude Code, Claude Desktop and Codex only",
   missing: "This request isn't in the agent's session files: they may be deleted, moved, or not written yet",
   read: "The session file couldn't be read",
 };
@@ -1995,7 +1995,7 @@ function ledContentBox(c) {
     box.append(sec);
   }
   if (c.cut) box.append(el("p", "cx-none", t("There was more than is shown here")));
-  box.append(el("p", "cx-src", t("Read from the agent's session file; magpie keeps no copy")));
+  box.append(el("p", "cx-src", t("Read from the agent's session file; blackpie keeps no copy")));
   return box;
 }
 
@@ -2141,7 +2141,7 @@ function ledStyle(host) {
     b.onclick = () => {
       if (id === cur) return;
       ledLine = id === "line";
-      try { localStorage.setItem("magpie.ledChart", id); } catch {}
+      try { localStorage.setItem("blackpie.ledChart", id); } catch {}
       drawLedTrend();
     };
     host.append(b);
@@ -2247,7 +2247,7 @@ function drawLedTrend() {
     }
     slide(host, key);
   };
-  pill($("#ledMetric"), "ledMetric", LED_TREND, ledMetric, (id) => { ledMetric = id; try { localStorage.setItem("magpie.ledMetric", id); } catch {} drawLedTrend(); });
+  pill($("#ledMetric"), "ledMetric", LED_TREND, ledMetric, (id) => { ledMetric = id; try { localStorage.setItem("blackpie.ledMetric", id); } catch {} drawLedTrend(); });
   ledStyle($("#ledStyle"));
   const keyed = (l.callerKeys || []).length > 0;
   if (ledSplit === "callerKey" && !keyed) ledSplit = "model";
@@ -2292,7 +2292,7 @@ function drawLedTrend() {
 // sight; the pointer on a day says its date and what it had.
 let ledHeat = null, ledHeatWant = "", ledHeatMetric = "tokens";
 try {
-  const m = localStorage.getItem("magpie.ledHeatMetric");
+  const m = localStorage.getItem("blackpie.ledHeatMetric");
   if (["tokens", "calls", "cost"].includes(m)) ledHeatMetric = m;
 } catch {}
 const LED_HEAT = [["tokens", "Tokens"], ["calls", "Requests"], ["cost", "Cost"]];
@@ -2350,7 +2350,7 @@ function drawLedHeat() {
     b.onclick = () => {
       if (id === ledHeatMetric) return;
       ledHeatMetric = id;
-      try { localStorage.setItem("magpie.ledHeatMetric", id); } catch {}
+      try { localStorage.setItem("blackpie.ledHeatMetric", id); } catch {}
       drawLedHeat();
     };
     seg.append(b);
@@ -2569,7 +2569,7 @@ const ledRowSpeed = (r) => { const d = ledDecode(r); return d ? d.n / (d.w / 100
 // speed after the first token can't be under. Against Claude Code's own
 // stream it read 2–5% under for a reply of 1,400 tokens or more, 11–33% for
 // a shorter one or one asked with a tool's result, so only a reply of 1,000
-// or more is told. 0 when it tells none, and a call magpie timed tells its
+// or more is told. 0 when it tells none, and a call blackpie timed tells its
 // own (ledDecode). Only the row's: the period's speed counts timed calls
 // and session files' floors (usage.Row.Floor), not a gateway row's below.
 // Claude Code's, Claude Desktop's and Codex's files only (usage.FloorAgents):
@@ -2764,20 +2764,20 @@ function ledRowEl(r, key) {
   }
   td(when, "when", new Date(r.t).toLocaleString(intlLang()));
   const who = el("span", "who");
-  // an agent on another computer, whose magpie passed the request on
+  // an agent on another computer, whose blackpie passed the request on
   const name = r.agentName || r.agent;
   // one made on another computer, whose usage sync brought (#542)
   const at = r.computerName ? t("{agent} · on {computer}", { agent: name, computer: r.computerName }) : name;
   who.append(icon(r.icon || "generic"), el("span", "", [r.via ? t("{agent} · via {host}", { agent: at, host: r.via }) : at, r.callerKeyLabel || r.callerKeyName].filter(Boolean).join(" · ")));
-  // a request magpie made by itself, apart from the agents' own (#1839);
+  // a request blackpie made by itself, apart from the agents' own (#1839);
   // one that tested the provider (the editor's Test, Detect APIs, a model
   // list) is counted nowhere, and says so (neiko on Discord)
   const probe = r.source === "probe";
-  // an agent's call to a tool of magpie's MCP servers (ferock on Discord)
+  // an agent's call to a tool of blackpie's MCP servers (ferock on Discord)
   const mcp = r.source === "mcp";
-  // magpie's ask of a search API, for a search an agent's model made (cybercaius on Discord)
+  // blackpie's ask of a search API, for a search an agent's model made (cybercaius on Discord)
   const search = r.source === "search";
-  if (r.agent === "magpie") {
+  if (r.agent === "blackpie") {
     const own = ownBadge();
     if (probe) own.title = probeWhy();
     who.append(own);
@@ -2788,7 +2788,7 @@ function ledRowEl(r, key) {
   // A session file names the provider it was set up to call, which is
   // where a call that went straight to a vendor went: nothing stood
   // between the agent and it. It is the file's own record and not a route
-  // magpie saw, so the id the file carries is shown as it is — never
+  // blackpie saw, so the id the file carries is shown as it is — never
   // resolved to a provider's name, which would promote an unknown request
   // to an official provider — and the row keeps saying it is a local
   // session. A row whose file names none says only that.
@@ -2818,14 +2818,14 @@ function ledRowEl(r, key) {
   if (local && (r.session_account || r.session_provider)) {
     const k = el("span", "src local", t("Local session"));
     k.title = r.session_provider
-      ? t("Read from the agent's session file, which names the provider it was set up to call. The name shown is that record, not a route magpie saw.")
+      ? t("Read from the agent's session file, which names the provider it was set up to call. The name shown is that record, not a route blackpie saw.")
       : t("Read from the agent's session file. The account is shown only when local metadata identifies it; no service provider is inferred.");
     badges.append(k);
   }
   // a call an app reported itself (#1874): it went straight to its vendor
   if (r.source === "reported") {
     const k = el("span", "src reported", t("Reported"));
-    k.title = t("Reported by the app that made it, through POST /v1/magpie/usage/requests: the call went straight to its vendor, not through magpie.");
+    k.title = t("Reported by the app that made it, through POST /v1/blackpie/usage/requests: the call went straight to its vendor, not through blackpie.");
     badges.append(k);
   }
   if (probe) {
@@ -2835,13 +2835,13 @@ function ledRowEl(r, key) {
   }
   if (mcp) {
     const k = el("span", "src mcp", "MCP");
-    k.title = t("{agent} called the tool {tool} of magpie's MCP server {server}. Its arguments are not kept, and it is not counted in any total: the model requests it made are rows of their own.", { agent: name, tool: r.req || "—", server: r.host || "magpie" });
+    k.title = t("{agent} called the tool {tool} of blackpie's MCP server {server}. Its arguments are not kept, and it is not counted in any total: the model requests it made are rows of their own.", { agent: name, tool: r.req || "—", server: r.host || "blackpie" });
     badges.append(k);
   }
   if (search) {
     // a search API's, or a plan's own search service's (r.provider)
     const k = el("span", "src search", t(r.provider ? "Web search" : "Search API"));
-    k.title = t("magpie asked {api} to search the web for {agent}. The query is not kept, and it is not counted in any total.", { api: r.req || "—", agent: name });
+    k.title = t("blackpie asked {api} to search the web for {agent}. The query is not kept, and it is not counted in any total.", { api: r.req || "—", agent: name });
     badges.append(k);
   }
   if (badges.childElementCount) wc.append(badges);
@@ -3158,7 +3158,7 @@ function ledGroupDraw(by, box, got) {
   const n = got.total, m = got.rows.length;
   foot.append(el("span", "", ledMis ? t(n === 1 ? "{n} mismatch in this group, {m} shown" : "{n} mismatches in this group, {m} shown", { n: ledNum(n), m: ledNum(m) })
     : t(n === 1 ? "{n} request in this group, {m} shown" : "{n} requests in this group, {m} shown", { n: ledNum(n), m: ledNum(m) })));
-  // the requests turned away and magpie's own probes are listed, and in
+  // the requests turned away and blackpie's own probes are listed, and in
   // none of the header's figures (usage.RowGroup.Rows)
   const off = ledMis ? 0 : (g.rows || 0) - (g.calls || 0);
   if (off > 0) foot.append(el("span", "muted", t(off === 1 ? "{n} of them, turned away or a probe, isn't counted in the figures above" : "{n} of them, turned away or probes, aren't counted in the figures above", { n: ledNum(off) })));
@@ -3188,7 +3188,7 @@ function ledOnlyGroup(by, g) {
   else if (by === "model") { ledRequested = g.id; ledReqName = g.name || g.id; ledLent.add("requested"); }
   else { ledSession = g.id; ledLent.add("session"); }
   ledGroup = "";
-  try { localStorage.setItem("magpie.ledGroup", ""); } catch {}
+  try { localStorage.setItem("blackpie.ledGroup", ""); } catch {}
   ledOffset = 0;
   loadLedger().catch((e) => status(e.message, "err"));
 }
@@ -3223,7 +3223,7 @@ function ledGroupTools(l) {
       btn.classList.toggle("set", !!by);
       btn.firstChild.textContent = label(by);
       ledGroup = by;
-      try { localStorage.setItem("magpie.ledGroup", by); } catch {}
+      try { localStorage.setItem("blackpie.ledGroup", by); } catch {}
       ledOffset = 0;
       loadLedger().catch((e) => status(e.message, "err"));
     }, "Group by");
@@ -3351,7 +3351,7 @@ function renderLedger(quiet) {
   // the same count
   if (l.total && l.swaps) $("#ledSum").append(" · ", el("span", "mis", t(l.swaps === 1 ? "{n} served-model mismatch" : "{n} served-model mismatches", { n: ledNum(l.swaps) })));
   // the two sources and their total, in the same block of cells as the totals
-  // above them: what magpie carried, what it only read about in the agents'
+  // above them: what blackpie carried, what it only read about in the agents'
   // own session files, and the two together. Each is a filter: picking one
   // lists only its requests, and the total is the way back. Its own numbers
   // are counted with the pick cleared (usage.RequestPage), so all three stay
@@ -3405,8 +3405,8 @@ function renderLedger(quiet) {
     }
     via.style.setProperty("--vias", String(n));
     tile(cells[0], "all requests", thru.calls + dir.calls + rep.calls, all, "");
-    tile(cells[1], "through magpie", thru.calls, thru, "through");
-    tile(cells[2], "not through magpie", dir.calls, dir, "direct");
+    tile(cells[1], "through blackpie", thru.calls, thru, "through");
+    tile(cells[2], "not through blackpie", dir.calls, dir, "direct");
     if (n === 4) tile(cells[3], "reported by apps", rep.calls, rep, "reported");
     via.hidden = false;
   } else {
@@ -3563,7 +3563,7 @@ function wslBadge(s) {
 }
 
 // sessModelsText: a session's models, the first two and how many more, and
-// where magpie's gateway sent its calls, the most first: a routing group's
+// where blackpie's gateway sent its calls, the most first: a routing group's
 // member and the reasoning it was asked for
 function sessModelsText(s) {
   const via = s.via?.length ? "→ " + [s.via[0].model, s.via[0].effort].filter(Boolean).join(" · ") + (s.via.length > 1 ? " +" + (s.via.length - 1) : "") : "";
@@ -3586,7 +3586,7 @@ function sessUsageDetail(d, s, line) {
   (s.via || []).forEach((v, i) => line(i ? "" : t("Routed"), viaText(v) + " · " + t("{n} tokens", { n: fmtN(v.tokens) }) + (v.credited ? " · " + ledCredits(v).textContent : "")));
 }
 
-// one place a session's calls went through magpie, in words
+// one place a session's calls went through blackpie, in words
 function viaText(v) {
   return `${v.provider}/${v.model}` + (v.effort ? " · " + v.effort : "") + " · " + t("{n} calls", { n: v.calls });
 }
@@ -3644,7 +3644,7 @@ let quotasStale = true, quotasStaleFrame = 0, quotasDrawnSig = "";
 // that brought nothing new, a minute not yet past) is no reason to draw them
 // again, as upstream's read that changed nothing draws nothing
 const quotasSig = () => JSON.stringify([quotas, quotaHistV, quotaLeft, quotaRange, locale, state?.settings, Math.floor(Date.now() / 60e3)]);
-try { const k = localStorage.getItem("magpie.usageTab"); if (USAGE_TABS.some(([id]) => id === k)) usageTab = k; } catch {}
+try { const k = localStorage.getItem("blackpie.usageTab"); if (USAGE_TABS.some(([id]) => id === k)) usageTab = k; } catch {}
 let sessAgent = "all";
 let sessQuery = "";
 // The list is drawn in pages: every session is read (so the count beside it
@@ -3746,11 +3746,11 @@ let sessMetric = "tokens";
 const SESS_TOPS = [["tokens", "Tokens"], ["cost", "Cost"], ["active", "Active"]];
 let sessTopBy = "tokens";
 try {
-  const r = localStorage.getItem("magpie.sessRange");
+  const r = localStorage.getItem("blackpie.sessRange");
   if (SESS_RANGES.some(([id]) => id === r)) sessRange = r;
-  const m = localStorage.getItem("magpie.sessMetric");
+  const m = localStorage.getItem("blackpie.sessMetric");
   if (SESS_METRICS.some(([id]) => id === m)) sessMetric = m;
-  const b = localStorage.getItem("magpie.sessTop");
+  const b = localStorage.getItem("blackpie.sessTop");
   if (SESS_TOPS.some(([id]) => id === b)) sessTopBy = b;
 } catch {}
 let sessStats = null; // { from, to, days: [{ date, usage, active }], agents } for sessRange
@@ -3775,7 +3775,7 @@ function renderUsageTab() {
       if (id === usageTab) return;
       if (usageTab === "requests") ledLeave();
       usageTab = id;
-      try { localStorage.setItem("magpie.usageTab", id); } catch {}
+      try { localStorage.setItem("blackpie.usageTab", id); } catch {}
       $("#usageCost").replaceChildren();
       // to the Overview is to the allowances (#1588)
       loadUsage(id === "usage").catch((e) => status(e.message, "err"));
@@ -4109,7 +4109,7 @@ function renderSessRange(loading) {
     b.onclick = () => {
       if (id === sessRange) return;
       sessRange = id;
-      try { localStorage.setItem("magpie.sessRange", id); } catch {}
+      try { localStorage.setItem("blackpie.sessRange", id); } catch {}
       sessStats = null;
       loadSessions().catch((e) => status(e.message, "err"));
     };
@@ -4224,7 +4224,7 @@ function renderSessions() {
       const history = el("button", "text sess-show-history", t("All sessions"));
       history.onclick = () => {
         sessRange = "all";
-        try { localStorage.setItem("magpie.sessRange", sessRange); } catch {}
+        try { localStorage.setItem("blackpie.sessRange", sessRange); } catch {}
         sessStats = null;
         loadSessions().catch((e) => status(e.message, "err"));
       };
@@ -4497,7 +4497,7 @@ function renderSessChart(chart, st, used, ov, acts) {
     const head = el("div", "sess-chart-head");
     const seg = sessSegs(SESS_METRICS.map(([id, name]) => [id, name, off[id]]), metric, (id) => {
       sessMetric = id;
-      try { localStorage.setItem("magpie.sessMetric", id); } catch {}
+      try { localStorage.setItem("blackpie.sessMetric", id); } catch {}
       chart.redraw();
     });
     head.append(el("span", "label", t(shape === "week" ? "By week" : shape === "day" ? "By day" : "Activity")), seg, el("span", "grow"));
@@ -4651,7 +4651,7 @@ function renderSessTop() {
   const head = sessCardHead("Top sessions");
   const seg = sessSegs(SESS_TOPS, sessTopBy, (id) => {
     sessTopBy = id;
-    try { localStorage.setItem("magpie.sessTop", id); } catch {}
+    try { localStorage.setItem("blackpie.sessTop", id); } catch {}
     renderSessTop();
   });
   head.append(el("span", "grow"), seg);
@@ -4668,12 +4668,12 @@ function renderSessTop() {
     const r = el("div", "row sess sess-top");
     r.append(icon(icons.get(s.agent) || "generic"));
     const who = el("div", "who");
-    // a session magpie saw only through the gateway (#2285: a Pi
+    // a session blackpie saw only through the gateway (#2285: a Pi
     // subagent's, its file in a temp folder) has no folder and no prompt
     // unless gateway conversations are recorded: say so, not "(no prompt)"
     who.append(el("div", "name", s.title || t(s.gateway ? "(prompt not recorded)" : "(no prompt)")));
     const sub = el("div", "sub", [s.cwd ? baseName(s.cwd) : s.gateway ? t("Gateway session") : "", names[s.agent] || s.agent, s.models?.[0], ago(s.last)].filter(Boolean).join(" · "));
-    sub.title = s.cwd || (s.gateway ? t("Seen only through the gateway: the agent kept no session file magpie can read. Turn on Record gateway conversations in Sessions to keep its prompts.") : "");
+    sub.title = s.cwd || (s.gateway ? t("Seen only through the gateway: the agent kept no session file blackpie can read. Turn on Record gateway conversations in Sessions to keep its prompts.") : "");
     who.append(sub);
     r.append(who);
     const fc = fmtCost({ cost: s.cost, unpriced: !s.priced });
@@ -4703,7 +4703,7 @@ function renderSessTop() {
 // the ways a session's shape is told, and the one shown
 const SESS_SHAPES = [["messages", "Messages"], ["minutes", "Length"], ["autonomy", "Tool calls"]];
 let sessShapeBy = "messages";
-try { const v = localStorage.getItem("magpie.sessShape"); if (SESS_SHAPES.some(([id]) => id === v)) sessShapeBy = v; } catch {}
+try { const v = localStorage.getItem("blackpie.sessShape"); if (SESS_SHAPES.some(([id]) => id === v)) sessShapeBy = v; } catch {}
 
 // renderSessShape counts the range's sessions by how long they ran: by
 // messages, by minutes at work, or by tool calls a prompt
@@ -4716,7 +4716,7 @@ function renderSessShape() {
   const head = sessCardHead("Session shape");
   const seg = sessSegs(SESS_SHAPES, sessShapeBy, (id) => {
     sessShapeBy = id;
-    try { localStorage.setItem("magpie.sessShape", id); } catch {}
+    try { localStorage.setItem("blackpie.sessShape", id); } catch {}
     renderSessShape();
   });
   head.append(seg, el("span", "grow"), el("span", "tz", sh ? t(sh.total === 1 ? "{n} session" : "{n} sessions", { n: fmtN(sh.total) }) : ""));
@@ -4983,7 +4983,7 @@ function sessionItem(s) {
   r.append(go);
   const open = (e) => {
     if (window.getSelection()?.toString()) return;
-    if (!featuresOff.has("sessions")) return magpie.call("sessions", "reveal", s, e);
+    if (!featuresOff.has("sessions")) return blackpie.call("sessions", "reveal", s, e);
     // Sessions is switched off: there is no page to open it on
     sessListOpen = sessListOpen === key ? "" : key;
     // one open at a time: the one that was folds
@@ -5028,7 +5028,7 @@ function sessionDetail(s) {
 }
 
 // All sessions: the Sessions page, on the agent picked here if one is
-$("#sessAll").onclick = (e) => magpie.call("sessions", "reveal", sessAgent === "all" ? {} : { agent: sessAgent }, e);
+$("#sessAll").onclick = (e) => blackpie.call("sessions", "reveal", sessAgent === "all" ? {} : { agent: sessAgent }, e);
 $("#sessQ").oninput = (e) => { sessQuery = e.target.value; if (sessions) renderSessions(); };
 $("#sessQ").onkeydown = (e) => { if (e.key === "Escape" && e.target.value) { e.stopPropagation(); e.target.value = ""; sessQuery = ""; if (sessions) renderSessions(); } };
 // scrolled, resized or come into sight: the rows now near it drawn (sessWin)
@@ -5042,7 +5042,7 @@ sessWinRO.observe($("#view-usage"));
 //
 // Three choices (palette, language, what the tray icon opens) and the facts
 // people come looking for:
-// the version, where magpie keeps its files, the gateway's address.
+// the version, where blackpie keeps its files, the gateway's address.
 
 // The Usage page reads its numbers again while it is looked at, as often as
 // the reader says — off, or every 5 s to a minute (a request through the gateway
@@ -5052,7 +5052,7 @@ sessWinRO.observe($("#view-usage"));
 const USAGE_EVERY = [[0, "Off"], [5, "5 s"], [10, "10 s"], [30, "30 s"], [60, "1 min"]];
 let usageEvery = 5; // seconds; 0 is off
 try {
-  const v = localStorage.getItem("magpie.usageEvery");
+  const v = localStorage.getItem("blackpie.usageEvery");
   if (USAGE_EVERY.some(([n]) => String(n) === v)) usageEvery = Number(v);
 } catch {}
 let usageLast = 0, usageReadAt = 0, sessionsAt = 0, quotasAsked = 0;
@@ -5068,7 +5068,7 @@ function renderUsageEvery() {
     if (b.classList.contains("open")) return closeProtoMenu();
     openProtoMenu(b, USAGE_EVERY.map(([n, name]) => ({ v: String(n), name: t(name), note: "" })), String(usageEvery), (v) => {
       usageEvery = Number(v);
-      try { localStorage.setItem("magpie.usageEvery", v); } catch {}
+      try { localStorage.setItem("blackpie.usageEvery", v); } catch {}
       usageLast = performance.now();
       renderUsageEvery();
     }, "Refresh every", "sess-menu");
@@ -5199,7 +5199,7 @@ if (mode === "window" && params.get("view") === "usage") {
 // chart and the heatmap open under them, in the same card. How it was left
 // is kept with the page's other folds (localStorage), and the fold is always
 // there: what it opens may still be reading.
-const LED_TREND_KEY = "magpie.ledSumOpen";
+const LED_TREND_KEY = "blackpie.ledSumOpen";
 let ledTrendOpen = false;
 try { ledTrendOpen = localStorage.getItem(LED_TREND_KEY) === "1"; } catch {}
 let ledTrendWired = false, ledTrendFrame = 0;

@@ -9,8 +9,8 @@
 package gateway
 
 import (
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/pluginrt"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/pluginrt"
 )
 
 func init() {

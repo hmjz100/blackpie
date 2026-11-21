@@ -15,11 +15,11 @@ import (
 // The fixture is a separate executable process, so assigning it to a job
 // never changes the test runner or other tests' process trees.
 func TestBrowserWriterJob(t *testing.T) {
-	if os.Getenv("MAGPIE_WRITER_FIXTURE") != "" {
+	if os.Getenv("BLACKPIE_WRITER_FIXTURE") != "" {
 		t.Skip("fixture child")
 	}
 	cmd := exec.Command(os.Args[0], "-test.run=^TestBrowserWriterFixture$", "-test.v")
-	cmd.Env = append(os.Environ(), "MAGPIE_WRITER_FIXTURE=helper", "MAGPIE_WRITER_DIR="+t.TempDir())
+	cmd.Env = append(os.Environ(), "BLACKPIE_WRITER_FIXTURE=helper", "BLACKPIE_WRITER_DIR="+t.TempDir())
 	if b, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("native writer fixture: %v\n%s", err, b)
 	}
@@ -39,15 +39,15 @@ func waitWriterFile(t *testing.T, name string) {
 }
 
 func TestBrowserWriterFixture(t *testing.T) {
-	mode := os.Getenv("MAGPIE_WRITER_FIXTURE")
+	mode := os.Getenv("BLACKPIE_WRITER_FIXTURE")
 	if mode == "" {
 		t.Skip("only invoked by writer job regression")
 	}
-	dir := os.Getenv("MAGPIE_WRITER_DIR")
+	dir := os.Getenv("BLACKPIE_WRITER_DIR")
 	command := func(mode string) *exec.Cmd {
 		c := exec.Command(os.Args[0], "-test.run=^TestBrowserWriterFixture$")
 		// Avoid duplicate environment keys (Windows lookup uses the first).
-		c.Env = []string{"SystemRoot=" + os.Getenv("SystemRoot"), "WINDIR=" + os.Getenv("WINDIR"), "TEMP=" + dir, "TMP=" + dir, "MAGPIE_WRITER_FIXTURE=" + mode, "MAGPIE_WRITER_DIR=" + dir}
+		c.Env = []string{"SystemRoot=" + os.Getenv("SystemRoot"), "WINDIR=" + os.Getenv("WINDIR"), "TEMP=" + dir, "TMP=" + dir, "BLACKPIE_WRITER_FIXTURE=" + mode, "BLACKPIE_WRITER_DIR=" + dir}
 		return c
 	}
 	switch mode {

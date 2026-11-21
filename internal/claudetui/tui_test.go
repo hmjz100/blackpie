@@ -16,12 +16,12 @@ import (
 	"time"
 )
 
-// The test binary is also the shim (MAGPIE_TUI_TEST=shim) and a fake
-// Claude Code (MAGPIE_TUI_TEST=claude): interactive, it shows a prompt,
+// The test binary is also the shim (BLACKPIE_TUI_TEST=shim) and a fake
+// Claude Code (BLACKPIE_TUI_TEST=claude): interactive, it shows a prompt,
 // writes each line typed into its transcript as a turn answered "echo:
 // <line>"; with -p it answers each stream-json line with a -p result.
 func TestMain(m *testing.M) {
-	switch os.Getenv("MAGPIE_TUI_TEST") {
+	switch os.Getenv("BLACKPIE_TUI_TEST") {
 	case "shim":
 		if err := Run(os.Args[1:]); err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -231,7 +231,7 @@ func runShim(t *testing.T, env []string, pargs []string, lines []string, want in
 	cmd := exec.Command(exe, pargs...)
 	tmp := filepath.Join(home, "tmp")
 	_ = os.Mkdir(tmp, 0o700)
-	cmd.Env = append(os.Environ(), "MAGPIE_TUI_TEST=shim", "HOME="+home, "XDG_CACHE_HOME="+filepath.Join(home, "cache"), "LOCALAPPDATA="+filepath.Join(home, "cache"),
+	cmd.Env = append(os.Environ(), "BLACKPIE_TUI_TEST=shim", "HOME="+home, "XDG_CACHE_HOME="+filepath.Join(home, "cache"), "LOCALAPPDATA="+filepath.Join(home, "cache"),
 		"TMPDIR="+tmp, "TMP="+tmp, "TEMP="+tmp, "CLAUDE_CONFIG_DIR="+cfg)
 	cmd.Env = append(cmd.Env, env...)
 	stdin, _ := cmd.StdinPipe()
@@ -244,7 +244,7 @@ func runShim(t *testing.T, env []string, pargs []string, lines []string, want in
 		_ = cmd.Process.Kill()
 		_ = cmd.Wait()
 	})
-	t.Setenv("MAGPIE_TUI_TEST_CFG", cfg)
+	t.Setenv("BLACKPIE_TUI_TEST_CFG", cfg)
 	for _, l := range lines {
 		// a line that is JSON is the message's content blocks
 		var content any = l
@@ -321,14 +321,14 @@ func TestShimTurnsInteractive(t *testing.T) {
 	if !strings.Contains(texts[1], `\n/help"`) {
 		t.Fatalf("the second turn said %s", texts[1])
 	}
-	args, _ := os.ReadFile(filepath.Join(os.Getenv("MAGPIE_TUI_TEST_CFG"), "args"))
+	args, _ := os.ReadFile(filepath.Join(os.Getenv("BLACKPIE_TUI_TEST_CFG"), "args"))
 	got := strings.Split(string(args), "\n")
 	for _, no := range []string{"-p", "--dangerously-skip-permissions", "--output-format", "--verbose", "--thinking-display"} {
 		if slices.Contains(got, no) {
 			t.Errorf("the interactive Claude Code was given %s: %q", no, got)
 		}
 	}
-	for _, yes := range []string{"--no-chrome", "mcp__magpie,WebSearch", "--session-id", "high"} {
+	for _, yes := range []string{"--no-chrome", "mcp__blackpie,WebSearch", "--session-id", "high"} {
 		if !slices.Contains(got, yes) {
 			t.Errorf("the interactive Claude Code wasn't given %s: %q", yes, got)
 		}
@@ -363,7 +363,7 @@ func TestShimPastesImages(t *testing.T) {
 	}
 	// Claude Code has them once their message is in the transcript: the
 	// files are gone while the helper goes on
-	left, _ := filepath.Glob(filepath.Join(filepath.Dir(os.Getenv("MAGPIE_TUI_TEST_CFG")), "tmp", imagesPrefix+"*"))
+	left, _ := filepath.Glob(filepath.Join(filepath.Dir(os.Getenv("BLACKPIE_TUI_TEST_CFG")), "tmp", imagesPrefix+"*"))
 	if len(left) > 0 {
 		t.Fatalf("the images are left after their message: %v", left)
 	}
@@ -415,9 +415,9 @@ func TestShimFallsBackToPrint(t *testing.T) {
 			if out[0]["result"] != "print mode" {
 				t.Fatalf("got %v, want the -p run's answer", out)
 			}
-			home := filepath.Dir(os.Getenv("MAGPIE_TUI_TEST_CFG"))
-			m, _ := filepath.Glob(filepath.Join(home, "*", "*", "magpie", "claude-tui-broken"))
-			m2, _ := filepath.Glob(filepath.Join(home, "*", "magpie", "claude-tui-broken"))
+			home := filepath.Dir(os.Getenv("BLACKPIE_TUI_TEST_CFG"))
+			m, _ := filepath.Glob(filepath.Join(home, "*", "*", "blackpie", "claude-tui-broken"))
+			m2, _ := filepath.Glob(filepath.Join(home, "*", "blackpie", "claude-tui-broken"))
 			if got := len(m)+len(m2) > 0; got != c.broken {
 				t.Fatalf("marked broken: %v, want %v", got, c.broken)
 			}
@@ -434,7 +434,7 @@ func runOnly(t *testing.T, home string, env []string) (out, stderr string, err e
 	tmp := filepath.Join(home, "tmp")
 	_ = os.Mkdir(tmp, 0o700)
 	cmd := exec.Command(exe, append([]string{fakePath(t)}, pArgs...)...)
-	cmd.Env = append(os.Environ(), "MAGPIE_TUI_TEST=shim", OnlyEnv+"=1", "HOME="+home, "XDG_CACHE_HOME="+filepath.Join(home, "cache"), "LOCALAPPDATA="+filepath.Join(home, "cache"),
+	cmd.Env = append(os.Environ(), "BLACKPIE_TUI_TEST=shim", OnlyEnv+"=1", "HOME="+home, "XDG_CACHE_HOME="+filepath.Join(home, "cache"), "LOCALAPPDATA="+filepath.Join(home, "cache"),
 		"TMPDIR="+tmp, "TMP="+tmp, "TEMP="+tmp, "CLAUDE_CONFIG_DIR="+cfg)
 	cmd.Env = append(cmd.Env, env...)
 	stdin, _ := cmd.StdinPipe()
@@ -491,7 +491,7 @@ func TestShimOnlyNeverPrints(t *testing.T) {
 			if err == nil || strings.Contains(out, "print mode") {
 				t.Fatalf("ended %v, wrote %q", err, out)
 			}
-			if !strings.Contains(stderr, "doesn't fall back to -p") || !strings.Contains(stderr, "magpie is set to use only it") {
+			if !strings.Contains(stderr, "doesn't fall back to -p") || !strings.Contains(stderr, "blackpie is set to use only it") {
 				t.Fatalf("stderr %q", stderr)
 			}
 		})
@@ -640,7 +640,7 @@ func TestTranslatorAPIError(t *testing.T) {
 // and is handed TERM through WSLENV, the gateway's own names kept.
 func TestShimInWSL(t *testing.T) {
 	s := &shim{wsl: &WSL{Args: []string{"-d", "Ubuntu"}, Mount: "/mnt/", Projects: `\\wsl$\Ubuntu\home\me\.claude\projects`}}
-	if got := s.path(`C:\Users\me\AppData\Local\Temp\magpie-images-1\1.png`); got != "/mnt/c/Users/me/AppData/Local/Temp/magpie-images-1/1.png" {
+	if got := s.path(`C:\Users\me\AppData\Local\Temp\blackpie-images-1\1.png`); got != "/mnt/c/Users/me/AppData/Local/Temp/blackpie-images-1/1.png" {
 		t.Fatalf("path %q", got)
 	}
 	if got := (&shim{}).path("/tmp/a.png"); got != "/tmp/a.png" {

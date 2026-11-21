@@ -8,15 +8,15 @@ import (
 	"path/filepath"
 )
 
-// ModeName is the file beside magpie (Beside) that says which of its two
+// ModeName is the file beside blackpie (Beside) that says which of its two
 // places its data is in, written by a data move. It is outside the data it
-// names and comes before Resolve's guess: a data folder left beside magpie
+// names and comes before Resolve's guess: a data folder left beside blackpie
 // after a move to the installed place is not taken for its data again.
 // Without it Resolve decides, as before.
-const ModeName = "moepie-data.json"
+const ModeName = "blackpie-data.json"
 
 // The two places: the user's config folder, or the data folder beside
-// magpie.
+// blackpie.
 const (
 	ModeInstalled = "installed"
 	ModePortable  = "portable"
@@ -27,7 +27,7 @@ type modeFile struct {
 	Mode    string `json:"mode"`
 }
 
-// ModePath is the mode file of a magpie run from exe.
+// ModePath is the mode file of a blackpie run from exe.
 func ModePath(exe string) string {
 	if real, err := filepath.EvalSymlinks(exe); err == nil {
 		exe = real
@@ -36,7 +36,7 @@ func ModePath(exe string) string {
 }
 
 // ReadMode is the mode exe's mode file names, or "" with none. A file that
-// can't be read or names neither mode is an error: magpie then opens
+// can't be read or names neither mode is an error: blackpie then opens
 // neither place rather than guess.
 func ReadMode(exe string) (string, error) {
 	b, err := os.ReadFile(ModePath(exe))
@@ -78,7 +78,7 @@ func WriteMode(exe, mode string) error {
 	return err
 }
 
-// PortableData is the data folder a portable magpie run from exe uses.
+// PortableData is the data folder a portable blackpie run from exe uses.
 func PortableData(exe string) string {
 	if real, err := filepath.EvalSymlinks(exe); err == nil {
 		exe = real
@@ -86,10 +86,10 @@ func PortableData(exe string) string {
 	return absolute(filepath.Join(Beside(exe), DataName))
 }
 
-// Installed is the folder an installed magpie keeps its files in.
+// Installed is the folder an installed blackpie keeps its files in.
 func Installed() string { return installed() }
 
-// CheckMode says why magpie run from exe can't open its data: a mode file
+// CheckMode says why blackpie run from exe can't open its data: a mode file
 // it can't read, or one naming a portable data folder that is gone. Main
 // shows it rather than open an empty or stale set of accounts.
 func CheckMode(exe string) error {
@@ -99,7 +99,7 @@ func CheckMode(exe string) error {
 	}
 	data := PortableData(exe)
 	if fi, err := os.Stat(data); err != nil || !fi.IsDir() {
-		return fmt.Errorf("%s says magpie's data is beside it, but %s is missing", ModePath(exe), data)
+		return fmt.Errorf("%s says blackpie's data is beside it, but %s is missing", ModePath(exe), data)
 	}
 	return nil
 }

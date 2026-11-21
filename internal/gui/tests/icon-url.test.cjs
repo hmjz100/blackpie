@@ -14,7 +14,7 @@ const path = require("node:path");
 const { test } = require("node:test");
 const { chromium, webkit } = require("playwright");
 
-const assets = process.env.MAGPIE_TEST_ASSETS || path.resolve(__dirname, "../assets");
+const assets = process.env.BLACKPIE_TEST_ASSETS || path.resolve(__dirname, "../assets");
 const relay = {
   id: "relay", name: "My Relay", icon: "generic", host: "relay.example.com", chat: "https://relay.example.com/v1", responses: "", anthropic: "", catalog: "",
   models: [{ id: "gpt-5", name: "gpt-5", on: true }], chosen: ["gpt-5"],
@@ -74,7 +74,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         page.on("pageerror", (e) => errors.push(e.message));
         const posts = [];
         await page.route("**/*", serve(lang, posts));
-        await page.goto("http://magpie.test/?view=providers");
+        await page.goto("http://blackpie.test/?view=providers");
 
         // every new word is said in every language, and the test reads its labels from there
         const w = await page.evaluate(([lang, keys]) => Object.fromEntries(keys.map((k) => [k, lang === "en" ? k : I18N[lang]?.[k]])), [lang, KEYS]);

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"net/http"
 	"net/url"
 	"os"
@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Note is one release's notes, as the app shows them after an update.
@@ -26,9 +26,9 @@ type Note struct {
 }
 
 // NotesFeed is where the notes of past releases are listed: beside the
-// update feed, on magpie's site. MAGPIE_NOTES_FEED points it elsewhere.
+// update feed, on blackpie's site. BLACKPIE_NOTES_FEED points it elsewhere.
 func NotesFeed() string {
-	if f := os.Getenv("MAGPIE_NOTES_FEED"); f != "" {
+	if f := os.Getenv("BLACKPIE_NOTES_FEED"); f != "" {
 		return f
 	}
 	return releaseAPI
@@ -37,7 +37,7 @@ func NotesFeed() string {
 // ReleasePage is version's page on GitHub, where its notes are when the
 // site can't give them (#661).
 func ReleasePage(version string) string {
-	return "https://github.com/lingqiqi5211/moepie/releases/tag/v" + strings.TrimPrefix(strings.TrimSpace(version), "v")
+	return "https://github.com/hmjz100/blackpie/releases/tag/v" + strings.TrimPrefix(strings.TrimSpace(version), "v")
 }
 
 // NotesBetween asks the site for the notes of every release after after
@@ -73,7 +73,7 @@ func NotesBack(ctx context.Context, upto string, n int, lang string) ([]Note, er
 
 // askNotes is the site's list for q, each release's notes in lang.
 func askNotes(ctx context.Context, q url.Values, lang string) ([]Note, error) {
-	if os.Getenv("MAGPIE_NOTES_FEED") == "" {
+	if os.Getenv("BLACKPIE_NOTES_FEED") == "" {
 		return githubNotes(ctx, q, lang)
 	}
 	if lang != "" {
@@ -139,7 +139,7 @@ func withLang(feed, lang string) string {
 	return u.String()
 }
 
-// MaxNotes is how many releases' notes are shown at most: magpie releases
+// MaxNotes is how many releases' notes are shown at most: blackpie releases
 // often, and a long-unopened one would have pages of them.
 const MaxNotes = 40
 
@@ -160,7 +160,7 @@ func MostNotes() int {
 // Stable is whether Settings' Update channel is Stable: the update feed is
 // asked for a version a week, the newest that had been out three days as
 // the week began (Monday 00:00 UTC), or an urgent one (a security hole, a
-// ban risk, lost data) as soon as it is out. usemagpie.ai chooses it from
+// ban risk, lost data) as soon as it is out. useblackpie.ai chooses it from
 // the release list (site/worker.js, "The Stable channel"); a release is
 // urgent when a line of its notes starts with "**Urgent release:**".
 func Stable() bool { return settings.Load().UpdateChannel == settings.UpdateStable }
@@ -250,7 +250,7 @@ var heading = lazyre.New(`^(#{1,6})\s+(.*?)\s*#*\s*$`)
 var installHeadings = []string{"Install", "安装", "安裝", "インストール"}
 
 // StripInstall takes a release's "Install" section (in any language) out of
-// its notes: the download links, which mean nothing to a magpie that just
+// its notes: the download links, which mean nothing to a blackpie that just
 // updated itself.
 // The section runs to the next heading of its level or above.
 func StripInstall(md string) string {
@@ -273,11 +273,11 @@ func StripInstall(md string) string {
 	return strings.TrimSpace(strings.Join(out, "\n"))
 }
 
-// ShowNotes decides, as magpie starts on current having last run as last
+// ShowNotes decides, as blackpie starts on current having last run as last
 // ("" when it never said), whether to show what changed since, and from
 // which version on (exclusive). Only an upgrade between releases shows:
 // not a fresh install, the same version again, a downgrade, or a build
-// from source. A magpie from before versions were kept has no last; when
+// from source. A blackpie from before versions were kept has no last; when
 // it was already in use (existed) its own version's notes are shown, from
 // "", which Between takes as upto's alone.
 func ShowNotes(last, current string, existed bool) (after string, show bool) {

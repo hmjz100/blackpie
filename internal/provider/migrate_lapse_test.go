@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 // An account whose sign-in the vendor refuses while the move reads the
@@ -20,7 +20,7 @@ import (
 func TestMoveRefusedWhileListing(t *testing.T) {
 	bun := testenv.Bun(t)
 	claudeHome(t)
-	t.Setenv("MAGPIE_BUN", bun)
+	t.Setenv("BLACKPIE_BUN", bun)
 	t.Cleanup(plugin.Settle)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
@@ -63,7 +63,7 @@ func TestMoveRefusedWhileListing(t *testing.T) {
 func TestMoveExpiredInWords(t *testing.T) {
 	bun := testenv.Bun(t)
 	claudeHome(t)
-	t.Setenv("MAGPIE_BUN", bun)
+	t.Setenv("BLACKPIE_BUN", bun)
 	t.Cleanup(plugin.Settle)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
@@ -96,10 +96,10 @@ func TestMoveExpiredInWords(t *testing.T) {
 	}
 }
 
-// A move's lock left by a magpie killed mid-move (a hung move stopped by
+// A move's lock left by a blackpie killed mid-move (a hung move stopped by
 // hand) holds nothing: the next move takes it, where it used to be
-// refused as "another magpie is moving" for a quarter of an hour.
-func TestMoveLockOfDeadMagpie(t *testing.T) {
+// refused as "another blackpie is moving" for a quarter of an hour.
+func TestMoveLockOfDeadBlackpie(t *testing.T) {
 	claudeHome(t)
 	gone := exec.Command("true")
 	if err := gone.Run(); err != nil {
@@ -114,9 +114,9 @@ func TestMoveLockOfDeadMagpie(t *testing.T) {
 	}
 	unlock, err := lockMoves()
 	if err != nil {
-		t.Fatalf("a dead magpie's lock: %v", err)
+		t.Fatalf("a dead blackpie's lock: %v", err)
 	}
-	// one held by a magpie still running stays held
+	// one held by a blackpie still running stays held
 	if _, err := lockMoves(); err == nil {
 		t.Fatal("a live lock was taken")
 	}

@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
-// cleary5779 on Discord: an agent built on magpie reads /v1/models and
-// shows what a call costs. Each model magpie knows a price of carries it
+// cleary5779 on Discord: an agent built on blackpie reads /v1/models and
+// shows what a call costs. Each model blackpie knows a price of carries it
 // as OpenRouter's list does, USD a token as decimal strings, at the price
 // the Usage page counts it at; a model no price is known for has no
 // pricing at all, never a 0.
@@ -62,8 +62,8 @@ func TestModelsListPricing(t *testing.T) {
 	if got := string(priced["pricing"]); got != want {
 		t.Errorf("a/claude-sonnet-4-5's pricing is %s, want %s", got, want)
 	}
-	if _, ok := priced["magpie_price"]; ok {
-		t.Error("magpie_price told to a list that didn't ask for it")
+	if _, ok := priced["blackpie_price"]; ok {
+		t.Error("blackpie_price told to a list that didn't ask for it")
 	}
 	unpriced, ok := byID["a/mystery-9"]
 	if !ok {

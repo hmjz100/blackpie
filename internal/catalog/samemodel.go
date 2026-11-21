@@ -1,7 +1,7 @@
 package catalog
 
 import (
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"strings"
 	"unicode"
 )

@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/agent"
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // groupsJSON is what the Routing view manages: the routing groups, the
@@ -24,7 +24,7 @@ type groupsJSON struct {
 	// Deciders: the decision providers' models (Jev), which may only be a
 	// group's classifier
 	Deciders []modelRef `json:"deciders"`
-	// Found: magpie finds groups on its own (provider.AutoGroupsOn)
+	// Found: blackpie finds groups on its own (provider.AutoGroupsOn)
 	Found bool `json:"found"`
 	// Skip: the providers kept out of found groups, by id
 	// (provider.AutoGroupSkip); Skippable: those that can be, each a
@@ -40,14 +40,14 @@ type groupsJSON struct {
 	Templates []provider.Template `json:"templates"`
 	// Clock: this computer's time zone, which the gateway reads a rule's
 	// hours on when they name no zone of their own; the page tells a rule's
-	// zone beside its hours when the two differ (gaubeebangeel on X: magpie
+	// zone beside its hours when the two differ (gaubeebangeel on X: blackpie
 	// on a server in UTC, its user in Beijing)
 	Clock clockJSON `json:"clock"`
 	// Shared: share's answer, the group as text to paste into another
-	// magpie (provider.ShareGroup)
+	// blackpie (provider.ShareGroup)
 	Shared string `json:"shared,omitempty"`
 	// Imported: import's answer, the group added and what of the text
-	// this magpie has none of (provider.ImportGroup)
+	// this blackpie has none of (provider.ImportGroup)
 	Imported *provider.Imported `json:"imported,omitempty"`
 	// Defaults: what every group follows when it sets no value of its own
 	// (settings.GroupSink, GroupFirstToken, GroupPatience)
@@ -85,7 +85,7 @@ type groupJSON struct {
 	// and by a group's classifier, never by an agent
 	Decides bool `json:"decides,omitempty"`
 	// Ref: the id agents pick it by (provider.Group.Ref): auto/<model> for
-	// a group magpie found, group/<id> for any other
+	// a group blackpie found, group/<id> for any other
 	Ref string `json:"ref"`
 	// ClassifierFailed: its classifier couldn't say the last time this
 	// group asked it, and why (gateway.GroupClassifierFailure), which its
@@ -135,7 +135,7 @@ type memberJSON struct {
 	Images  bool `json:"images,omitempty"`
 	// ImagesUnknown: nothing was read of its images either way, so it counts
 	// text-only for a describer (gateway.blindTo) without its list having
-	// said it takes none. Sent only when true: a model magpie has an answer
+	// said it takes none. Sent only when true: a model blackpie has an answer
 	// for carries no such key, which is what the page reads as known (its
 	// own `images` decides then). Named apart from the Gateway page's
 	// `imageSet`, which means the user answered for the model themselves
@@ -198,7 +198,7 @@ type poolJSON struct {
 func seesImages(e provider.Entry) bool { return e.Images && (e.ImageInput == nil || *e.ImageInput) }
 
 // imagesUnknown is whether nothing was read of the model's images either way:
-// no list said so, and what magpie reads of it doesn't say it sees. Such a
+// no list said so, and what blackpie reads of it doesn't say it sees. Such a
 // model counts text-only for a describer (gateway.blindTo), which is not its
 // list saying it takes none, and the page says unknown rather than text-only.
 func imagesUnknown(e provider.Entry) bool { return e.ImageInput == nil && !e.Images }
@@ -418,7 +418,7 @@ func groupRoutes(mux *http.ServeMux) {
 		var body struct {
 			provider.Group
 			From string `json:"from"` // the id the group had: another is a rename
-			On   bool   `json:"on"`   // found: magpie finds groups on its own
+			On   bool   `json:"on"`   // found: blackpie finds groups on its own
 			// skip: the providers kept out of found groups
 			// (provider.SetAutoGroupSkip)
 			Skip []string `json:"skip"`
@@ -479,7 +479,7 @@ func groupRoutes(mux *http.ServeMux) {
 			// a group as it is, under name (provider.CopyGroup)
 			_, err = provider.CopyGroup(in.ID, in.Name)
 		case "share":
-			// the group as text for another magpie: no key goes with it
+			// the group as text for another blackpie: no key goes with it
 			shared, err = provider.ShareGroup(in.ID)
 		case "import":
 			var res provider.Imported

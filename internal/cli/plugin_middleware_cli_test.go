@@ -7,12 +7,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/middleware"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/middleware"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
-// magpie plugin says which plugins are gateway middleware and their hooks,
+// blackpie plugin says which plugins are gateway middleware and their hooks,
 // or why one didn't load; a middleware plugin has no provider to sign in
 // to, so the list had nothing under it.
 func TestPluginListSaysMiddleware(t *testing.T) {
@@ -20,7 +20,7 @@ func TestPluginListSaysMiddleware(t *testing.T) {
 	groupsHome(t)
 	// the Bun the other plugin tests run on, not one downloaded from
 	// GitHub (#1922)
-	t.Setenv("MAGPIE_BUN", bun)
+	t.Setenv("BLACKPIE_BUN", bun)
 	t.Cleanup(plugin.Settle) // what adding the plugins told ends with the test
 	dir := t.TempDir()
 	good := filepath.Join(dir, "alias.middleware.js")
@@ -56,14 +56,14 @@ func TestPluginListSaysMiddleware(t *testing.T) {
 	}
 }
 
-// magpie plugin off, on and rm take a plugin's short name, as options
-// does: `magpie plugin off think-tags` said there was no such plugin.
+// blackpie plugin off, on and rm take a plugin's short name, as options
+// does: `blackpie plugin off think-tags` said there was no such plugin.
 func TestPluginOnOffRmShortName(t *testing.T) {
 	groupsHome(t)
 	t.Cleanup(plugin.Settle)
 	dir := filepath.Join(t.TempDir(), "middleware-zz-tags")
 	os.MkdirAll(dir, 0o755)
-	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"name": "@magpie-community/middleware-zz-tags", "magpie": {"middleware": "./zz.middleware.js"}}`), 0o644)
+	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"name": "@magpie-community/middleware-zz-tags", "blackpie": {"middleware": "./zz.middleware.js"}}`), 0o644)
 	os.WriteFile(filepath.Join(dir, "zz.middleware.js"), []byte("export function onRequest(b) {}\n"), 0o644)
 	if _, err := plugin.Add(context.Background(), dir); err != nil {
 		t.Fatal(err)

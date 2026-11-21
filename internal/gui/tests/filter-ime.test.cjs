@@ -15,7 +15,7 @@ const path = require("node:path");
 const { test } = require("node:test");
 const { chromium, webkit } = require("playwright");
 
-const assets = process.env.MAGPIE_FILTER_ASSETS || path.resolve(__dirname, "../assets");
+const assets = process.env.BLACKPIE_FILTER_ASSETS || path.resolve(__dirname, "../assets");
 
 const models = [
   { id: "a/one", name: "one", providerName: "A", icon: "generic" },
@@ -120,7 +120,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         page.on("pageerror", (e) => errors.push(e.message));
         await page.route("**/*", serve(lang, held));
         // the routing groups are their own pane of the Routing page
-        await page.goto("http://magpie.test/?view=" + view + (view === "routing" ? "&tab=groups" : ""));
+        await page.goto("http://blackpie.test/?view=" + view + (view === "routing" ? "&tab=groups" : ""));
         return { page, errors };
       };
       // typeIn: through an IME where there is one to drive, by key elsewhere

@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // A refetch's "{p}: {n} models" counts the models the editor lists, not

@@ -16,15 +16,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/masking"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/masking"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
-// An agent's request that magpie holds before routing it went nowhere a
+// An agent's request that blackpie holds before routing it went nowhere a
 // user could see (heyusaku6 on X): Codex thought for over ten minutes on a
 // routing group's model, then on two others, the Routing page showed none
-// of them, and only a restart of Codex and magpie ended it. Codex waits for
+// of them, and only a restart of Codex and blackpie ended it. Codex waits for
 // a reply's headers with no limit of its own, and a request shows on the
 // Routing page once a route is begun for it, so whatever held it before
 // that (a lock, a wait with no end) held it in silence.
@@ -32,16 +32,16 @@ import (
 // What held it isn't known. So a request with no route begun for it is
 // shown on the Routing page as routing once it has waited unroutedShow,
 // and is answered with an error once it has waited unroutedMost, with
-// magpie's log saying where every goroutine stood. Its context ends then
+// blackpie's log saying where every goroutine stood. Its context ends then
 // too, so what waits on it lets go.
 //
 // Two minutes of a spinner before that error was a torment of its own
-// (sharwowwow on X). Most of what comes before a route is a wait magpie
+// (sharwowwow on X). Most of what comes before a route is a wait blackpie
 // knows of and that may rightly be long: the body still arriving (an
 // image over a slow link), masking (the local model), the routing
 // group's decision model, an image described for a model that can't see,
 // a Codex reset spent, the plugins' gateway hooks and JS middleware, a
-// slot or a minute's room (noteWait, notePhase). The rest is magpie's own
+// slot or a minute's room (noteWait, notePhase). The rest is blackpie's own
 // work: parsing, the catalog, the plan. A request that has spent
 // unroutedUnknown in none of those waits, added up however they came, is
 // answered then with the same error; one in those waits still has
@@ -60,7 +60,7 @@ import (
 var unroutedShow, unroutedUnknown, unroutedMost = 15 * time.Second, 30 * time.Second, 2 * time.Minute
 
 // unroutedWatched is whether a request to path is an agent's turn, which
-// is given a route once magpie knows where it goes: Chat, Responses,
+// is given a route once blackpie knows where it goes: Chat, Responses,
 // Messages, Gemini and Codex's own backend. A compaction or a model list
 // has no route of its own, and an MCP or a search call is not a turn.
 func unroutedWatched(path string) bool {
@@ -90,20 +90,20 @@ func unroutedProto(path string) provider.Protocol {
 // A pointer, as a giveUp of a test's request may run on after it.
 var heldAnswered atomic.Pointer[func(u *unroutedHold)]
 
-// errUnrouted ends a request's context when magpie stopped holding it.
-var errUnrouted = errors.New("magpie held the request too long before routing it")
+// errUnrouted ends a request's context when blackpie stopped holding it.
+var errUnrouted = errors.New("blackpie held the request too long before routing it")
 
-// heldWriter is the client's writer while magpie may still answer for its
-// handler: what the handler writes goes through it, and once magpie has
+// heldWriter is the client's writer while blackpie may still answer for its
+// handler: what the handler writes goes through it, and once blackpie has
 // answered (gaveUp) the handler's writes go nowhere. The handler's headers
-// are its own until it writes, so magpie's answer never shares a map
+// are its own until it writes, so blackpie's answer never shares a map
 // another goroutine is filling.
 type heldWriter struct {
 	w      http.ResponseWriter
 	mu     sync.Mutex
 	hdr    http.Header
 	wrote  bool // the handler began its reply
-	gaveUp bool // magpie answered for it
+	gaveUp bool // blackpie answered for it
 }
 
 func newHeldWriter(w http.ResponseWriter) *heldWriter {
@@ -120,7 +120,7 @@ func (h *heldWriter) Header() http.Header {
 }
 
 // begin is the handler's reply starting: its headers go to the client's.
-// Called with mu held; false once magpie has answered.
+// Called with mu held; false once blackpie has answered.
 func (h *heldWriter) begin() bool {
 	if h.gaveUp {
 		return false
@@ -168,8 +168,8 @@ func (h *heldWriter) FlushError() error {
 // Unwrap is for http.ResponseController's deadlines.
 func (h *heldWriter) Unwrap() http.ResponseWriter { return h.w }
 
-// claim takes the reply for magpie, unless the handler began one: from
-// here the handler's writes go nowhere, and send writes magpie's answer.
+// claim takes the reply for blackpie, unless the handler began one: from
+// here the handler's writes go nowhere, and send writes blackpie's answer.
 // Between the two its route is ended (#4200), so a client that has the
 // answer finds the request's route done.
 func (h *heldWriter) claim() bool {
@@ -182,7 +182,7 @@ func (h *heldWriter) claim() bool {
 	return true
 }
 
-// send writes magpie's own reply, whole, once claim took it. Its length
+// send writes blackpie's own reply, whole, once claim took it. Its length
 // is said, so the client has all of it while the handler may still be
 // held: a reply of no length ends only when the handler does.
 func (h *heldWriter) send(proto provider.Protocol, status int, msg string) {
@@ -215,7 +215,7 @@ type unroutedHold struct {
 	cancel context.CancelCauseFunc
 	asked  atomic.Value // string: the model it asked for, once read
 	shown  *Route       // under f.mu
-	ended  bool         // under f.mu: answered by magpie
+	ended  bool         // under f.mu: answered by blackpie
 	over   bool         // under f.mu: its handler returned
 	// masking counts the maskings under way for it: one held there waits
 	// for Settings → Privacy's local model, and its error says so
@@ -225,7 +225,7 @@ type unroutedHold struct {
 	bodyStopped atomic.Bool
 	bodyActive  atomic.Bool
 
-	// the waits magpie knows it is in (noteWait), under wmu: how many are
+	// the waits blackpie knows it is in (noteWait), under wmu: how many are
 	// under way, since when one has been, the time spent in one before
 	// that, and whether unknown fired in one and looks again at its end
 	wmu     sync.Mutex
@@ -340,7 +340,7 @@ func (u *unroutedHold) checkMost() {
 	u.giveUp(false)
 }
 
-// noteWait tells ctx's watch its request is in a wait magpie knows of
+// noteWait tells ctx's watch its request is in a wait blackpie knows of
 // until the func it answers is called: the time it spends there counts
 // toward unroutedMost alone, not unroutedUnknown.
 func noteWait(ctx context.Context) (done func()) {
@@ -465,7 +465,7 @@ func (b waitedBody) Read(p []byte) (int, error) {
 	return n, err
 }
 
-var errBodyStopped = errors.New("magpie stopped reading this request's body: it was still arriving when magpie answered for it")
+var errBodyStopped = errors.New("blackpie stopped reading this request's body: it was still arriving when blackpie answered for it")
 
 func (u *unroutedHold) inBody() bool { return u.bodyActive.Load() }
 
@@ -473,10 +473,10 @@ func (u *unroutedHold) inBody() bool { return u.bodyActive.Load() }
 // between two of its reads, and less has come than the request's own
 // Content-Length says. The hold can run out in the gap between two reads
 // of a trickled body, and a read's absence alone answered such a request
-// 504, as if magpie held it of its own (a full run raced one out there,
+// 504, as if blackpie held it of its own (a full run raced one out there,
 // #4511); a body short of its length is still arriving, and the time is
 // the client's. Not before its first read: a request waiting for body
-// room (bodyRoom.take) is held by magpie, whose 503 or 504 says so, and
+// room (bodyRoom.take) is held by blackpie, whose 503 or 504 says so, and
 // its client may have sent the whole body already. A body read whole, a
 // length never said and an empty one are judged by the read alone.
 func (u *unroutedHold) bodyArriving() bool {
@@ -512,7 +512,7 @@ func byteWord(n int64) string {
 	return fmt.Sprintf("%d bytes", n)
 }
 func unroutedBodyMsg(held time.Duration, body string) string {
-	return fmt.Sprintf("magpie stopped this request after %s because its body was still arriving from the client (read: %s), before it could be routed to any provider. Send it again.", held, body)
+	return fmt.Sprintf("blackpie stopped this request after %s because its body was still arriving from the client (read: %s), before it could be routed to any provider. Send it again.", held, body)
 }
 
 // watchUnrouted watches r, counted as f, until the func it answers is
@@ -599,7 +599,7 @@ func (u *unroutedHold) show() {
 // showLocked begins the route that shows it; f.mu is held.
 func (u *unroutedHold) showLocked() {
 	asked, _ := u.asked.Load().(string)
-	rt := Route{Time: u.f.start, Agent: u.agent, Session: u.f.session, Model: asked, Provider: "magpie"}
+	rt := Route{Time: u.f.start, Agent: u.agent, Session: u.f.session, Model: asked, Provider: "blackpie"}
 	if rt.Agent == "" {
 		rt.Agent = u.f.agent
 	}
@@ -622,7 +622,7 @@ func (u *unroutedHold) routed() (drop *Route) {
 // giveUp answers the request with an error, when no route was begun for it
 // and its handler wrote nothing, ends its context, and says on its route
 // and in the log what held it. unknown: it was held unroutedUnknown in no
-// wait magpie knows of, rather than unroutedMost other than masking.
+// wait blackpie knows of, rather than unroutedMost other than masking.
 func (u *unroutedHold) giveUp(unknown bool) {
 	f := u.f
 	f.mu.Lock()
@@ -638,7 +638,7 @@ func (u *unroutedHold) giveUp(unknown bool) {
 	}
 	switch {
 	case unknown:
-		where = fmt.Sprintf(" %s of it in no wait magpie knows of", unroutedUnknown)
+		where = fmt.Sprintf(" %s of it in no wait blackpie knows of", unroutedUnknown)
 	case u.masking.Load() > 0:
 		where = " masking it"
 	}
@@ -682,12 +682,12 @@ func unroutedMsg(held time.Duration, masking bool) string {
 		if b := modelBusy(); b != "" {
 			why = " (" + b + ")"
 		}
-		return fmt.Sprintf("magpie held this request for %s waiting for the local masking model (Settings → Privacy) to mask it%s, so it was stopped rather than sent masked by the rules alone. Send it again. To send requests without waiting for the model, turn it off in Settings → Privacy.", held, why)
+		return fmt.Sprintf("blackpie held this request for %s waiting for the local masking model (Settings → Privacy) to mask it%s, so it was stopped rather than sent masked by the rules alone. Send it again. To send requests without waiting for the model, turn it off in Settings → Privacy.", held, why)
 	}
 	if masking {
-		return fmt.Sprintf("magpie held this request for %s while masking it (Settings → Privacy), before routing it to any provider, so it was stopped rather than left waiting. Send it again; if it keeps happening, restart magpie and report it with magpie's log, which says where it was held.", held)
+		return fmt.Sprintf("blackpie held this request for %s while masking it (Settings → Privacy), before routing it to any provider, so it was stopped rather than left waiting. Send it again; if it keeps happening, restart blackpie and report it with blackpie's log, which says where it was held.", held)
 	}
-	return fmt.Sprintf("magpie held this request for %s without routing it to any provider, so it was stopped rather than left waiting. Send it again; if it keeps happening, restart magpie and report it with magpie's log, which says where it was held.", held)
+	return fmt.Sprintf("blackpie held this request for %s without routing it to any provider, so it was stopped rather than left waiting. Send it again; if it keeps happening, restart blackpie and report it with blackpie's log, which says where it was held.", held)
 }
 
 // modelOn and modelBusy are internal/masking's, a test's

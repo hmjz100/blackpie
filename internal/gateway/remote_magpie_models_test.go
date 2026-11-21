@@ -10,19 +10,19 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
-// A Remote magpie's list has the image models the other magpie draws with,
+// A Remote blackpie's list has the image models the other blackpie draws with,
 // which draw there through it, and names each model with its provider
 // there, so the same model of two of its relays isn't two of one name here
 // (Jorben, 莫 on Discord). What it lists is still what its agents are
 // shown: a model its user didn't pick, or of a provider kept to routing
 // groups, isn't in it.
-func TestRemoteMagpieModels(t *testing.T) {
+func TestRemoteBlackpieModels(t *testing.T) {
 	var mu sync.Mutex
-	var vendor, hops []string // paths the vendor, and the remote magpie, were asked on
+	var vendor, hops []string // paths the vendor, and the remote blackpie, were asked on
 	up := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		b, _ := io.ReadAll(r.Body)
 		mu.Lock()
@@ -70,7 +70,7 @@ func TestRemoteMagpieModels(t *testing.T) {
 		h.ServeHTTP(w, r)
 	}))
 	t.Cleanup(remote.Close)
-	id, err := provider.Add(provider.Provider{ID: "office", Name: "Office", Preset: provider.RemoteMagpiePreset, Chat: strings.TrimPrefix(remote.URL, "http://")})
+	id, err := provider.Add(provider.Provider{ID: "office", Name: "Office", Preset: provider.RemoteBlackpiePreset, Chat: strings.TrimPrefix(remote.URL, "http://")})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,7 +126,7 @@ func TestRemoteMagpieModels(t *testing.T) {
 		mu.Lock()
 		vendor, hops = nil, nil
 		mu.Unlock()
-		code, body := post(t, "/v1/images/generations", `{"model":"office/`+c.model+`","prompt":"a magpie"}`)
+		code, body := post(t, "/v1/images/generations", `{"model":"office/`+c.model+`","prompt":"a blackpie"}`)
 		mu.Lock()
 		gotHops, gotVendor := slices.Clone(hops), slices.Clone(vendor)
 		mu.Unlock()
@@ -139,9 +139,9 @@ func TestRemoteMagpieModels(t *testing.T) {
 	}
 }
 
-// A magpie from before the list said more takes the list as it was: the
+// A blackpie from before the list said more takes the list as it was: the
 // model's own name, no image models.
-func TestRemoteMagpieOldList(t *testing.T) {
+func TestRemoteBlackpieOldList(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 	t.Setenv("XDG_CACHE_HOME", t.TempDir())
 	old := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -149,7 +149,7 @@ func TestRemoteMagpieOldList(t *testing.T) {
 		io.WriteString(w, `{"object":"list","data":[{"id":"relay-a/claude-sonnet-5","object":"model","owned_by":"relay-a","display_name":"Claude Sonnet 5","native_endpoints":["/v1/messages"]}]}`)
 	}))
 	t.Cleanup(old.Close)
-	id, err := provider.Add(provider.Provider{ID: "office", Name: "Office", Key: "k", Preset: provider.RemoteMagpiePreset, Chat: old.URL})
+	id, err := provider.Add(provider.Provider{ID: "office", Name: "Office", Key: "k", Preset: provider.RemoteBlackpiePreset, Chat: old.URL})
 	if err != nil {
 		t.Fatal(err)
 	}

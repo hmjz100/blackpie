@@ -135,7 +135,7 @@ export const FakePlugin = async ({ client }) => ({
     if (process.env.FAKE_SEARCHES) cfg.provider[ID].searches = true
     // $FAKE_DECIDE: the provider serves a decision API too (#1514), asked
     // at its base /systemone through the loader's fetch: fake-clef is a
-    // decision model it marks, jev-9 one magpie knows by its name.
+    // decision model it marks, jev-9 one blackpie knows by its name.
     // "models" marks them without saying decide.
     if (process.env.FAKE_DECIDE) {
       if (process.env.FAKE_DECIDE !== "models") cfg.provider[ID].decide = true
@@ -219,15 +219,15 @@ export const FakePlugin = async ({ client }) => ({
         // own requests from a stray that reached a port the kernel handed
         // on (testenv.FakeVendor)
         if (process.env.FAKE_RUN) h.set("x-fake-run", process.env.FAKE_RUN)
-        // where magpie said the agent works, as the plugin read it; its own
+        // where blackpie said the agent works, as the plugin read it; its own
         // headers go on too, as a plugin that sends on what it got sends
         // them, for the host to take off
-        for (const k of ["x-magpie-work-dir", "x-magpie-work-git", "x-magpie-fallback"]) if (h.has(k)) h.set("x-saw-" + k.slice(9), h.get(k))
+        for (const k of ["x-blackpie-work-dir", "x-blackpie-work-git", "x-blackpie-fallback"]) if (h.has(k)) h.set("x-saw-" + k.slice(9), h.get(k))
         // $FAKE_QUEUE: that model is queued at the vendor, as Qoder's free
-        // models are: waited out (here until magpie gives up) unless magpie
+        // models are: waited out (here until blackpie gives up) unless blackpie
         // said it needn't be, then said at once with the queue's 503
         if (process.env.FAKE_QUEUE && typeof init.body === "string" && JSON.parse(init.body).model === process.env.FAKE_QUEUE) {
-          if (h.get("x-magpie-fallback") === "1") {
+          if (h.get("x-blackpie-fallback") === "1") {
             return new Response(JSON.stringify({ error: { message: `FakeCo queued the request for ${process.env.FAKE_QUEUE}; try again in 30s`, type: "queued" } }), { status: 503, headers: { "content-type": "application/json", "retry-after": "30" } })
           }
           await new Promise((_, no) => {
@@ -242,7 +242,7 @@ export const FakePlugin = async ({ client }) => ({
       },
     }
     },
-    // magpie's: the account's allowance; "full@fake" has used its five
+    // blackpie's: the account's allowance; "full@fake" has used its five
     // hours, which count only fake-claude
     usage: async (getAuth) => {
       const a = await getAuth()
@@ -298,7 +298,7 @@ export const FakePlugin = async ({ client }) => ({
     // account's name/uid, so two of one name tell apart), and the
     // answer said by the key: ck-claim gives 50 on a 3-day streak, ck-done
     // is in already, ck-captcha is asked a captcha, ck-throw can't reach
-    // the vendor, ck-odd answers no outcome magpie knows, and ck-until
+    // the vendor, ck-odd answers no outcome blackpie knows, and ck-until
     // answers what the test wrote to <FAKE_CHECKIN>.until ({outcome, until})
     ...(process.env.FAKE_CHECKIN
       ? {
@@ -363,7 +363,7 @@ export const FakePlugin = async ({ client }) => ({
         p.models["mimo-v2.6-flash-free"] = { ...p.models["fake-1"], id: "mimo-v2.6-flash-free", name: "MiMo V2.6 Flash Free", api: { ...p.models["fake-1"].api, id: "mimo-v2.6-flash-free" }, free: true, variants: {},
           capabilities: {"temperature":true,"reasoning":true,"attachment":true,"toolcall":true,"input":{"text":true,"image":true,"audio":true,"video":true,"pdf":false},"output":{"text":true,"image":false,"audio":false,"video":false,"pdf":false},"interleaved":{"field":"reasoning_content"}} }
       }
-      // $FAKE_KINDS: models as XYenon's magpie-google-ai-studio lists them
+      // $FAKE_KINDS: models as XYenon's blackpie-google-ai-studio lists them
       // (#3279): the embedding as the report gives it (output text false,
       // nothing else said), one not named an embedding, a TTS with its
       // parseModels' outputs (audio alone), a model that talks and speaks,
@@ -408,7 +408,7 @@ export const FakePlugin = async ({ client }) => ({
         // "own": it hands back a table of its own, saying it fell back, as
         // Command Code's Go and ZCode do
         if (r === null && process.env.FAKE_MODELS_THROW === "own")
-          return { "fake-1": { ...p.models["fake-1"] }, [Symbol.for("magpie.fellBack")]: true }
+          return { "fake-1": { ...p.models["fake-1"] }, [Symbol.for("blackpie.fellBack")]: true }
         if (r) p.models["fake-" + r] = { ...p.models["fake-1"], id: "fake-" + r, name: r }
       }
       return p.models

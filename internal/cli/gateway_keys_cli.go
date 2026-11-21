@@ -13,10 +13,10 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/budget"
-	"github.com/yetone/magpie/internal/oidc"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/budget"
+	"github.com/hmjz100/blackpie/internal/oidc"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 func gatewayKeys(args []string) error { return gatewayKeysTo(os.Stdout, args) }
@@ -78,7 +78,7 @@ func gatewayKeysTo(out io.Writer, args []string) error {
 		args = args[:2]
 	}
 	if (action == "list" && len(args) != 1) || (action != "list" && len(args) != 2) {
-		return fmt.Errorf("usage: magpie gateway-key list | add <name> [--key <value> | --key -] | rotate <id> | remove <id> | limit <id> [list | off | reset [<n>] | remove <n> | [add] day|week|month|<N>d|<N>h [--tokens N] [--cost USD] [--cache-reads]] | models <id> [all | <provider>/<model>|<provider>/* ...] | accounts <id> [all | <provider>/<account>|<provider>/<key id> ...] | quotas <id> [on | off] | move <id> <place> | issue --ttl <duration> [--name <name>] [--models a,b] [--accounts a,b] [--tokens N] [--cost USD] [--from <id>] | issuer <id> [on | off] | oidc [list | add --key <id> --repo owner/name … | remove <rule id>]")
+		return fmt.Errorf("usage: blackpie gateway-key list | add <name> [--key <value> | --key -] | rotate <id> | remove <id> | limit <id> [list | off | reset [<n>] | remove <n> | [add] day|week|month|<N>d|<N>h [--tokens N] [--cost USD] [--cache-reads]] | models <id> [all | <provider>/<model>|<provider>/* ...] | accounts <id> [all | <provider>/<account>|<provider>/<key id> ...] | quotas <id> [on | off] | move <id> <place> | issue --ttl <duration> [--name <name>] [--models a,b] [--accounts a,b] [--tokens N] [--cost USD] [--from <id>] | issuer <id> [on | off] | oidc [list | add --key <id> --repo owner/name … | remove <rule id>]")
 	}
 	switch action {
 	case "list", "add", "rotate", "remove":
@@ -152,16 +152,16 @@ func gatewayKeysTo(out io.Writer, args []string) error {
 
 // gatewayKeyLimit shows or sets a key's limits (#585, several since #2227):
 //
-//	magpie gateway-key limit <id> [list]                what it has used of each limit
-//	magpie gateway-key limit <id> off                   no limit
-//	magpie gateway-key limit <id> day|week|month|<N>d|<N>h [--tokens N] [--cost USD] [--cache-reads]
+//	blackpie gateway-key limit <id> [list]                what it has used of each limit
+//	blackpie gateway-key limit <id> off                   no limit
+//	blackpie gateway-key limit <id> day|week|month|<N>d|<N>h [--tokens N] [--cost USD] [--cache-reads]
 //	                                                    its only limit, or the one of several with that window
-//	magpie gateway-key limit <id> add <window> [--tokens N] [--cost USD] [--cache-reads]
+//	blackpie gateway-key limit <id> add <window> [--tokens N] [--cost USD] [--cache-reads]
 //	                                                    one more limit; a request passes only while every one has something left
-//	magpie gateway-key limit <id> remove <n>            take off the nth limit
-//	magpie gateway-key limit <id> reset [<n>]           count from 0 again, every limit or the nth; a new N-day or N-hour cycle from now (#1509)
+//	blackpie gateway-key limit <id> remove <n>            take off the nth limit
+//	blackpie gateway-key limit <id> reset [<n>]           count from 0 again, every limit or the nth; a new N-day or N-hour cycle from now (#1509)
 func gatewayKeyLimit(out io.Writer, args []string) error {
-	usage := fmt.Errorf("usage: magpie gateway-key limit <id> [off | reset [<n>] | remove <n> | [add] day|week|month|<N>d|<N>h [--tokens N] [--cost USD] [--cache-reads]]")
+	usage := fmt.Errorf("usage: blackpie gateway-key limit <id> [off | reset [<n>] | remove <n> | [add] day|week|month|<N>d|<N>h [--tokens N] [--cost USD] [--cache-reads]]")
 	if len(args) == 0 {
 		return usage
 	}
@@ -183,7 +183,7 @@ func gatewayKeyLimit(out io.Writer, args []string) error {
 				if len(have) == 0 {
 					return nil, fmt.Errorf("%s has no limit", keys[i].Name)
 				}
-				return nil, fmt.Errorf("a limit's number is 1 to %d, as `magpie gateway-key limit %s` lists them: %q", len(have), id, v)
+				return nil, fmt.Errorf("a limit's number is 1 to %d, as `blackpie gateway-key limit %s` lists them: %q", len(have), id, v)
 			}
 			n--
 			return &n, nil
@@ -250,7 +250,7 @@ func gatewayKeyLimit(out io.Writer, args []string) error {
 					return v != nil && l.Period == v.Period && l.Days == v.Days && l.Hours == v.Hours
 				})
 				if n < 0 {
-					return fmt.Errorf("%s has %d limits and none %s: add one with `magpie gateway-key limit %s add %s ...`, or take one off with `remove <n>`", keys[i].Name, len(have), perPhrase(v), id, args[1])
+					return fmt.Errorf("%s has %d limits and none %s: add one with `blackpie gateway-key limit %s add %s ...`, or take one off with `remove <n>`", keys[i].Name, len(have), perPhrase(v), id, args[1])
 				}
 				in.Index = &n
 			}
@@ -390,12 +390,12 @@ func parseKeyLimit(window string, rest []string, usage error) (*access.Limit, er
 
 // gatewayKeyModels shows or sets the models a key may use (#882):
 //
-//	magpie gateway-key models <id>                          the models it may use
-//	magpie gateway-key models <id> all                      every model
-//	magpie gateway-key models <id> openai/gpt-5 anthropic/*  only these
+//	blackpie gateway-key models <id>                          the models it may use
+//	blackpie gateway-key models <id> all                      every model
+//	blackpie gateway-key models <id> openai/gpt-5 anthropic/*  only these
 func gatewayKeyModels(out io.Writer, args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("usage: magpie gateway-key models <id> [all | <provider>/<model>|<provider>/* ...]")
+		return fmt.Errorf("usage: blackpie gateway-key models <id> [all | <provider>/<model>|<provider>/* ...]")
 	}
 	id := args[0]
 	if len(args) > 1 {
@@ -458,7 +458,7 @@ func limitWords(k access.Key, now time.Time) string {
 // account by its name, a key by its KeyID — every one when none are set.
 func gatewayKeyAccounts(out io.Writer, args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("usage: magpie gateway-key accounts <id> [all | <provider>/<account>|<provider>/<key id> ...]")
+		return fmt.Errorf("usage: blackpie gateway-key accounts <id> [all | <provider>/<account>|<provider>/<key id> ...]")
 	}
 	id := args[0]
 	if len(args) > 1 {
@@ -497,10 +497,10 @@ func gatewayKeyAccounts(out io.Writer, args []string) error {
 // or accounts is told the quotas of what it may use (#2216): the cards of
 // the providers whose every model it may use, of its accounts and keys.
 //
-//	magpie gateway-key quotas <id>         whether it is
-//	magpie gateway-key quotas <id> on|off  tell it them, or none (#1981)
+//	blackpie gateway-key quotas <id>         whether it is
+//	blackpie gateway-key quotas <id> on|off  tell it them, or none (#1981)
 func gatewayKeyQuotas(out io.Writer, args []string) error {
-	usage := fmt.Errorf("usage: magpie gateway-key quotas <id> [on | off]")
+	usage := fmt.Errorf("usage: blackpie gateway-key quotas <id> [on | off]")
 	if len(args) == 0 || len(args) > 2 {
 		return usage
 	}
@@ -532,14 +532,14 @@ func gatewayKeyQuotas(out io.Writer, args []string) error {
 }
 
 // gatewayKeyMove puts a key at a place in the list, counted from 1 as
-// `magpie gateway-key list` shows them, the order the app's Gateway page
+// `blackpie gateway-key list` shows them, the order the app's Gateway page
 // lists them in too, where a key is dragged to its place (alextjy on
 // Discord):
 //
-//	magpie gateway-key move <id> <place>
+//	blackpie gateway-key move <id> <place>
 func gatewayKeyMove(out io.Writer, args []string) error {
 	if len(args) != 2 {
-		return fmt.Errorf("usage: magpie gateway-key move <id> <place>")
+		return fmt.Errorf("usage: blackpie gateway-key move <id> <place>")
 	}
 	keys, err := access.List()
 	if err != nil {
@@ -547,7 +547,7 @@ func gatewayKeyMove(out io.Writer, args []string) error {
 	}
 	n, err := strconv.Atoi(args[1])
 	if err != nil || n < 1 || n > len(keys) {
-		return fmt.Errorf("a key's place is 1 to %d, as `magpie gateway-key list` lists them: %q", len(keys), args[1])
+		return fmt.Errorf("a key's place is 1 to %d, as `blackpie gateway-key list` lists them: %q", len(keys), args[1])
 	}
 	n--
 	if _, err := access.Update("move-key", access.Change{Key: args[0], Index: &n}); err != nil {
@@ -561,13 +561,13 @@ func gatewayKeyMove(out io.Writer, args []string) error {
 // agent, that stops working by itself), and prints its secret alone so a
 // script can take it:
 //
-//	magpie gateway-key issue --ttl 1h [--name n] [--models a,b] [--accounts a,b]
+//	blackpie gateway-key issue --ttl 1h [--name n] [--models a,b] [--accounts a,b]
 //	                         [--tokens N] [--cost USD] [--from <id>]
 //
 // --from issues it under a key that may issue keys (issuer <id> on), held
-// to that key as POST /v1/magpie/keys with it would be.
+// to that key as POST /v1/blackpie/keys with it would be.
 func gatewayKeyIssue(out io.Writer, args []string) error {
-	usage := fmt.Errorf("usage: magpie gateway-key issue --ttl <duration, e.g. 1h> [--name <name>] [--models <provider>/<model>,...] [--accounts <provider>/<account>,...] [--tokens N] [--cost USD] [--from <id>] [--json]")
+	usage := fmt.Errorf("usage: blackpie gateway-key issue --ttl <duration, e.g. 1h> [--name <name>] [--models <provider>/<model>,...] [--accounts <provider>/<account>,...] [--tokens N] [--cost USD] [--from <id>] [--json]")
 	var in access.Issue
 	asJSON := false
 	list := func(v string) []string {
@@ -638,11 +638,11 @@ func gatewayKeyIssue(out io.Writer, args []string) error {
 }
 
 // gatewayKeyIssuer shows or sets whether a key may issue short-lived keys
-// under itself (POST /v1/magpie/keys with it), each held to it:
+// under itself (POST /v1/blackpie/keys with it), each held to it:
 //
-//	magpie gateway-key issuer <id> [on | off]
+//	blackpie gateway-key issuer <id> [on | off]
 func gatewayKeyIssuer(out io.Writer, args []string) error {
-	usage := fmt.Errorf("usage: magpie gateway-key issuer <id> [on | off] | oidc [list | add --key <id> --repo owner/name … | remove <rule id>]")
+	usage := fmt.Errorf("usage: blackpie gateway-key issuer <id> [on | off] | oidc [list | add --key <id> --repo owner/name … | remove <rule id>]")
 	if len(args) == 0 || len(args) > 2 {
 		return usage
 	}
@@ -674,11 +674,11 @@ func gatewayKeyIssuer(out io.Writer, args []string) error {
 // gatewayKeyOIDC writes the rules a CI job's OIDC token is traded for a
 // key by (#4531, package oidc):
 //
-//	magpie gateway-key oidc [list]
-//	magpie gateway-key oidc add --key <id> --repo owner/name [--owner o] [--ref r] [--environment e] [--claim name=value]… [--ttl 1h] [--issuer URL] [--audience aud]
-//	magpie gateway-key oidc remove <rule id>
+//	blackpie gateway-key oidc [list]
+//	blackpie gateway-key oidc add --key <id> --repo owner/name [--owner o] [--ref r] [--environment e] [--claim name=value]… [--ttl 1h] [--issuer URL] [--audience aud]
+//	blackpie gateway-key oidc remove <rule id>
 func gatewayKeyOIDC(out io.Writer, args []string) error {
-	usage := fmt.Errorf("usage: magpie gateway-key oidc [list] | add --key <id> --repo owner/name [--owner <owner>] [--ref refs/heads/main] [--environment <name>] [--claim name=value]… [--ttl 1h] [--issuer URL] [--audience <aud>] | remove <rule id>")
+	usage := fmt.Errorf("usage: blackpie gateway-key oidc [list] | add --key <id> --repo owner/name [--owner <owner>] [--ref refs/heads/main] [--environment <name>] [--claim name=value]… [--ttl 1h] [--issuer URL] [--audience <aud>] | remove <rule id>")
 	if len(args) == 0 || args[0] == "list" {
 		if len(args) > 1 {
 			return usage
@@ -688,7 +688,7 @@ func gatewayKeyOIDC(out io.Writer, args []string) error {
 			return err
 		}
 		if len(rules) == 0 {
-			_, err = fmt.Fprintln(out, "No OIDC rules: magpie gateway-key oidc add --key <id> --repo owner/name")
+			_, err = fmt.Fprintln(out, "No OIDC rules: blackpie gateway-key oidc add --key <id> --repo owner/name")
 			return err
 		}
 		w := tabwriter.NewWriter(out, 0, 4, 2, ' ', 0)
@@ -766,6 +766,6 @@ func gatewayKeyOIDC(out io.Writer, args []string) error {
 	if err != nil {
 		return err
 	}
-	_, err = fmt.Fprintf(out, "OIDC rule %s: a token from %s with audience %s and %d claim(s) matched gets a key issued under %s, living up to %s.\nPOST it to /v1/magpie/keys/oidc as Authorization: Bearer <token>.\n", r.ID, r.Issuer, r.Audience, len(r.Claims), r.Key, r.Lifetime())
+	_, err = fmt.Fprintf(out, "OIDC rule %s: a token from %s with audience %s and %d claim(s) matched gets a key issued under %s, living up to %s.\nPOST it to /v1/blackpie/keys/oidc as Authorization: Bearer <token>.\n", r.ID, r.Issuer, r.Audience, len(r.Claims), r.Key, r.Lifetime())
 	return err
 }

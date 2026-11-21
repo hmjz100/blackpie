@@ -7,7 +7,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/yetone/magpie/internal/sessions"
+	"github.com/hmjz100/blackpie/internal/sessions"
 )
 
 // Compare the previous whole-answer encoding with the two passes used for

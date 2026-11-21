@@ -9,11 +9,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/agent"
 )
 
 // Tystem on Discord: connecting Codex with no provider or subscription in
-// magpie answered "Codex can't be connected to magpie", untranslated. The
+// blackpie answered "Codex can't be connected to blackpie", untranslated. The
 // answer carries code no_models and the agent's name, which the GUI says
 // in the reader's language.
 func TestAgentConnectNoModels(t *testing.T) {
@@ -34,11 +34,11 @@ func TestAgentConnectNoModels(t *testing.T) {
 	}
 }
 
-// Lumens on Discord: connecting WorkBuddy, whose one field puts magpie in
-// its own picker, answered 200 with nothing added in magpie, so the page
+// Lumens on Discord: connecting WorkBuddy, whose one field puts blackpie in
+// its own picker, answered 200 with nothing added in blackpie, so the page
 // said it was connected and its switch went back off. It answers
 // no_models now, as Codex does.
-func TestAgentConnectNoModelsMagpieAsProvider(t *testing.T) {
+func TestAgentConnectNoModelsBlackpieAsProvider(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
 	t.Setenv("USERPROFILE", home)
@@ -56,7 +56,7 @@ func TestAgentConnectNoModelsMagpieAsProvider(t *testing.T) {
 	}
 }
 
-// znuaibot (#1989): magpie has models, none left in the agent's lists. The
+// znuaibot (#1989): blackpie has models, none left in the agent's lists. The
 // answer carries code all_hidden and the agent's name, which the GUI says
 // in the reader's language, pointing at the agent's Model list.
 func TestAgentConnectAllHidden(t *testing.T) {

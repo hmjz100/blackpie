@@ -21,7 +21,7 @@ const path = require("node:path");
 const { test } = require("node:test");
 const { chromium, webkit } = require("playwright");
 
-const assets = process.env.MAGPIE_REPAIR_ASSETS || path.resolve(__dirname, "../assets");
+const assets = process.env.BLACKPIE_REPAIR_ASSETS || path.resolve(__dirname, "../assets");
 
 const accounts = Array.from({ length: 5 }, (_, i) => ({ user: `account-${i + 1}@example.invalid`, active: i === 0, on: true, plan: "personal_standard" }));
 const fakeco = { id: "fakeco", name: "FakeCo", icon: "generic", models: Array.from({ length: 16 }, (_, i) => ({ id: `model-${i + 1}`, on: i % 2 === 0 })), agents: [], key: {}, routing: "smart",
@@ -49,7 +49,7 @@ function serve(lang, usage) {
     if (url.pathname === "/api/login/usage") return json(await usage(url.searchParams.get("agent")));
     if (url.pathname === "/api/groups") return json({ groups: [], pools: [] });
     if (url.pathname.startsWith("/api/")) return json({});
-    if (!/^\/[\w./-]*$/.test(url.pathname) || url.host !== "magpie.test") return route.fulfill({ status: 404, body: "" });
+    if (!/^\/[\w./-]*$/.test(url.pathname) || url.host !== "blackpie.test") return route.fulfill({ status: 404, body: "" });
     const file = path.join(assets, url.pathname === "/" ? "index.html" : url.pathname);
     const contentType = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png" }[path.extname(file)];
     try { await route.fulfill({ body: await fs.readFile(file), contentType }); } catch { await route.fulfill({ status: 404, body: "" }); }
@@ -63,7 +63,7 @@ async function openEditor(browser, lang, id, usage) {
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.route("**/*", serve(lang, usage));
-  await page.goto("http://magpie.test/?view=providers");
+  await page.goto("http://blackpie.test/?view=providers");
   await page.locator(`.row.provider[data-id="${id}"]`).click();
   await page.locator("#modal .ebody").waitFor();
   // the open's grow and fade over: what moves after is the redraw's

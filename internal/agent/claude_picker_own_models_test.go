@@ -5,15 +5,15 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // raclen (#4548): the "Show {agent}'s own models" switch left Claude Code's
-// own rows in /model untouched: it filters magpie's pickers alone
-// (agent.Picks, #1642), and nothing magpie writes for Claude Code looked at
-// it. Claude Code's /model is fed by magpie all the same — modelPicker's
-// rows are magpie's (writePicker) — and Claude Code drops its built-in
+// own rows in /model untouched: it filters blackpie's pickers alone
+// (agent.Picks, #1642), and nothing blackpie writes for Claude Code looked at
+// it. Claude Code's /model is fed by blackpie all the same — modelPicker's
+// rows are blackpie's (writePicker) — and Claude Code drops its built-in
 // lineup rows when a modelPicker says replaceBuiltInOptions, so writePicker
 // sets that while the switch is off, and takes it back out when on. The
 // Default row stays either way: Claude Code keeps it as its own fallback,

@@ -7,10 +7,10 @@ import (
 	"testing"
 )
 
-// A ChatGPT account that runs out of its allowance after a magpie model was
-// picked beside its sign-in leaves the Codex app sending nothing, a magpie
-// model's turn included (#540): Sync makes magpie Codex's provider then, as
-// a pick does for an account already out, and puts magpie back beside the
+// A ChatGPT account that runs out of its allowance after a blackpie model was
+// picked beside its sign-in leaves the Codex app sending nothing, a blackpie
+// model's turn included (#540): Sync makes blackpie Codex's provider then, as
+// a pick does for an account already out, and puts blackpie back beside the
 // sign-in once the allowance is back. A provider the user asked for (api)
 // or one for a Codex not signed in to ChatGPT stays.
 func TestCodexRunsOutAfterPick(t *testing.T) {
@@ -26,14 +26,14 @@ func TestCodexRunsOutAfterPick(t *testing.T) {
 	if err := cx.Sync(); err != nil {
 		t.Fatal(err)
 	}
-	if cfg := read(); !strings.Contains(cfg, `model_provider = "magpie"`) || !strings.Contains(cfg, "model_catalog_json") ||
+	if cfg := read(); !strings.Contains(cfg, `model_provider = "blackpie"`) || !strings.Contains(cfg, "model_catalog_json") ||
 		!strings.Contains(cfg, "openai_base_url") || !strings.Contains(cfg, `model = "fake/m1"`) {
 		t.Fatalf("used up:\n%s", cfg)
 	}
 	if err := cx.Sync(); err != nil { // still out: stays
 		t.Fatal(err)
 	}
-	if cfg := read(); !strings.Contains(cfg, `model_provider = "magpie"`) {
+	if cfg := read(); !strings.Contains(cfg, `model_provider = "blackpie"`) {
 		t.Fatalf("used up, synced again:\n%s", cfg)
 	}
 	codexUsedUp = func() bool { return false }
@@ -45,23 +45,23 @@ func TestCodexRunsOutAfterPick(t *testing.T) {
 		t.Fatalf("allowance back:\n%s", cfg)
 	}
 
-	// magpie as the provider because the user asked for it stays so
+	// blackpie as the provider because the user asked for it stays so
 	if err := cx.Field("login").Set("api"); err != nil {
 		t.Fatal(err)
 	}
-	if cfg := read(); !strings.Contains(cfg, `model_provider = "magpie"`) {
+	if cfg := read(); !strings.Contains(cfg, `model_provider = "blackpie"`) {
 		t.Fatalf("api:\n%s", cfg)
 	}
 	if err := cx.Sync(); err != nil {
 		t.Fatal(err)
 	}
-	if cfg := read(); !strings.Contains(cfg, `model_provider = "magpie"`) {
+	if cfg := read(); !strings.Contains(cfg, `model_provider = "blackpie"`) {
 		t.Fatalf("api, allowance there, synced:\n%s", cfg)
 	}
 }
 
 // Kept on ChatGPT (Always ChatGPT), a ChatGPT account that runs out leaves
-// magpie beside the sign-in: Codex isn't moved to magpie as its provider,
+// blackpie beside the sign-in: Codex isn't moved to blackpie as its provider,
 // by a pick or by Sync, and one moved before the user chose it is put back
 // beside it at once.
 func TestCodexKeptOnChatGPT(t *testing.T) {
@@ -75,8 +75,8 @@ func TestCodexKeptOnChatGPT(t *testing.T) {
 	if err := cx.Sync(); err != nil {
 		t.Fatal(err)
 	}
-	if cfg := read(); !strings.Contains(cfg, `model_provider = "magpie"`) {
-		t.Fatalf("ChatGPT, used up: magpie its provider:\n%s", cfg)
+	if cfg := read(); !strings.Contains(cfg, `model_provider = "blackpie"`) {
+		t.Fatalf("ChatGPT, used up: blackpie its provider:\n%s", cfg)
 	}
 
 	beside := func(when string) {
@@ -106,7 +106,7 @@ func TestCodexKeptOnChatGPT(t *testing.T) {
 	if err := cx.Field("login").Set(""); err != nil {
 		t.Fatal(err)
 	}
-	if cfg := read(); !strings.Contains(cfg, `model_provider = "magpie"`) {
+	if cfg := read(); !strings.Contains(cfg, `model_provider = "blackpie"`) {
 		t.Fatalf("ChatGPT again, used up:\n%s", cfg)
 	}
 }
@@ -114,10 +114,10 @@ func TestCodexKeptOnChatGPT(t *testing.T) {
 // The same on one of Codex's own models picked beside the sign-in
 // (MasterYi on Discord: the Codex app greyed Send on a used-up account,
 // and the third-party models it was joined with couldn't be used either).
-// Sync makes magpie Codex's provider on that model as magpie serves it,
+// Sync makes blackpie Codex's provider on that model as blackpie serves it,
 // and once the account has room puts Codex back on the one picked, beside
 // its sign-in.
-func TestCodexOwnModelGoesThroughMagpieWhileUsedUp(t *testing.T) {
+func TestCodexOwnModelGoesThroughBlackpieWhileUsedUp(t *testing.T) {
 	home, read := codexHome(t, `{"tokens":{"access_token":"x","id_token":"x.e30.x"}}`, "model = \"gpt-a\"\n")
 	os.WriteFile(filepath.Join(home, ".codex", "models_cache.json"),
 		[]byte(`{"models":[{"slug":"gpt-a","display_name":"A","priority":1}]}`), 0o644)
@@ -135,11 +135,11 @@ func TestCodexOwnModelGoesThroughMagpieWhileUsedUp(t *testing.T) {
 	if err := cx.Sync(); err != nil {
 		t.Fatal(err)
 	}
-	if cfg := read(); !strings.Contains(cfg, `model_provider = "magpie"`) || !strings.Contains(cfg, `model = "codex/gpt-a"`) {
+	if cfg := read(); !strings.Contains(cfg, `model_provider = "blackpie"`) || !strings.Contains(cfg, `model = "codex/gpt-a"`) {
 		t.Fatalf("used up:\n%s", cfg)
 	}
 	if !cx.AppOut() {
-		t.Fatal("used up, magpie its provider: not AppOut")
+		t.Fatal("used up, blackpie its provider: not AppOut")
 	}
 	if err := cx.Sync(); err != nil { // still out: stays
 		t.Fatal(err)
@@ -201,7 +201,7 @@ func TestCodexOwnModelKeptOnChatGPT(t *testing.T) {
 	}
 }
 
-// Moved onto magpie on one of Codex's own models while the account is
+// Moved onto blackpie on one of Codex's own models while the account is
 // used up, then kept on ChatGPT from the Agents row's takeover line
 // (eddie.zhan on Discord: the Codex app's browser use said it had no
 // permission): Codex goes back on its sign-in at once, on the model it

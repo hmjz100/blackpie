@@ -16,11 +16,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 // A plugin's model listed by an id of the user's own (zeewell on X:
@@ -31,7 +31,7 @@ import (
 func TestLocalModelIDAtAPlugin(t *testing.T) {
 	bun := testenv.Bun(t)
 	fresh(t)
-	t.Setenv("MAGPIE_BUN", bun)
+	t.Setenv("BLACKPIE_BUN", bun)
 	t.Cleanup(plugin.Settle)
 
 	type seen struct{ path, model, body string }

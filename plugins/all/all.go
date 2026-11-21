@@ -1,20 +1,20 @@
-// Package all registers every built-in plugin. Only magpie's main imports
+// Package all registers every built-in plugin. Only blackpie's main imports
 // it: core never imports a plugin, and a plugin never imports another.
 package all
 
 import (
-	_ "github.com/yetone/magpie/plugins/budget"
-	_ "github.com/yetone/magpie/plugins/gateway"
-	_ "github.com/yetone/magpie/plugins/groups"
-	_ "github.com/yetone/magpie/plugins/library"
-	_ "github.com/yetone/magpie/plugins/middleware"
-	_ "github.com/yetone/magpie/plugins/otel"
-	_ "github.com/yetone/magpie/plugins/redact"
-	_ "github.com/yetone/magpie/plugins/rotation"
-	_ "github.com/yetone/magpie/plugins/routing"
-	_ "github.com/yetone/magpie/plugins/search"
-	_ "github.com/yetone/magpie/plugins/sessions"
-	_ "github.com/yetone/magpie/plugins/tools"
-	_ "github.com/yetone/magpie/plugins/usage"
-	_ "github.com/yetone/magpie/plugins/warmups"
+	_ "github.com/hmjz100/blackpie/plugins/budget"
+	_ "github.com/hmjz100/blackpie/plugins/gateway"
+	_ "github.com/hmjz100/blackpie/plugins/groups"
+	_ "github.com/hmjz100/blackpie/plugins/library"
+	_ "github.com/hmjz100/blackpie/plugins/middleware"
+	_ "github.com/hmjz100/blackpie/plugins/otel"
+	_ "github.com/hmjz100/blackpie/plugins/redact"
+	_ "github.com/hmjz100/blackpie/plugins/rotation"
+	_ "github.com/hmjz100/blackpie/plugins/routing"
+	_ "github.com/hmjz100/blackpie/plugins/search"
+	_ "github.com/hmjz100/blackpie/plugins/sessions"
+	_ "github.com/hmjz100/blackpie/plugins/tools"
+	_ "github.com/hmjz100/blackpie/plugins/usage"
+	_ "github.com/hmjz100/blackpie/plugins/warmups"
 )

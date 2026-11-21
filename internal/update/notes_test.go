@@ -37,7 +37,7 @@ func TestShowNotes(t *testing.T) {
 }
 
 func TestStripInstall(t *testing.T) {
-	md := "## Bug Fixes\n\n- Fixed a thing. (#464)\n\n### Install\n\nDownload from [usemagpie.ai](https://usemagpie.ai).\n\n- **macOS:** `magpie.dmg`\n"
+	md := "## Bug Fixes\n\n- Fixed a thing. (#464)\n\n### Install\n\nDownload from [useblackpie.ai](https://useblackpie.ai).\n\n- **macOS:** `blackpie.dmg`\n"
 	if got, want := StripInstall(md), "## Bug Fixes\n\n- Fixed a thing. (#464)"; got != want {
 		t.Errorf("got %q, want %q", got, want)
 	}
@@ -51,7 +51,7 @@ func TestStripInstall(t *testing.T) {
 	}
 	// the Chinese notes' section is 安装 (#649), Japanese ones' インストール
 	for _, h := range []string{"安装", "インストール"} {
-		md = "## Bug Fixes\n\n- 修复了一件事。\n\n### " + h + "\n\n从 [usemagpie.ai](https://usemagpie.ai) 下载。"
+		md = "## Bug Fixes\n\n- 修复了一件事。\n\n### " + h + "\n\n从 [useblackpie.ai](https://useblackpie.ai) 下载。"
 		if got, want := StripInstall(md), "## Bug Fixes\n\n- 修复了一件事。"; got != want {
 			t.Errorf("%s: got %q, want %q", h, got, want)
 		}
@@ -103,7 +103,7 @@ func TestNotesBetween(t *testing.T) {
 		}})
 	}))
 	defer srv.Close()
-	t.Setenv("MAGPIE_NOTES_FEED", srv.URL)
+	t.Setenv("BLACKPIE_NOTES_FEED", srv.URL)
 	got, err := NotesBetween(context.Background(), "0.1.600", "0.1.604", "")
 	if err != nil {
 		t.Fatal(err)
@@ -146,7 +146,7 @@ func TestNotesBack(t *testing.T) {
 		json.NewEncoder(w).Encode(map[string]any{"releases": list})
 	}))
 	defer srv.Close()
-	t.Setenv("MAGPIE_NOTES_FEED", srv.URL)
+	t.Setenv("BLACKPIE_NOTES_FEED", srv.URL)
 	got, err := NotesBack(context.Background(), "0.1.612", 10, "zh")
 	if err != nil {
 		t.Fatal(err)

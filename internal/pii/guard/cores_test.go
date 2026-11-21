@@ -8,7 +8,7 @@ import (
 
 // A panic on a goroutine the read starts is panicked again on the one
 // that waits, where Find's caller recovers it: left on its own it ended
-// magpie (#4553). Every part ends first.
+// blackpie (#4553). Every part ends first.
 func TestParallelCarriesAPanic(t *testing.T) {
 	var ran sync.WaitGroup
 	ran.Add(4)

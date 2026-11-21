@@ -43,7 +43,7 @@ func TestForgetLiveClaudeSwitchesFirst(t *testing.T) {
 }
 
 // Claude Code's account in use is never signed out by a removal, even its
-// only one: its sign-in may be in the keychain, and magpie serves its
+// only one: its sign-in may be in the keychain, and blackpie serves its
 // saved accounts while it is signed out (claudeStandIn). The refusal says
 // it is the only one, not "sign it in to another first".
 func TestForgetOnlyClaudeIsKept(t *testing.T) {

@@ -17,7 +17,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/yetone/magpie/internal/oidc"
+	"github.com/hmjz100/blackpie/internal/oidc"
 )
 
 // Issuer is one issuer. Fetches counts the times its keys were read;

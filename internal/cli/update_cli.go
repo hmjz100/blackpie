@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/update"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/update"
 )
 
 // updateExecutable, updateCanElevate and updateInContainer are
@@ -26,11 +26,11 @@ var (
 	updatePackagedBy  = update.PackagedBy
 )
 
-// updateEveries are the intervals magpie update auto takes, by their
+// updateEveries are the intervals blackpie update auto takes, by their
 // minutes in settings.UpdateEveries.
 var updateEveries = map[string]int{"30m": 30, "1h": 60, "6h": 360, "24h": 1440}
 
-// updateAutoCmd is `magpie update auto [on|off] [download|notify]
+// updateAutoCmd is `blackpie update auto [on|off] [download|notify]
 // [30m|1h|6h|24h]`: whether the app asks for a newer version by itself, how
 // often (#472), and whether one found is downloaded at once or only said to
 // be out, downloaded on a click (notify, #2296). With none, it says how it
@@ -46,7 +46,7 @@ func updateAutoCmd(args []string) error {
 		default:
 			m, ok := updateEveries[a]
 			if !ok {
-				return fmt.Errorf("magpie update auto takes on, off, download, notify or how often (30m, 1h, 6h or 24h), not %q", a)
+				return fmt.Errorf("blackpie update auto takes on, off, download, notify or how often (30m, 1h, 6h or 24h), not %q", a)
 			}
 			s.UpdateEvery = m
 		}
@@ -63,27 +63,27 @@ func updateAutoCmd(args []string) error {
 		}
 	}
 	if s.NoAutoUpdate {
-		fmt.Println("automatic updates are off", muted.Render("· magpie update or Settings' Check looks for one (every "+every+" when on)"))
+		fmt.Println("automatic updates are off", muted.Render("· blackpie update or Settings' Check looks for one (every "+every+" when on)"))
 		if s.NoAutoDownload {
-			fmt.Println(muted.Render("  a newer version found is only said to be out; Download update or magpie update downloads it"))
+			fmt.Println(muted.Render("  a newer version found is only said to be out; Download update or blackpie update downloads it"))
 		}
 		return nil
 	}
 	if s.NoAutoDownload {
-		fmt.Println("automatic updates are on", muted.Render("· magpie looks for a newer version every "+every+" and says it is out; Download update or magpie update downloads it (magpie update auto download: at once)"))
+		fmt.Println("automatic updates are on", muted.Render("· blackpie looks for a newer version every "+every+" and says it is out; Download update or blackpie update downloads it (blackpie update auto download: at once)"))
 		return nil
 	}
-	fmt.Println("automatic updates are on", muted.Render("· magpie looks for a newer version every "+every+" and downloads it (magpie update auto notify: only says it is out)"))
+	fmt.Println("automatic updates are on", muted.Render("· blackpie looks for a newer version every "+every+" and downloads it (blackpie update auto notify: only says it is out)"))
 	return nil
 }
 
-// updateMirrorCmd is `magpie update mirror [<prefix>|off]`: the GitHub
+// updateMirrorCmd is `blackpie update mirror [<prefix>|off]`: the GitHub
 // download mirror every update goes through, the app's own among them
 // (settings.UpdateMirror). With nothing, it says which.
 func updateMirrorCmd(args []string) error {
 	s := settings.Load()
 	if len(args) > 1 {
-		return fmt.Errorf("magpie update mirror takes one prefix, or off")
+		return fmt.Errorf("blackpie update mirror takes one prefix, or off")
 	}
 	if len(args) == 1 {
 		switch m := strings.TrimSpace(args[0]); m {
@@ -100,21 +100,21 @@ func updateMirrorCmd(args []string) error {
 		}
 	}
 	if s.UpdateMirror == "" {
-		fmt.Println("updates are downloaded from GitHub", muted.Render("· magpie update mirror <prefix> has them come through a mirror; the checksum is still the fork release's"))
+		fmt.Println("updates are downloaded from GitHub", muted.Render("· blackpie update mirror <prefix> has them come through a mirror; the checksum is still the fork release's"))
 		return nil
 	}
-	fmt.Println("updates are downloaded through", bold.Render(s.UpdateMirror), muted.Render("· each is checked against the fork release's checksum · magpie update mirror off goes back to GitHub"))
+	fmt.Println("updates are downloaded through", bold.Render(s.UpdateMirror), muted.Render("· each is checked against the fork release's checksum · blackpie update mirror off goes back to GitHub"))
 	return nil
 }
 
-// updateChannelCmd is `magpie update channel [stable|every]`: which
+// updateChannelCmd is `blackpie update channel [stable|every]`: which
 // versions an update is offered (settings.UpdateChannel, ssharpcc on X):
 // Stable, one a week and an urgent one at once, or every version as it
 // comes out. With none, it says which.
 func updateChannelCmd(args []string) error {
 	s := settings.Load()
 	if len(args) > 1 {
-		return fmt.Errorf("magpie update channel takes stable or every")
+		return fmt.Errorf("blackpie update channel takes stable or every")
 	}
 	if len(args) == 1 {
 		switch strings.ToLower(strings.TrimSpace(args[0])) {
@@ -123,17 +123,17 @@ func updateChannelCmd(args []string) error {
 		case "every", "all":
 			s.UpdateChannel = ""
 		default:
-			return fmt.Errorf("magpie update channel takes stable or every, not %q", args[0])
+			return fmt.Errorf("blackpie update channel takes stable or every, not %q", args[0])
 		}
 		if err := settings.Save(s); err != nil {
 			return err
 		}
 	}
 	if s.UpdateChannel == settings.UpdateStable {
-		fmt.Println("update channel: stable", muted.Render("· a version a week, the newest out three days as the week began, and an urgent one at once · magpie update channel every: each one as it comes out"))
+		fmt.Println("update channel: stable", muted.Render("· a version a week, the newest out three days as the week began, and an urgent one at once · blackpie update channel every: each one as it comes out"))
 		return nil
 	}
-	fmt.Println("update channel: every version", muted.Render("· each one as it comes out · magpie update channel stable: one a week, an urgent one at once"))
+	fmt.Println("update channel: every version", muted.Render("· each one as it comes out · blackpie update channel stable: one a week, an urgent one at once"))
 	return nil
 }
 
@@ -171,7 +171,7 @@ func updateFlags(args []string) (rest []string, proxy, mirror string, err error)
 	return rest, proxy, mirror, nil
 }
 
-// updateCmd is `magpie update [check] [--proxy <url>] [--mirror <prefix>]`:
+// updateCmd is `blackpie update [check] [--proxy <url>] [--mirror <prefix>]`:
 // the app replaces its bundle, the terminal build its binary.
 func updateCmd(args []string) error {
 	args, proxy, mirror, err := updateFlags(args)
@@ -188,7 +188,7 @@ func updateCmd(args []string) error {
 		return updateChannelCmd(args[2:])
 	}
 	if len(args) > 2 || len(args) == 2 && args[1] != "check" {
-		return fmt.Errorf("usage: magpie update [check] [--proxy <url>] [--mirror <prefix>]")
+		return fmt.Errorf("usage: blackpie update [check] [--proxy <url>] [--mirror <prefix>]")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
@@ -200,25 +200,25 @@ func updateCmd(args []string) error {
 	if !update.Newer(rel.Version, version) {
 		if update.Released(version) {
 			if update.Stable() {
-				fmt.Println(green.Render("✓"), "magpie", version, muted.Render("is up to date on the stable channel (stable is "+rel.Version+")"))
+				fmt.Println(green.Render("✓"), "blackpie", version, muted.Render("is up to date on the stable channel (stable is "+rel.Version+")"))
 			} else {
-				fmt.Println(green.Render("✓"), "magpie", version, muted.Render("is the latest"))
+				fmt.Println(green.Render("✓"), "blackpie", version, muted.Render("is the latest"))
 			}
 		} else {
-			fmt.Println("magpie", version, muted.Render("was built from source; the latest release is "+rel.Version))
+			fmt.Println("blackpie", version, muted.Render("was built from source; the latest release is "+rel.Version))
 		}
 		return nil
 	}
-	fmt.Println("magpie", bold.Render(rel.Version), "is out", muted.Render("(you have "+version+") · "+rel.URL))
+	fmt.Println("blackpie", bold.Render(rel.Version), "is out", muted.Render("(you have "+version+") · "+rel.URL))
 	if len(args) > 1 && args[1] == "check" {
 		return nil
 	}
 	if !update.Released(version) {
-		return fmt.Errorf("this magpie was built from source; update it the way you built it, or get the release from %s", update.Site)
+		return fmt.Errorf("this blackpie was built from source; update it the way you built it, or get the release from %s", update.Site)
 	}
 	if app := update.Bundle(); app != "" {
 		if update.Stuck(app) != "" {
-			return fmt.Errorf("%s can't be replaced where it is; move magpie to Applications, or download the new version from %s", tilde(app), update.Site)
+			return fmt.Errorf("%s can't be replaced where it is; move blackpie to Applications, or download the new version from %s", tilde(app), update.Site)
 		}
 		fmt.Println(muted.Render("  downloading " + update.AppAsset() + via(ctx) + " …"))
 		staged, err := update.Stage(ctx, rel, app)
@@ -236,19 +236,19 @@ func updateCmd(args []string) error {
 		fmt.Println(muted.Render("  " + restartRunning(gateway.URL(), rel.Version)))
 		if stale := update.StaleCLI(rel.Version); stale != "" {
 			// The copy won't follow the app; the fix is the link install.sh
-			// makes. `magpie update` run from the copy can't do it (it
+			// makes. `blackpie update` run from the copy can't do it (it
 			// replaces the copy with another copy), so name the real step.
-			bin := filepath.Join(app, "Contents", "MacOS", "magpie")
-			fmt.Println(muted.Render("  the `magpie` command at " + tilde(stale) + " is a copy behind this app; re-run the installer, or link it: ln -sf " + tilde(bin) + " " + tilde(stale)))
+			bin := filepath.Join(app, "Contents", "MacOS", "blackpie")
+			fmt.Println(muted.Render("  the `blackpie` command at " + tilde(stale) + " is a copy behind this app; re-run the installer, or link it: ln -sf " + tilde(bin) + " " + tilde(stale)))
 		}
 		return nil
 	}
-	// the Docker image's /magpie, run as nonroot: the image is what is
+	// the Docker image's /blackpie, run as nonroot: the image is what is
 	// updated, and a replace would only fail with "permission denied"
 	if exe, err := updateExecutable(); err == nil && !update.Writable(filepath.Dir(exe)) && !updateCanElevate() && updateInContainer() {
-		return fmt.Errorf("this magpie runs in a container and can't replace itself; pull the new image (docker pull ghcr.io/yetone/magpie:latest) and recreate the container")
+		return fmt.Errorf("this blackpie runs in a container and can't replace itself; pull the new image (docker pull ghcr.io/hmjz100/blackpie:latest) and recreate the container")
 	}
-	// a package manager's binary (Homebrew's, pacman's magpie-bin from
+	// a package manager's binary (Homebrew's, pacman's blackpie-bin from
 	// the AUR, a .deb's): replaced under it, the manager's database names
 	// the old version and its next upgrade writes over this one
 	if exe, err := updateExecutable(); err == nil {
@@ -265,26 +265,26 @@ func updateCmd(args []string) error {
 	return nil
 }
 
-// restartRunning asks the magpie serving the gateway at base to restart
+// restartRunning asks the blackpie serving the gateway at base to restart
 // into version, which this command put in (gateway.RestartPath), and
 // says what came of it. Before, the app ran on as the old version until
-// it was quit and reopened by hand (gaubeebangeel on X: an agent magpie
-// serves ran the update, and restarting magpie cut it off). The app
+// it was quit and reopened by hand (gaubeebangeel on X: an agent blackpie
+// serves ran the update, and restarting blackpie cut it off). The app
 // restarts as its own update does, handing the gateway over on a Mac or
 // Linux, so this command's own agent isn't cut short.
 var restartRunning = func(base, version string) string {
 	c := &http.Client{Timeout: 10 * time.Second}
 	res, err := c.Post(base+gateway.RestartPath, "application/json", strings.NewReader(`{"version":`+strconv.Quote(version)+`}`))
 	if err != nil {
-		return "magpie isn't running; it starts as " + version + " next time"
+		return "blackpie isn't running; it starts as " + version + " next time"
 	}
 	defer res.Body.Close()
 	var r gateway.RestartReply
 	if res.StatusCode == http.StatusNotFound || res.StatusCode == http.StatusMethodNotAllowed {
-		return "the magpie running is too old to restart by itself: quit and reopen magpie to use it"
+		return "the blackpie running is too old to restart by itself: quit and reopen blackpie to use it"
 	}
 	if err := json.NewDecoder(io.LimitReader(res.Body, 1<<16)).Decode(&r); err != nil || res.StatusCode != http.StatusOK {
-		return fmt.Sprintf("the magpie running didn't restart (%s): quit and reopen magpie to use it", res.Status)
+		return fmt.Sprintf("the blackpie running didn't restart (%s): quit and reopen blackpie to use it", res.Status)
 	}
 	carried := ""
 	if r.Handover {
@@ -292,17 +292,17 @@ var restartRunning = func(base, version string) string {
 	}
 	switch r.State {
 	case "restarting":
-		return "magpie " + r.Version + " restarts into " + version + " now" + carried
+		return "blackpie " + r.Version + " restarts into " + version + " now" + carried
 	case "waiting":
 		n := 0
 		if r.Busy != nil {
 			n = r.Busy.Requests + r.Busy.Tools
 		}
-		return fmt.Sprintf("magpie %s restarts into %s once the %d request(s) it would cut short are done%s", r.Version, version, n, carried)
+		return fmt.Sprintf("blackpie %s restarts into %s once the %d request(s) it would cut short are done%s", r.Version, version, n, carried)
 	case "unsupported":
-		return "the magpie serving the gateway (" + r.Version + ", magpie serve) doesn't restart by itself: restart it the way you started it to use " + version
+		return "the blackpie serving the gateway (" + r.Version + ", blackpie serve) doesn't restart by itself: restart it the way you started it to use " + version
 	}
-	return "the magpie serving the gateway (" + r.Version + ") runs from another copy, which wasn't updated: update that one, or restart it"
+	return "the blackpie serving the gateway (" + r.Version + ") runs from another copy, which wasn't updated: update that one, or restart it"
 }
 
 // via says the mirror a download goes through, if any.

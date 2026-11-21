@@ -94,13 +94,13 @@ func TestCindyPiSessions(t *testing.T) {
 		t.Fatalf("prompts %q in %+v", said, tr.Parts)
 	}
 
-	// its calls are Cindy's on the Usage page, those through magpie the
+	// its calls are Cindy's on the Usage page, those through blackpie the
 	// gateway's
 	by, relay := map[string]int{}, 0
 	for _, c := range Calls(time.Time{}) {
 		by[c.Agent]++
-		if c.Agent == "cindy" && (c.Upstream == "magpie" || c.Upstream == "dead") {
-			t.Errorf("a call through magpie or one that failed: %+v", c)
+		if c.Agent == "cindy" && (c.Upstream == "blackpie" || c.Upstream == "dead") {
+			t.Errorf("a call through blackpie or one that failed: %+v", c)
 		}
 		if c.Agent == "cindy" && (c.Session == raftParent || c.Session == raftFork) && c.Upstream == "relay" {
 			relay++

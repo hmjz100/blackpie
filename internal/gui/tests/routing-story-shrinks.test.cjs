@@ -46,7 +46,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ['chromium',
       p.setDefaultTimeout(5000);
       const errors=[];p.on('pageerror',e=>errors.push(e.message));
       const feed={next:null};await p.route('**/*',serve(lang,feed));
-      await p.goto('http://magpie.test/?view=routing');await p.locator('.rt-selected').waitFor();
+      await p.goto('http://blackpie.test/?view=routing');await p.locator('.rt-selected').waitFor();
       const send=async r=>{for(let i=0;i<60&&!feed.next;i++)await p.waitForTimeout(50);assert(feed.next,'trace subscription');const next=feed.next;feed.next=null;next(r);await p.waitForTimeout(200);};
       const compact=async()=>{
         const x=await p.locator('.rt-log').evaluate(e=>{const r=e.querySelector('.rt-route'),a=r.querySelector('.rt-analysis'),d=e.querySelector('.rt-diag');return {routeHeld:r.style.minHeight,diagHeld:d.style.minHeight,open:d.open,gap:e.querySelector('.rt-result').getBoundingClientRect().top-a.getBoundingClientRect().bottom};});

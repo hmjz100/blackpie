@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // A group's member the user unchecked in its provider's model list is

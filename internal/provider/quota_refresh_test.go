@@ -10,7 +10,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/yetone/magpie/internal/agentenv"
+	"github.com/hmjz100/blackpie/internal/agentenv"
 )
 
 // A card's refresh button reads that card alone (Hu9956, #840): the key

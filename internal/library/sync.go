@@ -7,9 +7,9 @@ import (
 	"os"
 	"slices"
 
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/mcpauth"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/mcpauth"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Result is what a change did to the agents.
@@ -46,7 +46,7 @@ type Result struct {
 	// dropped are the servers taken out of an agent's config, as it had
 	// them, whose processes go once no agent runs them (mcp_reap.go)
 	dropped []*Server
-	// run are the servers given Codex as the gateway's, which magpie runs
+	// run are the servers given Codex as the gateway's, which blackpie runs
 	// for it (mcp_run.go), by name
 	run map[string]runSpec
 }
@@ -91,7 +91,7 @@ func (l *Library) sync() *Result {
 }
 
 // syncSteps are what a sync does, one agent's part at a time, in order. The
-// agents gone from here that still have what magpie gave them (held) only
+// agents gone from here that still have what blackpie gave them (held) only
 // have what was unticked taken out, after the rest.
 func syncSteps(all, gone []*Target, b *backups, res *Result) []func(*Library) {
 	// a skill whose app moved it is followed first, for every agent to
@@ -135,10 +135,10 @@ func syncSteps(all, gone []*Target, b *backups, res *Result) []func(*Library) {
 }
 
 // Sync writes the library into the agents again: after an agent is
-// installed, or a profile brings another library in. magpie does one at
+// installed, or a profile brings another library in. blackpie does one at
 // every start, and the Library page waits on the lock for each read and
 // change: held for the whole sync, through every agent's skills, the
-// first operations after opening magpie took seconds (#1624, Hipple).
+// first operations after opening blackpie took seconds (#1624, Hipple).
 // It lets go after each agent's part, for whatever waits to go first.
 func Sync() (*Result, error) {
 	// a plugin's tools, a server of their own (plugin_tools.go)
@@ -212,14 +212,14 @@ func (l *Library) syncMCP(t *Target, b *backups, res *Result) {
 		runs.Unlock()
 	}
 	a := l.applied(id)
-	// an agent given no server, with none of magpie's in it, isn't read:
+	// an agent given no server, with none of blackpie's in it, isn't read:
 	// a file of its that can't be read is nothing the library did
 	if len(a.MCP) == 0 && len(a.ToolRules) == 0 && (t.Gone || !slices.ContainsFunc(l.MCP, func(s *Server) bool { return slices.Contains(s.Agents, id) })) {
 		return
 	}
 	how := toolsOffOf(t)
-	toolsOff := map[string][]string{} // what magpie's in each entry's list now
-	startup := map[string]float64{}   // the startup timeout magpie's in each entry now
+	toolsOff := map[string][]string{} // what blackpie's in each entry's list now
+	startup := map[string]float64{}   // the startup timeout blackpie's in each entry now
 	entries, err := t.MCP.entries()
 	if err != nil {
 		res.fail(id, "mcp", err)
@@ -239,7 +239,7 @@ func (l *Library) syncMCP(t *Target, b *backups, res *Result) {
 		res.changed(id)
 		return true
 	}
-	// with the hub on, the agent is given magpie's one entry in place of
+	// with the hub on, the agent is given blackpie's one entry in place of
 	// the servers behind it (mcp_hub.go); one that can't take it keeps
 	// each server's own
 	hub, _ := l.hubFor(t, a, entries)
@@ -304,7 +304,7 @@ func (l *Library) syncMCP(t *Target, b *backups, res *Result) {
 			s = npxDirect(s)
 		}
 		// a server the user keeps direct is started by Codex itself, in
-		// the thread's folder (#4382): magpie would start it from home
+		// the thread's folder (#4382): blackpie would start it from home
 		if run && s.Hub != HubDirect {
 			if via, spec, ok := runVia(s, base); ok {
 				if res.run == nil {
@@ -401,10 +401,10 @@ type AgentView struct {
 	// startup_timeout_sec)
 	Startup bool   `json:"startup,omitempty"`
 	MCPVia  string `json:"mcpVia,omitempty"`
-	// Hub, with the MCP hub on, is "on" for an agent given magpie's one
+	// Hub, with the MCP hub on, is "on" for an agent given blackpie's one
 	// entry in place of its servers, or why it keeps theirs: no-remote
 	// (it reaches no server over HTTP), taken (a library server is called
-	// magpie) or own (it has an entry called magpie of its own); "" for one
+	// blackpie) or own (it has an entry called blackpie of its own); "" for one
 	// given none of the hub's servers
 	Hub string `json:"hub,omitempty"`
 	// How is the way it is given its skills, link or copy, and HowOwn its
@@ -413,12 +413,12 @@ type AgentView struct {
 	How      string `json:"how,omitempty"`
 	HowOwn   bool   `json:"howOwn,omitempty"`
 	MustCopy bool   `json:"mustCopy,omitempty"`
-	// Gone: not installed here any more, and listed only for what magpie
+	// Gone: not installed here any more, and listed only for what blackpie
 	// gave it to be taken out (held); it is given nothing new
 	Gone bool `json:"gone,omitempty"`
 	// Asleep is the WSL distro, not running now, the agent is in: it is
-	// listed by what magpie last knew of it (wsl_asleep.go), and a change
-	// for it is written there when the distro next runs. Unseen: magpie
+	// listed by what blackpie last knew of it (wsl_asleep.go), and a change
+	// for it is written there when the distro next runs. Unseen: blackpie
 	// never saw where it keeps its MCP servers or skills, so its ticks
 	// can't be shown or changed until the distro runs
 	Asleep string `json:"asleep,omitempty"`
@@ -431,7 +431,7 @@ type ServerView struct {
 	Icon string `json:"icon,omitempty"`
 	// Problems are the agents it couldn't be given to, and why
 	Problems map[string]string `json:"problems,omitempty"`
-	// SignIn is magpie's sign-in to a streamable HTTP server, which the
+	// SignIn is blackpie's sign-in to a streamable HTTP server, which the
 	// agents then use (#615)
 	SignIn *mcpauth.Status `json:"signIn,omitempty"`
 }
@@ -497,7 +497,7 @@ type View struct {
 	Backups      string            `json:"backups"`
 	SkillGroups  []SkillGroup      `json:"skillGroups"`
 	CopySkills   bool              `json:"copySkills"` // the library gives skills as copies (#896)
-	// MCPHub: the agents are given magpie's one MCP server in place of
+	// MCPHub: the agents are given blackpie's one MCP server in place of
 	// the library's (#2679), at HubPath<agent> on the gateway
 	MCPHub  bool   `json:"mcpHub"`
 	HubPath string `json:"hubPath"`
@@ -507,7 +507,7 @@ type View struct {
 	HubNote string `json:"hubNote"`
 	HubName string `json:"hubName"`
 	// CheckDue is set when the skills from GitHub weren't checked for
-	// updates since magpie started, or not for a while: the page checks
+	// updates since blackpie started, or not for a while: the page checks
 	// them as it shows them (#1449)
 	CheckDue bool `json:"checkDue,omitempty"`
 	// Partial is a glance (Glance): FoundSkills and each skill's Behind
@@ -602,7 +602,7 @@ func readView(problems []Problem, glance bool) (*View, error) {
 		}
 		v.Agents = append(v.Agents, av)
 	}
-	// an agent gone from here that still has what magpie gave it: listed on
+	// an agent gone from here that still has what blackpie gave it: listed on
 	// the rows of what it has, for that to be taken out (held)
 	gone := l.held(targets)
 	for _, t := range gone {
@@ -612,7 +612,7 @@ func readView(problems []Problem, glance bool) (*View, error) {
 		}
 		v.Agents = append(v.Agents, av)
 	}
-	// a stopped WSL distro's agents, by what magpie last knew of them:
+	// a stopped WSL distro's agents, by what blackpie last knew of them:
 	// nothing of theirs is opened, which would start the distro (#3896)
 	for _, a := range asleep {
 		if av, ok := l.asleepView(a); ok {
@@ -741,7 +741,7 @@ func SaveServer(old string, s Server) (*Result, error) {
 			if i < 0 {
 				return fmt.Errorf("no server called %s", old)
 			}
-			// magpie's sign-in goes with a renamed server, before the agents
+			// blackpie's sign-in goes with a renamed server, before the agents
 			// are given it under its new name
 			if old != s.Name {
 				if err := mcpauth.Rename(old, s.Name); err != nil {
@@ -845,7 +845,7 @@ func serversAgents(names, agents []string, on bool) (*Result, error) {
 }
 
 // reach is which agents a server can be given: those whose MCP file
-// supports it, and a stopped distro's by what magpie last knew of them.
+// supports it, and a stopped distro's by what blackpie last knew of them.
 type reach struct {
 	mcp    map[string]*mcpFile
 	shapes map[string]*shape
@@ -875,7 +875,7 @@ func (r reach) takes(a string, s *Server) bool {
 }
 
 // RemoveServer takes a server out of the library and out of every agent
-// magpie gave it to.
+// blackpie gave it to.
 func RemoveServer(name string) (*Result, error) {
 	res, err := change(func(l *Library) error { return removeServer(l, name) })
 	if err == nil {
@@ -886,7 +886,7 @@ func RemoveServer(name string) (*Result, error) {
 }
 
 // RemoveServers takes the servers named out of the library and every agent
-// in one write (#1027), each as RemoveServer does: only the entries magpie
+// in one write (#1027), each as RemoveServer does: only the entries blackpie
 // wrote (Applied) leave the agents' files, a server of the agent's own by
 // another name stays, and each one's sign-in goes with it. One that can't
 // be taken out stays, and is said in Unremoved.

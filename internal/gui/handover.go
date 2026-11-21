@@ -12,21 +12,21 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/handoff"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/update"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/handoff"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/update"
 )
 
 // A restart to update on a Mac or Linux hands the gateway to the new
-// version rather than ending it (xuanwo on X): the new magpie is started
+// version rather than ending it (xuanwo on X): the new blackpie is started
 // while this one runs, takes the socket the gateway listens on
 // (internal/handoff) and serves the next requests on it, while this one
 // stops accepting, finishes the requests it has, and quits. Nothing an
 // agent sends is refused or cut short on the way, so the restart waits
 // only for what can't go on in another process: the turns of Claude Code
 // run through the subscription bridge (restartBusy). Windows can't hand a
-// socket over this way and `magpie web` re-executes in place; both still
+// socket over this way and `blackpie web` re-executes in place; both still
 // wait for the gateway to be idle (#577).
 //
 // The two never show at once. On a Mac this one lets go of its instance
@@ -36,17 +36,17 @@ import (
 // before it puts up its tray icon; this one keeps its own until then.
 
 // handoverHost is set by the app (Run): a restart there may hand the
-// gateway over. `magpie web` and tests leave it unset.
+// gateway over. `blackpie web` and tests leave it unset.
 var handoverHost atomic.Bool
 
-// startExe is the program this magpie started as, symlinks resolved; an
+// startExe is the program this blackpie started as, symlinks resolved; an
 // update puts the new version at the same path (on Linux the running
 // one's own path reads "(deleted)" once it has).
 var startExe string
 
 // handsOver is whether a restart now would hand the gateway over.
 var handsOver = func() bool {
-	if !handoverHost.Load() || gateway.Handover || os.Getenv("MAGPIE_NO_HANDOVER") != "" || startExe == "" || moving.Load() {
+	if !handoverHost.Load() || gateway.Handover || os.Getenv("BLACKPIE_NO_HANDOVER") != "" || startExe == "" || moving.Load() {
 		return false
 	}
 	if runtime.GOOS != "darwin" && runtime.GOOS != "linux" {
@@ -72,11 +72,11 @@ func blocking(b gateway.Busy, handover bool) gateway.Busy {
 // pending is the handover under way, nil while none is.
 var pending atomic.Pointer[handover]
 
-// handedOver is set once the new magpie serves the gateway: this one's
+// handedOver is set once the new blackpie serves the gateway: this one's
 // end leaves what goes with the gateway (Codex's failover) to it.
 var handedOver atomic.Bool
 
-// onHandedOver hides this magpie once the new one serves (the Mac's menu
+// onHandedOver hides this blackpie once the new one serves (the Mac's menu
 // bar icon and windows); set by Run.
 var onHandedOver func()
 
@@ -88,7 +88,7 @@ type handover struct {
 	quit     chan func()  // the caller's quit, called once done (leave)
 }
 
-// Waits a handover gives the new magpie: to start and say hello, and to
+// Waits a handover gives the new blackpie: to start and say hello, and to
 // serve on the socket once it has it.
 var (
 	helloWait = 60 * time.Second
@@ -154,7 +154,7 @@ func leave(quit func()) {
 	quit()
 }
 
-// run hands the gateway over and quits: once the new magpie serves on its
+// run hands the gateway over and quits: once the new blackpie serves on its
 // socket and this one has finished its requests, or, should it not take
 // it in time, as a restart did before (the new one opened once this one
 // has exited).
@@ -202,7 +202,7 @@ func (ho *handover) run() {
 	}
 	ho.offer.Withdraw()
 	handedOver.Store(true)
-	log.Printf("update: magpie %s (pid %d) serves the gateway now; this one finishes its requests and quits", c.Hello.Version, c.Hello.PID)
+	log.Printf("update: blackpie %s (pid %d) serves the gateway now; this one finishes its requests and quits", c.Hello.Version, c.Hello.PID)
 	if onHandedOver != nil {
 		onHandedOver()
 	}
@@ -237,10 +237,10 @@ func (ho *handover) fail(err error) {
 	}
 }
 
-// takeOver, in the new magpie, takes the gateway from the one that
+// takeOver, in the new blackpie, takes the gateway from the one that
 // started it, when that one hands it over: its socket is this one's to
 // serve, and the tool calls of its Claude Code runs go back to it. The
-// pid of the magpie before, 0 when none hands over.
+// pid of the blackpie before, 0 when none hands over.
 func takeOver(exe string) int {
 	t, err := handoff.Take(settings.Dir(), exe, handoff.Hello{PID: os.Getpid(), Version: Version}, 30*time.Second)
 	if err != nil {
@@ -254,7 +254,7 @@ func takeOver(exe string) int {
 	gateway.Inherit(t.Listener, func() {
 		once.Do(func() {
 			if err := t.Ack(); err != nil {
-				log.Println("update: the magpie before didn't hear that this one serves:", err)
+				log.Println("update: the blackpie before didn't hear that this one serves:", err)
 			}
 		})
 	})
@@ -263,7 +263,7 @@ func takeOver(exe string) int {
 	return t.Meta.PID
 }
 
-// handedOffWait is how long the new magpie on Linux waits for the one
+// handedOffWait is how long the new blackpie on Linux waits for the one
 // before to quit: its requests' drain (gateway.handedOffDrain) and a
 // minute.
 var handedOffWait = 16 * time.Minute

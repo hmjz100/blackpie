@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/appdir"
 )
 
 // Reading Settings must not turn an installed app into a portable one on

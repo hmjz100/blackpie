@@ -18,7 +18,7 @@ func TestDiffLines(t *testing.T) {
 	for i := 0; i < 30000; i++ {
 		fmt.Fprintf(&big, "[projects.\"/p/%d\"]\ntrust_level = \"trusted\"\n", i)
 	}
-	before := "model = \"magpie/deepseek/pro\"\nmodel_provider = \"magpie\"\napi_key = \"sk-live-123\"\n" + big.String() + "[model_providers.magpie]\nname = \"magpie\"\n"
+	before := "model = \"blackpie/deepseek/pro\"\nmodel_provider = \"blackpie\"\napi_key = \"sk-live-123\"\n" + big.String() + "[model_providers.blackpie]\nname = \"blackpie\"\n"
 	after := "model = \"gpt-6\"\nopenai_key = \"sk-live-456\"\n" + big.String()
 	start := time.Now()
 	got := diffLines(before, after)
@@ -26,12 +26,12 @@ func TestDiffLines(t *testing.T) {
 		t.Fatalf("took %s", d)
 	}
 	want := []LineDiff{
-		{Op: "~", Text: `model = "gpt-6"`, Was: `model = "magpie/deepseek/pro"`},
+		{Op: "~", Text: `model = "gpt-6"`, Was: `model = "blackpie/deepseek/pro"`},
 		{Op: "+", Text: "openai_key = ••••"},
-		{Op: "-", Text: `model_provider = "magpie"`},
+		{Op: "-", Text: `model_provider = "blackpie"`},
 		{Op: "-", Text: "api_key = ••••"},
-		{Op: "-", Text: "[model_providers.magpie]"},
-		{Op: "-", Text: `name = "magpie"`},
+		{Op: "-", Text: "[model_providers.blackpie]"},
+		{Op: "-", Text: `name = "blackpie"`},
 	}
 	if fmt.Sprint(got) != fmt.Sprint(want) {
 		t.Fatalf("got  %v\nwant %v", got, want)
@@ -55,16 +55,16 @@ func TestDiffLines(t *testing.T) {
 		fmt.Fprintf(&table, "  \"m%d\": {\"name\": \"M %d\"},\n", i, i)
 	}
 	start = time.Now()
-	d := diffLines("{\n\"model\": \"magpie/x\",\n\"provider\": {\n"+table.String()+"}\n}\n", "{\n\"provider\": {\n}\n}\n")
-	if time.Since(start) > 2*time.Second || len(d) != 7001 || d[0] != (LineDiff{Op: "-", Text: `"model": "magpie/x",`}) {
+	d := diffLines("{\n\"model\": \"blackpie/x\",\n\"provider\": {\n"+table.String()+"}\n}\n", "{\n\"provider\": {\n}\n}\n")
+	if time.Since(start) > 2*time.Second || len(d) != 7001 || d[0] != (LineDiff{Op: "-", Text: `"model": "blackpie/x",`}) {
 		t.Fatalf("a table taken out: %d lines in %s, first %v", len(d), time.Since(start), d[:min(len(d), 1)])
 	}
 }
 
 func TestMask(t *testing.T) {
-	const compact = `[{"requestHeaders":{"Authorization":"Bearer magpie"}}]`
+	const compact = `[{"requestHeaders":{"Authorization":"Bearer blackpie"}}]`
 	for in, want := range map[string]string{
-		`  "ANTHROPIC_AUTH_TOKEN": "magpie",`:          `  "ANTHROPIC_AUTH_TOKEN": "magpie",`,
+		`  "ANTHROPIC_AUTH_TOKEN": "blackpie",`:          `  "ANTHROPIC_AUTH_TOKEN": "blackpie",`,
 		`  "ANTHROPIC_API_KEY": "sk-ant-x",`:           `  "ANTHROPIC_API_KEY": ••••`,
 		`export OPENAI_API_KEY=sk-1`:                   `export OPENAI_API_KEY= ••••`,
 		`env_key = "$KEY"`:                             `env_key = "$KEY"`,
@@ -98,8 +98,8 @@ func TestElapsed(t *testing.T) {
 	}
 }
 
-// The process that disconnects on a copy takes as magpie's the providers
-// the magpie asking has on, also those it reads from another agent's
+// The process that disconnects on a copy takes as blackpie's the providers
+// the blackpie asking has on, also those it reads from another agent's
 // sign-in the copy doesn't hold (Codex's auth.json on Windows): a Claude Code
 // on codex/… had an empty preview.
 func TestDryRunKnowsTheAskersProviders(t *testing.T) {
@@ -107,8 +107,8 @@ func TestDryRunKnowsTheAskersProviders(t *testing.T) {
 		dryProviders = nil
 		disconnectDryRun = false
 	})
-	if isMagpie("elsewhere/gpt-x") {
-		t.Fatal("an unknown provider's model is magpie's")
+	if isBlackpie("elsewhere/gpt-x") {
+		t.Fatal("an unknown provider's model is blackpie's")
 	}
 	p := filepath.Join(t.TempDir(), dryProvidersFile)
 	if err := os.WriteFile(p, []byte("elsewhere\nother"), 0o600); err != nil {
@@ -116,7 +116,7 @@ func TestDryRunKnowsTheAskersProviders(t *testing.T) {
 	}
 	t.Setenv(dryProvidersVar, p)
 	_ = DryRun("no-such-agent")
-	if !isMagpie("elsewhere/gpt-x") || isMagpie("third/gpt-x") || isMagpie("elsewhere") {
+	if !isBlackpie("elsewhere/gpt-x") || isBlackpie("third/gpt-x") || isBlackpie("elsewhere") {
 		t.Fatalf("held %v", dryProviders)
 	}
 }

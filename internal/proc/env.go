@@ -3,7 +3,7 @@ package proc
 import (
 	"context"
 	"errors"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"strings"
 )
 

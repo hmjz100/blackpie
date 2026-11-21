@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 func TestArrangedKeysAreGatewayCandidates(t *testing.T) {

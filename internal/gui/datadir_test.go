@@ -10,11 +10,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/datamove"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/datamove"
 )
 
-// moveHere is a magpie in a folder of its own, its data installed, and a
+// moveHere is a blackpie in a folder of its own, its data installed, and a
 // move here whose steps stand in for the window's: idle at once, nothing
 // to stop.
 func moveHere(t *testing.T) (exe string, thawed *int) {
@@ -30,7 +30,7 @@ func moveHere(t *testing.T) (exe string, thawed *int) {
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(home, ".config"))
 	t.Setenv("XDG_CACHE_HOME", filepath.Join(home, ".cache"))
 	t.Setenv("APPDATA", filepath.Join(home, "AppData", "Roaming"))
-	exe = filepath.Join(dir, "app", "moepie.exe")
+	exe = filepath.Join(dir, "app", "blackpie.exe")
 	for path, body := range map[string]string{exe: "binary", filepath.Join(appdir.Installed(), "settings.json"): "{}"} {
 		os.MkdirAll(filepath.Dir(path), 0o755)
 		if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
@@ -245,7 +245,7 @@ func TestDataMoveShowsResolvedCachePaths(t *testing.T) {
 	}
 }
 
-// magpie web's page and a browser on the app's can't move the data: the
+// blackpie web's page and a browser on the app's can't move the data: the
 // app quits for it.
 func TestDataMoveFromTheWindowOnly(t *testing.T) {
 	moveHere(t)

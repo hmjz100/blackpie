@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// heatonz on Discord (Hermes Agent to magpie in Docker): requests held
+// heatonz on Discord (Hermes Agent to blackpie in Docker): requests held
 // 2m0s "without routing it to any provider", the report's one wait "body
 // 2m0s (under way)". A body that keeps coming, a byte at a time and never
 // idle for the read's own limit, reached unroutedMost while it was still
@@ -94,11 +94,11 @@ func isClosedConn(err error) bool {
 
 // A full run caught the trickle above red with a 504 (#4511): the hold
 // ran out between two of its reads, and the read's absence alone was
-// taken for a hold of magpie's own. Less of the body having come than
+// taken for a hold of blackpie's own. Less of the body having come than
 // the request's own Content-Length says, once its read has begun, the
 // body is still arriving and the time is the client's, inside a read or
 // between two. Before its first read, in the wait for body room, the
-// time is magpie's own.
+// time is blackpie's own.
 func TestUnroutedBodyArrivingBetweenReads(t *testing.T) {
 	r := httptest.NewRequest("POST", "/v1/chat/completions", strings.NewReader(strings.Repeat(" ", 400)))
 	u := &unroutedHold{r: r}
@@ -128,7 +128,7 @@ func TestUnroutedBodyArrivingBetweenReads(t *testing.T) {
 }
 
 // A request waiting for body room before its first read is held by
-// magpie, not by its client, whose body may all be sent: it is not
+// blackpie, not by its client, whose body may all be sent: it is not
 // answered 408 "its body was still arriving".
 func TestUnroutedBodyRoomWaitNot408(t *testing.T) {
 	t.Setenv("XDG_CACHE_HOME", t.TempDir())
@@ -165,6 +165,6 @@ func TestUnroutedBodyRoomWaitNot408(t *testing.T) {
 	b, _ := io.ReadAll(res.Body)
 	res.Body.Close()
 	if res.StatusCode == http.StatusRequestTimeout || strings.Contains(string(b), "its body was still arriving") {
-		t.Fatalf("a request waiting for magpie's body room was answered %d %s", res.StatusCode, b)
+		t.Fatalf("a request waiting for blackpie's body room was answered %d %s", res.StatusCode, b)
 	}
 }

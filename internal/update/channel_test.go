@@ -9,7 +9,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // stableFor saves Settings' Update channel for one test and puts the one
@@ -44,7 +44,7 @@ func TestLatestAsksTheChannel(t *testing.T) {
 		json.NewEncoder(w).Encode(Release{Version: v})
 	}))
 	defer srv.Close()
-	t.Setenv("MAGPIE_UPDATE_FEED", srv.URL+"/api/latest")
+	t.Setenv("BLACKPIE_UPDATE_FEED", srv.URL+"/api/latest")
 	ctx := context.Background()
 
 	for _, c := range []struct{ channel, lang, query, version string }{

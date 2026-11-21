@@ -9,7 +9,7 @@ import (
 )
 
 // dirLink makes path a link to the folder target: a junction on Windows,
-// what Scoop hangs magpie's data folder off its install folder with, and a
+// what Scoop hangs blackpie's data folder off its install folder with, and a
 // symlink elsewhere.
 func dirLink(t *testing.T, target, path string) {
 	t.Helper()
@@ -36,7 +36,7 @@ func TestWindowPageThroughLinkedConfigDir(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(pkg, "page"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(pkg, "package.json"), []byte(`{"name":"chat","main":"host.js","magpie":{"page":{"title":"Chat","file":"page/index.html"},"permissions":["usage:summary"]}}`), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(pkg, "package.json"), []byte(`{"name":"chat","main":"host.js","blackpie":{"page":{"title":"Chat","file":"page/index.html"},"permissions":["usage:summary"]}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(pkg, "page", "index.html"), []byte("<p>hi</p>"), 0o644); err != nil {
@@ -51,13 +51,13 @@ func TestWindowPageThroughLinkedConfigDir(t *testing.T) {
 	}
 	dirLink(t, secret, filepath.Join(pkg, "page", "out"))
 
-	// apps\magpie-ai\<ver>\data → persist\data, as Scoop lays it out
+	// apps\blackpie-ai\<ver>\data → persist\data, as Scoop lays it out
 	app := filepath.Join(root, "apps", "1.0")
 	if err := os.MkdirAll(app, 0o755); err != nil {
 		t.Fatal(err)
 	}
 	dirLink(t, real, filepath.Join(app, "data"))
-	// and the exe started through apps\magpie-ai\current → <ver>
+	// and the exe started through apps\blackpie-ai\current → <ver>
 	dirLink(t, app, filepath.Join(root, "apps", "current"))
 
 	for _, data := range []string{filepath.Join(app, "data"), filepath.Join(root, "apps", "current", "data")} {

@@ -14,9 +14,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // nativeSealedReply is a Responses stream whose output is one compaction item,
@@ -48,7 +48,7 @@ func nativeAsk(t *testing.T, model, body string) (int, string) {
 // #1099: a provider set to compact natively is asked Codex's
 // compaction_trigger as Codex sent it, and the compaction it seals goes
 // back to Codex unchanged; the next turn carries it to the same provider
-// as it is. One not set to keeps magpie's summary (magpie1:).
+// as it is. One not set to keeps blackpie's summary (blackpie1:).
 func TestNativeCompactionPassesTheTrigger(t *testing.T) {
 	f := &fake{t: t, reply: nativeSealedReply("gAAAAB-sealed-by-relay")}
 	setup(t, provider.Responses, f)
@@ -57,12 +57,12 @@ func TestNativeCompactionPassesTheTrigger(t *testing.T) {
 		w.WriteHeader(400)
 	})
 
-	// off: magpie summarises, the trigger never reaches the relay
+	// off: blackpie summarises, the trigger never reaches the relay
 	f.reply = sse(
 		`data: {"type":"response.output_item.done","output_index":0,"item":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"SUMMARY"}]}}`,
 		`data: {"type":"response.completed","response":{"id":"resp_s","status":"completed","output":[],"usage":{"input_tokens":1,"output_tokens":1,"total_tokens":2}}}`)
 	code, body := nativeAsk(t, "fake/m1", compactTurn)
-	if code != 200 || strings.Contains(string(f.got), "compaction_trigger") || !strings.Contains(body, magpieCompaction) {
+	if code != 200 || strings.Contains(string(f.got), "compaction_trigger") || !strings.Contains(body, blackpieCompaction) {
 		t.Fatalf("off: %d %s\nrelay got %s", code, body, f.got)
 	}
 
@@ -79,7 +79,7 @@ func TestNativeCompactionPassesTheTrigger(t *testing.T) {
 	if f.path != "/v1/responses" {
 		t.Errorf("asked at %s", f.path)
 	}
-	if !strings.Contains(body, `"encrypted_content":"gAAAAB-sealed-by-relay"`) || strings.Contains(body, magpieCompaction) {
+	if !strings.Contains(body, `"encrypted_content":"gAAAAB-sealed-by-relay"`) || strings.Contains(body, blackpieCompaction) {
 		t.Errorf("Codex got %s", body)
 	}
 
@@ -92,7 +92,7 @@ func TestNativeCompactionPassesTheTrigger(t *testing.T) {
 }
 
 // A relay that refuses compaction_trigger has its own error go back to
-// Codex, not a summary of magpie's in its place.
+// Codex, not a summary of blackpie's in its place.
 func TestNativeCompactionRefusalGoesBack(t *testing.T) {
 	f := &fake{t: t}
 	f.refuse = func(body []byte) (int, string) {
@@ -105,7 +105,7 @@ func TestNativeCompactionRefusalGoesBack(t *testing.T) {
 	chatgpt(t, func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(400) })
 	nativeOn(t, "fake")
 	code, body := nativeAsk(t, "fake/m1", compactTurn)
-	if code != 400 || !strings.Contains(body, "Invalid value: 'compaction_trigger'") || strings.Contains(body, magpieCompaction) {
+	if code != 400 || !strings.Contains(body, "Invalid value: 'compaction_trigger'") || strings.Contains(body, blackpieCompaction) {
 		t.Fatalf("%d %s", code, body)
 	}
 	if f.calls != 1 {
@@ -147,7 +147,7 @@ func TestNativeCompactionStaysWithItsWriter(t *testing.T) {
 
 // GitHub Copilot's GPT models answer on Responses, so a Copilot account
 // set to compact natively is asked Codex's compaction as it was sent; its
-// Claude models, on chat completions, keep magpie's summary.
+// Claude models, on chat completions, keep blackpie's summary.
 func TestNativeCompactionCopilot(t *testing.T) {
 	var mu sync.Mutex
 	var asked []string
@@ -193,7 +193,7 @@ func TestNativeCompactionCopilot(t *testing.T) {
 	mu.Unlock()
 
 	code, body = nativeAsk(t, "copilot/claude-sonnet-4.5", compactTurn)
-	if code != 200 || !strings.Contains(body, magpieCompaction) {
+	if code != 200 || !strings.Contains(body, blackpieCompaction) {
 		t.Fatalf("claude: %d %s", code, body)
 	}
 	mu.Lock()
@@ -382,10 +382,10 @@ func TestNativeCompactionWriterThroughAGroupWhoseListLacksTheModel(t *testing.T)
 	}
 }
 
-// #2582, #2642: Codex compacting one of its own models through magpie's
+// #2582, #2642: Codex compacting one of its own models through blackpie's
 // Codex accounts compacts natively only with the codex provider's native
 // compaction on. Off (the default), the trigger never reaches the ChatGPT
-// backend: magpie's summary comes back, which any account reads, and no
+// backend: blackpie's summary comes back, which any account reads, and no
 // account is recorded as the conversation's only reader. Before, the
 // trigger was relayed whatever the setting and the seal bound the
 // conversation to the account that answered, so switching to another
@@ -417,7 +417,7 @@ func TestCodexOwnModelCompactionHonoursTheToggle(t *testing.T) {
 	}
 
 	code, body := nativeAsk(t, "gpt-5.5", compactTurn)
-	if code != 200 || !strings.Contains(body, magpieCompaction) || strings.Contains(body, "gAAAAB-sealed-by-chatgpt") {
+	if code != 200 || !strings.Contains(body, blackpieCompaction) || strings.Contains(body, "gAAAAB-sealed-by-chatgpt") {
 		t.Fatalf("off: %d %s", code, body)
 	}
 	mu.Lock()
@@ -437,7 +437,7 @@ func TestCodexOwnModelCompactionHonoursTheToggle(t *testing.T) {
 
 	nativeOn(t, "codex")
 	code, body = nativeAsk(t, "gpt-5.5", compactTurn)
-	if code != 200 || !strings.Contains(body, `"encrypted_content":"gAAAAB-sealed-by-chatgpt"`) || strings.Contains(body, magpieCompaction) {
+	if code != 200 || !strings.Contains(body, `"encrypted_content":"gAAAAB-sealed-by-chatgpt"`) || strings.Contains(body, blackpieCompaction) {
 		t.Fatalf("on: %d %s", code, body)
 	}
 	mu.Lock()
@@ -795,12 +795,12 @@ func TestCodexNativeLegacyCompactKeepsPoolRestrictions(t *testing.T) {
 // when a key that lists the model can be asked it on the Responses API.
 // When the vendor's lists hold the model to a key that speaks no
 // Responses there (its key is set to Chat, so WithKey leaves it no
-// Responses URL), the trigger is not kept: magpie summarises instead,
+// Responses URL), the trigger is not kept: blackpie summarises instead,
 // which the listed key reads, as it does when native compaction is off.
 // Before, the trigger was kept because the provider (whose setting is
 // what kept it) carries it, and then refused saying none of the keys that
 // serve the model can be asked it on Responses — a dead end, when
-// magpie's summary was one turn away.
+// blackpie's summary was one turn away.
 func TestNativeCompactionTriggerSummarisedWhenNoListedKeyCarriesIt(t *testing.T) {
 	noRests()
 	t.Cleanup(noRests)
@@ -841,7 +841,7 @@ func TestNativeCompactionTriggerSummarisedWhenNoListedKeyCarriesIt(t *testing.T)
 	if f.path != "/v1/chat/completions" || f.head.Get("Authorization") != "Bearer kchat" {
 		t.Errorf("the summary didn't go by the listed key: %s %q", f.path, f.head.Get("Authorization"))
 	}
-	if !strings.Contains(body, magpieCompaction) || strings.Contains(body, "gAAAAB") {
+	if !strings.Contains(body, blackpieCompaction) || strings.Contains(body, "gAAAAB") {
 		t.Errorf("Codex got %s", body)
 	}
 }
@@ -887,7 +887,7 @@ func TestNativeCompactionTriggerThroughTheListedKeyThatCarriesIt(t *testing.T) {
 	if f.path != "/v1/responses" || f.head.Get("Authorization") != "Bearer kcarries" {
 		t.Errorf("the trigger didn't go by the listed key: %s %q", f.path, f.head.Get("Authorization"))
 	}
-	if !strings.Contains(body, `"encrypted_content":"gAAAAB-sealed-by-listed"`) || strings.Contains(body, magpieCompaction) {
+	if !strings.Contains(body, `"encrypted_content":"gAAAAB-sealed-by-listed"`) || strings.Contains(body, blackpieCompaction) {
 		t.Errorf("Codex got %s", body)
 	}
 }

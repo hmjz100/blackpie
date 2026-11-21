@@ -3,10 +3,10 @@ package agent
 // fx (fx.sh, Vercel Labs) keeps its settings in ~/.fx/settings.json: the
 // provider it talks to under "provider" (gateway, codex, grok or one of
 // the user's own), each provider's model under "models", and providers of
-// the user's own under "providers". magpie adds itself there as the
-// provider "magpie", keyless (auth none), speaking chat completions, with
-// the catalog as its model_metadata; a model through magpie is
-// "magpie/<provider>/<model>" here, provider "magpie" and models.magpie
+// the user's own under "providers". blackpie adds itself there as the
+// provider "blackpie", keyless (auth none), speaking chat completions, with
+// the catalog as its model_metadata; a model through blackpie is
+// "blackpie/<provider>/<model>" here, provider "blackpie" and models.blackpie
 // "<provider>/<model>" in fx's settings. fx sends no effort to a provider
 // of the user's own, so there is no effort to pick.
 
@@ -17,8 +17,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/edit"
 )
 
 // fxMaxModels is how many models fx takes in a provider's model_metadata;
@@ -32,7 +32,7 @@ func fx(home string) *Agent { return fxIn(here(home)) }
 func fxIn(at place) *Agent {
 	dir := at.join(".fx")
 	path := filepath.Join(dir, "settings.json")
-	// magpie's provider, with what the user set on it in fx kept
+	// blackpie's provider, with what the user set on it in fx kept
 	fxProvider := func(cur string) any { return fxKept(path, fxProviderAt(cur, at.v1())) }
 	get := func(k string) string { v, _ := edit.GetJSON(path, k); return v }
 	// the provider fx talks to; unset, it is Vercel's AI Gateway
@@ -50,9 +50,9 @@ func fxIn(at place) *Agent {
 		}
 		return get("model")
 	}
-	dropMagpie := func() error {
-		keys := []string{"providers." + magpieID, "models." + magpieID}
-		if get("provider") == magpieID {
+	dropBlackpie := func() error {
+		keys := []string{"providers." + blackpieID, "models." + blackpieID}
+		if get("provider") == blackpieID {
 			keys = append(keys, "provider")
 		}
 		return edit.DelJSON(path, keys...)
@@ -65,7 +65,7 @@ func fxIn(at place) *Agent {
 		detect:   func() bool { return agentDir(dir) },
 		ListOnly: true,
 		Sync: func() error {
-			return syncJSON(path, "providers."+magpieID, func() any { return fxProvider(fxModels(path)[magpieID]) })
+			return syncJSON(path, "providers."+blackpieID, func() any { return fxProvider(fxModels(path)[blackpieID]) })
 		},
 		Notice: func() string {
 			if Running(`(^|/)fx( |$)`) {
@@ -74,33 +74,33 @@ func fxIn(at place) *Agent {
 			return ""
 		},
 		Check: func() string {
-			if prov() != magpieID {
+			if prov() != blackpieID {
 				return ""
 			}
-			return wiringOff("fx", path, func(k string) (string, bool) { return edit.GetJSON(path, "providers."+magpieID+"."+k) },
+			return wiringOff("fx", path, func(k string) (string, bool) { return edit.GetJSON(path, "providers."+blackpieID+"."+k) },
 				"base_url", at.v1())
 		},
 		Fields: []Field{{
 			Key: "model", Label: "model",
 			Get: func() string {
-				if p := prov(); p != magpieID {
+				if p := prov(); p != blackpieID {
 					return own(p)
 				}
-				if m := fxModels(path)[magpieID]; m != "" {
-					return magpieID + "/" + m
+				if m := fxModels(path)[blackpieID]; m != "" {
+					return blackpieID + "/" + m
 				}
 				return ""
 			},
 			Set: func(v string) error {
-				if ref, ok := strings.CutPrefix(v, magpieID+"/"); ok && isMagpie(ref) {
+				if ref, ok := strings.CutPrefix(v, blackpieID+"/"); ok && isBlackpie(ref) {
 					return edit.SetJSON(path,
-						edit.KV{Path: "providers." + magpieID, Value: fxProvider(ref)},
-						edit.KV{Path: "provider", Value: magpieID},
-						edit.KV{Path: "models." + magpieID, Value: ref})
+						edit.KV{Path: "providers." + blackpieID, Value: fxProvider(ref)},
+						edit.KV{Path: "provider", Value: blackpieID},
+						edit.KV{Path: "models." + blackpieID, Value: ref})
 				}
-				// fx's own: magpie steps out, back to the provider fx
+				// fx's own: blackpie steps out, back to the provider fx
 				// talks to without it
-				if err := dropMagpie(); err != nil {
+				if err := dropBlackpie(); err != nil {
 					return err
 				}
 				p := prov()
@@ -115,10 +115,10 @@ func fxIn(at place) *Agent {
 			},
 			Options: func(cur map[string]string) []Option {
 				var out []Option
-				if v := cur["model"]; v != "" && !usesMagpie(v) {
+				if v := cur["model"]; v != "" && !usesBlackpie(v) {
 					out = append(out, Option{Value: v, Icon: modelIcon("", v)})
 				}
-				return withVia(out, "fx", magpieID+"/")
+				return withVia(out, "fx", blackpieID+"/")
 			},
 		}},
 	}
@@ -145,12 +145,12 @@ func fxModels(path string) map[string]string {
 	return out
 }
 
-// fxProviderAt is magpie's entry in settings.json's providers, for an fx
+// fxProviderAt is blackpie's entry in settings.json's providers, for an fx
 // reaching the gateway's /v1 at v1. Its model_metadata is what fx's model
 // picker lists: the catalog, the model in use first so it is never the one
 // cut at fx's limit.
 func fxProviderAt(cur, v1 string) map[string]any {
-	all := magpieModels("fx")
+	all := blackpieModels("fx")
 	slices.SortStableFunc(all, func(a, b catalog.Model) int {
 		switch {
 		case a.ID == cur && b.ID != cur:
@@ -181,16 +181,16 @@ func fxProviderAt(cur, v1 string) map[string]any {
 	}
 }
 
-// fxKept is want, magpie's provider in fx's settings.json at path, with
+// fxKept is want, blackpie's provider in fx's settings.json at path, with
 // what the user set on the one there kept: fx takes a reviewer_model on a
-// provider (the model its auto permission mode asks), which magpie doesn't
-// write, and a tool_choice_mode, which magpie writes "send" and the user
+// provider (the model its auto permission mode asks), which blackpie doesn't
+// write, and a tool_choice_mode, which blackpie writes "send" and the user
 // may turn to "omit" (src/core/config/configured_provider.zig); a sync wrote
 // both away on every start, as T3 Code's did (#2030). Its protocol,
-// address, auth and model_metadata are magpie's; auth is written whole, as
+// address, auth and model_metadata are blackpie's; auth is written whole, as
 // fx refuses an env beside type none.
 func fxKept(path string, want map[string]any) any {
-	key := "providers." + magpieID
+	key := "providers." + blackpieID
 	if mode, ok := edit.GetJSON(path, key+".tool_choice_mode"); ok && (mode == "omit" || mode == "send") {
 		want["tool_choice_mode"] = mode
 	}

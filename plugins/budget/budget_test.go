@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/gwbudget"
-	"github.com/yetone/magpie/internal/pluginrt"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/gwbudget"
+	"github.com/hmjz100/blackpie/internal/pluginrt"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 func TestMain(m *testing.M) { testenv.Main(m) }

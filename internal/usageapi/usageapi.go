@@ -1,6 +1,6 @@
-// Package usageapi builds what magpie tells of its usage log: the Usage
+// Package usageapi builds what blackpie tells of its usage log: the Usage
 // page's summary and its requests, a page at a time. The GUI's /api/usage
-// and the gateway's /v1/magpie/usage answer the same JSON from here, so an
+// and the gateway's /v1/blackpie/usage answer the same JSON from here, so an
 // app reading one reads the other.
 package usageapi
 
@@ -14,16 +14,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 // Client is an agent as the usage JSON names it.
 type Client struct{ ID, Name, Icon string }
 
-// Clients are the agents magpie knows, for their names and logos: set by
+// Clients are the agents blackpie knows, for their names and logos: set by
 // the GUI (internal/agent imports the gateway, which imports this). Unset,
 // an agent is named by its id.
 var Clients func() []Client
@@ -65,7 +65,7 @@ type Usage struct {
 }
 
 // State is the Usage page's summary of a period: what /api/usage and the
-// gateway's GET /v1/magpie/usage answer.
+// gateway's GET /v1/blackpie/usage answer.
 func State(p usage.Period) Usage { return stateOf(usage.Summarize(p)) }
 
 // PageSessions is how many sessions Page lists: the Usage page draws none of
@@ -86,7 +86,7 @@ func PageIn(p usage.Period, zone *time.Location) Usage {
 
 // ZoneOf is the reader's time zone, which the Usage page names in ?tz= (its
 // browser's IANA name, as Intl gives it) for its days and hours to be the
-// reader's: magpie web may be read from another zone than the computer's
+// reader's: blackpie web may be read from another zone than the computer's
 // (Outvi V on Discord). This computer's when it names none or one unknown
 // here.
 func ZoneOf(r *http.Request) *time.Location { return usage.Zone(r.URL.Query().Get("tz")) }
@@ -133,7 +133,7 @@ func stateOf(s usage.Summary) Usage {
 }
 
 // providerFaces names a provider id from the usage log as the Usage page
-// shows it: by the provider set up under it (all), by the name magpie
+// shows it: by the provider set up under it (all), by the name blackpie
 // knows it by when none is (a Claude Code subscription signed out of, a
 // preset's removed since: provider.KnownFace), and by the id itself only
 // when neither knows it. A session file without route evidence is a local
@@ -266,7 +266,7 @@ type Row struct {
 }
 
 // RowGroup is a usage.RowGroup with the name the page shows it by: a group
-// magpie found, as its rows' requested model is shown (auto/<model>).
+// blackpie found, as its rows' requested model is shown (auto/<model>).
 type RowGroup struct {
 	usage.RowGroup
 	Name string `json:"name,omitempty"`
@@ -294,8 +294,8 @@ type Ledger struct {
 	// the two together, so the page can show all three (#the usage report).
 	Through usage.Totals `json:"through"`
 	Direct  usage.Totals `json:"direct"`
-	// Reported: the calls a client told magpie of through POST
-	// /v1/magpie/usage/requests (#1874), which went straight to their vendor
+	// Reported: the calls a client told blackpie of through POST
+	// /v1/blackpie/usage/requests (#1874), which went straight to their vendor
 	Reported usage.Totals `json:"reported"`
 	// Agents, Providers and Purposes: those with calls in the period, for the filters
 	Agents    []Named  `json:"agents"`
@@ -322,7 +322,7 @@ type Share struct {
 
 // Account is a subscription account the Account filter offers: its
 // name, as the record keeps it and the filter asks by, the name the user
-// gave it in magpie when there is one (plugins#310), and the providers it
+// gave it in blackpie when there is one (plugins#310), and the providers it
 // answered for, by name.
 type Account struct {
 	ID        string   `json:"id"`
@@ -389,7 +389,7 @@ func LedgerPage(p usage.Period, f usage.Filter, offset, limit int) Ledger {
 	for _, g := range out.CallerKeys {
 		callerLabels[g.CallerKeyID] = g.Name
 	}
-	// a group magpie found is named as agents pick it, auto/<model>; the
+	// a group blackpie found is named as agents pick it, auto/<model>; the
 	// ledger keeps group/auto-<slug> (provider.CanonicalRef)
 	pub := map[string]string{}
 	wires := settings.Load().Wires()

@@ -1,8 +1,8 @@
 package gui
 
 import (
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // replaceKey puts a new value in place of one of a provider's keys
@@ -36,8 +36,8 @@ func replaceKey(id, ref, key string) error {
 	return nil
 }
 
-// liftRests lifts every rest of each key named, in the gateway this magpie
-// serves; one served by another magpie keeps them. Swapped in tests.
+// liftRests lifts every rest of each key named, in the gateway this blackpie
+// serves; one served by another blackpie keeps them. Swapped in tests.
 var liftRests = func(keys []string) {
 	if gw := served.Load(); gw != nil {
 		for _, k := range keys {

@@ -6,7 +6,7 @@ import (
 )
 
 func TestURLCarriesThePictureWhole(t *testing.T) {
-	t.Setenv("MAGPIE_ICON_PROXY", "")
+	t.Setenv("BLACKPIE_ICON_PROXY", "")
 	pic := "https://github.com/magpie-community.png?size=96&x=a b#c"
 	got := URL(pic)
 	u, err := url.Parse(got)
@@ -21,12 +21,12 @@ func TestURLCarriesThePictureWhole(t *testing.T) {
 	}
 }
 
-func TestURLLeavesUsemagpieAlone(t *testing.T) {
-	t.Setenv("MAGPIE_ICON_PROXY", "")
+func TestURLLeavesUseblackpieAlone(t *testing.T) {
+	t.Setenv("BLACKPIE_ICON_PROXY", "")
 	for u, want := range map[string]string{
-		"https://usemagpie.ai/partners/x.png":     "https://usemagpie.ai/partners/x.png",
-		"https://usemagpie.ai.evil.example/x.png": Base + "?url=" + url.QueryEscape("https://usemagpie.ai.evil.example/x.png"),
-		"https://evil.example/?usemagpie.ai":      Base + "?url=" + url.QueryEscape("https://evil.example/?usemagpie.ai"),
+		"https://useblackpie.ai/partners/x.png":     "https://useblackpie.ai/partners/x.png",
+		"https://useblackpie.ai.evil.example/x.png": Base + "?url=" + url.QueryEscape("https://useblackpie.ai.evil.example/x.png"),
+		"https://evil.example/?useblackpie.ai":      Base + "?url=" + url.QueryEscape("https://evil.example/?useblackpie.ai"),
 	} {
 		if got := URL(u); got != want {
 			t.Errorf("URL(%q) = %q, want %q", u, got, want)

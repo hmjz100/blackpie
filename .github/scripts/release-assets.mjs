@@ -2,9 +2,9 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 
 export const expectedAssets = [
-  ...['arm64', 'amd64'].flatMap((a) => [`moepie-darwin-${a}.dmg`, `moepie-darwin-${a}.zip`]),
-  ...['darwin-arm64', 'darwin-amd64', 'linux-amd64', 'linux-arm64', 'android-arm64'].map((p) => `moepie-cli-${p}`),
-  ...['amd64', 'arm64'].flatMap((a) => [`moepie-cli-windows-${a}.exe`, `moepie-windows-${a}.exe`, `moepie-linux-${a}`]),
+  ...['arm64', 'amd64'].flatMap((a) => [`blackpie-darwin-${a}.dmg`, `blackpie-darwin-${a}.zip`]),
+  ...['darwin-arm64', 'darwin-amd64', 'linux-amd64', 'linux-arm64', 'android-arm64'].map((p) => `blackpie-cli-${p}`),
+  ...['amd64', 'arm64'].flatMap((a) => [`blackpie-cli-windows-${a}.exe`, `blackpie-windows-${a}.exe`, `blackpie-linux-${a}`]),
 ].sort();
 
 const actual = readdirSync('dist').sort();

@@ -51,7 +51,7 @@ const latest = !releases.some((r) => !r.draft && !r.prerelease && /^v0\.1\.\d+$/
 // --target records the build SHA for prepare's retry/skip lookup only; the
 // reserved ref and verifyTag, not that metadata field, bind it to the build.
 gh('release', 'create', tag, ...files.map((f) => `dist/${f}`), '-R', repo,
-  '--verify-tag', '--target', sha, '--title', `moepie ${tag}`, '--notes-file', 'dist/release-notes.md', '--draft');
+  '--verify-tag', '--target', sha, '--title', `blackpie ${tag}`, '--notes-file', 'dist/release-notes.md', '--draft');
 const actual = JSON.parse(gh('release', 'view', tag, '-R', repo, '--json', 'assets')).assets.map((a) => a.name).sort();
 if (JSON.stringify(actual) !== JSON.stringify(files)) throw new Error('Uploaded asset names do not match; release remains draft');
 // Uploading may take minutes: do not publish if the ref moved meanwhile.

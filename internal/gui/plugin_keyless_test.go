@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/plugin"
 )
 
 func TestPluginSubscriptionCarriesSingleIdentity(t *testing.T) {

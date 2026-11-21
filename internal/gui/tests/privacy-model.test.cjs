@@ -24,7 +24,7 @@ const words = {
 };
 
 // model is the page's /api/privacy-model: a POST is recorded and moves it
-// along, as magpie would (downloading, then on and running on the GPU)
+// along, as blackpie would (downloading, then on and running on the GPU)
 function serve(lang, masking, model, posts) {
   const settings = () => ({ lang, theme: "light", redact: masking, redactPersonal: false });
   const state = { agents: [], profiles: [], settings: settings() };
@@ -72,7 +72,7 @@ async function open(engine, lang, width, masking, model, posts) {
   page.on("pageerror", (e) => errors.push(e.message));
   await page.route("**/*", serve(lang, masking, model, posts));
   await watchSettingsReads(page);
-  await page.goto("http://magpie.test/?view=settings&tab=privacy");
+  await page.goto("http://blackpie.test/?view=settings&tab=privacy");
   await page.locator("#redactList .row").first().waitFor();
   await settingsDrawn(page);
   return { browser, page, errors };
@@ -234,7 +234,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
 
   // the model is picked in the app's own menu beside the switch (#3578):
   // each model by its name, what it is and its size, in every language;
-  // picking one says so to magpie, and nothing is cut or moved
+  // picking one says so to blackpie, and nothing is cut or moved
   for (const lang of Object.keys(pickWords)) {
     for (const width of [1100, 640]) {
       test(`${engine} ${lang} ${width}px: the local model is picked from the app's menu`, async (t) => {
@@ -281,7 +281,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
 
   // the threshold (@Yayoi_no_yume on X): under the model, its default
   // or one the user picks from the app's menu, in every language; the
-  // pick is sent with the model it is for, and shown once magpie has it
+  // pick is sent with the model it is for, and shown once blackpie has it
   for (const lang of Object.keys(scoreWords)) {
     for (const width of [1100, 640]) {
       test(`${engine} ${lang} ${width}px: the model's threshold is picked from the app's menu`, async (t) => {

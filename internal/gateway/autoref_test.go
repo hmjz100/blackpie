@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
-// A group magpie found is listed as auto/<model> (ZeroClover on X), and
+// A group blackpie found is listed as auto/<model> (ZeroClover on X), and
 // served by that id and by its old group/auto-<slug> alike: one group, one
 // route, one name in the usage log, whichever an agent sent.
 func TestFoundGroupServedByBothIDs(t *testing.T) {

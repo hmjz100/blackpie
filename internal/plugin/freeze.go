@@ -14,11 +14,11 @@ var hostsLive = struct {
 	m map[*host]bool
 }{m: map[*host]bool{}}
 
-// hostsFrozen keeps a host from being started while magpie moves its data
+// hostsFrozen keeps a host from being started while blackpie moves its data
 // directory; hostMu guards it.
 var hostsFrozen bool
 
-var errFrozen = errors.New("magpie is moving its data directory")
+var errFrozen = errors.New("blackpie is moving its data directory")
 
 // Freeze stops every host, current and retiring, and waits up to timeout
 // for each Bun process to be waited for; none is started until Thaw. An

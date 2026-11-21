@@ -15,13 +15,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/browserext"
+	"github.com/hmjz100/blackpie/internal/browserext"
 )
 
 // The fixture page the real browser works in, served from this test.
 const browserFixture = `<!doctype html>
 <title>Fixture</title>
-<h1>Magpie fixture</h1>
+<h1>Blackpie fixture</h1>
 <input aria-label="Name" id="name">
 <button onclick="out.textContent = 'clicked ' + document.getElementById('name').value">Go</button>
 <select aria-label="Colour" onchange="out.textContent = 'colour ' + this.value"><option value="r">Red</option><option value="g">Green</option></select>
@@ -43,15 +43,15 @@ const browserFixture = `<!doctype html>
   document.addEventListener('mouseup', (e) => { if (down === 'src' && e.target.id === 'dst') out.textContent = 'dropped'; down = null; });
 </script>`
 
-// Magpie Browser in a real Chromium: the extension magpie writes, loaded
+// Blackpie Browser in a real Chromium: the extension blackpie writes, loaded
 // as a user loads it, connects to the gateway, and every tool an agent
-// calls is carried out in a real tab. Set MAGPIE_BROWSER_CHROME to a
+// calls is carried out in a real tab. Set BLACKPIE_BROWSER_CHROME to a
 // Chromium that takes --load-extension (Chrome for Testing, as Playwright
 // has it) to run it.
 func TestBrowserToolsInARealBrowser(t *testing.T) {
-	chrome := os.Getenv("MAGPIE_BROWSER_CHROME")
+	chrome := os.Getenv("BLACKPIE_BROWSER_CHROME")
 	if chrome == "" {
-		t.Skip("MAGPIE_BROWSER_CHROME names no Chromium")
+		t.Skip("BLACKPIE_BROWSER_CHROME names no Chromium")
 	}
 	fresh(t)
 	s := New()
@@ -156,9 +156,9 @@ func TestBrowserToolsInARealBrowser(t *testing.T) {
 		ok("browser_evaluate", map[string]any{"script": "() => document.getElementById('out').textContent"}, want)
 	}
 
-	page := ok("browser_tabs", map[string]any{"action": "new", "url": site.URL}, "Opened t", "Tab t", "Fixture", "Magpie fixture")
+	page := ok("browser_tabs", map[string]any{"action": "new", "url": site.URL}, "Opened t", "Tab t", "Fixture", "Blackpie fixture")
 	ok("browser_tabs", nil, "* t", site.URL)
-	page = ok("browser_snapshot", nil, `heading "Magpie fixture"`)
+	page = ok("browser_snapshot", nil, `heading "Blackpie fixture"`)
 	ok("browser_snapshot", map[string]any{"interactive": true}, `button "Go"`)
 
 	ok("browser_type", map[string]any{"ref": ref(page, "textbox", "Name"), "text": "Ada"}, "Typed into")
@@ -195,7 +195,7 @@ func TestBrowserToolsInARealBrowser(t *testing.T) {
 
 	ok("browser_scroll", map[string]any{"direction": "down", "amount": 600}, "Scrolled down 600px")
 	ok("browser_evaluate", map[string]any{"script": "window.scrollY"}, "600")
-	ok("browser_text", nil, "Magpie fixture", "Bottom of the page")
+	ok("browser_text", nil, "Blackpie fixture", "Bottom of the page")
 
 	shot := call("browser_screenshot", nil)
 	if shot.Result.IsError || shot.Result.Content[0].Type != "image" || shot.Result.Content[0].MimeType != "image/jpeg" {
@@ -210,8 +210,8 @@ func TestBrowserToolsInARealBrowser(t *testing.T) {
 	}
 
 	ok("browser_navigate", map[string]any{"url": site.URL + "/two"}, "Opened", "Page two")
-	ok("browser_navigate", map[string]any{"go": "back"}, "Went back", "Magpie fixture")
-	page = ok("browser_navigate", map[string]any{"go": "reload"}, "Reloaded", "Magpie fixture")
+	ok("browser_navigate", map[string]any{"go": "back"}, "Went back", "Blackpie fixture")
+	page = ok("browser_navigate", map[string]any{"go": "reload"}, "Reloaded", "Blackpie fixture")
 
 	// a link that opens a tab: the session goes on in it
 	two := ok("browser_click", map[string]any{"ref": ref(page, "link", "Open two")}, "opened a new tab", "Page two")

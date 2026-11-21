@@ -23,9 +23,9 @@ import (
 
 	"github.com/tidwall/jsonc"
 
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/proc"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // copilotCLIHeaders are what the CLI sends with its token.
@@ -55,8 +55,8 @@ func copilotCLIHome() string {
 }
 
 // CopilotWSLDirs, set by internal/agent, are the Copilot CLI's folders
-// (~/.copilot), as magpie opens them, in the WSL distros that run now:
-// magpie on Windows finds a Copilot CLI signed in inside one (#723,
+// (~/.copilot), as blackpie opens them, in the WSL distros that run now:
+// blackpie on Windows finds a Copilot CLI signed in inside one (#723,
 // jia2). Where ~/.copilot is a link the folder is where it leads (#4502).
 // nil, or none, off Windows. A stopped distro isn't in it: reading its
 // files would start it.
@@ -74,10 +74,10 @@ var copilotWSL struct {
 }
 
 // copilotCLILogin is the account the Copilot CLI is signed in to, with its
-// token: on this machine, or, for magpie on Windows, in a WSL distro that
+// token: on this machine, or, for blackpie on Windows, in a WSL distro that
 // runs now. A distro's token is read only from its config.json, where the
 // CLI keeps it when the distro has no keyring to put it in (WSL has none
-// unless one is set up): magpie can't reach a distro's keyring.
+// unless one is set up): blackpie can't reach a distro's keyring.
 func copilotCLILogin() (copilotApp, bool) {
 	if settings.AccountDiscoveryOff() {
 		return copilotApp{}, false

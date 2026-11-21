@@ -4,13 +4,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
-// An agent whose only models through magpie are routing groups is
-// connected on the first of them (#939: the switch said magpie had no
-// models Codex could use while `magpie codex group/folia-1` connected it).
+// An agent whose only models through blackpie are routing groups is
+// connected on the first of them (#939: the switch said blackpie had no
+// models Codex could use while `blackpie codex group/folia-1` connected it).
 func TestConnectOnARoutingGroupAlone(t *testing.T) {
 	home, _ := codexHome(t, "", "")
 	if err := provider.Save(provider.Provider{ID: "aaa", Name: "AAA", Chat: "https://a.example/v1", Key: "k", Models: []string{"m1"}}); err != nil {

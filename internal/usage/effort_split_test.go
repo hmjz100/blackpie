@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/sessions"
+	"github.com/hmjz100/blackpie/internal/sessions"
 )
 
 // Codex's effort before the last days is kept in effort-v1.json: a start
@@ -45,7 +45,7 @@ func TestCodexEffortSettledFromDisk(t *testing.T) {
 		requestCache.Lock()
 		requestCache.pairs = nil
 		requestCache.Unlock()
-		// moepie's whole-answer cache would answer before the split is asked
+		// blackpie's whole-answer cache would answer before the split is asked
 		os.Remove(codexEffortDiskPath())
 	}
 	restart()

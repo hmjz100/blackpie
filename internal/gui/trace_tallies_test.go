@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/gateway"
 )
 
 // The Routing page's accounts and keys counted each account's tried and

@@ -8,7 +8,7 @@
 //
 // The files grow long (hundreds of MB), so each one's parse is kept by path,
 // size and time, and a file that only grew is read on from where it was left.
-// The parses are kept on disk too, in magpie's cache folder.
+// The parses are kept on disk too, in blackpie's cache folder.
 package sessions
 
 import (
@@ -16,7 +16,7 @@ import (
 	"bytes"
 	"cmp"
 	"errors"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io"
 	"io/fs"
 	"maps"
@@ -34,12 +34,12 @@ import (
 	"unicode/utf8"
 
 	"github.com/klauspost/compress/zstd"
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/dirent"
-	"github.com/yetone/magpie/internal/proc"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/dirent"
+	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Tokens is a count of tokens. Input excludes what was read from cache.
@@ -117,10 +117,10 @@ type CodexIdentity struct {
 // Session is one agent session.
 type Session struct {
 	ReadOnly bool `json:"read_only,omitempty"`
-	// Gateway: seen only through magpie's gateway, with no file of the
+	// Gateway: seen only through blackpie's gateway, with no file of the
 	// agent's on this computer (external.go)
 	Gateway       bool          `json:"gateway,omitempty"`
-	Agent         string        `json:"agent"` // magpie agent id: claude, codex, opencode, pi, omp, zcode, dsh, cline, qoder, qoder-cn, grok, workbuddy, codebuddy, droid, cursor, hermes, alma, kimi, agy
+	Agent         string        `json:"agent"` // blackpie agent id: claude, codex, opencode, pi, omp, zcode, dsh, cline, qoder, qoder-cn, grok, workbuddy, codebuddy, droid, cursor, hermes, alma, kimi, agy
 	ID            string        `json:"id"`
 	Cwd           string        `json:"cwd"`
 	Title         string        `json:"title"` // the name it was given, else the agent's own title, else the first prompt
@@ -153,7 +153,7 @@ type Session struct {
 	// WSL is the WSL distro the session ran in, its files read through
 	// \\wsl.localhost (see wsl.go); "" for this computer's own
 	WSL string `json:"wsl,omitempty"`
-	// Convs are the ids magpie's gateway keys the session's requests by
+	// Convs are the ids blackpie's gateway keys the session's requests by
 	// when they carry no session id of their own (dshConvs)
 	Convs []string `json:"-"`
 	// Copies are the ids of the sessions that are copies of its
@@ -1090,7 +1090,7 @@ var (
 func CachePath() string { return filepath.Join(filepath.Dir(catalog.CachePath()), "sessions.json") }
 
 // cacheVersion changes when a parse would come out differently, so the
-// parses kept by an older magpie are read again.
+// parses kept by an older blackpie are read again.
 // 2: each file's usage by day, and its active time
 // 3: the active time by hour of the day
 // 4: the tool calls and skills a day
@@ -1122,7 +1122,7 @@ func CachePath() string { return filepath.Join(filepath.Dir(catalog.CachePath())
 const cacheVersion = 29
 
 // parseVersions is cacheVersion for one agent's parses, 0 when not listed:
-// raised, the parses of that agent's files kept by an older magpie are read
+// raised, the parses of that agent's files kept by an older blackpie are read
 // again, and the rest stand.
 var parseVersions = map[string]int{}
 
@@ -1237,7 +1237,7 @@ var saveGap = time.Minute
 // lost or outdated index), not a poll catching up with a live session. Its
 // checkpoints wait scanSaveGap, not saveGap, and its last save waits for
 // nothing: under saveGap a scan's later checkpoints and its end waited a
-// minute after its first checkpoint, and a magpie quit or updated within
+// minute after its first checkpoint, and a blackpie quit or updated within
 // it kept a few hundred of 17,000 files, so each start read 22 GB of
 // rollouts again (15 to 28 s before Sessions showed, 70 to 94 s of CPU).
 var (
@@ -1351,7 +1351,7 @@ func refresh(want, all []file) {
 			parsing[f.path] = make(chan struct{})
 			todo = append(todo, f)
 		} else if s.Agent != f.agent && parsing[f.path] == nil {
-			// kept by a magpie that didn't name the agent: named now, so
+			// kept by a blackpie that didn't name the agent: named now, so
 			// a raise of another agent's parseVersions keeps it
 			n := *s
 			n.Agent = f.agent
@@ -1458,7 +1458,7 @@ func refresh(want, all []file) {
 	}
 	// What is read is kept on disk every checkpointEvery, not only at the
 	// end: a first read of a long history on a slow disk runs for minutes,
-	// and a magpie quit before the end (its CPU full, #1665) kept nothing
+	// and a blackpie quit before the end (its CPU full, #1665) kept nothing
 	// of it, so the next start read it all again.
 	checkpointGap, endGap := saveGap, saveGap
 	if len(jobs) >= scanFiles {
@@ -1650,7 +1650,7 @@ func List(limit int) []Session {
 // listKeptFor. When that number is made, the listing is still the one
 // the caller had it with, and no copy of it is given (same). The Sessions
 // page asks for every session each 15 s, and an unchanged list was
-// copied, rowed, encoded and hashed again, only to answer X-Magpie-Same.
+// copied, rowed, encoded and hashed again, only to answer X-Blackpie-Same.
 func ListUnless(limit, made int) (out []Session, now int, same bool) {
 	// read before the locks: it reads settings.json
 	alias := provider.UsageAlias()
@@ -1806,7 +1806,7 @@ func assemble(fs []file, price func(string) *catalog.Price, codexTitle func(stri
 // to resume it, its subagents): whether List lists the session, and its
 // agent, id, title and usage. The stats ask it of every session on each
 // poll, and building every session's subagents there read each Claude Code
-// subagent's file again (3.5 GB of a live magpie's 6.3 GB of scans).
+// subagent's file again (3.5 GB of a live blackpie's 6.3 GB of scans).
 func assembleListed(fs []file, price func(string) *catalog.Price, codexTitle func(string) string) (Session, bool) {
 	sortSessionFiles(fs)
 	s := Session{Agent: fs[0].agent, Path: fs[0].path, Models: []Model{}, WSL: fs[0].m().wsl}
@@ -2296,7 +2296,7 @@ func scanBuffer(f io.Reader, off int64) int {
 
 // lineReaders keep scanAt's read buffers between scans, one pool per
 // power-of-two size from scanBuffer's 16 KiB to its 1 MiB. Every scan
-// allocated its own: a live magpie's start read ~3,200 Claude Code subagent
+// allocated its own: a live blackpie's start read ~3,200 Claude Code subagent
 // files for their first lines (ccTask), most over 1 MiB, and with the
 // session and call reads scanAt allocated 6.3 GB in 48 minutes, 3.8 GB of
 // it these buffers, while ~157 MB was live. A pool keeps about one buffer
@@ -2373,7 +2373,7 @@ func openLines(path string) (io.ReadCloser, error) {
 
 // streams holds decoders between packed reads. A decoder made for each
 // read allocated its window (a packed rollout's is 2 MiB, held in 3 MiB at
-// low memory) and its block buffers every time: 75 GB of a live magpie's
+// low memory) and its block buffers every time: 75 GB of a live blackpie's
 // first read of 11,591 rollouts. One kept here keeps them, and is let go
 // with the pool's other idle ones by the garbage collector. streamShelf
 // keeps a few first, across collections.
@@ -2507,7 +2507,7 @@ func title(s string) string {
 
 var dated = lazyre.New(`-\d{8}$`)
 
-// priceOf prices a model as a session names it: one through magpie as
+// priceOf prices a model as a session names it: one through blackpie as
 // "<provider>/<model>" at the price the gateway counts it at — what the user
 // set for that provider and model, else that provider's own list price, else
 // its maker's on models.dev — and a bare id only ever at its maker's, which is
@@ -2626,7 +2626,7 @@ func resumeCommand(distro, agent, id, cwd, path string) string {
 		run = "kimi --session " + id
 	case "agy":
 		// --conversation picks it up from any folder; one started on
-		// magpie's gateway needs the variables and --model it was
+		// blackpie's gateway needs the variables and --model it was
 		// started with
 		run = "agy --conversation " + id
 		if AgyStart != nil && distro == "" {

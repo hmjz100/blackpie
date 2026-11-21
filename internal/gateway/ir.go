@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/catalog"
 )
 
 // The APIs are close cousins; everything below is the shape they have
@@ -176,7 +176,7 @@ type Request struct {
 	// translated to an Anthropic upstream (parseTranslated, #4571).
 	clientCache *clientCache
 	// cacheTTL is how long a Claude bridge run started for the request
-	// keeps its prompt cache (claudeRunTTL), which the marks magpie adds
+	// keeps its prompt cache (claudeRunTTL), which the marks blackpie adds
 	// follow (runMark); "" is an hour
 	cacheTTL string
 	// askedTTL is the longest TTL the request's own cache marks ask for
@@ -219,7 +219,7 @@ type Request struct {
 	// reply made the calls this request answers after another request
 	// did: its run branches off it there (subscriptionBridge.branch).
 	branch *savedSession
-	// hourMarks has the cache marks magpie adds on Anthropic's Messages
+	// hourMarks has the cache marks blackpie adds on Anthropic's Messages
 	// (anthropicBody) last an hour: a Responses client's (Codex's), whose
 	// turns are often more than five minutes apart and whose own vendor
 	// keeps a thread's prompt cached an hour (chatGPTCold). Off when the
@@ -257,14 +257,14 @@ type Request struct {
 	Ultrafast bool
 	// Tier is the service_tier the client sent, as it sent it. It goes on
 	// as it is to a provider the user added by its address (OwnTier):
-	// a relay of theirs may serve Fast and Ultrafast where magpie can't
+	// a relay of theirs may serve Fast and Ultrafast where blackpie can't
 	// tell (hsiangron on X: both were left out)
 	Tier string
 	// OwnTier is set for such a provider (gateway.go, as each attempt is
 	// built); one that turns the field away is asked again without it
 	// (optionalFields)
 	OwnTier bool
-	// OwnEffort is set when Effort is magpie's own ask, not the client's:
+	// OwnEffort is set when Effort is blackpie's own ask, not the client's:
 	// auto mode's classifier asked to reason least of a model whose levels
 	// aren't known (fitAutoModeClassifier). An upstream that turns it away
 	// is asked at low, or without it, as it would have been
@@ -292,7 +292,7 @@ type Request struct {
 	// was sent, null and all, when the request is built again for a
 	// Responses upstream, whose answer to a value it doesn't take
 	// (invalid_access_program) is the client's to read; no other API takes
-	// it (magpie-releases#18). Only OpenAI's upstreams are sent it
+	// it (blackpie-releases#18). Only OpenAI's upstreams are sent it
 	// (keepsAccessPrograms, #3172).
 	AccessPrograms json.RawMessage
 	// Metadata is an Anthropic client's metadata (Claude Code's user_id),
@@ -446,7 +446,7 @@ type Usage struct {
 	// It is never accumulated from earlier usage.
 	cacheCreationHasCounts bool
 	// cacheUnknown: the reply said its vendor counts no cache tokens
-	// (a plugin's magpie_cache_unknown), so a CacheRead of 0 is not a miss
+	// (a plugin's blackpie_cache_unknown), so a CacheRead of 0 is not a miss
 	cacheUnknown bool
 	// searches: the web searches the reply says its model ran with its
 	// provider's own tool (searchTally), for the request log's Web search
@@ -476,7 +476,7 @@ type Usage struct {
 	Tier string `json:"tier,omitempty"`
 	// Deferred is what the reply counted of earlier requests of its
 	// conversation, which their own replies couldn't (cUsage's
-	// MagpieDeferred): billed with this one, never told as its prompt
+	// BlackpieDeferred): billed with this one, never told as its prompt
 	Deferred *Usage `json:"deferred,omitempty"`
 	// Credits is what the reply said the request cost in its plan's own
 	// credits, nil when it said none: WorkBuddy's usage.credit, the
@@ -921,7 +921,7 @@ func ByStrength(efforts []string) []string {
 // and max only.
 //
 // Codex's ultra is no API's level, whatever a list says (ChatGPT's lists
-// it for Codex's picker; magpie offers it on Copilot's gpt-6.1-sol, #656):
+// it for Codex's picker; blackpie offers it on Copilot's gpt-6.1-sol, #656):
 // it is sent as max, or the nearest the model has below it.
 func fitEffort(want string, levels []string) string {
 	if want == "ultra" {

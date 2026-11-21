@@ -6,24 +6,24 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/agentplug"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/agentplug"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // goneAgentSrc is an agent plugin as agent-kilo is: a JSONC file, the
 // model under "model", a provider block of its own.
 const goneAgentSrc = `
-export const agent = { id: "kilo", name: "Kilo", config: "~/.config/kilo/kilo.jsonc", model: "model", prefix: "magpie/" };
+export const agent = { id: "kilo", name: "Kilo", config: "~/.config/kilo/kilo.jsonc", model: "model", prefix: "blackpie/" };
 export function connect({ gateway }) {
-  return { "provider.magpie": { npm: "@ai-sdk/openai-compatible", options: { baseURL: gateway.v1, apiKey: gateway.key } } };
+  return { "provider.blackpie": { npm: "@ai-sdk/openai-compatible", options: { baseURL: gateway.v1, apiKey: gateway.key } } };
 }
 `
 
 const goneAgentMine = "{\n  // mine\n  \"model\": \"anthropic/claude-sonnet-4-5\", // mine\n  \"provider\": {\n    \"anthropic\": {}\n  }\n}\n"
 
 // goneAgentHome has the kilo plugin, its kilo.jsonc as the user wrote it,
-// and kilo on magpie's a/m through `magpie kilo a/m`; it returns the file
+// and kilo on blackpie's a/m through `blackpie kilo a/m`; it returns the file
 // and the plugin's folder.
 func goneAgentHome(t *testing.T) (string, string) {
 	t.Helper()
@@ -31,7 +31,7 @@ func goneAgentHome(t *testing.T) (string, string) {
 	home := os.Getenv("HOME")
 	dir := filepath.Join(home, "plugins", "kilo")
 	os.MkdirAll(dir, 0o755)
-	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"name":"agent-kilo","magpie":{"agent":"./agent.js"}}`), 0o644)
+	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"name":"agent-kilo","blackpie":{"agent":"./agent.js"}}`), 0o644)
 	os.WriteFile(filepath.Join(dir, "agent.js"), []byte(goneAgentSrc), 0o644)
 	b, _ := json.Marshal(plugin.List{Plugins: []plugin.Entry{{Spec: dir}}})
 	os.MkdirAll(settings.Dir(), 0o755)
@@ -59,7 +59,7 @@ func fileIs(t *testing.T, path, want string) {
 	}
 }
 
-// `magpie plugin off` and `magpie plugin rm` put the agent's config back
+// `blackpie plugin off` and `blackpie plugin rm` put the agent's config back
 // byte for byte before the plugin goes (#3810).
 func TestPluginOffAndRemovePutTheAgentBack(t *testing.T) {
 	for _, op := range []string{"off", "rm"} {
@@ -73,8 +73,8 @@ func TestPluginOffAndRemovePutTheAgentBack(t *testing.T) {
 	}
 }
 
-// With the plugin deleted on disk, `magpie kilo default` puts kilo.jsonc
-// back from what magpie stashed, where it said "unknown agent".
+// With the plugin deleted on disk, `blackpie kilo default` puts kilo.jsonc
+// back from what blackpie stashed, where it said "unknown agent".
 func TestGoneAgentDefault(t *testing.T) {
 	path, dir := goneAgentHome(t)
 	os.RemoveAll(dir)

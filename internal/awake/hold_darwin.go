@@ -4,12 +4,12 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/yetone/magpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/proc"
 )
 
 // takeHold runs caffeinate -i, which keeps the Mac from idle sleep while it
-// runs, with -d its display from sleeping too; -w ends it with magpie should
-// magpie end without letting go.
+// runs, with -d its display from sleeping too; -w ends it with blackpie should
+// blackpie end without letting go.
 func takeHold(display bool) (func(), error) {
 	cmd := proc.Command("/usr/bin/caffeinate", caffeinateArgs(display, os.Getpid())...)
 	if err := cmd.Start(); err != nil {

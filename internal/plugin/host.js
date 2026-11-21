@@ -1,22 +1,22 @@
-// magpie's plugin host: runs OpenCode (v1) server plugins under Bun and
-// answers magpie over stdin/stdout, one JSON message a line.
+// blackpie's plugin host: runs OpenCode (v1) server plugins under Bun and
+// answers blackpie over stdin/stdout, one JSON message a line.
 //
-// magpie → host: {id, method, params}; the host answers {id, result} or
+// blackpie → host: {id, method, params}; the host answers {id, result} or
 // {id, error}. A fetch streams its reply first: {id, event: "head", status,
 // headers}, then {id, event: "chunk", data} (base64) as the body comes, then
 // {id, result: null}. {method: "abort", params: {id}} cancels one, and
 // {method: "credit", params: {id, n}} gives a fetch back the n charged bytes
 // its reader took (the payload it read, and a frame's overhead once the frame
 // is done), so it may send that much more. A fetch starts with the window
-// magpie gave it and sends no more than that ahead of its reader, so a slow
+// blackpie gave it and sends no more than that ahead of its reader, so a slow
 // reader pauses its upstream instead of the host buffering without bound.
-// host → magpie, unasked: {event: "log", level, message} and {event:
+// host → blackpie, unasked: {event: "log", level, message} and {event:
 // "toast", ...} (what a plugin logs or shows), {event: "auth", provider}
 // (a sign-in the host saved or refreshed).
 //
 // The plugins get what OpenCode hands them (PluginInput): a client whose
-// auth.set saves to magpie's plugin-auth.json in OpenCode's auth.json shape,
-// tui.showToast and app.log, config.get; Bun's $; the folder magpie keeps
+// auth.set saves to blackpie's plugin-auth.json in OpenCode's auth.json shape,
+// tui.showToast and app.log, config.get; Bun's $; the folder blackpie keeps
 // its files in. What else a plugin asks the client for answers {data:
 // undefined}.
 //
@@ -170,7 +170,7 @@ const MAX_FRAME = 64 << 10
 // keeps a producer of tiny frames from filling a window with structs.
 const FRAME_OVERHEAD = 2048
 
-// HEAD_MAX and HEAD_ENTRIES are magpie's own head-envelope policy, not HTTP's:
+// HEAD_MAX and HEAD_ENTRIES are blackpie's own head-envelope policy, not HTTP's:
 // a fetch's head carries at most HEAD_MAX header bytes (the UTF-8 bytes of
 // every name and value, plus HEAD_ENTRY_COST an entry) and HEAD_ENTRIES
 // entries, counted the same by Go before it is queued, so a vendor's unbounded
@@ -217,27 +217,27 @@ function makeGate(window) {
 }
 
 // A plugin writing to stdout would break the protocol: everything it
-// prints goes to stderr, which magpie logs.
+// prints goes to stderr, which blackpie logs.
 const toErr = (...xs) => process.stderr.write(xs.map((x) => (typeof x === "string" ? x : Bun.inspect(x))).join(" ") + "\n")
 console.log = console.info = console.debug = console.warn = toErr
 process.stdout.write = (chunk, enc, cb) => process.stderr.write(chunk, enc, cb)
 
 // Nor may a program a plugin starts have them: one given the host's stdin
-// reads magpie's messages away (pi-devin-plus runs `devin auth login` with
+// reads blackpie's messages away (pi-devin-plus runs `devin auth login` with
 // stdio "inherit", which took the next requests as its answer and gave up,
 // "Login canceled"), and its stdout is the host's answers. It reads
 // nothing instead and writes to stderr. node:child_process starts every
 // program through Bun.spawn and Bun.spawnSync, so these see all of them.
 //
 // And it has the proxy the plugin's own fetches take, as a built-in's CLI
-// had magpie's (netproxy.Env): the host has its *_PROXY only as
-// MAGPIE_*_PROXY (see below), so `grok login`, which the Grok plugin runs,
+// had blackpie's (netproxy.Env): the host has its *_PROXY only as
+// BLACKPIE_*_PROXY (see below), so `grok login`, which the Grok plugin runs,
 // went out with none and, where x.ai is reached only through one, printed
 // no link to open (𝕏 on Discord). One the plugin set itself is kept.
 // Node's fetch goes past *_PROXY unless NODE_USE_ENV_PROXY=1 says to take
 // them, so a plugin downloading in a Node program it starts went out with
 // none and failed where the vendor is reached only through one (larchsis
-// on 𝕏, Windows 11, a proxy set in magpie only). It is told to, unless
+// on 𝕏, Windows 11, a proxy set in blackpie only). It is told to, unless
 // the plugin said otherwise.
 const own = (v, fd) => v === "inherit" || v === fd || v === (fd ? process.stdout : process.stdin)
 const PROXY_VARS = ["HTTPS_PROXY", "HTTP_PROXY", "ALL_PROXY"]
@@ -257,13 +257,13 @@ function proxied(env) {
   return env
 }
 // And a program started with no folder of its own runs in workDir, not
-// the host's: the host runs in magpie's config folder, beside
+// the host's: the host runs in blackpie's config folder, beside
 // settings.json and providers.json, so whatever a program saved by a
 // relative name went there, and a tool told to write "providers.json"
-// would write over magpie's. The chat page plugin (magpie-chat) starts
+// would write over blackpie's. The chat page plugin (blackpie-chat) starts
 // the user's MCP servers this way and runs their tools for a model,
 // whose fetched pages and saved files (jiakun_zhao on 𝕏 asked whose
-// page_<hash>.html and magpie_*.md files they had found) belong in a
+// page_<hash>.html and blackpie_*.md files they had found) belong in a
 // folder of their own. A folder the plugin gives is kept.
 const workDir = path.join(process.cwd(), "plugin-work")
 let workReady = false
@@ -348,8 +348,8 @@ let config = { provider: {} } // what the plugins' config hooks made of it
 // listing. A plugin stuck on its vendor (a sign-in answered 401 and tried
 // again, a vendor that never answers) is then given up on alone: the
 // plugins load side by side and every other one is listed meanwhile,
-// rather than all waiting behind it until magpie's own deadline fails the
-// whole host or the whole list. magpie sets both at init.
+// rather than all waiting behind it until blackpie's own deadline fails the
+// whole host or the whole list. blackpie sets both at init.
 let loadWait = 20 * 1000
 let listWait = 20 * 1000
 
@@ -371,14 +371,14 @@ function inTime(step, ms, what) {
 // (#237) goes through it, and so does every fetch the plugin makes for
 // it; one for a provider set to "direct" goes through none. Bun reads
 // *_PROXY once, and a fetch given no proxy option can't be told to skip
-// them, so the host is started with them as MAGPIE_*_PROXY and each
-// fetch is given magpie's own here when it has none of its own.
+// them, so the host is started with them as BLACKPIE_*_PROXY and each
+// fetch is given blackpie's own here when it has none of its own.
 // Loopback never goes through one.
 const via = new AsyncLocalStorage() // the proxy: "", "direct" or its URL
 const bunFetch = globalThis.fetch
 
 function proxyVar(k) {
-  return process.env["MAGPIE_" + k] || process.env["MAGPIE_" + k.toLowerCase()] || ""
+  return process.env["BLACKPIE_" + k] || process.env["BLACKPIE_" + k.toLowerCase()] || ""
 }
 
 const globalProxy = {
@@ -403,9 +403,9 @@ function loopback(host) {
   return host === "localhost" || host.endsWith(".localhost") || host === "::1" || /^127\./.test(host)
 }
 
-// A host on the user's own network — another computer's magpie, an LLM
+// A host on the user's own network — another computer's blackpie, an LLM
 // relay on the NAS — is reached directly, whatever proxy the host was
-// started with, as magpie's own requests reach it (netproxy.onLAN, lan.go,
+// started with, as blackpie's own requests reach it (netproxy.onLAN, lan.go,
 // #982, #1572): a proxy is for reaching vendors; one elsewhere can't reach
 // the user's network, and one here only goes there directly itself. A
 // provider's own proxy (via) is still taken as it is. The rule is lan.go's:
@@ -580,23 +580,23 @@ function asked(input, init) {
   )
 }
 
-// MAGPIE_ONLY are the headers magpie tells a plugin's fetch where the agent
+// BLACKPIE_ONLY are the headers blackpie tells a plugin's fetch where the agent
 // that asked works (WorkDirHeader and WorkGitHeader in internal/provider)
 // and that a queue needn't be waited out (FallbackHeader): for the plugin
 // to read, never for its vendor, so a plugin that sends on the headers it
 // was given sends them nowhere.
-const MAGPIE_ONLY = ["x-magpie-work-dir", "x-magpie-work-git", "x-magpie-fallback"]
+const BLACKPIE_ONLY = ["x-blackpie-work-dir", "x-blackpie-work-git", "x-blackpie-fallback"]
 
 function unsaid(input, init) {
-  if (input instanceof Request && MAGPIE_ONLY.some((k) => input.headers.has(k))) {
+  if (input instanceof Request && BLACKPIE_ONLY.some((k) => input.headers.has(k))) {
     const h = new Headers(input.headers)
-    for (const k of MAGPIE_ONLY) h.delete(k)
+    for (const k of BLACKPIE_ONLY) h.delete(k)
     input = new Request(input, { headers: h })
   }
   if (init?.headers) {
     const h = new Headers(init.headers)
-    if (MAGPIE_ONLY.some((k) => h.has(k))) {
-      for (const k of MAGPIE_ONLY) h.delete(k)
+    if (BLACKPIE_ONLY.some((k) => h.has(k))) {
+      for (const k of BLACKPIE_ONLY) h.delete(k)
       init = { ...init, headers: h }
     }
   }
@@ -619,8 +619,8 @@ globalThis.fetch = Object.assign(function fetch(input, init) {
 // An HTTP/2 session a plugin opens itself goes through the proxy its
 // fetches take, as a built-in's requests on Go's transport did. Cursor's
 // plugin runs agent.v1.AgentService/Run on node:http2, which Bun connects
-// directly, *_PROXY or not: where Cursor is reached only through magpie's
-// proxy (the system's, or one set in magpie), its sign-in, models and
+// directly, *_PROXY or not: where Cursor is reached only through blackpie's
+// proxy (the system's, or one set in blackpie), its sign-in, models and
 // usage came through and every chat went out without it (#1035).
 const h2connect = http2.connect
 http2.connect = function connect(authority, options, listener) {
@@ -736,7 +736,7 @@ function tunnel(which, host, port) {
 // from its last good generation, plugin-auth.json.bak, which each write
 // keeps first; a write over one that doesn't read copies it aside
 // (plugin-auth.json.bad-<time>) first, and never writes none over it. As
-// internal/lastgood does for magpie's own files.
+// internal/lastgood does for blackpie's own files.
 
 // parseAuth is the sign-ins in text, null when it isn't one JSON object.
 function parseAuth(text) {
@@ -939,7 +939,7 @@ function pause(ms) {
 }
 
 // Two hosts run at once while one is restarted (the old one finishing its
-// calls), and magpie writes the file when no host runs: each change to it
+// calls), and blackpie writes the file when no host runs: each change to it
 // is made under plugin-auth.json.lock, read afresh and written back with
 // only its own accounts changed, so a host never writes another's newer
 // token away with what it read before. Nothing awaits under the lock; one
@@ -1228,7 +1228,7 @@ function entries(target) {
     // a command alone (bin), an MCP server, is no plugin at all (#1327)
     const cmd = pkg?.bin ? ", only a command (bin). If it is an MCP server, add it under Library → MCP servers instead" : ""
     // said without a stack: there is no fault in the host to trace
-    throw Object.assign(new Error(`${pkg?.name || target} isn't an OpenCode or magpie plugin: its package names no file to load (no main or exports in package.json, no index file)${cmd}`), { plain: true })
+    throw Object.assign(new Error(`${pkg?.name || target} isn't an OpenCode or blackpie plugin: its package names no file to load (no main or exports in package.json, no index file)${cmd}`), { plain: true })
   }
   return [...new Set(out)]
 }
@@ -1255,16 +1255,16 @@ function servers(mod) {
 async function loadPlugins(list) {
   const input = {
     client: makeClient(),
-    project: { id: "magpie", worktree: directory, vcs: undefined, time: { created: Date.now() } },
+    project: { id: "blackpie", worktree: directory, vcs: undefined, time: { created: Date.now() } },
     directory,
     worktree: directory,
     experimental_workspace: { register() {} },
     serverUrl: new URL("http://127.0.0.1:4096"),
     $: Bun.$,
-    // magpie's own (OpenCode has none): the plugin's options as the user
-    // set them in magpie, read when wanted, so a change reaches the
+    // blackpie's own (OpenCode has none): the plugin's options as the user
+    // set them in blackpie, read when wanted, so a change reaches the
     // plugin without a restart (#2038)
-    magpie: { option: optionValue, options: optionValues, load: reportLoad },
+    blackpie: { option: optionValue, options: optionValues, load: reportLoad },
   }
   // pi's packages and extensions are loaded as pi loads them (pi.js)
   let pi
@@ -1291,7 +1291,7 @@ async function loadPlugins(list) {
     let gateway
     if (p.gateway) {
       gateway = await import(pathToFileURL(p.gateway).href)
-      if (typeof gateway.onRequest !== "function") throw new Error("magpie.hooks exports no onRequest")
+      if (typeof gateway.onRequest !== "function") throw new Error("blackpie.hooks exports no onRequest")
     }
     let fns = []
     // A gateway-only package needs no OpenCode entry. Mixed packages
@@ -1490,9 +1490,9 @@ function auths() {
 // signsIn are the provider ids the plugin spec's auth hooks name.
 const signsIn = (spec) => [...new Set(hooks.filter((h) => h.spec === spec && h.hooks.auth?.provider).map((h) => h.hooks.auth.provider))]
 
-// withProviders is a loaded plugin as init tells magpie of it: the provider
+// withProviders is a loaded plugin as init tells blackpie of it: the provider
 // ids it signs in to, and for each one another plugin serves (two plugins
-// naming one id: the host runs one), the plugin that does. magpie says so
+// naming one id: the host runs one), the plugin that does. blackpie says so
 // on the plugin's row rather than leave its provider missing. And the
 // tools it gives (toolList).
 function withProviders(l) {
@@ -1509,9 +1509,9 @@ function withProviders(l) {
 //
 // A plugin's tools are OpenCode's tool hook: {tool: {name: {description,
 // args, execute(args, ctx)}}}, args a zod shape (OpenCode's tool.schema is
-// zod) or a JSON Schema. magpie offers them to every agent through its
+// zod) or a JSON Schema. blackpie offers them to every agent through its
 // plugin tools MCP server (internal/gateway/tools_mcp.go), so each is told
-// to magpie by its name, description and a JSON Schema of its arguments.
+// to blackpie by its name, description and a JSON Schema of its arguments.
 
 const TOOL_NAME = /^[A-Za-z0-9_-]{1,48}$/
 
@@ -1712,7 +1712,7 @@ const MODALITIES = ["text", "image", "audio", "video", "pdf"]
 const modalities = (list) => Object.fromEntries(MODALITIES.map((k) => [k, (list ?? ["text"]).includes(k)]))
 
 // kinds are the kinds a capabilities.input or .output says yes to, for
-// magpie: undefined when the plugin gave none.
+// blackpie: undefined when the plugin gave none.
 function kinds(c) {
   if (!c || typeof c !== "object") return undefined
   const out = Object.keys(c).filter((k) => c[k] === true)
@@ -1772,10 +1772,10 @@ async function info(id, key, strict, limit) {
     options: { ...(cfg?.options ?? {}) },
     npm: cfg?.npm ?? md?.npm,
     api: cfg?.api ?? md?.api,
-    // magpie's own field: the plugin serves a decision API (System One)
+    // blackpie's own field: the plugin serves a decision API (System One)
     // for this provider, asked at its base /systemone through its fetch
     decide: cfg?.decide === true,
-    // magpie's own field: the provider's upstream answers a web search
+    // blackpie's own field: the provider's upstream answers a web search
     // tool offered on its Anthropic or Responses API by itself, so a
     // client's web_search goes to it as sent (#2027)
     searches: cfg?.searches === true,
@@ -1807,7 +1807,7 @@ async function info(id, key, strict, limit) {
       // what the config itself says of the model's sampling, as Factory's
       // config models say temperature of their OpenAI route (plugins#154)
       ...(m.temperature !== undefined ? { temperature: m.temperature } : {}),
-      // magpie's own mark: a decision model, answering System One
+      // blackpie's own mark: a decision model, answering System One
       ...(typeof m.decides === "boolean" ? { decides: m.decides } : was?.decides !== undefined ? { decides: was.decides } : {}),
       // and one that searches the web by itself, asked in plain words
       ...(typeof m.searches === "boolean" ? { searches: m.searches } : was?.searches !== undefined ? { searches: was.searches } : {}),
@@ -1834,11 +1834,11 @@ async function info(id, key, strict, limit) {
       const ask = () => listing.run(l, () => inScope(id, k, () => ph.models(given, { auth: authCopy(k) })))
       const next = limit > 0 ? await inTime(ask, Math.max(limit - (Date.now() - began), 0), "the plugin's model list") : await ask()
       // a hook that asked its vendor, got no list and gave back the one it
-      // was given fell back: magpie keeps the list it had, as a built-in
+      // was given fell back: blackpie keeps the list it had, as a built-in
       // whose fetch failed keeps the one it fetched last; so does one that
-      // says so, handing back a list of its own (Symbol.for("magpie.fellBack")
+      // says so, handing back a list of its own (Symbol.for("blackpie.fellBack")
       // on it: Command Code's Go table, ZCode's models)
-      out.fellBack = (next === given.models && l.tried && !l.lastOk) || next?.[Symbol.for("magpie.fellBack")] === true
+      out.fellBack = (next === given.models && l.tried && !l.lastOk) || next?.[Symbol.for("blackpie.fellBack")] === true
       // why, as far as the host saw it: the editor says so rather than
       // show the plugin's short defaults as if they were the account's
       if (out.fellBack) out.listError = l.said || "the plugin couldn't get its vendor's list"
@@ -1848,7 +1848,7 @@ async function info(id, key, strict, limit) {
       // list a request should be built from
       if (e instanceof Late) out.late = true
       // an error the models hook throws may say what it means for the
-      // sign-in, as an answer's X-Magpie-Sign-In does: a built-in whose
+      // sign-in, as an answer's X-Blackpie-Sign-In does: a built-in whose
       // model list the vendor refused marked the account
       if (["expired", "kept", "renewed"].includes(e?.signIn) && all[k]) send({ event: "signIn", provider: id, account: k, said: e.signIn })
       // strict (a move's check) fails on what the account can't do, but
@@ -1858,7 +1858,7 @@ async function info(id, key, strict, limit) {
       const r = reach.getStore()
       if (r && e?.signIn === "expired") r.refused ??= e?.message ?? String(e)
       // a hook that threw on its vendor's failure has no list to tell:
-      // magpie keeps the one it had, as for one that gave its defaults back
+      // blackpie keeps the one it had, as for one that gave its defaults back
       out.fellBack = true
       out.listError = e?.message ?? String(e)
       send({ event: "log", level: "error", message: `${h.spec}: provider.models: ${e?.message ?? e}` })
@@ -1888,22 +1888,22 @@ function keepInfo(key, p, gen) {
   if (gen === infoGen && !p.failed && !p.late) infos.set(key, { gen, md: mdev(), info: p })
 }
 
-// shown is a plugin's string as magpie shows it: trimmed and at most n
+// shown is a plugin's string as blackpie shows it: trimmed and at most n
 // characters, "" for anything else.
 const shown = (v, n) => (typeof v === "string" ? v.trim().slice(0, n) : "")
 
-// optionsOf are the switches a plugin declares for its provider, magpie's
+// optionsOf are the switches a plugin declares for its provider, blackpie's
 // own field (#2038, Vocllum): auth.options, each {key, label, description?,
 // default?, confirm?, labels?, descriptions?, confirms?, filtersModels?}.
-// magpie shows each as an Off/On switch in the provider's editor and keeps
-// what the user sets; the plugin reads it with input.magpie.option(provider,
+// blackpie shows each as an Off/On switch in the provider's editor and keeps
+// what the user sets; the plugin reads it with input.blackpie.option(provider,
 // key). A switch is kept and handed over, and the models listed again (one
 // may go by it); nothing else is run. Keys are [a-z0-9_-], 1–40 long, the
 // first of a key kept; at most MAX_OPTIONS; one without a key or a label is
 // left out. labels, descriptions and confirms are the same words in the
 // window's other languages ({"zh": "…", "zh-TW": "…", "ja": "…", "de":
 // "…"}), as a page's titles are (plugins#590): label stays a string beside
-// them, so an older magpie still reads the option. filtersModels says the
+// them, so an older blackpie still reads the option. filtersModels says the
 // plugin's model list leaves models out while the switch is on, which the
 // editor says by the models.
 const MAX_OPTIONS = 16
@@ -1955,7 +1955,7 @@ function optionValues(provider) {
   return out
 }
 
-// reportLoad is magpie.load(provider, loads): how busy each of the
+// reportLoad is blackpie.load(provider, loads): how busy each of the
 // provider's models is now, as a plugin knows from its vendor, for the
 // model list to show and routing to weigh (axelburks on Discord). loads
 // maps a model id to a percent from 0, past 100 for a vendor that queues
@@ -1967,8 +1967,8 @@ function optionValues(provider) {
 const LOAD_MODELS = 1000
 const LOAD_MOST = 10000 // a sanity cap: 100 times full, so the UI stays sane
 function reportLoad(provider, loads) {
-  if (typeof provider !== "string" || !provider || provider.length > 200) throw new TypeError("magpie.load: provider must be a provider id")
-  if (!loads || typeof loads !== "object" || Array.isArray(loads)) throw new TypeError("magpie.load: loads must map model ids to a number from 0 up, or null")
+  if (typeof provider !== "string" || !provider || provider.length > 200) throw new TypeError("blackpie.load: provider must be a provider id")
+  if (!loads || typeof loads !== "object" || Array.isArray(loads)) throw new TypeError("blackpie.load: loads must map model ids to a number from 0 up, or null")
   const out = {}
   let n = 0
   for (const [id, v] of Object.entries(loads)) {
@@ -1990,7 +1990,7 @@ function optionValue(provider, key) {
 }
 
 // methods are the auth hook's ways to sign in. An "api" one may say what
-// its key looks like (placeholder, magpie's own: OpenCode's dialog says
+// its key looks like (placeholder, blackpie's own: OpenCode's dialog says
 // "API key"); its label titles the key's field, as OpenCode's does.
 function methods(auth) {
   return (auth.methods ?? []).map((m) => ({
@@ -2001,46 +2001,46 @@ function methods(auth) {
   }))
 }
 
-// iconOf is the picture a plugin gives its provider, magpie's own field
+// iconOf is the picture a plugin gives its provider, blackpie's own field
 // (OpenCode's providers have none): the auth hook's icon, else
-// package.json's magpie.icon. An https URL or a data:image URI; magpie
+// package.json's blackpie.icon. An https URL or a data:image URI; blackpie
 // checks and keeps it (internal/provider), nothing is fetched here.
 function iconOf(a) {
   const ok = (v) => {
     const s = typeof v === "string" ? v.trim() : ""
-    // a data URI of a picture over 1 MB, magpie's most, isn't carried
+    // a data URI of a picture over 1 MB, blackpie's most, isn't carried
     return s.length <= 3 << 19 && /^(https:\/\/|data:image\/)/i.test(s) ? s : ""
   }
   const own = ok(a.auth.icon)
   if (own || !a.target) return own
   const dir = fs.statSync(a.target, { throwIfNoEntry: false })?.isDirectory() ? a.target : path.dirname(a.target)
-  return ok(readJSON(path.join(dir, "package.json"))?.magpie?.icon)
+  return ok(readJSON(path.join(dir, "package.json"))?.blackpie?.icon)
 }
 
 // concurrencyOf is how many requests the plugin says each of its accounts
-// takes at once, magpie's own field: the auth hook's maxConcurrency, else
-// package.json's magpie.maxConcurrency. A whole number over 0, else none
+// takes at once, blackpie's own field: the auth hook's maxConcurrency, else
+// package.json's blackpie.maxConcurrency. A whole number over 0, else none
 // (0); the user's setting on the provider goes over it.
 function concurrencyOf(a) {
   return declared(a, "maxConcurrency")
 }
 
 // atOnceOf is how many of its accounts the plugin says may take requests
-// at the same time, magpie's own field: the auth hook's maxAccounts, else
-// package.json's magpie.maxAccounts, as concurrencyOf reads its own. The
+// at the same time, blackpie's own field: the auth hook's maxAccounts, else
+// package.json's blackpie.maxAccounts, as concurrencyOf reads its own. The
 // user's setting on the provider goes over it.
 function atOnceOf(a) {
   return declared(a, "maxAccounts")
 }
 
 // declared is a whole number over 0 the plugin declares under key, on its
-// auth hook or else in its package.json's magpie, at most 1000; else 0.
+// auth hook or else in its package.json's blackpie, at most 1000; else 0.
 function declared(a, key) {
   const ok = (v) => (Number.isInteger(v) && v > 0 ? Math.min(v, 1000) : 0)
   const own = ok(a.auth[key])
   if (own || !a.target) return own
   const dir = fs.statSync(a.target, { throwIfNoEntry: false })?.isDirectory() ? a.target : path.dirname(a.target)
-  return ok(readJSON(path.join(dir, "package.json"))?.magpie?.[key])
+  return ok(readJSON(path.join(dir, "package.json"))?.blackpie?.[key])
 }
 
 // rateOf reads a model's credit rate as a plugin gives it: a number (0.5)
@@ -2141,7 +2141,7 @@ async function providers({ proxies } = {}) {
           outputsSaid: kindsSaid(m.capabilities?.output),
           // whether the model takes temperature and top_p, where something
           // said so (models.dev, the config, the models hook); unsaid goes
-          // to magpie as nothing, which keeps them (#2492)
+          // to blackpie as nothing, which keeps them (#2492)
           ...(typeof m.temperature === "boolean" ? { temperature: m.temperature } : {}),
           released: m.release_date ?? "",
           cost: m.cost,
@@ -2160,7 +2160,7 @@ async function providers({ proxies } = {}) {
           // offered as a routing group's classifier
           decides: m.decides === true,
           // a model that searches the web by itself, asked in plain
-          // words, which magpie may search with for other models
+          // words, which blackpie may search with for other models
           searches: m.searches === true,
         })),
     }
@@ -2183,7 +2183,7 @@ function applies(prompt, inputs) {
 
 // nextPrompt is the method's next question for inputs so far, as
 // OpenCode's CLI asks them: in order, those whose when/condition hold. A
-// method may ask its own way (magpie's hook, which pi's sign-ins use, as
+// method may ask its own way (blackpie's hook, which pi's sign-ins use, as
 // they ask as they go): ask(inputs) → the next question, or null.
 async function nextPrompt(provider, index, inputs) {
   const m = authOf(provider).methods[index]
@@ -2245,13 +2245,13 @@ async function authorize({ provider, method, inputs, account, proxy }) {
   // the inputs go only to a method that asks something, as OpenCode's TUI
   // (/connect) passes them: an object with none is how its CLI (opencode
   // auth login) calls, and a plugin told so asks its questions on the
-  // terminal, magpie's stdin here (opencode-antigravity-auth waited on its
+  // terminal, blackpie's stdin here (opencode-antigravity-auth waited on its
   // "Project ID" prompt, the sign-in never starting)
   const a = await via.run(proxy ?? "", () => inScope(provider, key, () => m.authorize(m.prompts?.length ? inputs ?? {} : undefined)))
   const session = String(nextSession++)
   sessions.set(session, { provider, key, a, inputs, proxy: proxy ?? "" })
   // opened (not OpenCode's) is a page the plugin's own CLI opened already:
-  // Grok Build's `grok login` opens it on macOS and Windows, and magpie's
+  // Grok Build's `grok login` opens it on macOS and Windows, and blackpie's
   // opening it too showed it twice (andyfmyth on X)
   return { session, url: a.url ?? "", instructions: a.instructions ?? "", method: a.method, opened: a.opened === true }
 }
@@ -2288,7 +2288,7 @@ async function apiKey({ provider, method, inputs, key, account, proxy }) {
 
 // ---- renewing a sign-in ------------------------------------------------------
 
-// A plugin may leave renewing its accounts' tokens to magpie (magpie's own
+// A plugin may leave renewing its accounts' tokens to blackpie (blackpie's own
 // hook, which OpenCode ignores):
 //   auth.refresh(auth, provider) → the account's sign-in renewed: the
 //     fields to keep over the old ({ access, refresh, expires, … }), or
@@ -2315,7 +2315,7 @@ function leadOf(a) {
 }
 
 // renewAt is when the sign-in at key is due to be renewed, 0 for never: an
-// OAuth one with an expiry, of a plugin that renews through magpie.
+// OAuth one with an expiry, of a plugin that renews through blackpie.
 function renewAt(a, stored) {
   if (typeof a?.refresh !== "function" || stored?.type !== "oauth") return 0
   const exp = Number(stored.expires)
@@ -2337,7 +2337,7 @@ async function fresh(provider, key) {
     pending++ // the host doesn't leave in the middle of it
     r = renew(provider, key, a).finally(() => {
       renewing.delete(key)
-      // nor does magpie stop it in the middle of one (host.go's stop)
+      // nor does blackpie stop it in the middle of one (host.go's stop)
       send({ event: "renewing", count: renewing.size })
       done()
     })
@@ -2349,7 +2349,7 @@ async function fresh(provider, key) {
   clearTimeout(t)
 }
 
-// Each magpie process runs a host of its own (the gateway, a CLI's quota
+// Each blackpie process runs a host of its own (the gateway, a CLI's quota
 // or usage, a host restarting), and each renews the same sign-in when it
 // comes due: a vendor that spends a refresh token once turned the second
 // away, and the account was marked signed out under the token the first
@@ -2440,7 +2440,7 @@ async function renewLocked(provider, key, a, was) {
     got = await inScope(provider, key, () => a.refresh(JSON.parse(JSON.stringify(was)), provider))
   } catch (e) {
     // the token was spent by a host that didn't wait for this one's lock
-    // (a magpie from before it) and saved what it got: not signed out
+    // (a blackpie from before it) and saved what it got: not signed out
     if (changed(readAuthState().all[key], was)) {
       send({ event: "log", level: "error", message: `${auths().get(provider)?.spec ?? provider}: auth.refresh: ${e?.message ?? e} (renewed elsewhere meanwhile)` })
       forgetAccount(key)
@@ -2501,7 +2501,7 @@ async function load({ provider, account, proxy }) {
 // ---- usage -------------------------------------------------------------------
 
 // usage is how much of its allowance the account at key has used, as the
-// plugin's auth.usage says (magpie's own hook, which OpenCode ignores):
+// plugin's auth.usage says (blackpie's own hook, which OpenCode ignores):
 //   auth.usage(getAuth, provider) → {
 //     plan?, user? (the account as the service names it), until?,
 //     renew?: "auto" | "off", balance?, error?,
@@ -2526,7 +2526,7 @@ async function load({ provider, account, proxy }) {
 //       and puts the one with the most left first among the provider's
 //       accounts in the same unit, #3950) }],
 //     signIn?: "expired" | "kept" | "renewed" (what the read means for the
-//       account's sign-in, as a model request's X-Magpie-Sign-In says;
+//       account's sign-in, as a model request's X-Blackpie-Sign-In says;
 //       without it an error saying to sign in again marks the account and
 //       a clean read clears it)
 //   }
@@ -2593,7 +2593,7 @@ async function usageOf(provider, account) {
 // ---- check-in ----------------------------------------------------------------
 
 // checkin presses the vendor's daily check-in (签到) for the account at key,
-// as the plugin's auth.checkin does it (magpie's own hook, which OpenCode
+// as the plugin's auth.checkin does it (blackpie's own hook, which OpenCode
 // ignores; Lemon on Discord: 签到 belongs in the plugins):
 //   auth.checkin(getAuth, provider) → {
 //     outcome: "claimed" (checked in now) | "done" (in already today) |
@@ -2604,7 +2604,7 @@ async function usageOf(provider, account) {
 //     until? (when the vendor's own day turns: an RFC 3339 time or epoch
 //       milliseconds; Qoder's daily credits open at 10:00 UTC+8)
 //   }
-// magpie asks once a Beijing day per account while the user has it on, and
+// blackpie asks once a Beijing day per account while the user has it on, and
 // again later that day after a failure, or at until; a hook that throws is
 // a failure.
 // Run in the account's scope, a token it renews is saved to that account.
@@ -2718,7 +2718,7 @@ async function fetchAs(id, record, key, params) {
     res.headers.forEach((v, k) => (rh[k] = v))
     const head = headCost(rh)
     if (head.entries > HEAD_ENTRIES || head.n > HEAD_MAX) {
-      // the reply's head is past magpie's envelope: give the fetch up rather
+      // the reply's head is past blackpie's envelope: give the fetch up rather
       // than write a line the host would refuse, and let the body go
       throw new Error(`the reply's headers are past the host's head envelope (${HEAD_MAX} bytes or ${HEAD_ENTRIES} entries)`)
     }
@@ -2862,7 +2862,7 @@ const handlers = {
   },
 }
 
-// Everything waits for init; a request is answered even when magpie has
+// Everything waits for init; a request is answered even when blackpie has
 // closed stdin behind it, the host leaving once nothing is pending.
 let ready
 let readyState

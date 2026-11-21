@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/filelock"
+	"github.com/hmjz100/blackpie/internal/filelock"
 )
 
 // Edits made at once each keep the others': each is made from what the
@@ -54,7 +54,7 @@ func TestEditErrorSavesNothing(t *testing.T) {
 	}
 }
 
-// Another magpie holding the settings past the wait: the save is refused,
+// Another blackpie holding the settings past the wait: the save is refused,
 // not written over its change.
 func TestSaveRefusedWhileAnotherHolds(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())

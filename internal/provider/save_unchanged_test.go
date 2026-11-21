@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/catalog"
 )
 
 // Save pressed on a provider's editor left as it was writes nothing and

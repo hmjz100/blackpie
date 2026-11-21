@@ -1,7 +1,7 @@
 package library
 
 // A plugin that gives tools (OpenCode's tool hook, served at the gateway's
-// /mcp/magpie/tools) is a server in the Library of its own (chenxiang0010
+// /mcp/blackpie/tools) is a server in the Library of its own (chenxiang0010
 // on Discord: Search1API's tools in the MCP hub). Once the plugin host has
 // noted the plugin's tools (plugin-tools.json), the library adds a server
 // named by the plugin's short name (search1api), at the gateway's
@@ -36,9 +36,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // pluginToolsOf and runPluginToolOf are the gateway's, a test's fakes in

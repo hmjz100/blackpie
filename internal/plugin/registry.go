@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io"
 	"net/http"
 	"net/url"
@@ -14,16 +14,16 @@ import (
 
 	toml "github.com/pelletier/go-toml/v2"
 
-	"github.com/yetone/magpie/internal/proc"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/source"
+	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/source"
 )
 
 // Where the npm registry in use came from (RegistryInUse.From).
 const (
-	FromMagpie  = "magpie"  // set on the Plugins page or with `magpie plugin registry`
-	FromEnv     = "env"     // magpie's environment: BUN_CONFIG_REGISTRY, NPM_CONFIG_REGISTRY
-	FromShell   = "shell"   // the login shell's, which magpie opened from the Dock doesn't have
+	FromBlackpie  = "blackpie"  // set on the Plugins page or with `blackpie plugin registry`
+	FromEnv     = "env"     // blackpie's environment: BUN_CONFIG_REGISTRY, NPM_CONFIG_REGISTRY
+	FromShell   = "shell"   // the login shell's, which blackpie opened from the Dock doesn't have
 	FromBunfig  = "bunfig"  // install.registry in a .bunfig.toml
 	FromNPMRC   = "npmrc"   // registry= in an .npmrc
 	FromChina   = "china"   // the 「国内镜像」 switch: npmmirror
@@ -47,15 +47,15 @@ var registryVars = []string{"BUN_CONFIG_REGISTRY", "NPM_CONFIG_REGISTRY", "npm_c
 // loginEnv is what the login shell said of a variable (a var for tests).
 var loginEnv = proc.LoginEnvKnown
 
-// Registry is the npm registry in use: the one set in magpie, then one the
-// user's own setup names (magpie's environment, the login shell's, a
+// Registry is the npm registry in use: the one set in blackpie, then one the
+// user's own setup names (blackpie's environment, the login shell's, a
 // .bunfig.toml, an .npmrc: a registry of the user's own, which bun reads
 // too), then npmmirror with the 「国内镜像」 switch on, then npm's own. A
-// registry the user set is never put behind magpie's switch (timwangdev
+// registry the user set is never put behind blackpie's switch (timwangdev
 // on X: plugins from a custom npm registry).
 func Registry() RegistryInUse {
 	if u, err := CleanRegistry(settings.Load().NPMRegistry); err == nil && u != "" {
-		return RegistryInUse{URL: u, From: FromMagpie}
+		return RegistryInUse{URL: u, From: FromBlackpie}
 	}
 	if r, ok := userRegistry(); ok {
 		return r
@@ -135,7 +135,7 @@ func CleanRegistry(u string) (string, error) {
 }
 
 // SetRegistry keeps u as the registry plugins use, "" or "default" for
-// none of magpie's own; an address that isn't one is refused, not kept.
+// none of blackpie's own; an address that isn't one is refused, not kept.
 func SetRegistry(u string) (RegistryInUse, error) {
 	if strings.EqualFold(strings.TrimSpace(u), "default") {
 		u = ""
@@ -156,17 +156,17 @@ func SetRegistry(u string) (RegistryInUse, error) {
 }
 
 // registryEnv is the registry bun installs from, given the environment it
-// runs in: the one set in magpie, the login shell's (which env lacks) and
+// runs in: the one set in blackpie, the login shell's (which env lacks) and
 // npmmirror with the switch on are told to it; one env, a bunfig or an
 // .npmrc names bun reads itself, and the switch's mirror is not put over it.
 func registryEnv(env []string) []string {
 	r := Registry()
 	switch r.From {
-	case FromMagpie, FromShell, FromChina:
+	case FromBlackpie, FromShell, FromChina:
 	default:
 		return nil
 	}
-	if r.From != FromMagpie {
+	if r.From != FromBlackpie {
 		// a variable the environment it runs in has (a test's) is its own
 		for _, kv := range env {
 			k, v, _ := strings.Cut(kv, "=")
@@ -256,7 +256,7 @@ func npmrcs() []npmrc {
 	return out
 }
 
-// npmBase is the registry magpie asks of package name, and the token an
+// npmBase is the registry blackpie asks of package name, and the token an
 // .npmrc keeps for it: a scope's own registry (@scope:registry=) for a
 // package of that scope (bun installs it from there whatever the default
 // registry is); Registry's otherwise. official is whether it is npm's own (which the 「国内镜像」
@@ -318,7 +318,7 @@ func fetchRegistry(ctx context.Context, u, token string, limit int64) ([]byte, e
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "magpie")
+	req.Header.Set("User-Agent", "blackpie")
 	req.Header.Set("Accept", "application/json")
 	if token != "" {
 		req.Header.Set("Authorization", "Bearer "+token)

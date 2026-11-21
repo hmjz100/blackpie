@@ -19,22 +19,22 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/filelock"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/filelock"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
-const Prefix = "sk-magpie-key-"
-const legacyLANPrefix = "sk-magpie-"
-const revokedLANPrefix = "sk-magpie-revoked-"
+const Prefix = "sk-blackpie-key-"
+const legacyLANPrefix = "sk-blackpie-"
+const revokedLANPrefix = "sk-blackpie-revoked-"
 
 func Managed(secret string) bool {
 	return strings.HasPrefix(secret, legacyLANPrefix)
 }
 
-// Named: secret has a named gateway key's form (sk-magpie-…), or is the
+// Named: secret has a named gateway key's form (sk-blackpie-…), or is the
 // key's own value a user gave it (Change.Secret), so a request from this
-// computer with one is counted and limited as that key, as a sk-magpie-
+// computer with one is counted and limited as that key, as a sk-blackpie-
 // key is.
 func Named(secret string) bool {
 	if Managed(secret) {
@@ -98,7 +98,7 @@ func ownSecret(secret string, keys []Key) (string, error) {
 		}
 	}
 	if strings.HasPrefix(secret, legacyLANPrefix) {
-		return "", errors.New("A key of your own can't start with sk-magpie-: leave the key empty and magpie makes one")
+		return "", errors.New("A key of your own can't start with sk-blackpie-: leave the key empty and blackpie makes one")
 	}
 	for _, k := range keys {
 		if subtle.ConstantTimeCompare([]byte(secret), []byte(k.Secret)) == 1 {
@@ -119,7 +119,7 @@ type Key struct {
 	Limit *Limit `json:"limit,omitempty"`
 	// More are its limits after the first (#2227), each a window of its
 	// own: a request passes only while every one has something left. A
-	// key has them only beside a Limit, which an older magpie still reads.
+	// key has them only beside a Limit, which an older blackpie still reads.
 	More []Limit `json:"moreLimits,omitempty"`
 	// Models are the models the key may use (#882): "<provider>/<model>",
 	// "<provider>/*" or a group's "group/<name>"; none for every model,
@@ -141,7 +141,7 @@ type Key struct {
 	// (issue.go); "" for one the user made or issued themselves.
 	Issuer string `json:"issuer,omitempty"`
 	// Issues lets the key issue short-lived keys under itself
-	// (POST /v1/magpie/keys); an issued key never can.
+	// (POST /v1/blackpie/keys); an issued key never can.
 	Issues bool `json:"issues,omitempty"`
 }
 
@@ -162,7 +162,7 @@ type Identity struct {
 	Issuer *Identity
 	// Issues: the key may issue keys under itself.
 	Issues bool
-	// Default: the key is the sharing key magpie made itself (Default),
+	// Default: the key is the sharing key blackpie made itself (Default),
 	// the one it writes into this computer's own agents that reach the
 	// gateway from beyond loopback, never one the user made for someone
 	// else.
@@ -176,7 +176,7 @@ func WithIdentity(ctx context.Context, who Identity) context.Context {
 func Caller(ctx context.Context) Identity { who, _ := ctx.Value(contextKey{}).(Identity); return who }
 
 // mu is held for every read of caller-keys.json a change is made from,
-// and the write, across magpies too (#1674): a key revoked with magpie
+// and the write, across blackpies too (#1674): a key revoked with blackpie
 // keys while the window adds one is never written back.
 var mu = filelock.Mutex{Path: func() string { return Path() + ".lock" }}
 
@@ -223,7 +223,7 @@ func List() ([]Key, error) {
 	return keys, nil
 }
 
-// LANSecret is the key magpie shares the gateway on the local network with
+// LANSecret is the key blackpie shares the gateway on the local network with
 // (the default key ConfigureLAN made), for an agent of this computer's that
 // reaches it from beyond loopback — one in a WSL distro under NAT, whose
 // requests the gateway takes only with a named key; "" while the gateway
@@ -257,12 +257,12 @@ func LANSecret() string {
 	return ""
 }
 
-// Default says secret is the sharing key magpie itself made (the default
-// key ConfigureLAN keeps), whether sharing is on now or not: magpie's own,
+// Default says secret is the sharing key blackpie itself made (the default
+// key ConfigureLAN keeps), whether sharing is on now or not: blackpie's own,
 // never one the user brought, so a write that keeps "a caller key of the
 // gateway's own the user put there" must not keep it (#2545: with sharing
 // off the key stays enabled in the store, Authenticate still took it, and
-// Rekey could no longer bring gateway.Token back). An older magpie kept it
+// Rekey could no longer bring gateway.Token back). An older blackpie kept it
 // in the settings alone; that value answers too, short of its revoked
 // mirror.
 func Default(secret string) bool {
@@ -328,7 +328,7 @@ type Change struct {
 	Issues bool `json:"issues,omitempty"`
 	// Secret is the value "add-key" gives the new key, one its clients
 	// already send (love1sbug on X: keys handed out from another gateway);
-	// "" for one magpie makes.
+	// "" for one blackpie makes.
 	Secret string `json:"secret,omitempty"`
 }
 
@@ -468,7 +468,7 @@ func Update(action string, in Change) (string, error) {
 		case "quotas-key":
 			keys[i].Quotas = in.Quotas
 		case "issuer-key":
-			// may issue short-lived keys under itself (POST /v1/magpie/keys)
+			// may issue short-lived keys under itself (POST /v1/blackpie/keys)
 			if in.Issues && (keys[i].Issuer != "" || !keys[i].Expires.IsZero()) {
 				return "", errors.New("An issued key can't issue keys of its own: let a key of yours issue them")
 			}
@@ -507,7 +507,7 @@ func Update(action string, in Change) (string, error) {
 		}
 		// Revoke the old-version mirror before changing the active key store.
 		if err := settings.Save(s); err != nil {
-			return "", fmt.Errorf("Cannot change the default gateway key without updating settings.json: older Magpie versions may still accept its old credential. Make the settings file writable and retry; the key is unchanged: %w", err)
+			return "", fmt.Errorf("Cannot change the default gateway key without updating settings.json: older Blackpie versions may still accept its old credential. Make the settings file writable and retry; the key is unchanged: %w", err)
 		}
 	}
 	if err := save(keys); err != nil {
@@ -569,11 +569,11 @@ func On(id string) bool {
 func legacyLANKey(secret string) Key {
 	// The fallback and eventual persisted key must share their usage identity.
 	sum := sha256.Sum256([]byte(secret))
-	return Key{ID: "lan-" + hex.EncodeToString(sum[:12]), Name: "Magpie", LAN: true, Secret: secret}
+	return Key{ID: "lan-" + hex.EncodeToString(sum[:12]), Name: "Blackpie", LAN: true, Secret: secret}
 }
 
 // MigrateLegacyLANKey makes the old Settings key a normal, revocable caller
-// key. Keep LANKey for older Magpie versions; LANKeyID marks a completed
+// key. Keep LANKey for older Blackpie versions; LANKeyID marks a completed
 // migration so the retained credential cannot resurrect a removed key.
 func MigrateLegacyLANKey() error {
 	mu.Lock()
@@ -583,7 +583,7 @@ func MigrateLegacyLANKey() error {
 
 func MigrateLegacyLANKeyBestEffort() {
 	if err := MigrateLegacyLANKey(); err != nil {
-		log.Printf("magpie: could not migrate LAN key: %v", err)
+		log.Printf("blackpie: could not migrate LAN key: %v", err)
 	}
 }
 
@@ -643,7 +643,7 @@ func configureLAN(on, rotate bool) error {
 		}
 		i := slices.IndexFunc(keys, func(k Key) bool { return k.ID == s.LANKeyID || k.LAN })
 		// a default key the user removed stays removed when sharing is
-		// turned on again: making a fresh "Magpie" key then read as a
+		// turned on again: making a fresh "Blackpie" key then read as a
 		// default key that keeps coming back beside the user's own
 		// (#1655, GradientLive). Only an explicit new key makes one.
 		if i < 0 && !rotate && removedDefault(s) {
@@ -660,7 +660,7 @@ func configureLAN(on, rotate bool) error {
 				if err != nil {
 					return err
 				}
-				keys = append(keys, Key{ID: id, Name: "Magpie", LAN: true})
+				keys = append(keys, Key{ID: id, Name: "Blackpie", LAN: true})
 				i = len(keys) - 1
 			}
 			keys[i].Secret = Prefix + token
@@ -678,7 +678,7 @@ func configureLAN(on, rotate bool) error {
 }
 
 // removedDefault: sharing made a default key before and it is no longer in
-// the store — its id is recorded (LANKeyID), or an older magpie that
+// the store — its id is recorded (LANKeyID), or an older blackpie that
 // drops that id kept only the revoked mirror Update leaves behind.
 func removedDefault(s settings.Settings) bool {
 	return s.LANKeyID != "" || strings.HasPrefix(s.LANKey, revokedLANPrefix)

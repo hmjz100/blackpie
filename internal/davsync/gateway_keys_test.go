@@ -6,11 +6,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/backup"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/backup"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Gateway keys travel with Settings in a backup. Changing just an independent
@@ -55,7 +55,7 @@ func TestGatewayKeysSync(t *testing.T) {
 			remote := func() backup.Bundle {
 				t.Helper()
 				fake.mu.Lock()
-				data := append([]byte(nil), fake.files["/dav/magpie/magpie.magpie-backup"]...)
+				data := append([]byte(nil), fake.files["/dav/blackpie/blackpie.blackpie-backup"]...)
 				fake.mu.Unlock()
 				got, err := backup.Open(data, cfg.Passphrase)
 				if err != nil {

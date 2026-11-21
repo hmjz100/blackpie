@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // TestForwardOnceCarriesBiliHeaders holds #3052: a billion-context proxy

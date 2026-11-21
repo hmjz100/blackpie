@@ -1,37 +1,37 @@
-// Package appdir decides where magpie keeps its own files: the one place
+// Package appdir decides where blackpie keeps its own files: the one place
 // every other package asks (#508).
 //
-// Installed, that is ~/.config/magpie ($XDG_CONFIG_HOME/magpie) for what
-// magpie keeps and ~/.cache/magpie ($XDG_CACHE_HOME/magpie) for what it
+// Installed, that is ~/.config/blackpie ($XDG_CONFIG_HOME/blackpie) for what
+// blackpie keeps and ~/.cache/blackpie ($XDG_CACHE_HOME/blackpie) for what it
 // can fetch again, as it always was. Portable, when a folder named "data"
-// (or a file named ".portable") sits beside magpie, everything magpie
+// (or a file named ".portable") sits beside blackpie, everything blackpie
 // keeps goes into that data folder, its caches into data/cache and the
 // Windows webview's profile into data/webview2 (no Start-menu shortcut or
 // App Paths entry is made either), and
-// nothing of magpie's own is written to the user's profile, the way VS
-// Code's portable mode works. "Beside magpie" is the folder holding the
+// nothing of blackpie's own is written to the user's profile, the way VS
+// Code's portable mode works. "Beside blackpie" is the folder holding the
 // executable, with links followed; for a Mac app it is the folder holding
-// Magpie.app (a file put inside the bundle would break its signature), and
+// Blackpie.app (a file put inside the bundle would break its signature), and
 // for an AppImage the folder holding the .AppImage file, not the folder it
 // is mounted at while it runs.
 //
-// What isn't magpie's own stays where its owner reads it: the agents'
+// What isn't blackpie's own stays where its owner reads it: the agents'
 // configs (~/.claude, ~/.codex…), the sign-ins they keep in the system
 // keychain, the folders the OS reads for autostart and link handling, and
 // temporary folders.
 //
 // A data folder in a folder every app or download shares (/Applications on
 // a Mac; the home folder, Downloads, Desktop and Documents everywhere) is
-// taken for magpie's own only when it already holds magpie's files and the
+// taken for blackpie's own only when it already holds blackpie's files and the
 // installed folder doesn't, or with a ".portable" marker: a "data" folder
 // there is as likely another app's or the user's own. Taking one showed a
-// user who had never asked for portable an empty magpie (#989), and wrote
-// magpie's files into a Downloads\data folder a Windows user's archiver
+// user who had never asked for portable an empty blackpie (#989), and wrote
+// blackpie's files into a Downloads\data folder a Windows user's archiver
 // empties, so a provider just added was gone (tangle778 on X).
 //
-// The decision is made once, from the executable as it was when magpie
-// started: an update moving the running copy aside (into .magpie-update on
-// a Mac, to magpie.exe.old on Windows) leaves it running from somewhere
+// The decision is made once, from the executable as it was when blackpie
+// started: an update moving the running copy aside (into .blackpie-update on
+// a Mac, to blackpie.exe.old on Windows) leaves it running from somewhere
 // else, and its files must not move with it.
 package appdir
 
@@ -45,10 +45,10 @@ import (
 )
 
 const (
-	// DataName is the folder beside magpie that makes it portable and
+	// DataName is the folder beside blackpie that makes it portable and
 	// holds its files.
 	DataName = "data"
-	// MarkerName is a file beside magpie that makes it portable too, its
+	// MarkerName is a file beside blackpie that makes it portable too, its
 	// files then going into a data folder made beside it.
 	MarkerName = ".portable"
 )
@@ -58,7 +58,7 @@ var (
 	portable string // the data folder, or "" when installed
 )
 
-// Portable is the data folder magpie keeps everything in, or "" when it
+// Portable is the data folder blackpie keeps everything in, or "" when it
 // isn't portable.
 func Portable() string {
 	once.Do(func() {
@@ -69,15 +69,15 @@ func Portable() string {
 		portable = Resolve(exe)
 		if portable == "" {
 			if data := Passed(exe); data != "" {
-				log.Printf("appdir: %s is beside magpie but not taken for its portable data: it is in a shared folder and %s has magpie's files too; a .portable file beside magpie makes it portable", data, installed())
+				log.Printf("appdir: %s is beside blackpie but not taken for its portable data: it is in a shared folder and %s has blackpie's files too; a .portable file beside blackpie makes it portable", data, installed())
 			}
 		}
 	})
 	return portable
 }
 
-// UseExecutable decides again as if magpie ran from exe ("" for an
-// installed magpie, whatever runs): for tests.
+// UseExecutable decides again as if blackpie ran from exe ("" for an
+// installed blackpie, whatever runs): for tests.
 func UseExecutable(exe string) {
 	once.Do(func() {})
 	portable = ""
@@ -86,7 +86,7 @@ func UseExecutable(exe string) {
 	}
 }
 
-// Resolve is the data folder of a magpie run from exe, or "" when it isn't
+// Resolve is the data folder of a blackpie run from exe, or "" when it isn't
 // portable.
 func Resolve(exe string) string {
 	if real, err := filepath.EvalSymlinks(exe); err == nil {
@@ -111,9 +111,9 @@ func Resolve(exe string) string {
 	return ""
 }
 
-// Passed is the data folder beside a magpie run from exe that holds
-// magpie's files but that Resolve doesn't take for its own, because it is
-// in a shared folder while the installed folder has magpie's files too, or
+// Passed is the data folder beside a blackpie run from exe that holds
+// blackpie's files but that Resolve doesn't take for its own, because it is
+// in a shared folder while the installed folder has blackpie's files too, or
 // "". A data folder holding none of them is someone else's and isn't named.
 func Passed(exe string) string {
 	if real, err := filepath.EvalSymlinks(exe); err == nil {
@@ -130,11 +130,11 @@ func Passed(exe string) string {
 	return ""
 }
 
-// shared says whether the data folder in dir can't be taken for magpie's:
+// shared says whether the data folder in dir can't be taken for blackpie's:
 // dir is a folder every app or download shares, where a folder named data
 // is as likely another app's or the user's own, and either data holds none
-// of magpie's files or the installed folder holds them too. One who keeps
-// magpie portable there has its files in data and never ran it installed,
+// of blackpie's files or the installed folder holds them too. One who keeps
+// blackpie portable there has its files in data and never ran it installed,
 // and keeps it portable; a ".portable" marker beside it makes it portable
 // whatever is there.
 func shared(dir, data string) bool {
@@ -148,7 +148,7 @@ func shared(dir, data string) bool {
 	return in != "" && hasFiles(in)
 }
 
-// hasFiles says whether dir holds magpie's own files.
+// hasFiles says whether dir holds blackpie's own files.
 func hasFiles(dir string) bool {
 	for _, f := range []string{"providers.json", "logins.json", "settings.json"} {
 		if fi, err := os.Stat(filepath.Join(dir, f)); err == nil && !fi.IsDir() {
@@ -183,31 +183,31 @@ var sharedFolder = func(dir string) bool {
 	return false
 }
 
-// installed is the folder an installed magpie keeps its files in, or ""
+// installed is the folder an installed blackpie keeps its files in, or ""
 // with no home folder.
 func installed() string {
 	if x := os.Getenv("XDG_CONFIG_HOME"); rooted(x) {
-		return filepath.Join(x, "magpie")
+		return filepath.Join(x, "blackpie")
 	}
 	h, err := Home()
 	if err != nil {
 		return ""
 	}
-	return filepath.Join(h, ".config", "magpie")
+	return filepath.Join(h, ".config", "blackpie")
 }
 
-// Beside is the folder a portable magpie run from exe keeps its data folder
+// Beside is the folder a portable blackpie run from exe keeps its data folder
 // in: the executable's own, the one holding the .app on a Mac, the one
 // holding the .AppImage on Linux. APPIMAGE counts only for the AppImage
-// magpie runs from (exe under its mount, APPDIR): every program an
-// AppImage starts inherits both, a magpie started from an AppImage
+// blackpie runs from (exe under its mount, APPDIR): every program an
+// AppImage starts inherits both, a blackpie started from an AppImage
 // terminal too.
 func Beside(exe string) string {
 	if img := os.Getenv("APPIMAGE"); img != "" && runtime.GOOS == "linux" && within(exe, os.Getenv("APPDIR")) {
 		return filepath.Dir(img)
 	}
 	dir := filepath.Dir(exe)
-	// …/Magpie.app/Contents/MacOS/magpie
+	// …/Blackpie.app/Contents/MacOS/blackpie
 	if filepath.Base(dir) == "MacOS" && filepath.Base(filepath.Dir(dir)) == "Contents" {
 		if app := filepath.Dir(filepath.Dir(dir)); strings.EqualFold(filepath.Ext(app), ".app") {
 			return filepath.Dir(app)
@@ -232,23 +232,23 @@ func absolute(p string) string {
 	return p
 }
 
-// Config is the folder magpie keeps its settings, providers, usage and the
+// Config is the folder blackpie keeps its settings, providers, usage and the
 // rest of its own state in.
 func Config() string {
 	if p := Portable(); p != "" {
 		return p
 	}
 	if x := os.Getenv("XDG_CONFIG_HOME"); rooted(x) {
-		return Join(x, "magpie")
+		return Join(x, "blackpie")
 	}
-	return Join(Join(mustHome(), ".config"), "magpie")
+	return Join(Join(mustHome(), ".config"), "blackpie")
 }
 
-// Redirected is the folder magpie keeps its files in when it is opened
-// from the Dock, the Start menu or a desktop launcher (~/.config/magpie),
-// while this magpie reads them from another that XDG_CONFIG_HOME, set in
-// the shell it was run from, names; "" when they are the same, or magpie
-// is portable. A magpie run in such a shell sees none of what the app's
+// Redirected is the folder blackpie keeps its files in when it is opened
+// from the Dock, the Start menu or a desktop launcher (~/.config/blackpie),
+// while this blackpie reads them from another that XDG_CONFIG_HOME, set in
+// the shell it was run from, names; "" when they are the same, or blackpie
+// is portable. A blackpie run in such a shell sees none of what the app's
 // window shows.
 func Redirected() string {
 	if Portable() != "" || os.Getenv("XDG_CONFIG_HOME") == "" {
@@ -258,13 +258,13 @@ func Redirected() string {
 	if err != nil {
 		return ""
 	}
-	if def := filepath.Join(h, ".config", "magpie"); filepath.Clean(def) != filepath.Clean(Config()) {
+	if def := filepath.Join(h, ".config", "blackpie"); filepath.Clean(def) != filepath.Clean(Config()) {
 		return def
 	}
 	return ""
 }
 
-// Cache is the folder for what magpie can fetch again (the models.dev
+// Cache is the folder for what blackpie can fetch again (the models.dev
 // catalog, exchange rates, market lists).
 func Cache() string {
 	if p := Portable(); p != "" {
@@ -273,19 +273,19 @@ func Cache() string {
 	return InstalledCache()
 }
 
-// InstalledCache is Cache of an installed magpie.
+// InstalledCache is Cache of an installed blackpie.
 func InstalledCache() string {
 	if x := os.Getenv("XDG_CACHE_HOME"); rooted(x) {
-		return Join(x, "magpie")
+		return Join(x, "blackpie")
 	}
-	return Join(Join(mustHome(), ".cache"), "magpie")
+	return Join(Join(mustHome(), ".cache"), "blackpie")
 }
 
 // Logs is the folder the desktop app writes its log in, where each system
-// keeps an app's logs: ~/Library/Logs/magpie on a Mac (beside the launch
-// agent's serve.log, `magpie daemon install`), %LOCALAPPDATA%\magpie\logs
-// on Windows, and $XDG_STATE_HOME/magpie (~/.local/state/magpie) elsewhere;
-// portable, data/logs. A user asked for magpie's log finds it there
+// keeps an app's logs: ~/Library/Logs/blackpie on a Mac (beside the launch
+// agent's serve.log, `blackpie daemon install`), %LOCALAPPDATA%\blackpie\logs
+// on Windows, and $XDG_STATE_HOME/blackpie (~/.local/state/blackpie) elsewhere;
+// portable, data/logs. A user asked for blackpie's log finds it there
 // (rayem1w on X: the app opened from the Finder had written none).
 func Logs() string {
 	return logsOn(runtime.GOOS)
@@ -298,25 +298,25 @@ func logsOn(goos string) string {
 	}
 	switch goos {
 	case "darwin":
-		return filepath.Join(mustHome(), "Library", "Logs", "magpie")
+		return filepath.Join(mustHome(), "Library", "Logs", "blackpie")
 	case "windows":
 		local := os.Getenv("LOCALAPPDATA")
 		if !rooted(local) {
 			local = filepath.Join(mustHome(), "AppData", "Local")
 		}
-		return filepath.Join(local, "magpie", "logs")
+		return filepath.Join(local, "blackpie", "logs")
 	}
 	if x := os.Getenv("XDG_STATE_HOME"); rooted(x) {
-		return filepath.Join(x, "magpie")
+		return filepath.Join(x, "blackpie")
 	}
-	return filepath.Join(mustHome(), ".local", "state", "magpie")
+	return filepath.Join(mustHome(), ".local", "state", "blackpie")
 }
 
 // WebView is the folder the Windows webview (WebView2) keeps its profile
 // in — its cache, cookies and the pages' storage — or "" for its own
 // default. Installed, that default is %APPDATA%\<exe name>, as it always
 // was, so nothing kept there is lost; portable, it is data\webview2, so a
-// portable magpie leaves no magpie.exe folder in the user's AppData (#508).
+// portable blackpie leaves no blackpie.exe folder in the user's AppData (#508).
 func WebView() string {
 	if p := Portable(); p != "" {
 		return filepath.Join(p, "webview2")
@@ -324,8 +324,8 @@ func WebView() string {
 	return ""
 }
 
-// SystemCache is the cache folder the OS names for magpie
-// (~/Library/Caches/magpie on a Mac, %LocalAppData%\magpie on Windows),
+// SystemCache is the cache folder the OS names for blackpie
+// (~/Library/Caches/blackpie on a Mac, %LocalAppData%\blackpie on Windows),
 // which a few caches have always used; portable, it is Cache.
 func SystemCache() (string, error) {
 	d, err := InstalledSystemCache()
@@ -347,7 +347,7 @@ func InstalledSystemCache() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(d, "magpie"), nil
+	return filepath.Join(d, "blackpie"), nil
 }
 
 // SameCachePath compares the two resolved cache paths. Migration separately

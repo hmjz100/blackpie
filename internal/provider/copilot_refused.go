@@ -11,7 +11,7 @@ package provider
 
 import (
 	"context"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"sync"
 	"time"
 )

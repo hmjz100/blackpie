@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // copilotFake signs a Copilot account in (its GitHub token gh) to a fake
@@ -224,7 +224,7 @@ const copilotStudentList = `{"data":[
   {"id":"gpt-4.1","model_picker_enabled":false,"model_picker_category":"versatile","policy":{"state":"enabled"},"capabilities":{"type":"chat"}}]}`
 
 // #256 (infinitr0us, 22:07, v0.1.921): /auto picked gpt-5.6-luna, which
-// Copilot refused "The requested model is not supported."; magpie then went
+// Copilot refused "The requested model is not supported."; blackpie then went
 // down the list in its order, gpt-4.1 last, five more refusals, and the
 // request failed with 400 before reaching gpt-4.1. The reply named
 // mai-code-1.1-flash, a refused pick. gpt-4.1 is now the first fallback,
@@ -263,8 +263,8 @@ func TestCopilotAutoFallsBackToBase(t *testing.T) {
 	if rec.Code != 200 || !strings.Contains(rec.Body.String(), "hello from gpt-4.1") {
 		t.Fatalf("copilot/auto: %d %s", rec.Code, rec.Body.String())
 	}
-	if got := rec.Header().Get("X-Magpie-Model"); got != "copilot/gpt-4.1" {
-		t.Errorf("X-Magpie-Model %q, want copilot/gpt-4.1", got)
+	if got := rec.Header().Get("X-Blackpie-Model"); got != "copilot/gpt-4.1" {
+		t.Errorf("X-Blackpie-Model %q, want copilot/gpt-4.1", got)
 	}
 	mu.Lock()
 	defer mu.Unlock()

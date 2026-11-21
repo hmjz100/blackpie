@@ -28,7 +28,7 @@ func TestModelMisreadsNotMasked(t *testing.T) {
 		{"Claude publishes it as an Artifact.", "Claude", "private_person"},
 		{"Another Claude session holds the port.", "Another Claude", "private_person"},
 		// a user name inside a path, a skill's name
-		{"read /Users/yetone/workspace/projects/magpie/AGENTS.md", "yetone", "private_person"},
+		{"read /Users/user/workspace/projects/blackpie/AGENTS.md", "yetone", "private_person"},
 		{"- artifact-design: Design guidance", "artifact-design", "private_person"},
 		// ids cut out of longer words
 		{`"tool_use_id":"toolu_01XyZabcDEF123456"`, "XyZabcDEF123456", "secret"},
@@ -39,7 +39,7 @@ func TestModelMisreadsNotMasked(t *testing.T) {
 		// names in Go's module cache, a path's piece
 		{"/Users/x/Library/Caches/go-build/63700b7ab65fd1d3@v63", "63700b7ab65fd1d3@v63", "secret"},
 		{"d6426ecaaf0a28de@v31", "d6426ecaaf0a28de@v31", "private_email"},
-		{"P=/Users/yetone/.npm/_npx/1e7f6d9597241db0", "/yetone/.", "private_email"},
+		{"P=/Users/user/.npm/_npx/1e7f6d9597241db0", "/user/.", "private_email"},
 		// a piece of a base64 image
 		{"iVBORw0KGgoAAAANSUhEUgAA+k5zM7Md7tM9ehxd51xF/isvM9", "k5zM7Md7tM9ehxd51xF", "secret"},
 		// a grep alternation, a session's file, a link

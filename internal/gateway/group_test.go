@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/routes"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/routes"
 )
 
 // keyed is a vendor that says which key each request came with, and
@@ -156,7 +156,7 @@ func TestOpenRouterSharedPoolRateLimitRestsOneModel(t *testing.T) {
 	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "from b") {
 		t.Fatalf("group reply: %d %s", rec.Code, rec.Body.String())
 	}
-	if rec.Header().Get("X-Magpie-OpenRouter-Limit-Source") != "" {
+	if rec.Header().Get("X-Blackpie-OpenRouter-Limit-Source") != "" {
 		t.Fatal("internal OpenRouter routing detail reached the client")
 	}
 	if first := s.trace.routes[len(s.trace.routes)-1].Tries[0]; first.Rest == nil || first.Rest.Key != "orf/x/a:free" {
@@ -192,7 +192,7 @@ func TestOpenRouterSharedPoolDirectReplyHidesRoutingHeader(t *testing.T) {
 	if rec.Code != http.StatusTooManyRequests {
 		t.Fatalf("direct reply: %d %s", rec.Code, rec.Body.String())
 	}
-	if got := rec.Header().Get("X-Magpie-OpenRouter-Limit-Source"); got != "" {
+	if got := rec.Header().Get("X-Blackpie-OpenRouter-Limit-Source"); got != "" {
 		t.Fatalf("internal routing header leaked: %q", got)
 	}
 }
@@ -225,7 +225,7 @@ func TestOpenRouterFreeAccountRateLimitKeepsProviderRest(t *testing.T) {
 	}
 }
 
-// A model two providers serve is a group magpie finds; a group the user
+// A model two providers serve is a group blackpie finds; a group the user
 // makes routes over its members in the order it names them, the next one
 // taking a request the one before can't.
 func TestRoutingGroups(t *testing.T) {
@@ -275,7 +275,7 @@ func TestRoutingGroups(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// removing one magpie found hides it; showing it brings it back
+	// removing one blackpie found hides it; showing it brings it back
 	if err := provider.DeleteGroup("auto-m"); err != nil {
 		t.Fatal(err)
 	}

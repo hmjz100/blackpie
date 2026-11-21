@@ -2,11 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleName</key><string>moepie</string>
-	<key>CFBundleDisplayName</key><string>moepie</string>
-	<key>CFBundleIdentifier</key><string>io.github.lingqiqi5211.moepie</string>
-	<key>CFBundleExecutable</key><string>moepie</string>
-	<key>CFBundleIconFile</key><string>magpie</string>
+	<key>CFBundleName</key><string>blackpie</string>
+	<key>CFBundleDisplayName</key><string>blackpie</string>
+	<key>CFBundleIdentifier</key><string>io.github.hmjz100.blackpie</string>
+	<key>CFBundleExecutable</key><string>blackpie</string>
+	<key>CFBundleIconFile</key><string>blackpie</string>
 	<key>CFBundleIconName</key><string>AppIcon</string>
 	<key>CFBundlePackageType</key><string>APPL</string>
 	<key>CFBundleShortVersionString</key><string>@VERSION@</string>
@@ -17,8 +17,8 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
-			<key>CFBundleURLName</key><string>com.yetone.magpie.import</string>
-			<key>CFBundleURLSchemes</key><array><string>magpie</string></array>
+			<key>CFBundleURLName</key><string>com.hmjz100.blackpie.import</string>
+			<key>CFBundleURLSchemes</key><array><string>blackpie</string></array>
 		</dict>
 	</array>
 	<key>NSHumanReadableCopyright</key><string>yetone</string>

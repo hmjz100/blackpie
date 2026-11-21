@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/steady"
+	"github.com/hmjz100/blackpie/internal/steady"
 )
 
 // fakeCodexRefresh answers a refresh with a fresh access token and the
@@ -111,7 +111,7 @@ func TestCodexRefreshFlushesAuthJSONBeforeReplacingIt(t *testing.T) {
 	}
 }
 
-// The same for Claude Code's own .credentials.json, written when magpie
+// The same for Claude Code's own .credentials.json, written when blackpie
 // switches the sign-in Claude Code is on: a write whose flush failed is
 // an error and leaves the file as it was.
 func TestClaudeCredentialFlushesBeforeReplacing(t *testing.T) {

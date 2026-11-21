@@ -10,12 +10,12 @@ import (
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
-// watchTrayUsage keeps the tray's cards up to date, and magpie's name over
+// watchTrayUsage keeps the tray's cards up to date, and blackpie's name over
 // today's total in the tooltip while there are none (trayIdleTip).
 func (h *host) watchTrayUsage() {
 	wake := make(chan struct{}, 1)

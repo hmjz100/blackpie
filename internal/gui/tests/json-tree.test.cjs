@@ -109,7 +109,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
           await browser.close();
         });
 
-        await page.goto("http://magpie.test/?view=usage&tab=requests");
+        await page.goto("http://blackpie.test/?view=usage&tab=requests");
         const rows = page.locator("#ledWrap .led tbody tr.led-row");
         await rows.first().waitFor();
         // a row's bodies, in its details; it opens on a click on its agent

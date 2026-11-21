@@ -19,7 +19,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       page.on("pageerror", e => errors.push(e.message));
       let cur = { lang, theme: "light", tray: "panel", currency: "usd", textSize: 100, trayUsageEvery: 3,
         redactWords: [], workbuddyCheckins: [], visionModels: [], imageGenModels: [], lanURLs: [],
-        version: "test", dir: "~/.config/magpie", gateway: "http://127.0.0.1:3425", fx: { rate: 7.2, at: new Date().toISOString() }, effectiveModelLimit: 24 };
+        version: "test", dir: "~/.config/blackpie", gateway: "http://127.0.0.1:3425", fx: { rate: 7.2, at: new Date().toISOString() }, effectiveModelLimit: 24 };
       await page.route("**/*", async route => {
         const req = route.request(), url = new URL(req.url());
         const json = data => route.fulfill({ json: data });
@@ -42,7 +42,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         return route.fulfill({ body: await fs.readFile(file), contentType: { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml" }[path.extname(file)] });
       });
       for (const value of ["", "48", "3", "0"]) {
-        await page.goto("http://magpie.test/?view=settings&tab=models", { waitUntil: "networkidle" });
+        await page.goto("http://blackpie.test/?view=settings&tab=models", { waitUntil: "networkidle" });
         const input = page.locator("#defaultModelLimitRow input");
         await input.waitFor();
         assert.equal(await input.getAttribute("aria-label"), tr("Default model limit"));
@@ -81,7 +81,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
           assert(posts.length > before, "change saved");
           assert.equal(posts.at(-1).defaultModelLimit, Number(value));
         }
-        await page.goto("http://magpie.test/?view=providers", { waitUntil: "networkidle" });
+        await page.goto("http://blackpie.test/?view=providers", { waitUntil: "networkidle" });
         await page.locator(".row.provider", { hasText: "Limit probe" }).click();
         const editor = page.locator("#modal:not([hidden]) .editor");
         await editor.locator(".mchips .mchip").first().waitFor();
@@ -92,7 +92,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await editor.locator('[data-serves="picked"]').click();
         assert.equal(await editor.locator(".mchip.on").count(), want, "Picked only seeds the effective vendor list");
       }
-      await page.goto("http://magpie.test/?view=settings&tab=models", { waitUntil: "networkidle" });
+      await page.goto("http://blackpie.test/?view=settings&tab=models", { waitUntil: "networkidle" });
       const input = page.locator("#defaultModelLimitRow input");
       const beforeInvalid = posts.length;
       // Assign atomically: WebKit's number spinner may clamp a synthetic fill

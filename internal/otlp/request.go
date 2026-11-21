@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 // request is one gateway request the exporter watches: a root span, and

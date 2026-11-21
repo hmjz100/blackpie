@@ -11,37 +11,37 @@ import (
 	"time"
 
 	"github.com/coder/websocket"
-	"github.com/yetone/magpie/internal/browserext"
+	"github.com/hmjz100/blackpie/internal/browserext"
 )
 
-// Magpie Browser: the agents magpie serves use the user's own browser,
-// its tabs signed in to whatever the user is, through the Magpie Browser
-// extension (internal/browserext). Not a browser of magpie's own: a fresh
+// Blackpie Browser: the agents blackpie serves use the user's own browser,
+// its tabs signed in to whatever the user is, through the Blackpie Browser
+// extension (internal/browserext). Not a browser of blackpie's own: a fresh
 // profile is signed in to nothing, and an agent's own browser tool stops
 // working when its account changes.
 //
 // The extension holds a WebSocket to BrowserExtensionPath, taken only from
 // its own origin on this computer. An agent calls the tools at
-// BrowserMCPPath (Streamable HTTP, or `magpie mcp browser` over stdio),
+// BrowserMCPPath (Streamable HTTP, or `blackpie mcp browser` over stdio),
 // and each call is handed to the extension, which carries it out with the
 // DevTools protocol in the tab and answers with MCP content. Only this
-// computer's agents may: unlike the other servers of magpie's own, it is
+// computer's agents may: unlike the other servers of blackpie's own, it is
 // never served to another machine, shared or not, since it acts as the
 // user wherever they are signed in.
 
 // BrowserMCPPath is where the browser MCP server is served.
-const BrowserMCPPath = "/mcp/magpie/browser"
+const BrowserMCPPath = "/mcp/blackpie/browser"
 
 // BrowserExtensionPath is where the extension connects.
-const BrowserExtensionPath = "/v1/magpie/browser/extension"
+const BrowserExtensionPath = "/v1/blackpie/browser/extension"
 
 // BrowserStatusPath tells whether the extension is connected.
-const BrowserStatusPath = "/v1/magpie/browser"
+const BrowserStatusPath = "/v1/blackpie/browser"
 
 // BrowserSessionHeader names the agent session a call is from, so each
-// one goes on in the tab it was working in; `magpie mcp browser` sends one
+// one goes on in the tab it was working in; `blackpie mcp browser` sends one
 // a process.
-const BrowserSessionHeader = "X-Magpie-Browser-Session"
+const BrowserSessionHeader = "X-Blackpie-Browser-Session"
 
 // browserCallWait is how long a call waits for the extension: a
 // browser_wait waits up to 60s, a load 30s, and each acts then waits for the
@@ -136,7 +136,7 @@ func (b *browserRelay) call(ctx context.Context, session, tool string, args json
 		args = json.RawMessage("{}")
 	}
 	if err := c.send(ctx, map[string]any{"id": id, "session": session, "tool": tool, "args": args}); err != nil {
-		return nil, errors.New("couldn't reach Magpie Browser: " + err.Error())
+		return nil, errors.New("couldn't reach Blackpie Browser: " + err.Error())
 	}
 	t := time.NewTimer(browserCallWait)
 	defer t.Stop()
@@ -144,18 +144,18 @@ func (b *browserRelay) call(ctx context.Context, session, tool string, args json
 	case r := <-ch:
 		return r, nil
 	case <-t.C:
-		return nil, errors.New("Magpie Browser didn't answer in " + browserCallWait.String() + ": the page may be stuck; take a snapshot or a screenshot to see where it is")
+		return nil, errors.New("Blackpie Browser didn't answer in " + browserCallWait.String() + ": the page may be stuck; take a snapshot or a screenshot to see where it is")
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
 }
 
-var errBrowserAway = errors.New("Magpie Browser isn't connected, so there is no browser to use. Ask the user to set it up: magpie's Library → Magpie Browser → Set up, which loads the extension in Chrome, Edge or another Chromium browser. Once installed it connects by itself whenever that browser and magpie are both running.")
+var errBrowserAway = errors.New("Blackpie Browser isn't connected, so there is no browser to use. Ask the user to set it up: blackpie's Library → Blackpie Browser → Set up, which loads the extension in Chrome, Edge or another Chromium browser. Once installed it connects by itself whenever that browser and blackpie are both running.")
 
 // browserExtension takes the extension's WebSocket.
 func (s *Server) browserExtension(w http.ResponseWriter, r *http.Request) {
 	if !local(r) || !loopbackHost(r.Host) || r.Header.Get("Origin") != browserext.Origin {
-		http.Error(w, "only the Magpie Browser extension, on this computer, connects here", http.StatusForbidden)
+		http.Error(w, "only the Blackpie Browser extension, on this computer, connects here", http.StatusForbidden)
 		return
 	}
 	ws, err := websocket.Accept(w, r, &websocket.AcceptOptions{OriginPatterns: []string{"chrome-extension://" + browserext.ID}})
@@ -171,7 +171,7 @@ func (s *Server) browserExtension(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if added {
 			s.browser.remove(c)
-			log.Printf("Magpie Browser disconnected")
+			log.Printf("Blackpie Browser disconnected")
 		}
 	}()
 	for {
@@ -195,7 +195,7 @@ func (s *Server) browserExtension(w http.ResponseWriter, r *http.Request) {
 			if !added {
 				s.browser.add(c)
 				added = true
-				log.Printf("Magpie Browser %s connected", m.Version)
+				log.Printf("Blackpie Browser %s connected", m.Version)
 			}
 		case m.Type == "ping":
 			c.send(ctx, map[string]string{"type": "pong"})
@@ -208,7 +208,7 @@ func (s *Server) browserExtension(w http.ResponseWriter, r *http.Request) {
 // browserStatus says whether the extension is connected, for the GUI.
 func (s *Server) browserStatus(w http.ResponseWriter, r *http.Request) {
 	if !local(r) || fromBrowser(r) {
-		http.Error(w, "Magpie Browser's state is told to this computer's magpie only", http.StatusForbidden)
+		http.Error(w, "Blackpie Browser's state is told to this computer's blackpie only", http.StatusForbidden)
 		return
 	}
 	out := map[string]any{"connected": false, "version": browserext.Version()}
@@ -226,10 +226,10 @@ func (s *Server) browserMCP(w http.ResponseWriter, r *http.Request) {
 	// user wherever their browser is signed in; and no web page's, whatever
 	// Settings lists
 	if !local(r) || fromBrowser(r) {
-		http.Error(w, "magpie's browser MCP server answers agents on this computer only", http.StatusForbidden)
+		http.Error(w, "blackpie's browser MCP server answers agents on this computer only", http.StatusForbidden)
 		return
 	}
-	serveMCP(w, r, "magpie's browser", "magpie-browser", 1<<20, s.browserMCPCall)
+	serveMCP(w, r, "blackpie's browser", "blackpie-browser", 1<<20, s.browserMCPCall)
 }
 
 func (s *Server) browserMCPCall(r *http.Request, m mcpMessage) (any, map[string]any) {
@@ -238,7 +238,7 @@ func (s *Server) browserMCPCall(r *http.Request, m mcpMessage) (any, map[string]
 		return map[string]any{
 			"protocolVersion": mcpVersion(m),
 			"capabilities":    map[string]any{"tools": map[string]any{}},
-			"serverInfo":      map[string]any{"name": "magpie-browser", "title": "Magpie Browser", "version": Version},
+			"serverInfo":      map[string]any{"name": "blackpie-browser", "title": "Blackpie Browser", "version": Version},
 			"instructions":    browserInstructions,
 		}, nil
 	case "ping":
@@ -262,7 +262,7 @@ func (s *Server) browserMCPCall(r *http.Request, m mcpMessage) (any, map[string]
 		}
 		var result map[string]any
 		if json.Unmarshal(out, &result) != nil || result["content"] == nil {
-			return toolResult("Magpie Browser answered with something that isn't a tool result: update it (magpie's Library → Magpie Browser)", true), nil
+			return toolResult("Blackpie Browser answered with something that isn't a tool result: update it (blackpie's Library → Blackpie Browser)", true), nil
 		}
 		return result, nil
 	}

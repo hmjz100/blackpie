@@ -101,7 +101,7 @@ async function open(browser, lang, theme, tray, url, width = 440, height = 900) 
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.route("**/*", serve(lang, theme, tray));
-  await page.addInitScript(() => { try { if (!sessionStorage.getItem("set")) { localStorage.clear(); localStorage.setItem("magpie.quotaRange", "off"); sessionStorage.setItem("set", "1"); } } catch {} });
+  await page.addInitScript(() => { try { if (!sessionStorage.getItem("set")) { localStorage.clear(); localStorage.setItem("blackpie.quotaRange", "off"); sessionStorage.setItem("set", "1"); } } catch {} });
   await page.goto(url);
   return { page, errors };
 }
@@ -115,7 +115,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         t.after(() => browser.close());
 
         // the Usage page
-        const { page, errors } = await open(browser, lang, theme, "window", "http://magpie.test/?view=usage");
+        const { page, errors } = await open(browser, lang, theme, "window", "http://blackpie.test/?view=usage");
         const card = '#subscriptionUsage > [data-key="workbuddy-ai"]';
         await page.waitForSelector(`${card} .quota-all`);
         const strip = page.locator(`${card} .quota-all`);
@@ -152,7 +152,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await page.locator("#quotaMode .opt").nth(0).click();
 
         // a routing group's row
-        await page.goto("http://magpie.test/?view=routing&tab=groups");
+        await page.goto("http://blackpie.test/?view=routing&tab=groups");
         const line = page.locator('.rt-groups > .rt-group[data-id="glm"] .rt-gquota');
         await line.waitFor();
         const said = await line.textContent();
@@ -164,7 +164,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         assert.deepEqual(errors, []);
 
         // the tray panel
-        const panel = await open(browser, lang, theme, "panel", "http://magpie.test/?mode=panel", 360, 760);
+        const panel = await open(browser, lang, theme, "panel", "http://blackpie.test/?mode=panel", 360, 760);
         await panel.page.locator('#ptabs [data-ptab="usage"]').click();
         const pq = panel.page.locator("#panelQuota .pq-group .pq-all");
         await pq.first().waitFor();

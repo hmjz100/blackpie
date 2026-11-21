@@ -15,14 +15,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
-// The model is downloaded through the proxy set in magpie, as magpie's
+// The model is downloaded through the proxy set in blackpie, as blackpie's
 // other requests are (hh0592821 on Discord: a client made before
 // netproxy.Install went direct, and in China huggingface.co answered with
 // a *.facebook.com certificate while their proxy got the file).
-func TestFetchGoesThroughMagpiesProxy(t *testing.T) {
+func TestFetchGoesThroughBlackpiesProxy(t *testing.T) {
 	h := t.TempDir()
 	t.Setenv("HOME", h)
 	t.Setenv("USERPROFILE", h)

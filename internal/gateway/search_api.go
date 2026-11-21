@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"html"
 	"io"
 	"net/http"
@@ -16,13 +16,13 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/budget"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/budget"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
-// When no provider can search, magpie's web_search tool is answered by a
+// When no provider can search, blackpie's web_search tool is answered by a
 // search API the user gave a key to (#419): what it found goes to the
 // model as it came, each page's title, address and what it says, with no
 // model asked to read it first.
@@ -39,7 +39,7 @@ type foundPage struct {
 	Age              string // how old the search said it is, "" when it didn't
 }
 
-// canSearch is whether magpie can answer its web_search tool: plugins/search
+// canSearch is whether blackpie can answer its web_search tool: plugins/search
 // is on (searchServed), and a provider searches for it, or a search API
 // does.
 func canSearch() bool {
@@ -56,7 +56,7 @@ func canSearch() bool {
 // server tool asked of any model here is answered.
 func CanSearch() bool { return canSearch() }
 
-// Searcher names the provider and model magpie searches with for a model
+// Searcher names the provider and model blackpie searches with for a model
 // that can't, "" when none can.
 func Searcher() string {
 	if p, m, ok := searcher(); ok {
@@ -77,7 +77,7 @@ func searcherName(p provider.Provider, model string) string {
 	return p.Name + " · " + model
 }
 
-// AutoSearcher names the provider and model magpie picks to search with
+// AutoSearcher names the provider and model blackpie picks to search with
 // when Settings names none, "" when none can.
 func AutoSearcher() string {
 	if p, m, ok := autoSearcher(); ok {
@@ -181,13 +181,13 @@ func logSearchAPI(ctx context.Context, a provider.SearchAPI, query string, start
 	logSearch(ctx, rec, query, start, found, err)
 }
 
-// logSearch writes rec, a search magpie ran with a search API or a plan's
+// logSearch writes rec, a search blackpie ran with a search API or a plan's
 // own search service, as the request log's row of it: the agent it was
 // for, how long it took and how it ended (200, the API's refusal, the
 // error, "found nothing"). The query is never kept, nor said in the
 // error: the row may go to another computer the usage syncs with.
 func logSearch(ctx context.Context, rec usage.Record, query string, start time.Time, found int, err error) {
-	rec.Time, rec.Agent, rec.Kind, rec.Source = start, "magpie", "web_search", usage.SourceSearch
+	rec.Time, rec.Agent, rec.Kind, rec.Source = start, "blackpie", "web_search", usage.SourceSearch
 	rec.Millis = time.Since(start).Milliseconds()
 	if f := searchFor(ctx); f != nil && f.Agent != "" {
 		rec.Agent = f.Agent
@@ -314,7 +314,7 @@ func (s *Server) askSearchAPI(ctx context.Context, a provider.SearchAPI, query s
 			getAt(provider.YouFreeSearch, url.Values{"query": {query}, "count": {fmt.Sprint(searchHits)}})
 		}
 	default:
-		return nil, fmt.Errorf("magpie can't ask %q", a.Vendor)
+		return nil, fmt.Errorf("blackpie can't ask %q", a.Vendor)
 	}
 	if err != nil {
 		return nil, err
@@ -322,8 +322,8 @@ func (s *Server) askSearchAPI(ctx context.Context, a provider.SearchAPI, query s
 	r.Header.Set("Accept", "application/json")
 	r.Header.Set("User-Agent", SearchAgent)
 	if a.Vendor == "you" {
-		// the tag You.com asked for, to tell magpie's searches apart (#1626)
-		r.Header.Set("User-Agent", SearchAgent+" youdotcom-integration/yetone-magpie")
+		// the tag You.com asked for, to tell blackpie's searches apart (#1626)
+		r.Header.Set("User-Agent", SearchAgent+" youdotcom-integration/hmjz100-blackpie")
 	}
 	if a.Key != "" {
 		switch a.Vendor {
@@ -386,7 +386,7 @@ func (s *Server) askSearchAPI(ctx context.Context, a provider.SearchAPI, query s
 			}
 		}
 		// an API that says the key back in its error doesn't get it into
-		// magpie's logs or the model's turn
+		// blackpie's logs or the model's turn
 		if a.Key != "" {
 			msg = strings.ReplaceAll(msg, a.Key, provider.MaskSearchKey(a.Key))
 		}

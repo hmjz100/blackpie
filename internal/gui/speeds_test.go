@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 // /api/model-speeds says how fast each provider answered a model this

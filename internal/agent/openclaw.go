@@ -13,25 +13,25 @@ package agent
 // apiKey, an api (openai-completions is OpenAI's chat completions) and its
 // models, each an id and a name, with input, reasoning and contextWindow
 // (ModelDefinitionSchema). The schema is strict: a key OpenClaw doesn't
-// know makes the file invalid, so magpie writes only those. A model is
+// know makes the file invalid, so blackpie writes only those. A model is
 // named provider/model, split at the first slash
-// (src/agents/model-selection-normalize.ts), so magpie's
-// magpie/<provider>/<model> is OpenClaw's ref as it is. The model OpenClaw
+// (src/agents/model-selection-normalize.ts), so blackpie's
+// blackpie/<provider>/<model> is OpenClaw's ref as it is. The model OpenClaw
 // runs on is agents.defaults.model, a ref or {primary, fallbacks}
 // (docs/concepts/models.md); `openclaw models set` sets primary and keeps
 // the fallbacks, and adds the ref to agents.defaults.models
 // (src/commands/models/shared.ts), which a config from before 2026.8.1
 // still reads as the models allowed. A non-empty
-// agents.defaults.modelPolicy.allow is the models allowed: magpie adds
-// "magpie/*" to it when nothing of magpie's is in it.
+// agents.defaults.modelPolicy.allow is the models allowed: blackpie adds
+// "blackpie/*" to it when nothing of blackpie's is in it.
 //
-// magpie adds itself as the provider "magpie", the gateway's /v1 with a key
+// blackpie adds itself as the provider "blackpie", the gateway's /v1 with a key
 // naming OpenClaw and one model entry per catalog model, and makes the model
 // picked the primary. What was the primary is stashed and put back on
-// Disconnect, while magpie's is still the primary. The user's own keys stay
-// as written, in magpie's provider and its model entries too (headers,
+// Disconnect, while blackpie's is still the primary. The user's own keys stay
+// as written, in blackpie's provider and its model entries too (headers,
 // timeoutSeconds, a model's maxTokens). OpenClaw writes the file as JSON
-// (src/config/io.write.ts) but reads JSON5; a file that isn't JSON magpie
+// (src/config/io.write.ts) but reads JSON5; a file that isn't JSON blackpie
 // can read is left alone. OpenClaw's gateway takes a change to models and
 // the default model without a restart (docs/gateway/configuration/
 // hot-reload.md), but a chat already pinned to a model keeps it until
@@ -43,7 +43,7 @@ package agent
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"os"
 	"path/filepath"
 	"slices"
@@ -52,23 +52,23 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/jsonc"
 
-	"github.com/yetone/magpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/edit"
 )
 
 // what OpenClaw says after a change (notice.go)
 var noticeOpenClaw = newNotice("OpenClaw takes this up without a restart. A chat that already has a model keeps it: send /model default in that chat to move it onto this one.")
 
-// openClawContext is what OpenClaw is told of a model whose context magpie
+// openClawContext is what OpenClaw is told of a model whose context blackpie
 // doesn't know.
 const openClawContext = 128000
 
-// the key paths magpie writes in openclaw.json
+// the key paths blackpie writes in openclaw.json
 const (
-	openClawProvider = "models.providers." + magpieID
+	openClawProvider = "models.providers." + blackpieID
 	openClawModel    = "agents.defaults.model"
 	openClawModels   = "agents.defaults.models"
 	openClawAllow    = "agents.defaults.modelPolicy.allow"
-	openClawAll      = magpieID + "/*"
+	openClawAll      = blackpieID + "/*"
 )
 
 // openClawProfile is a profile name OpenClaw takes (profile-utils.ts).
@@ -128,7 +128,7 @@ func openClawRead(path string) ([]byte, error) {
 	}
 	s := jsonc.ToJSONInPlace(append([]byte(nil), b...))
 	if !json.Valid(s) || !gjson.ParseBytes(s).IsObject() {
-		return nil, fmt.Errorf("OpenClaw's %s isn't JSON magpie can read (JSON5?); it was left as it is", path)
+		return nil, fmt.Errorf("OpenClaw's %s isn't JSON blackpie can read (JSON5?); it was left as it is", path)
 	}
 	return s, nil
 }
@@ -136,7 +136,7 @@ func openClawRead(path string) ([]byte, error) {
 // openClawKey is a key as one part of a key path.
 func openClawKey(k string) string { return strings.ReplaceAll(k, ".", `\.`) }
 
-// openClawEntry is one of magpie's models as OpenClaw is told it.
+// openClawEntry is one of blackpie's models as OpenClaw is told it.
 type openClawEntry struct {
 	ID            string   `json:"id"`
 	Name          string   `json:"name"`
@@ -145,7 +145,7 @@ type openClawEntry struct {
 	ContextWindow int      `json:"contextWindow"`
 }
 
-// openClawWant is magpie's models as OpenClaw is told them, each laid over
+// openClawWant is blackpie's models as OpenClaw is told them, each laid over
 // the entry of the same id there was (raw), so the user's own keys in it
 // stay.
 func openClawWant(raw gjson.Result) []any {
@@ -197,18 +197,18 @@ func openClawPrimary(r gjson.Result) string {
 	return ""
 }
 
-// openClawWas is what agents.defaults.model was before magpie, as written,
-// and which of the objects holding magpie's keys magpie made.
+// openClawWas is what agents.defaults.model was before blackpie, as written,
+// and which of the objects holding blackpie's keys blackpie made.
 type openClawWas struct {
 	Had   bool            `json:"had,omitempty"`
 	Model json.RawMessage `json:"model,omitempty"`
-	// Made are the key paths of objects that weren't there before magpie
+	// Made are the key paths of objects that weren't there before blackpie
 	Made []string `json:"made,omitempty"`
-	// File: the file wasn't there before magpie
+	// File: the file wasn't there before blackpie
 	File bool `json:"file,omitempty"`
 }
 
-// openClawProviderAt is magpie's provider entry for a gateway at gw, as
+// openClawProviderAt is blackpie's provider entry for a gateway at gw, as
 // it is written (models aside).
 func openClawProviderAt(gw string) map[string]string {
 	return map[string]string{"baseUrl": gw + "/v1", "apiKey": agentKeyAt("openclaw", gw), "api": "openai-completions"}
@@ -246,7 +246,7 @@ func openClawAt(at place) *Agent {
 		}
 		return edit.WriteAtomic(path, out)
 	}
-	// wire writes magpie's provider and its models, the user's own keys in
+	// wire writes blackpie's provider and its models, the user's own keys in
 	// it left as they are, and with model, if given, makes it the primary;
 	// it writes nothing when the file has it all already
 	wire := func(c gjson.Result, model string) ([]edit.KV, []string) {
@@ -265,7 +265,7 @@ func openClawAt(at place) *Agent {
 		if model == "" {
 			return set, del
 		}
-		ref := magpieID + "/" + model
+		ref := blackpieID + "/" + model
 		m := c.Get(openClawModel)
 		if m.IsObject() {
 			if m.Get("primary").String() != ref {
@@ -274,7 +274,7 @@ func openClawAt(at place) *Agent {
 		} else if m.String() != ref || m.Type != gjson.String {
 			set = append(set, edit.KV{Path: openClawModel, Value: ref})
 		}
-		// as `openclaw models set` does; the ref of a model magpie put
+		// as `openclaw models set` does; the ref of a model blackpie put
 		// there before goes, as it had nothing of the user's in it
 		if ms := c.Get(openClawModels); ms.IsObject() {
 			ms.ForEach(func(k, v gjson.Result) bool {
@@ -289,7 +289,7 @@ func openClawAt(at place) *Agent {
 		}
 		if allow := c.Get(openClawAllow); allow.IsArray() && len(allow.Array()) > 0 && !slices.ContainsFunc(allow.Array(), func(a gjson.Result) bool {
 			s := a.String()
-			return s == "*" || s == ref || s == openClawAll || s == magpieID+"/"+strings.SplitN(model, "/", 2)[0]+"/*"
+			return s == "*" || s == ref || s == openClawAll || s == blackpieID+"/"+strings.SplitN(model, "/", 2)[0]+"/*"
 		}) {
 			var list []any
 			json.Unmarshal([]byte(allow.Raw), &list)
@@ -297,8 +297,8 @@ func openClawAt(at place) *Agent {
 		}
 		return set, del
 	}
-	// unwire takes magpie's provider out, and OpenClaw back to the model it
-	// ran on before — when it still runs on magpie's: a pick the user made
+	// unwire takes blackpie's provider out, and OpenClaw back to the model it
+	// ran on before — when it still runs on blackpie's: a pick the user made
 	// since is theirs and stands. own, if given, is the model to run on.
 	unwire := func(own string) error {
 		s, err := openClawRead(path)
@@ -359,8 +359,8 @@ func openClawAt(at place) *Agent {
 		if err := patch(set, del); err != nil {
 			return err
 		}
-		// the objects magpie made, where nothing else is in them now,
-		// deepest first; and the file, where magpie made it and it is
+		// the objects blackpie made, where nothing else is in them now,
+		// deepest first; and the file, where blackpie made it and it is
 		// left empty
 		for i := len(was.Made) - 1; i >= 0; i-- {
 			k := was.Made[i]
@@ -380,7 +380,7 @@ func openClawAt(at place) *Agent {
 		}
 		return nil
 	}
-	// connect makes model, one of magpie's, the primary, stashing what was
+	// connect makes model, one of blackpie's, the primary, stashing what was
 	// there first
 	connect := func(model string) error {
 		s, err := openClawRead(path)
@@ -444,7 +444,7 @@ func openClawAt(at place) *Agent {
 			}
 			p := c.Get(openClawProvider)
 			if !p.Exists() {
-				return "OpenClaw's " + openClawProvider + " (openclaw.json) is gone, so it no longer reaches magpie"
+				return "OpenClaw's " + openClawProvider + " (openclaw.json) is gone, so it no longer reaches blackpie"
 			}
 			want := openClawProviderAt(at.gw())
 			return wiringOff("OpenClaw", path, func(k string) (string, bool) {
@@ -453,8 +453,8 @@ func openClawAt(at place) *Agent {
 			}, "baseUrl", want["baseUrl"], "apiKey", want["apiKey"])
 		},
 		Fields: []Field{{
-			// the model OpenClaw runs on: one of magpie's is
-			// magpie/<provider>/<model>, OpenClaw's ref for it as it is
+			// the model OpenClaw runs on: one of blackpie's is
+			// blackpie/<provider>/<model>, OpenClaw's ref for it as it is
 			Key: "model", Label: "model",
 			Get: func() string { return openClawPrimary(read().Get(openClawModel)) },
 			Set: func(v string) error {
@@ -463,7 +463,7 @@ func openClawAt(at place) *Agent {
 					return err
 				}
 				c := gjson.ParseBytes(s)
-				if ref, ok := strings.CutPrefix(v, magpieID+"/"); ok && isMagpie(ref) {
+				if ref, ok := strings.CutPrefix(v, blackpieID+"/"); ok && isBlackpie(ref) {
 					return connect(ref)
 				}
 				if c.Get(openClawProvider).Exists() || ours(c) {
@@ -478,15 +478,15 @@ func openClawAt(at place) *Agent {
 				return patch([]edit.KV{{Path: openClawModel, Value: v}}, nil)
 			},
 			Options: func(cur map[string]string) []Option {
-				return withVia(openClawOwn(keyWas, cur["model"]), "openclaw", magpieID+"/")
+				return withVia(openClawOwn(keyWas, cur["model"]), "openclaw", blackpieID+"/")
 			},
 		}},
 	}, path)
 }
 
-// openClawOwn is the model OpenClaw ran on before magpie, or runs on now,
+// openClawOwn is the model OpenClaw ran on before blackpie, or runs on now,
 // for the picker: OpenClaw's own providers are its sign-ins and plugins,
-// which magpie can't list.
+// which blackpie can't list.
 func openClawOwn(keyWas, cur string) []Option {
 	var was openClawWas
 	json.Unmarshal([]byte(stashShared()[keyWas]), &was)

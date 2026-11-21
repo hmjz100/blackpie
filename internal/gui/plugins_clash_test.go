@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 // Two installed plugins that sign in to one provider (neiko on Discord:
@@ -23,8 +23,8 @@ func TestPluginsClashRows(t *testing.T) {
 	testenv.SetHome(t, dir)
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(dir, "config"))
 	t.Setenv("XDG_CACHE_HOME", filepath.Join(dir, "cache"))
-	t.Setenv("MAGPIE_BUN", bun)
-	t.Setenv("MAGPIE_PLUGIN_MARKET", "off")
+	t.Setenv("BLACKPIE_BUN", bun)
+	t.Setenv("BLACKPIE_PLUGIN_MARKET", "off")
 	t.Cleanup(plugin.Settle)
 	src, err := os.ReadFile("../plugin/testdata/fake/index.js")
 	if err != nil {

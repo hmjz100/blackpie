@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 func TestUsagePurposeRoutes(t *testing.T) {

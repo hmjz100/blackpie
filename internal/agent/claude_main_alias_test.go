@@ -6,18 +6,18 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // TestClaudeMainModelIsAnAlias (iryan_sun on X): Claude Desktop's Code tab
 // runs Claude Code on the user's own subscription with the provider
 // routing managed by the host, so it drops the settings.json env (the
 // gateway's address, the tiers) but still takes the top-level "model".
-// magpie's provider-prefixed id there went to Anthropic, which doesn't
+// blackpie's provider-prefixed id there went to Anthropic, which doesn't
 // know it, and every request failed (WebFetch among them). The main model
 // is written as the alias of the tier that carries it, which the env gives
-// magpie's model and Anthropic's own gives the real tier.
+// blackpie's model and Anthropic's own gives the real tier.
 func TestClaudeMainModelIsAnAlias(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
@@ -58,7 +58,7 @@ func TestClaudeMainModelIsAnAlias(t *testing.T) {
 			t.Fatalf("%s: claudeMain %q", main, got)
 		}
 	}
-	// a Sync leaves it as it is, and a settings.json an older magpie wrote
+	// a Sync leaves it as it is, and a settings.json an older blackpie wrote
 	// with the prefixed id is brought to the alias
 	if err := edit.SetJSON(path, edit.KV{Path: "model", Value: "deepseek/pro"}); err != nil {
 		t.Fatal(err)
@@ -90,7 +90,7 @@ func TestClaudeMainModelIsAnAlias(t *testing.T) {
 	if err := a.Sync(); err != nil {
 		t.Fatal(err)
 	}
-	// Disconnect leaves no alias on magpie's tiers behind
+	// Disconnect leaves no alias on blackpie's tiers behind
 	if err := a.Unwire(); err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +100,7 @@ func TestClaudeMainModelIsAnAlias(t *testing.T) {
 }
 
 // writtenModel is settings.json's main model as the id it stands for: an
-// alias magpie wrote resolved through its tier's env, anything else as is.
+// alias blackpie wrote resolved through its tier's env, anything else as is.
 func writtenModel(path string) string {
 	m, _ := edit.GetJSON(path, "model")
 	if t := strings.TrimSuffix(m, "[1m]"); contains(claudeTiers, t) {

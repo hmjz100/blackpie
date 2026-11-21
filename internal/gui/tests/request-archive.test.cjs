@@ -29,7 +29,7 @@ const ROWS = [row(0, "kept", KEPT), row(1, "plain")];
 
 function serve(lang, seen) {
   const where = "bkt/team on https://s3.example.com";
-  const here = { folder: "~/.config/magpie/request-archive", cap: 1 << 30 };
+  const here = { folder: "~/.config/blackpie/request-archive", cap: 1 << 30 };
   const gateway = { running: true, window: true, mine: true, url: "http://127.0.0.1:3999", groups: [], archive: { on: false, ...here }, calls: [] };
   const providers = { providers: [{ id: "fixture", name: "Fixture", icon: "generic", models: [{ id: "kept", name: "Kept", on: true }], agents: [] }], gateway };
   return async (route) => {
@@ -64,7 +64,7 @@ function serve(lang, seen) {
     if (url.pathname === "/api/usage/requests") return json({ period: url.searchParams.get("period"), rows: ROWS, offset: 0, total: 2, calls: 2, errors: 0, input: 600, output: 80, cache_read: 0, cache_write: 0, reasoning: 0, cost: 0.02, unpriced: 0, agents: [{ id: "claude", name: "Claude Code", icon: "claudecode-color" }] });
     if (url.pathname === "/api/usage/requests/content") return json({ found: false, why: "read" });
     if (url.pathname === "/api/usage/quotas") return json([]);
-    if (url.pathname === "/api/usage") return json({ calls: 2, errors: 0, input: 600, output: 80, cache_read: 0, cache_write: 0, reasoning: 0, unpriced: 0, cost: 0.02, bucket: "day", series: [], agents: [], models: [], path: "~/.config/magpie/usage.jsonl" });
+    if (url.pathname === "/api/usage") return json({ calls: 2, errors: 0, input: 600, output: 80, cache_read: 0, cache_write: 0, reasoning: 0, unpriced: 0, cost: 0.02, bucket: "day", series: [], agents: [], models: [], path: "~/.config/blackpie/usage.jsonl" });
     if (url.pathname === "/api/sessions") return json({ sessions: [], dirs: [] });
     if (url.pathname === "/api/sessions/stats") return json({ from: "", to: "", days: [], agents: {} });
     if (url.pathname.startsWith("/api/")) return json({});
@@ -78,13 +78,13 @@ const words = {
   en: {
     name: "Request archive", fetch: "Fetch from archive", failed: "Upload failed", failedWhy: "Last upload failed: HTTP 403",
     notSaved: "Not saved", notSavedWhy: "Last save failed: disk full",
-    local: "Keeps each call’s headers and bodies, secrets taken out, on this computer in ~/.config/magpie/request-archive, the oldest removed past 1.1 GB",
+    local: "Keeps each call’s headers and bodies, secrets taken out, on this computer in ~/.config/blackpie/request-archive, the oldest removed past 1.1 GB",
     bucket: "Keeps each call’s headers and bodies, secrets taken out, in bkt/team on https://s3.example.com",
   },
   zh: {
     name: "请求存档", fetch: "从存档取回", failed: "上传失败", failedWhy: "上次上传失败：HTTP 403",
     notSaved: "未保存", notSavedWhy: "上次保存失败：disk full",
-    local: "每次调用的请求/响应头和正文去除密钥后存到本机的 ~/.config/magpie/request-archive，超过 1.1 GB 时先删除最早的",
+    local: "每次调用的请求/响应头和正文去除密钥后存到本机的 ~/.config/blackpie/request-archive，超过 1.1 GB 时先删除最早的",
     bucket: "每次调用的请求/响应头和正文去除密钥后存到 bkt/team on https://s3.example.com",
   },
 };
@@ -104,7 +104,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       seen.ring = [];
       await page.route("**/*", serve(lang, seen));
       // the requests ungrouped: the archive is a request row's
-      await page.addInitScript(() => localStorage.setItem("magpie.ledGroup", ""));
+      await page.addInitScript(() => localStorage.setItem("blackpie.ledGroup", ""));
       // brought into view by the wheel, as the reader would; the click itself
       // must not move the page
       const press = async (loc, view) => {
@@ -117,7 +117,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       const wait = async (n) => { for (let i = 0; i < 60 && seen.length < n; i++) await page.waitForTimeout(50); };
 
       // the Gateway page: no switch, nor the archive named
-      await page.goto("http://magpie.test/?view=gateway");
+      await page.goto("http://blackpie.test/?view=gateway");
       await page.locator("#view-gateway .gw-requests").waitFor();
       assert.equal(await page.locator("#archiveList, #view-gateway [role=switch]").count(), 0, "no archive switch on the Gateway page");
       assert.equal(await page.locator("#view-gateway").getByRole("button", { name: w.fetch }).count(), 0, "no Fetch from archive on the Gateway page");
@@ -236,7 +236,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         "Request archive", "Upload failed", "Last upload failed: {e}", "Not saved", "Last save failed: {e}",
         "Keeps each call’s headers and bodies, secrets taken out, in {where}",
         "Keeps each call’s headers and bodies, secrets taken out, on this computer in {where}, the oldest removed past {size}",
-        "Not in the archive on this computer: it is saved just after the call, the oldest are removed past the archive's size, or the save failed (magpie's log says why)",
+        "Not in the archive on this computer: it is saved just after the call, the oldest are removed past the archive's size, or the save failed (blackpie's log says why)",
       ].flatMap((k) => ["zh", "zh-TW", "ja", "de"].filter((l) => !I18N[l][k]).map((l) => l + " " + k)));
       assert.deepEqual(missing, [], "every string has its Chinese, Japanese and German");
       assert.deepEqual(errors, []);

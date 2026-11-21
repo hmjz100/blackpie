@@ -5,16 +5,16 @@ const path = require("node:path");
 const { test } = require("node:test");
 const { chromium, webkit } = require("playwright");
 
-const assets = process.env.MAGPIE_PARTNER_ASSETS || path.resolve(__dirname, "../assets");
+const assets = process.env.BLACKPIE_PARTNER_ASSETS || path.resolve(__dirname, "../assets");
 
 const partner = (id, name, extra = {}) => ({ id, name, icon: "generic", kind: "partner", sponsored: true, chat: `https://api.${id}.example.com/v1`, ...extra });
 const partners = [
   partner("acme", "Acme AI", { notes: { en: "Fast relay", zh: "快速中转", ja: "高速な中継" },
     // its pages are /go links, named by the host they send the browser to
-    website: "https://usemagpie.ai/go/acme/site", siteHost: "www.acme.example",
+    website: "https://useblackpie.ai/go/acme/site", siteHost: "www.acme.example",
     regions: [
-      { id: "cn", name: "China", chat: "https://api.acme.example.com/v1", website: "https://usemagpie.ai/go/acme/site/cn", siteHost: "cn.acme.example" },
-      { id: "global", name: "Global", chat: "https://global.acme.example.com/v1", website: "https://usemagpie.ai/go/acme/site/global", siteHost: "global.acme.example" },
+      { id: "cn", name: "China", chat: "https://api.acme.example.com/v1", website: "https://useblackpie.ai/go/acme/site/cn", siteHost: "cn.acme.example" },
+      { id: "global", name: "Global", chat: "https://global.acme.example.com/v1", website: "https://useblackpie.ai/go/acme/site/global", siteHost: "global.acme.example" },
     ], splitAccounts: true }),
   partner("zhonly", "China Only", { langs: ["zh"], notes: { en: "Mainland relay", zh: "国内中转" } }),
   partner("taken", "Taken", { added: true }),
@@ -56,7 +56,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         const errors = [], counted = [];
         page.on("pageerror", (e) => errors.push(e.message));
         await page.route("**/*", server(lang, partners.map((p) => ({ ...p, new: true })), counted));
-        await page.goto("http://magpie.test/?view=providers");
+        await page.goto("http://blackpie.test/?view=providers");
         const add = page.locator("#addProvider");
         await add.waitFor();
         assert.equal(await add.evaluate((b) => b.classList.contains("has-new")), false);

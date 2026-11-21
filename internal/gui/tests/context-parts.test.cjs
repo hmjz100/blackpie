@@ -145,8 +145,8 @@ async function open(page, lang, width, latest) {
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.route("**/*", serve(lang, [], latest));
-  await page.addInitScript(() => { try { if (!sessionStorage.getItem("set")) { localStorage.clear(); localStorage.setItem("magpie.usageTab", "context"); sessionStorage.setItem("set", "1"); } } catch {} });
-  await page.goto("http://magpie.test/?view=usage");
+  await page.addInitScript(() => { try { if (!sessionStorage.getItem("set")) { localStorage.clear(); localStorage.setItem("blackpie.usageTab", "context"); sessionStorage.setItem("set", "1"); } } catch {} });
+  await page.goto("http://blackpie.test/?view=usage");
   const card = await openSession(page);
   return { errors, card };
 }
@@ -301,7 +301,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await page.waitForFunction(() => document.querySelector(".ctx-sess.open .ctx-viz")?.dataset.look === "blocks");
         assert.ok(await bar.isHidden());
         assert.equal(await card.locator(".ctx-blocks .ctx-block").count(), 7);
-        assert.equal(await page.evaluate(() => localStorage.getItem("magpie.ctxLook")), "blocks");
+        assert.equal(await page.evaluate(() => localStorage.getItem("blackpie.ctxLook")), "blocks");
         // a block's head picks its part, an item in it opens its text
         await card.locator(".ctx-block.k-files .ctx-block-h").click();
         assert.equal(await card.locator('.ctx-leg[data-k="files"]').getAttribute("aria-pressed"), "true");
@@ -317,7 +317,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await wheelTo(page, card.locator(".ctx-sec"));
         await card.locator(".ctx-sec .segs .opt", { hasText: w.bar }).click();
         await card.locator(".ctx-segbar .ctx-seg").first().waitFor();
-        assert.equal(await page.evaluate(() => localStorage.getItem("magpie.ctxLook")), "bar");
+        assert.equal(await page.evaluate(() => localStorage.getItem("blackpie.ctxLook")), "bar");
 
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "the page scrolls sideways");
         assert.deepEqual(errors, []);

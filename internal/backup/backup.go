@@ -1,9 +1,9 @@
-// Package backup packs what the user set up in magpie into one file, sealed
+// Package backup packs what the user set up in blackpie into one file, sealed
 // with a passphrase, to carry to another machine: the providers (their keys
 // too, unless left out), the pictures picked for them, the settings (the
 // built-in plugins' switches and config included), the profiles, every
 // agent's model and the library (the instructions, MCP servers and skills
-// magpie gives the agents). Subscriptions are not in it: each is the
+// blackpie gives the agents). Subscriptions are not in it: each is the
 // sign-in of an agent on this machine, so each machine signs in on its own.
 //
 // The file is JSON: a header naming how it is sealed, and the bundle
@@ -28,22 +28,22 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/agent"
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/library"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/pluginrt"
-	"github.com/yetone/magpie/internal/profile"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/library"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/pluginrt"
+	"github.com/hmjz100/blackpie/internal/profile"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Ext is the extension backups are saved with.
-const Ext = ".magpie-backup"
+const Ext = ".blackpie-backup"
 
 const (
-	format     = "magpie-backup"
+	format     = "blackpie-backup"
 	iterations = 600_000
 )
 
@@ -66,7 +66,7 @@ func isBackupJSON(data []byte) bool {
 type Bundle struct {
 	Version     int                        `json:"version"`
 	Created     time.Time                  `json:"created"`
-	App         string                     `json:"app,omitempty"` // the magpie that made it
+	App         string                     `json:"app,omitempty"` // the blackpie that made it
 	Keys        bool                       `json:"keys"`          // whole-backup credential policy
 	Providers   []provider.Provider        `json:"providers"`
 	Icons       map[string][]byte          `json:"icons,omitempty"`  // pictures picked for providers, by file name
@@ -75,24 +75,24 @@ type Bundle struct {
 	GatewayKeys *[]access.Key              `json:"gatewayKeys,omitempty"`
 	Profiles    map[string]profile.Profile `json:"profiles,omitempty"`
 	Agents      map[string]string          `json:"agents,omitempty"`  // every agent's fields as they are now
-	Library     *library.Bundle            `json:"library,omitempty"` // nil from a magpie before it, or with none
+	Library     *library.Bundle            `json:"library,omitempty"` // nil from a blackpie before it, or with none
 	// Searches are the web search APIs (#419), their keys with the
-	// providers'; nil from a magpie before them.
+	// providers'; nil from a blackpie before them.
 	Searches *[]provider.SearchAPI `json:"searches,omitempty"`
 	// Order is the order the user put the providers in (#499), by id;
-	// none from a magpie before it went, or when they were never arranged.
+	// none from a blackpie before it went, or when they were never arranged.
 	Order []string `json:"order,omitempty"`
 	// GroupOrder is the order the user put the routing groups in (#779),
-	// by id; none from a magpie before it, or when never arranged.
+	// by id; none from a blackpie before it, or when never arranged.
 	GroupOrder []string `json:"groupOrder,omitempty"`
 	// Plugins are the OpenCode plugins and middlewares added from npm or
 	// git (provider.Carried), installed where the backup is put back:
 	// the providers they serve come with them. Their sign-ins don't, as a
-	// subscription's don't. Nil from a magpie before them.
+	// subscription's don't. Nil from a blackpie before them.
 	Plugins *[]plugin.Entry `json:"plugins,omitempty"`
 	// BuiltinPlugins is plugins.yml: which built-in plugins are on, the
 	// preset they follow, and each one's config, put back with Settings.
-	// Nil from a magpie before it, or with no file.
+	// Nil from a blackpie before it, or with no file.
 	BuiltinPlugins *pluginrt.File `json:"builtinPlugins,omitempty"`
 	// Sync can carry one part's credentials without changing the others'
 	// Keys policy; these are absent from older backups and whole collects.
@@ -116,14 +116,14 @@ var ErrPassphrase = errors.New("wrong passphrase, or the file was changed")
 
 // ErrCorrupt is a file that isn't a backup at all, or one cut short: its
 // JSON, format, or key-derivation fields don't read. It is told from a
-// wrong passphrase and from a newer magpie's file, so a sync can rebuild
+// wrong passphrase and from a newer blackpie's file, so a sync can rebuild
 // the damaged one from this computer rather than fail on it forever.
-var ErrCorrupt = errors.New("not a magpie backup")
+var ErrCorrupt = errors.New("not a blackpie backup")
 
 // ErrNotBackup is a file that doesn't begin like a backup at all: an empty
 // one, a page a server answered with, another app's file. It reads as
 // ErrCorrupt does, but is never rebuilt over by a sync on its own.
-var ErrNotBackup = errors.New("not a magpie backup")
+var ErrNotBackup = errors.New("not a blackpie backup")
 
 // BundleVersion is the bundle's structure: 2 carries the per-part
 // credential markers (ProvidersKeys, SettingsKeys, LibraryKeys) as their
@@ -132,7 +132,7 @@ const BundleVersion = 2
 
 // Flag is a per-part credential marker as a bundle field takes one: the
 // part's own, written when a sync merged it. Absent (nil) is a whole
-// collect's or an older magpie's.
+// collect's or an older blackpie's.
 func Flag(keys bool) *bool { return &keys }
 
 // scopedKeys is whether a part's credentials are in the bundle: the part's
@@ -307,7 +307,7 @@ func Open(data []byte, pass string) (Bundle, error) {
 		// damaged-backup case — but so does any other non-JSON body a
 		// server answers with (a captive portal's sign-in page), and that
 		// isn't damage to rebuild over. Only a body that begins like a
-		// magpie backup counts as one; anything else is what it is.
+		// blackpie backup counts as one; anything else is what it is.
 		if isBackupJSON(data) {
 			return Bundle{}, ErrCorrupt
 		}
@@ -317,7 +317,7 @@ func Open(data []byte, pass string) (Bundle, error) {
 		return Bundle{}, ErrNotBackup
 	}
 	if e.Version != 1 || e.KDF != "pbkdf2-sha256" {
-		return Bundle{}, errors.New("this backup was made by a newer magpie; update magpie to open it")
+		return Bundle{}, errors.New("this backup was made by a newer blackpie; update blackpie to open it")
 	}
 	if e.Iterations < 100_000 || e.Iterations > 10_000_000 || len(e.Nonce) != 12 || len(e.Salt) < 16 {
 		return Bundle{}, ErrCorrupt
@@ -448,8 +448,8 @@ func Restore(b Bundle, parts Parts) (Result, error) {
 		}
 	}
 	if parts.Settings && (b.Settings != nil || b.GatewayKeys != nil || b.BuiltinPlugins != nil) {
-		// a plugins.yml this magpie can't write is told before anything is,
-		// and the rest of the settings still go in: one from a newer magpie
+		// a plugins.yml this blackpie can't write is told before anything is,
+		// and the rest of the settings still go in: one from a newer blackpie
 		// must not stop them, or every sync after it
 		builtins := b.BuiltinPlugins
 		if builtins != nil {

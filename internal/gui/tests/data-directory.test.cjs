@@ -11,7 +11,7 @@ for(const engine of (process.env.BROWSER?[process.env.BROWSER]:['chromium','webk
  const browser=await(engine==='webkit'?webkit.launch():chromium.launch({channel:'chromium'}));t.after(()=>browser.close());
  const page=await browser.newPage({viewport:{width,height:900}});page.setDefaultTimeout(5000);
  const errors=[],calls=[];page.on('pageerror',e=>errors.push(e.message));
- let st={mode:'installed',webStays:true,places:[{mode:'installed',config:'/synthetic/home/.config/magpie',cache:'/synthetic/home/.cache/magpie',systemCache:'/synthetic/home/system-cache/magpie'},{mode:'portable',config:'/synthetic/application/data',cache:'/synthetic/application/data/cache'}]};
+ let st={mode:'installed',webStays:true,places:[{mode:'installed',config:'/synthetic/home/.config/blackpie',cache:'/synthetic/home/.cache/blackpie',systemCache:'/synthetic/home/system-cache/blackpie'},{mode:'portable',config:'/synthetic/application/data',cache:'/synthetic/application/data/cache'}]};
  await page.route('**/*',async route=>{
   const u=new URL(route.request().url()),p=u.pathname;const json=(x,status=200)=>route.fulfill({json:x,status});
   if(p==='/boot.js')return route.fulfill({contentType:'text/javascript',body:`window.bootPrefs={lang:${JSON.stringify(lang)},theme:'light',web:false};`});
@@ -23,7 +23,7 @@ for(const engine of (process.env.BROWSER?[process.env.BROWSER]:['chromium','webk
   if(p==='/api/usage/quotas')return json([]);if(p==='/api/plugins')return json({plugins:[]});if(p==='/api/groups')return json({groups:[]});if(p.startsWith('/api/'))return json({});
   const file=path.join(assets,p==='/'?'index.html':p);return route.fulfill({body:await fs.readFile(file),contentType:{'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png'}[path.extname(file)]});
  });
- const open=async()=>{await page.goto('http://magpie.test/?view=settings&tab=general');await page.locator('#dataDirRow:not([hidden])').waitFor();await page.locator('#dataDirSegs button').nth(1).waitFor();};
+ const open=async()=>{await page.goto('http://blackpie.test/?view=settings&tab=general');await page.locator('#dataDirRow:not([hidden])').waitFor();await page.locator('#dataDirSegs button').nth(1).waitFor();};
  await open();
  assert.equal(await page.locator('#dataDirRow .name').textContent(),labels[lang][2]);
  assert.deepEqual(await page.locator('#dataDirSegs button').allTextContents(),labels[lang].slice(0,2));
@@ -34,7 +34,7 @@ for(const engine of (process.env.BROWSER?[process.env.BROWSER]:['chromium','webk
  await paths.locator('summary').click();
  assert.equal(await paths.locator('code').first().isVisible(),true);
  assert.match(await paths.textContent(),/\/synthetic\/application\/data/);
- assert.match(await paths.textContent(),/\/synthetic\/home\/system-cache\/magpie/);
+ assert.match(await paths.textContent(),/\/synthetic\/home\/system-cache\/blackpie/);
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)<=1,'expanded paths overflow');
  await paths.locator('summary').click();
  assert.ok((await page.locator('#dataDirRow').boundingBox()).height<170,'collapsed setting is compact');

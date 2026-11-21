@@ -17,11 +17,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/plugin"
 )
 
 // factoryKeyPrefix is droid's Uh: what a Factory API key starts with.

@@ -188,7 +188,7 @@ func TestSteadyGCKeepsTheUsersGOGC(t *testing.T) {
 	debug.SetGCPercent(200)
 	steadyGCStart()
 	if got := gcPercent(); got != 200 {
-		t.Fatalf("GOGC=200 set by the user, magpie runs under %d", got)
+		t.Fatalf("GOGC=200 set by the user, blackpie runs under %d", got)
 	}
 	tightGC.Lock()
 	steady := tightGC.steady
@@ -206,7 +206,7 @@ func TestSteadyGCKeepsTheUsersGOGC(t *testing.T) {
 func TestSteadyGCRetunesAfterACollection(t *testing.T) {
 	// Earlier tests can keep more than steadyGCRoom alive. Run this
 	// small-heap case in its own process, keeping its exact expectations.
-	if os.Getenv("MAGPIE_TEST_STEADY_GC_CHILD") != "1" {
+	if os.Getenv("BLACKPIE_TEST_STEADY_GC_CHILD") != "1" {
 		exe, err := os.Executable()
 		if err != nil {
 			t.Fatal(err)
@@ -214,7 +214,7 @@ func TestSteadyGCRetunesAfterACollection(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 		cmd := exec.CommandContext(ctx, exe, "-test.run=^TestSteadyGCRetunesAfterACollection$", "-test.v")
-		cmd.Env = append(os.Environ(), "MAGPIE_TEST_STEADY_GC_CHILD=1")
+		cmd.Env = append(os.Environ(), "BLACKPIE_TEST_STEADY_GC_CHILD=1")
 		cmd.WaitDelay = time.Second
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("isolated steady GC: %v\n%s", err, out)

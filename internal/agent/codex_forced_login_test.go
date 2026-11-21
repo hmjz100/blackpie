@@ -12,9 +12,9 @@ import (
 // Codex drop a ChatGPT sign-in (the TUI logs it out on start, the app
 // server reads no account). Wired beside that sign-in, through
 // openai_base_url and the built-in provider, the Codex app asked for a
-// sign-in and offered an API key alone. Such a sign-in is none to magpie:
-// magpie is the provider, without requires_openai_auth, so Codex needs no
-// sign-in, and the user's line stays. Taking the line out lets magpie
+// sign-in and offered an API key alone. Such a sign-in is none to blackpie:
+// blackpie is the provider, without requires_openai_auth, so Codex needs no
+// sign-in, and the user's line stays. Taking the line out lets blackpie
 // recognize the ChatGPT sign-in again.
 func TestCodexForcedAPILoginIsNoChatGPT(t *testing.T) {
 	home, read := codexHome(t, `{"tokens":{"access_token":"x","id_token":"x.e30.x"}}`, "forced_login_method = \"api\"\n")
@@ -23,8 +23,8 @@ func TestCodexForcedAPILoginIsNoChatGPT(t *testing.T) {
 		t.Fatal(err)
 	}
 	cfg := read()
-	if !strings.Contains(cfg, `model_provider = "magpie"`) {
-		t.Fatalf("forced API login: magpie its provider, not beside a sign-in Codex won't use:\n%s", cfg)
+	if !strings.Contains(cfg, `model_provider = "blackpie"`) {
+		t.Fatalf("forced API login: blackpie its provider, not beside a sign-in Codex won't use:\n%s", cfg)
 	}
 	if strings.Contains(cfg, "requires_openai_auth") {
 		t.Fatalf("forced API login: no requires_openai_auth, or the app asks for a sign-in:\n%s", cfg)

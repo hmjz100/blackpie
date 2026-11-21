@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-// A kept list past magpieModelsFor is built again on its next ask, so the
+// A kept list past blackpieModelsFor is built again on its next ask, so the
 // sweep lets it go; one still fresh stays, and the sweep looks again for it.
 func TestKeptListsPastTheirMinuteLetGo(t *testing.T) {
 	var s stampedLists[string]
@@ -18,7 +18,7 @@ func TestKeptListsPastTheirMinuteLetGo(t *testing.T) {
 		t.Fatal("no sweep armed for the lists kept")
 	}
 	b := s.m["old"]
-	b.at = b.at.Add(-2 * magpieModelsFor)
+	b.at = b.at.Add(-2 * blackpieModelsFor)
 	s.m["old"] = b
 	s.Unlock()
 
@@ -34,7 +34,7 @@ func TestKeptListsPastTheirMinuteLetGo(t *testing.T) {
 
 	s.Lock()
 	b = s.m["fresh"]
-	b.at = b.at.Add(-2 * magpieModelsFor)
+	b.at = b.at.Add(-2 * blackpieModelsFor)
 	s.m["fresh"] = b
 	s.Unlock()
 	s.sweep()

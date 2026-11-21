@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/coder/websocket"
-	"github.com/yetone/magpie/internal/browserext"
+	"github.com/hmjz100/blackpie/internal/browserext"
 )
 
 func browserPost(h http.Handler, addr, body string, hdr ...string) *httptest.ResponseRecorder {
@@ -28,7 +28,7 @@ func browserPost(h http.Handler, addr, body string, hdr ...string) *httptest.Res
 	return w
 }
 
-// fakeExtension connects to the gateway at base as Magpie Browser does,
+// fakeExtension connects to the gateway at base as Blackpie Browser does,
 // and answers each call with answer.
 func fakeExtension(t *testing.T, base string, answer func(id, session, tool string, args map[string]any) any) {
 	t.Helper()
@@ -142,7 +142,7 @@ func TestBrowserMCPSaysWhenNoBrowser(t *testing.T) {
 		t.Fatalf("tools/list: %d %s", w.Code, w.Body.String())
 	}
 	m := readImageReply(t, browserPost(h, "127.0.0.1:5000", imageToolCall("browser_snapshot", nil)))
-	if !m.Result.IsError || !strings.Contains(m.Result.Content[0].Text, "Magpie Browser isn't connected") {
+	if !m.Result.IsError || !strings.Contains(m.Result.Content[0].Text, "Blackpie Browser isn't connected") {
 		t.Fatalf("no browser: %+v", m)
 	}
 	w = browserPost(h, "127.0.0.1:5000", imageToolCall("browser_format_disk", nil))
@@ -156,8 +156,8 @@ func TestBrowserMCPSaysWhenNoBrowser(t *testing.T) {
 // web page on this one.
 func TestBrowserMCPGuarded(t *testing.T) {
 	fresh(t)
-	t.Setenv("MAGPIE_ADDR", "")
-	t.Setenv("MAGPIE_PUBLIC_URL", "")
+	t.Setenv("BLACKPIE_ADDR", "")
+	t.Setenv("BLACKPIE_PUBLIC_URL", "")
 	h := lanGuard(New().Handler())
 	list := `{"jsonrpc":"2.0","id":1,"method":"tools/list"}`
 	const there = "192.0.2.7:4000"
@@ -192,7 +192,7 @@ func TestBrowserMCPGuarded(t *testing.T) {
 // them.
 func TestBrowserExtensionOnlyFromItsOrigin(t *testing.T) {
 	fresh(t)
-	t.Setenv("MAGPIE_ADDR", "")
+	t.Setenv("BLACKPIE_ADDR", "")
 	h := lanGuard(New().Handler())
 	newCaller(t, "Laptop")
 	for _, c := range []struct{ addr, host, origin string }{

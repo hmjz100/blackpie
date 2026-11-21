@@ -5,7 +5,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/yetone/magpie/internal/probelog"
+	"github.com/hmjz100/blackpie/internal/probelog"
 )
 
 // A Google sign-in (Antigravity, Gemini CLI) speaks Code Assist alone, an

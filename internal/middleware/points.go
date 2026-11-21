@@ -23,7 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"log"
 	"math"
 	"path/filepath"
@@ -35,11 +35,11 @@ import (
 
 	"github.com/MoeForge/moejs"
 
-	"github.com/yetone/magpie/internal/beat"
-	"github.com/yetone/magpie/internal/filememo"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/routes"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/beat"
+	"github.com/hmjz100/blackpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/routes"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 var (
@@ -412,8 +412,8 @@ func (o *observer) Serve() (stop func()) {
 	go func() {
 		defer wg.Done()
 		// a plugin turned on here is seen once saved (Written); every
-		// OthersEvery only catches one the CLI or a second magpie turned on
-		// (#3185: a 1s tick woke an idle magpie every second)
+		// OthersEvery only catches one the CLI or a second blackpie turned on
+		// (#3185: a 1s tick woke an idle blackpie every second)
 		for {
 			select {
 			case <-done:

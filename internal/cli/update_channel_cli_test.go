@@ -5,10 +5,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
-// magpie update channel stable|every saves Settings' Update channel
+// blackpie update channel stable|every saves Settings' Update channel
 // (ssharpcc on X); with nothing after it, it only says which; anything
 // else is refused and nothing is saved.
 func TestUpdateChannelCmd(t *testing.T) {

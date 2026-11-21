@@ -28,10 +28,10 @@ var tapJS []byte
 // tapPrefix names the folders a tap is written to, the helper's pid after
 // it; tap.js knows itself by it, to take itself out of what Claude Code
 // hands on.
-const tapPrefix = "magpie-claude-tap-"
+const tapPrefix = "blackpie-claude-tap-"
 
 // tapEnv names the file tap.js writes to.
-const tapEnv = "MAGPIE_CLAUDE_TAP"
+const tapEnv = "BLACKPIE_CLAUDE_TAP"
 
 // how long a message of the transcript waits for its stream, and a turn's
 // end for its streams to end; and how often the tap is read while one

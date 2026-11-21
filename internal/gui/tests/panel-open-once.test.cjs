@@ -1,6 +1,6 @@
 // Run with Node's test runner and Playwright on the module path; see README.md.
 // The tray panel opens the main window from one place: the header's
-// open-as-a-window icon. Its foot had an "Open magpie" button too, which did
+// open-as-a-window icon. Its foot had an "Open blackpie" button too, which did
 // the same (yogurt36 on Discord); the foot keeps Profiles, the status line
 // and Quit, which are its own.
 const assert = require("node:assert/strict");
@@ -44,7 +44,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       page.on("pageerror", (e) => errors.push(e.message));
       const calls = [];
       await page.route("**/*", handler(lang, calls));
-      await page.goto("http://magpie.test/?mode=panel");
+      await page.goto("http://blackpie.test/?mode=panel");
       await page.locator("#agents .row.agent").first().waitFor();
 
       // the header's icon opens the window

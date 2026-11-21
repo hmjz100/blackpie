@@ -13,7 +13,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/yetone/magpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/gateway"
 )
 
 // Each line goes to the gateway's browser server with this process's
@@ -63,14 +63,14 @@ func TestBridgePassesLinesWithItsSession(t *testing.T) {
 	if err := serve(strings.NewReader(`{"jsonrpc":"2.0","id":7,"method":"tools/list"}`+"\n"), &out, srv.URL); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out.String(), `"id":7`) || !strings.Contains(out.String(), "magpie isn't running") {
+	if !strings.Contains(out.String(), `"id":7`) || !strings.Contains(out.String(), "blackpie isn't running") {
 		t.Fatalf("gateway gone: %q", out.String())
 	}
 }
 
-// `magpie mcp search` passes each line to the gateway's web search server,
+// `blackpie mcp search` passes each line to the gateway's web search server,
 // with no browser session, and a gateway that can't be reached names
-// Magpie Web Search.
+// Blackpie Web Search.
 func TestSearchBridgePassesLines(t *testing.T) {
 	var mu sync.Mutex
 	var paths, sessions []string
@@ -98,7 +98,7 @@ func TestSearchBridgePassesLines(t *testing.T) {
 	defer srv.Close()
 	in := strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"initialize"}` + "\n" +
 		`{"jsonrpc":"2.0","method":"notifications/initialized"}` + "\n" +
-		`{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"web_search","arguments":{"query":"magpie"}}}` + "\n")
+		`{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"web_search","arguments":{"query":"blackpie"}}}` + "\n")
 	var out bytes.Buffer
 	if err := serveSearch(in, &out, srv.URL); err != nil {
 		t.Fatal(err)
@@ -115,12 +115,12 @@ func TestSearchBridgePassesLines(t *testing.T) {
 	if err := serveSearch(strings.NewReader(`{"jsonrpc":"2.0","id":7,"method":"tools/list"}`+"\n"), &out, srv.URL); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out.String(), `"id":7`) || !strings.Contains(out.String(), "Magpie Web Search can't be reached") {
+	if !strings.Contains(out.String(), `"id":7`) || !strings.Contains(out.String(), "Blackpie Web Search can't be reached") {
 		t.Fatalf("gateway gone: %q", out.String())
 	}
 }
 
-// magpie mcp vision relays each line to the gateway's image recognition
+// blackpie mcp vision relays each line to the gateway's image recognition
 // server, a relative image path made the agent's folder's on the way
 // (the gateway can't know where the agent runs), and says so by id when
 // the gateway can't be reached (matrix0487 on Discord).
@@ -178,7 +178,7 @@ func TestVisionBridgePassesLines(t *testing.T) {
 	if err := serveVision(strings.NewReader(`{"jsonrpc":"2.0","id":7,"method":"tools/list"}`+"\n"), &out, srv.URL); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out.String(), `"id":7`) || !strings.Contains(out.String(), "Magpie Image Recognition can't be reached") {
+	if !strings.Contains(out.String(), `"id":7`) || !strings.Contains(out.String(), "Blackpie Image Recognition can't be reached") {
 		t.Fatalf("gateway gone: %q", out.String())
 	}
 	if err := RunVision([]string{"extra"}); err == nil {

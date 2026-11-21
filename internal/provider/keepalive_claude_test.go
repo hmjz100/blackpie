@@ -16,7 +16,7 @@ import (
 // switched off as a reserve) had nothing run on it, and its refresh token
 // sat idle until it was found signed out. The keep-alive has Claude Code
 // itself run on each, in its own config directory, and keeps what Claude
-// Code made of the sign-in; magpie asks Anthropic nothing (fakeClaudeUsage
+// Code made of the sign-in; blackpie asks Anthropic nothing (fakeClaudeUsage
 // fails a test that does).
 func TestRenewLoginsKeepsSavedClaudeSignedIn(t *testing.T) {
 	claudeThree(t) // team@ and max@ saved, Claude Code on pro@
@@ -230,7 +230,7 @@ func TestRenewLoginsKeepsClaudeReading(t *testing.T) {
 	if len(cards) != 1 || used(cards[0].Windows) != 37 || cards[0].Error != "" || cards[0].User != max {
 		t.Fatalf("the card: %+v", cards)
 	}
-	// and on disk, dated, for a magpie started after
+	// and on disk, dated, for a blackpie started after
 	lastQuotas.Lock()
 	lastQuotas.m, lastQuotas.loaded = nil, false
 	lastQuotas.Unlock()
@@ -324,7 +324,7 @@ func TestRenewLoginsFailedWaitsItsTurn(t *testing.T) {
 	if got := took(); !slices.Equal(got, []string{claudeAccountDir(first)}) {
 		t.Fatalf("look 4 ran %q", got)
 	}
-	// `magpie accounts refresh` tries it at once, waiting or not
+	// `blackpie accounts refresh` tries it at once, waiting or not
 	if rs := RenewLogins(context.Background(), 0); len(rs) != 2 {
 		t.Fatalf("refresh: %+v", rs)
 	}

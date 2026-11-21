@@ -2,7 +2,7 @@ package edit
 
 import (
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"sort"
 	"strconv"
 	"strings"

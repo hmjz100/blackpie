@@ -1,15 +1,15 @@
-// Package daemon runs `magpie serve` as a service of the user's own: a
+// Package daemon runs `blackpie serve` as a service of the user's own: a
 // systemd user unit on Linux, a launch agent on the Mac. The system starts
 // it at boot or login and starts it again when it stops, with no window
 // and no desktop session, for a server or a machine reached over SSH.
 // Whether it is installed and running is the system's own record, read
-// each time, never a setting of magpie's.
+// each time, never a setting of blackpie's.
 package daemon
 
 import (
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"html"
 	"os"
 	"os/exec"
@@ -19,15 +19,15 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/yetone/magpie/internal/agentenv"
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/autostart"
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/agentenv"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/autostart"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/proc"
 )
 
-// Name is the service's name: magpie.service, com.yetone.magpie.serve.
-const Name = "magpie"
+// Name is the service's name: blackpie.service, com.hmjz100.blackpie.serve.
+const Name = "blackpie"
 
 // Status is what the system says of the service.
 type Status struct {
@@ -57,7 +57,7 @@ type manager interface {
 // goos picks the manager; a var so that the tests run both on any unix.
 var goos = runtime.GOOS
 
-// ErrUnsupported is for a system with no service manager magpie writes for.
+// ErrUnsupported is for a system with no service manager blackpie writes for.
 var ErrUnsupported = errors.New("unsupported")
 
 func current() (manager, error) {
@@ -67,26 +67,26 @@ func current() (manager, error) {
 	case "darwin":
 		return launchd{}, nil
 	case "windows":
-		return nil, fmt.Errorf("%w on Windows: `magpie autostart on` opens magpie, with its gateway, when you log in; or run `magpie daemon install` inside WSL", ErrUnsupported)
+		return nil, fmt.Errorf("%w on Windows: `blackpie autostart on` opens blackpie, with its gateway, when you log in; or run `blackpie daemon install` inside WSL", ErrUnsupported)
 	case "android":
-		return nil, fmt.Errorf("%w on Android: `magpie autostart on` starts the gateway at boot through Termux:Boot", ErrUnsupported)
+		return nil, fmt.Errorf("%w on Android: `blackpie autostart on` starts the gateway at boot through Termux:Boot", ErrUnsupported)
 	}
-	return nil, fmt.Errorf("%w on %s: run `magpie serve` under the system's own service manager", ErrUnsupported, goos)
+	return nil, fmt.Errorf("%w on %s: run `blackpie serve` under the system's own service manager", ErrUnsupported, goos)
 }
 
 // Options are what the service serves besides the gateway.
 type Options struct {
-	// Web is the address the app's page is served on (`magpie serve
+	// Web is the address the app's page is served on (`blackpie serve
 	// --web=…`), "" for none.
 	Web string
-	// Key is the page's MAGPIE_WEB_KEY, written into the service so its
+	// Key is the page's BLACKPIE_WEB_KEY, written into the service so its
 	// link stays the same across restarts; needed with Web.
 	Key string
 }
 
-// Install writes the service for this copy of magpie, with the
+// Install writes the service for this copy of blackpie, with the
 // environment it was installed from, and starts it; again, it writes the
-// service anew (a moved magpie, a new PATH or proxy) and restarts it.
+// service anew (a moved blackpie, a new PATH or proxy) and restarts it.
 func Install(o Options) error {
 	m, err := current()
 	if err != nil {
@@ -95,7 +95,7 @@ func Install(o Options) error {
 	// the app opened at login serves the gateway too: the two would take
 	// turns failing on the port
 	if autostartEnabled() {
-		return errors.New("magpie already opens at login and serves the gateway: run `magpie autostart off` first, or keep that instead")
+		return errors.New("blackpie already opens at login and serves the gateway: run `blackpie autostart off` first, or keep that instead")
 	}
 	if o.Web != "" && o.Key == "" {
 		return errors.New("the page needs a key")
@@ -113,7 +113,7 @@ func Install(o Options) error {
 }
 
 // removedMark is there once the user removed the service (Uninstall): what
-// magpie puts in place by itself (the terminal's keepGateway, as it quits) is put there
+// blackpie puts in place by itself (the terminal's keepGateway, as it quits) is put there
 // no more.
 func removedMark() string { return filepath.Join(appdir.Config(), "daemon-removed") }
 
@@ -123,7 +123,7 @@ func Removed() bool {
 	return err == nil
 }
 
-// serveArgs is what the service runs magpie with.
+// serveArgs is what the service runs blackpie with.
 func serveArgs(o Options) []string {
 	if o.Web == "" {
 		return []string{"serve"}
@@ -131,11 +131,11 @@ func serveArgs(o Options) []string {
 	return []string{"serve", webFlag + o.Web}
 }
 
-// webFlag is `magpie serve`'s, naming the page's address.
+// webFlag is `blackpie serve`'s, naming the page's address.
 const webFlag = "--web="
 
 // webKeyVar is the page's key in the service's environment.
-const webKeyVar = "MAGPIE_WEB_KEY"
+const webKeyVar = "BLACKPIE_WEB_KEY"
 
 // withKey is env with the page's key, when it has a page: a key in the
 // shell's environment is never carried otherwise.
@@ -163,13 +163,13 @@ func Web() (addr, key string) {
 
 var (
 	webArgRe = lazyre.New(`(?:"|<string>)` + regexp.QuoteMeta(webFlag) + `([^"<\s]+)(?:"|</string>)`)
-	// a unit's Environment="MAGPIE_WEB_KEY=…", a plist's
-	// <key>MAGPIE_WEB_KEY</key><string>…</string>
+	// a unit's Environment="BLACKPIE_WEB_KEY=…", a plist's
+	// <key>BLACKPIE_WEB_KEY</key><string>…</string>
 	webKeyRe = lazyre.New(webKeyVar + `(?:=|</key><string>)([A-Za-z0-9._~-]+)`)
 )
 
 // TLS is the certificate and key files the installed service serves
-// HTTPS with (`magpie daemon install --tls-cert … --tls-key …`), "" when
+// HTTPS with (`blackpie daemon install --tls-cert … --tls-key …`), "" when
 // it has none or isn't installed.
 func TLS() (cert, key string) {
 	m, err := current()
@@ -197,7 +197,7 @@ func tlsOf(text string) (cert, key string) {
 		}
 		return ""
 	}
-	cert, key = val("MAGPIE_TLS_CERT"), val("MAGPIE_TLS_KEY")
+	cert, key = val("BLACKPIE_TLS_CERT"), val("BLACKPIE_TLS_KEY")
 	if cert == "" || key == "" {
 		return "", ""
 	}
@@ -263,7 +263,7 @@ func Start() error { return installed(manager.start) }
 // Stop stops it, until the next boot or login, or Start.
 func Stop() error { return installed(manager.stop) }
 
-// Restart stops it and starts it again: a magpie updated in place serves
+// Restart stops it and starts it again: a blackpie updated in place serves
 // as the new version.
 func Restart() error { return installed(manager.restart) }
 
@@ -283,7 +283,7 @@ func Get() (Status, error) {
 }
 
 // ErrNotInstalled is Start, Stop or Restart before Install.
-var ErrNotInstalled = errors.New("the magpie service isn't installed: `magpie daemon install`")
+var ErrNotInstalled = errors.New("the blackpie service isn't installed: `blackpie daemon install`")
 
 func with(f func(manager) error) error {
 	m, err := current()
@@ -302,7 +302,7 @@ func installed(f func(manager) error) error {
 	})
 }
 
-// autostartEnabled: magpie's own record is there, whether or not the
+// autostartEnabled: blackpie's own record is there, whether or not the
 // user has it switched off in System Settings for now, since switching
 // it back on there opens the app with the service still installed. A
 // var for the tests.
@@ -310,7 +310,7 @@ var autostartEnabled = func() bool { return autostart.Enabled() != autostart.Off
 
 // self is the program the service runs: this one, by the name on PATH
 // when that is this same file, so a package manager's link (Homebrew's
-// /opt/homebrew/bin/magpie) still leads to the version it updates to. A
+// /opt/homebrew/bin/blackpie) still leads to the version it updates to. A
 // var for the tests, whose binary is a build Go deletes.
 var self = func() (string, error) {
 	if p := os.Getenv("APPIMAGE"); p != "" {
@@ -331,10 +331,10 @@ var self = func() (string, error) {
 // name it was started by.
 func pick(real, exe string) (string, error) {
 	if strings.Contains(real, "/AppTranslocation/") {
-		return "", errors.New("move magpie to Applications first, then install the service")
+		return "", errors.New("move blackpie to Applications first, then install the service")
 	}
 	if strings.Contains(real, string(filepath.Separator)+"go-build") {
-		return "", errors.New("this magpie is a build `go run` deletes when it ends: install magpie, then run `magpie daemon install` from it")
+		return "", errors.New("this blackpie is a build `go run` deletes when it ends: install blackpie, then run `blackpie daemon install` from it")
 	}
 	if p, err := exec.LookPath(Name); err == nil {
 		if abs, err := filepath.Abs(p); err == nil {
@@ -360,16 +360,16 @@ func sameFile(a, b string) bool {
 
 // carried are the variables the service gets from the shell it was
 // installed from: the PATH that finds the agents' CLIs and bun, the proxy,
-// magpie's own settings, and where each agent keeps its files. A service
+// blackpie's own settings, and where each agent keeps its files. A service
 // starts with the system's bare environment otherwise.
 var carried = []string{
 	"PATH",
 	"HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "NO_PROXY",
 	"http_proxy", "https_proxy", "all_proxy", "no_proxy",
 	"XDG_CONFIG_HOME", "XDG_DATA_HOME", "XDG_CACHE_HOME", "XDG_STATE_HOME",
-	"MAGPIE_ADDR", "MAGPIE_TRUST_PROXY", "MAGPIE_BUN", "MAGPIE_WEB_URL",
-	// `magpie daemon install --tls-cert … --tls-key …` sets them
-	"MAGPIE_TLS_CERT", "MAGPIE_TLS_KEY",
+	"BLACKPIE_ADDR", "BLACKPIE_TRUST_PROXY", "BLACKPIE_BUN", "BLACKPIE_WEB_URL",
+	// `blackpie daemon install --tls-cert … --tls-key …` sets them
+	"BLACKPIE_TLS_CERT", "BLACKPIE_TLS_KEY",
 }
 
 // environ is carried's variables that are set, as KEY=value, in order.

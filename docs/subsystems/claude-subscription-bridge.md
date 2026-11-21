@@ -11,52 +11,52 @@ meet it.
 
 `claudeBinary` (and the sign-in's `claudeExecutable`) take
 `claudecode.Find`: the machine's own `claude` (`proc.FindTool`), else the
-one `magpie claude-code install` downloaded into
+one `blackpie claude-code install` downloaded into
 `<cache>/claude-code/<version>/` (`internal/claudecode`), else, on Windows,
 one in WSL. The download is Anthropic's native build from
 `downloads.claude.ai/claude-code-releases`, the "latest" channel, as
 `claude.ai/install.sh` takes it: the release's `manifest.json` gives the
 platform's SHA-256 and size, and a build that doesn't match both is not
-kept. It is only made when the user asks (`magpie claude-code install`, or
-yes to `magpie accounts add claude`'s offer on a machine without one), for
+kept. It is only made when the user asks (`blackpie claude-code install`, or
+yes to `blackpie accounts add claude`'s offer on a machine without one), for
 a server or a container (Jorben on Discord). It is not on PATH and stands
 in for no agent. It doesn't update itself (the bridge sets
 `DISABLE_AUTOUPDATER`); installing again takes the newest and removes the
 older one.
 
 A run is started with `--dangerously-skip-permissions` (`claudeCLIArgs`):
-its only tools are magpie's MCP ones, answered by the client, and
+its only tools are blackpie's MCP ones, answered by the client, and
 Anthropic's web search. Claude Code run as root refuses that flag ("cannot
 be used with root/sudo privileges") unless `IS_SANDBOX` is `1` or
-`CLAUDE_CODE_BUBBLEWRAP` is set, so a run as root, magpie's own euid 0 or
+`CLAUDE_CODE_BUBBLEWRAP` is set, so a run as root, blackpie's own euid 0 or
 a WSL distro whose default user is root (the probe's `uid`,
 `wslrun.Tool.Root`), is given `IS_SANDBOX=1` (`claudeCLI.asRoot`;
 FrierenF on Discord). A run as anyone else has its env as before. Only the
 bridge's run gets it; the warm-up and `/usage` runs don't skip
 permissions.
 
-Every Claude Code magpie starts for the subscription (a turn's run, the
+Every Claude Code blackpie starts for the subscription (a turn's run, the
 warm-up and model test `askClaude`, `/usage`, and the sign-in's
 `auth login` and `auth status`) is given its proxy through one helper,
 `claudeCLI.proxied` in each package, which is
 `netproxy.EnvForBunWith`: the account's own proxy, else the
 subscription's, else the global one (`netproxy.EnvWith`), with a SOCKS5
-proxy replaced by magpie's loopback HTTP bridge to it (`netproxy.Bridge`,
-as for every bun magpie starts, #1409). Claude Code is built with Bun,
+proxy replaced by blackpie's loopback HTTP bridge to it (`netproxy.Bridge`,
+as for every bun blackpie starts, #1409). Claude Code is built with Bun,
 which takes only http:// and https:// proxies: given `socks5://`, every
 request failed as `UnsupportedProxyProtocol`, after about three minutes of
 Claude Code's own retries, as a 502 (#2651). A Claude Code in a WSL
 distro that doesn't share Windows' loopback (`wslrun.Tool.Host` set)
 can't reach the bridge, so there, and where the bridge can't start, a
 SOCKS proxy is refused before Claude Code starts, with an error that says
-to use an http:// proxy. The `settings.json` env that magpie writes for the
+to use an http:// proxy. The `settings.json` env that blackpie writes for the
 user's own Claude Code sessions leaves a SOCKS proxy out (see
 [Providers and accounts](providers-accounts.md)).
 
-A saved account added by a setup-token (see [Providers and accounts](providers-accounts.md)) has no sign-in in its config directory. `inClaudeDir`, which builds the env of every run in a saved account's directory (a turn's run, the warm-up, `askClaude`, `/usage`), drops any `CLAUDE_CODE_OAUTH_TOKEN` it was given and sets it to `provider.ClaudeDirToken(configDir)` when that directory is a token account's: the token reaches the real Claude Code there and nowhere else, never on its command line, never in a log, and never to Claude Code's own account. magpie asks Anthropic nothing with it; the entrypoint and everything else about the run are as for any account.
+A saved account added by a setup-token (see [Providers and accounts](providers-accounts.md)) has no sign-in in its config directory. `inClaudeDir`, which builds the env of every run in a saved account's directory (a turn's run, the warm-up, `askClaude`, `/usage`), drops any `CLAUDE_CODE_OAUTH_TOKEN` it was given and sets it to `provider.ClaudeDirToken(configDir)` when that directory is a token account's: the token reaches the real Claude Code there and nowhere else, never on its command line, never in a log, and never to Claude Code's own account. blackpie asks Anthropic nothing with it; the entrypoint and everything else about the run are as for any account.
 
 The helper offers each of the client's tools under `bridgeToolName`
-(`bridgeTools`), which Claude Code calls `mcp__magpie__<name>`. Claude Code
+(`bridgeTools`), which Claude Code calls `mcp__blackpie__<name>`. Claude Code
 keeps only `[A-Za-z0-9_-]` of an MCP tool's name, so a name it would change
 (`spawn.agent`, `fs/read`), one longer than 51 (64 with the prefix) or one
 ending as a changed name ends (`_` and 12 hex digits) is cut, made of those
@@ -67,15 +67,15 @@ run was offered it. `subscriptionRun.names` (`bridgeNames`) maps it back
 to the declared name in `toolStart`, for streamed and whole messages, and
 in `mcpCall` (#2649).
 
-The run's MCP server is magpie itself (`magpie claude-mcp-helper`,
+The run's MCP server is blackpie itself (`blackpie claude-mcp-helper`,
 `internal/claudebridge`), which hands each tool call back to the gateway
-at `POST /_magpie/claude-mcp/<token>` (`mcpCall`), where the call is
+at `POST /_blackpie/claude-mcp/<token>` (`mcpCall`), where the call is
 registered in `b.calls` for the turn with its results to find. The token
 is `randomToken` (24 bytes from `crypto/rand`), one per run. The callback
 URL is written to `callback` in the run's own temp folder (0600) and the
 helper is given that file's path, so the token is never on Claude Code's
 command line. The helper calls the address the gateway listens on
-(`callbackBaseURL`: `MAGPIE_ADDR`, `0.0.0.0`/`::` as `127.0.0.1`), which,
+(`callbackBaseURL`: `BLACKPIE_ADDR`, `0.0.0.0`/`::` as `127.0.0.1`), which,
 pinned to one interface's address, isn't loopback, and it sends no
 gateway key. `lanGuard` therefore lets in exactly that path, by POST, with
 the token of a run now live (`ownCallback`: `addCallback` when the run is
@@ -93,7 +93,7 @@ entrypoint, and a `-p` run's `sdk-cli` costs about twice the plan's allowance of
 mode's `cli` (anthropics/claude-code#97074). The run is the real
 interactive Claude Code: nothing sets `CLAUDE_CODE_ENTRYPOINT`.
 
-The bridge starts `magpie claude-tui-helper <claude> <the -p arguments>`
+The bridge starts `blackpie claude-tui-helper <claude> <the -p arguments>`
 (`internal/claudetui`) in place of `claude` when `claudeTUI` says so, and
 talks to it as it talks to `-p`: stream-json in and out. The helper:
 
@@ -101,8 +101,8 @@ talks to it as it talks to `-p`: stream-json in and out. The helper:
   `-p`, the stream-json formats, `--verbose`,
   `--include-partial-messages`, `--thinking-display`,
   `--dangerously-skip-permissions` and `--no-session-persistence` go;
-  `--permission-mode default --allowedTools mcp__magpie[,WebSearch]
-  --no-chrome` come. Permissions are not skipped: only magpie's MCP tools
+  `--permission-mode default --allowedTools mcp__blackpie[,WebSearch]
+  --no-chrome` come. Permissions are not skipped: only blackpie's MCP tools
   (and the web search `-p` was given) are allowed, and nothing else is
   offered (`--tools ""`). A new session is given `--session-id`;
 - starts Claude Code in a pseudo-terminal of its own (200x50), no tmux,
@@ -118,28 +118,28 @@ talks to it as it talks to `-p`: stream-json in and out. The helper:
   (Claude Code is told as a closed window tells it) and kills it after
   3s. Its `-p` fallback runs Claude Code as a child, since Windows has no
   exec. A Claude Code in WSL is run the same way, through `wsl.exe` in
-  the console: the gateway hands the helper `MAGPIE_CLAUDE_TUI_WSL`
+  the console: the gateway hands the helper `BLACKPIE_CLAUDE_TUI_WSL`
   (`claudetui.WSL`, `claudeCLI.tuiWSL`), wsl.exe's arguments up to
-  Claude Code's (`wslrun.Tool.Args`, `MAGPIE_WSL_RUN` among them), the
+  Claude Code's (`wslrun.Tool.Args`, `BLACKPIE_WSL_RUN` among them), the
   distro's mount of the drives, and the projects folder as Windows reads
   it: the account's config directory (handed in as
   `CLAUDE_CONFIG_DIR/p`), or the distro user's own `~/.claude/projects`
   through `\\wsl$\<distro>` (`wslrun.Tool.Home`, from the probe). `TERM` is
   added to `WSLENV`, and an image's path is pasted as the distro reads
   it (`/mnt/c/…`, `shim.path`). The helper itself is the Windows
-  magpie.exe, not the `/mnt/c/…` path the MCP helper is started at.
+  blackpie.exe, not the `/mnt/c/…` path the MCP helper is started at.
   In the distro user's own folder the run is `-p` when Windows can't
   stat `\\wsl$\<distro>\<home>` (`tuiWSLUnread`), since the helper
   would wait for a transcript it can't see: a session with no 9P
   redirector, as one over ssh, reads nothing there.
   Killing the gateway ended the distro's Claude Code with wsl.exe (tried
-  on Windows 11 26200, magpie-desktop, Claude Code 2.1.289);
+  on Windows 11 26200, blackpie-desktop, Claude Code 2.1.289);
 - pastes each user message into the prompt (bracketed paste) and presses
   Enter. A message opening with `/`, `!`, `#` or `&` is pasted after a
   line break, so it is words, not a command (`pasteable`);
 - pastes a message's images as files (`userPieces`, `writeImage`): each
   base64 image is written to `image-N.<ext>` (0600) in a
-  `magpie-claude-images-*` temp folder, and its path is pasted alone,
+  `blackpie-claude-images-*` temp folder, and its path is pasted alone,
   which Claude Code reads into the message as `[Image #N]` (a path inside
   other words stays words). Claude Code reads the file after the paste
   returns, so the helper waits for `[Image #N]` with N past the last
@@ -148,7 +148,7 @@ talks to it as it talks to `-p`: stream-json in and out. The helper:
   notes each one's path to the model (`[Image: source: …]`). The folder
   is removed once its message is sent (Claude Code has read the files
   by then), and when the helper ends, on SIGINT, SIGTERM and SIGHUP too:
-  magpie's own handler (`endProbesOnSignal`) let go of the signals for
+  blackpie's own handler (`endProbesOnSignal`) let go of the signals for
   this command (`leaveSignals`), since it re-raised SIGTERM and killed the
   helper before it could end Claude Code and remove its files. Windows
   ends a run by killing its job, which no handler hears, so a helper
@@ -163,9 +163,9 @@ talks to it as it talks to `-p`: stream-json in and out. The helper:
 The transcript has a message only once it ends, so the tap streams it.
 Claude Code is a Bun program, and Bun loads first what `BUN_OPTIONS`
 names with `--preload`. The helper writes `tap.js` and an empty
-`tap.jsonl` to a `magpie-claude-tap-*` temp folder, and starts Claude
+`tap.jsonl` to a `blackpie-claude-tap-*` temp folder, and starts Claude
 Code with `BUN_OPTIONS` set to the user's own value followed by
-`--preload <tap.js>`, and `MAGPIE_CLAUDE_TAP` set to the file. Claude Code
+`--preload <tap.js>`, and `BLACKPIE_CLAUDE_TAP` set to the file. Claude Code
 in WSL gets both through `WSLENV`, with the paths as WSL reads them, and
 not the user's Windows `BUN_OPTIONS`. `BUN_OPTIONS` has no quoting, so on
 Windows a path with a space takes its short name. A path that still has
@@ -222,9 +222,9 @@ thinking: the model's text before its call is lost to the client.
 
 The user's own `~/.claude.json` and `~/.claude` are never written. Claude
 Code asks whether to trust a folder it has not run in; the helper answers
-yes only when the bridge sets `MAGPIE_CLAUDE_TUI_TRUST=1`, which it does
-for magpie's own working folder or a saved account's config directory,
-both magpie's. In the caller's folder under the account Claude Code is
+yes only when the bridge sets `BLACKPIE_CLAUDE_TUI_TRUST=1`, which it does
+for blackpie's own working folder or a saved account's config directory,
+both blackpie's. In the caller's folder under the account Claude Code is
 signed in to, the question is the user's: a folder the user has not
 trusted makes that run `-p`. The question opens on "No, exit", and a key
 sent as it is first drawn can be lost to its being drawn again, so the
@@ -260,7 +260,7 @@ opens, kept 30 seconds and dropped when the setting changes, not in
 found), `os` and `no-shim`. What only a request decides (safeguards and
 the rest above) the page names as still `-p`; the WSL folder Windows
 can't read is per account, so the page doesn't know it. A subscription
-with Only switch serves nothing through magpie and shows no row.
+with Only switch serves nothing through blackpie and shows no row.
 
 A turn the interactive mode can't take ends the run, and the next starts
 anew: a turn with an image known by its URL, one that takes earlier turns
@@ -274,7 +274,7 @@ Claude Code signed in for `-p` only, as in a container given
 "Security notes", a config folder whose onboarding isn't done), the helper becomes `claude -p` with the same
 arguments (`printMode`, `exec` on the same pid, its input still unread),
 so the turn is answered all the same, and it writes
-`<cache>/magpie/claude-tui-broken`, which holds the number of failed
+`<cache>/blackpie/claude-tui-broken`, which holds the number of failed
 starts in a row. For 30 minutes after one, doubled with each one after
 to a day (`brokenFor`), every run goes to `-p` at once: the helper is
 not started (`claudePrintWhy`, "the interactive mode failed to start
@@ -287,7 +287,7 @@ shown, or as `-p` after the fallback, so the bridge waits for it
 10s of any other control request. With 10s, a Claude Code slower than
 that to start (2 vCPU in Docker) was ended as the helper waited, before
 it could become `-p`, and every try was answered 502 "Claude Code has
-not answered magpie's initialize request in 10s" (#4504). A helper that
+not answered blackpie's initialize request in 10s" (#4504). A helper that
 answers nothing even then is ended, the mark is written, and `start`
 starts the turn again as `-p`.
 
@@ -300,7 +300,7 @@ which `claudePrintMode` set too overrides):
 - a run that `claudeTUI` would make `-p` (any reason above) is not
   started; the request gets an error naming the reason and the setting
   (`claudeOnlyErr`, `claudeNotTUIWhy`);
-- the helper is handed `MAGPIE_CLAUDE_TUI_ONLY=1` (`claudetui.OnlyEnv`,
+- the helper is handed `BLACKPIE_CLAUDE_TUI_ONLY=1` (`claudetui.OnlyEnv`,
   `claudeCLI.tuiEnv`). Where it would become `-p` (no start, `ready`'s
   sign-in, first-run notes, untrusted folder or timeout) it exits with
   the reason instead (`fallBack` in `Run`), and it ignores the broken mark;
@@ -326,7 +326,7 @@ A run started anew is told the whole conversation in one user message
 (`renderClaudePrompt`), a prefix the prompt cache has never seen, so the
 conversation is written to the cache again and its images are sent again.
 By default, that message holds the history in blocks of `historyChunk`
-messages, and magpie's one mark (Claude Code keeps three of Anthropic's four) is on the
+messages, and blackpie's one mark (Claude Code keeps three of Anthropic's four) is on the
 last whole block, else on the caller's instructions: a later run started
 anew for the same conversation while it is cached reads the history up to an
 earlier run's mark, found within Anthropic's 20-block lookback. A
@@ -340,12 +340,12 @@ cache.
 
 A run keeps its prompt cache as long as the user picked for Claude Code's
 main conversation (`claudeRunTTL`): `FORCE_PROMPT_CACHING_5M`, then
-`CLAUDE_CODE_PROMPT_CACHE_TTL`, in magpie's environment or settings.json's
+`CLAUDE_CODE_PROMPT_CACHE_TTL`, in blackpie's environment or settings.json's
 `env`, then settings.json's `promptCacheTtl` (the Agents page's "Prompt
 cache · main conversation"), and an hour with none of them, as Claude Code
 writes it on a subscription within its limits. The run is given it as
 `CLAUDE_CODE_PROMPT_CACHE_TTL` (`cleanClaudeEnvTTL`; a saved account's
-Claude Code reads its own folder's settings, not the user's), and magpie's
+Claude Code reads its own folder's settings, not the user's), and blackpie's
 mark in the first message is as long (`Request.runMark`), since Anthropic
 refuses a 1h mark after a 5m one. A session a run goes on from keeps the
 lifetime it started with (`cachePrefix.ttl`; one saved before it was kept
@@ -367,11 +367,11 @@ A new run picks its lifetime with `runTTLFor`:
   runs on (`Request.pickedTTL`, `claudeTTLOf`). For Claude Code on this
   computer (its token or `claude-cli/` User-Agent from loopback,
   `caller.claudeHere`), it is this computer's, read as `claudeRunTTL`
-  reads it. For a request another magpie passed on, it is what that
-  magpie named in `X-Magpie-Claude-Cache-TTL` (`ClaudeCacheTTLHeader`):
+  reads it. For a request another blackpie passed on, it is what that
+  blackpie named in `X-Blackpie-Claude-Cache-TTL` (`ClaudeCacheTTLHeader`):
   `5m`, `1h`, or `default` for no pick. `passOnCaller` sends it on every
-  request to a Remote magpie whose caller is Claude Code here, or that
-  came with it. `callerFrom` takes it from a `magpie/` request alone, and
+  request to a Remote blackpie whose caller is Claude Code here, or that
+  came with it. `callerFrom` takes it from a `blackpie/` request alone, and
   `withCaller` takes it off what comes in, so no vendor is sent it.
   `default` gives `claudeRunTTL`: this computer's own pick, or an hour,
   as Claude Code keeps it on a subscription.
@@ -388,19 +388,19 @@ relayed write was five minutes, while a 5m pick still had its unmarked
 side calls written for an hour (linkaww). The header carries the pick
 itself. A settings.json that can't be read or parsed names no pick
 (`claudeSettingsKnown`), and the marks decide as before. Not seen by
-magpie: a pick made only in the shell Claude Code was started from, or
+blackpie: a pick made only in the shell Claude Code was started from, or
 in a project's `.claude/settings.json`. Such a client is sent `default`,
 an hour, unless its marks name an hour. A Claude Code that goes straight
-to a remote magpie, with no magpie of its own, sends no header, and its
+to a remote blackpie, with no blackpie of its own, sends no header, and its
 marks decide as before. Chat and Responses requests carry no marks and
 keep `claudeRunTTL`; warmup and usage runs have no request and keep it
 too (`cleanClaudeEnv`). `TestAskedCacheTTL`,
-`TestClaudeRunKeepsTheUsersCacheTTL`, `TestClaudeCacheTTLFromAMagpieOnly`,
-`TestClaudeCacheTTLOf`, `TestClaudeCacheTTLReachesTheRemoteMagpie`.
+`TestClaudeRunKeepsTheUsersCacheTTL`, `TestClaudeCacheTTLFromABlackpieOnly`,
+`TestClaudeCacheTTLOf`, `TestClaudeCacheTTLReachesTheRemoteBlackpie`.
 
 ## Client-placed cache marks (#1717)
 
-A client can send `X-Magpie-Cache-Marks: client` on a `/v1/messages`
+A client can send `X-Blackpie-Cache-Marks: client` on a `/v1/messages`
 request to a Claude subscription. Without that header, the bridge behaves
 as before — except Claude Code's auto mode classifier, whose own marks are
 kept like an opted-in client's when they are valid, and dropped as before when
@@ -440,7 +440,7 @@ messages order, returns HTTP 400 with Anthropic's `type: error` and
 `cache_control`. Both error messages and the omitted-TTL default were
 checked through a relay to the live Anthropic API.
 
-`X-Magpie-Cache-Marks-Dropped` lists counts by section, such as
+`X-Blackpie-Cache-Marks-Dropped` lists counts by section, such as
 `tools:1,messages:3`. It is absent when nothing was dropped. A mark on a
 system block removed with the billing header is reported as `system`.
 The bridge also reports marks on content it cannot render. Cache usage
@@ -536,11 +536,11 @@ exit status and the end of its stderr (`endedBefore`), as one that ends
 before it reads its input is (`whyEnded`). The tool-results path and
 `resume` already start a new run when the one they found has ended.
 
-magpie ends a run (`abort`) by asking Claude Code to end with SIGTERM
+blackpie ends a run (`abort`) by asking Claude Code to end with SIGTERM
 (`proc.Tree.Stop`) and kills its tree only once it has exited or
 `stopGrace` (5s) has passed; Windows kills the job at once. Claude Code
 removes `~/.claude/.oauth_refresh.lock` as it exits on SIGTERM (2.1.299
-exits within half a second), and the SIGKILL magpie sent before left the
+exits within half a second), and the SIGKILL blackpie sent before left the
 lock for the next requests to fail on (#2195). The run counts as ended at
 once; the gateway stopping (`abortAll`) waits for every tree. Covered by
 `TestClaudeAbortAllowsLockCleanup` and `TestTreeStop*`.
@@ -619,7 +619,7 @@ other (`serveSubscription`'s ended callback runs only when `gone()`
 stopped the `AfterFunc` that calls `letGo`), so it isn't those two of one
 request. `keepIdle` holds the rule whichever caller it was (#1596). Past `idleMost`, the
 eviction loop takes out the key it found as oldest, not the run's own.
-Before (X, Sma1lboy: magpie at 158 GB after two days of omp agents), one
+Before (X, Sma1lboy: blackpie at 158 GB after two days of omp agents), one
 run under two keys was the oldest on every pass, the pass took out only
 its newer key, and the loop never ended: it held `b.mu`, stopping every
 Claude subscription request, and grew its list of runs to let go without
@@ -746,7 +746,7 @@ whose text is replaced by the line is not this shape, and starts anew.
 
 ## How many Claude Code processes run (`claudeRoom`, #2956)
 
-Every Claude Code magpie starts for a Claude subscription takes a place in
+Every Claude Code blackpie starts for a Claude subscription takes a place in
 `claudeRoom` (`claude_room.go`) before it starts, and frees it once its
 process has exited: each conversation's run (`startRun`), busy, idle or
 parked on tool results, and each one-off test, warm-up and /usage read
@@ -759,11 +759,11 @@ six idle runs were enough for two OOM kills.
 How many may run (`claudeRunsMost`):
 
 - the user's `claudeRunsMost` in settings.json, set with
-  `magpie claude-code runs N` (`auto` clears it). It is this machine's own
+  `blackpie claude-code runs N` (`auto` clears it). It is this machine's own
   setting (`KeepOwn`): a sync never brings a desktop's number to a server.
 - otherwise, on Linux, `(limit − 256 MiB) / 128 MiB`, at least 1, where
   the limit is the least of MemTotal, the cgroup v2 `memory.max` and
-  `memory.high` of magpie's cgroup and every one above it, and the cgroup v1
+  `memory.high` of blackpie's cgroup and every one above it, and the cgroup v1
   `memory.limit_in_bytes` (`memLimit`). 512 MiB gives 2, 1 GiB 6, a 964 MiB
   machine with no cgroup limit 5. It is read once per process.
 - otherwise no bound: macOS, Windows, and a Linux whose limits can't be
@@ -798,33 +798,33 @@ the 503.
 ### Which ones run (`ClaudeRunsPath`)
 
 Each run is two processes: Claude Code, and the MCP helper it starts for
-the caller's tools (`magpie claude-mcp-helper`, `internal/claudebridge`).
+the caller's tools (`blackpie claude-mcp-helper`, `internal/claudebridge`).
 Claude Code's parallel subagents are conversations of their own, so a
 session that starts eight has eight pairs running while they work and
 `idleMost` (6) pairs kept for an hour after. Those still waiting on tool
 calls stay for `runTimeout` (30 minutes) once their caller stops. A task
 manager names Claude Code by its version (its binary is
 `versions/2.1.311`), so on macOS Activity Monitor shows these as "2.1.311" and
-"magpie", with nothing to say what they are (@Candydidi3 on X).
+"blackpie", with nothing to say what they are (@Candydidi3 on X).
 
-`GET /v1/magpie/claude-runs` (`claude_runs.go`, loopback only, as the
+`GET /v1/blackpie/claude-runs` (`claude_runs.go`, loopback only, as the
 heap profile) lists each run with its pid, model, account, `state`
 (`answering`, `idle` for its next turn, `tools` waiting on the caller's
 tools) and `since`. It also gives `ends`, when its timer lets it go
 (`endIn` records it at each reset), and Claude Code's RSS. `live` is
-`claudeRoom`'s count, one-off asks included. `magpie claude-code runs`
+`claudeRoom`'s count, one-off asks included. `blackpie claude-code runs`
 prints the list under the bound and says what the processes are.
-On 10-27, a sandbox `magpie serve` with a made-up Claude sign-in and real
+On 10-27, a sandbox `blackpie serve` with a made-up Claude sign-in and real
 Claude Code 2.1.311 against a mock API got 8 concurrent subagent-like
 requests. It kept 6 Claude Code and 6 helpers, and the list named the same
-6 pids that `ps` showed. Quitting magpie ended all 12 within a second.
+6 pids that `ps` showed. Quitting blackpie ended all 12 within a second.
 
 ## How large one Claude Code process may grow (`claudeRunBudget`, #3256)
 
 `claudeRoom` bounds how many Claude Code processes run, not how large each
 is. A run is kept for its conversation's next turn, turn after turn, and a
 service that is never restarted kept one for days: on a 31 GiB host a
-`node-MainThread` in magpie.service reached 8 GiB RSS and the kernel's OOM
+`node-MainThread` in blackpie.service reached 8 GiB RSS and the kernel's OOM
 killer took the machine's other work with it.
 
 Each time a run's reply ends, `oversized` (`claude_rss.go`) reads the
@@ -832,7 +832,7 @@ resident memory of its process tree (`proc.Tree.RSS`: `/proc/<pid>/status`
 VmRSS on Linux, `ps -o rss=` on macOS, the working sets of every process in
 its job on Windows, where an npm install's `claude.cmd` is a cmd.exe with
 the node under it) and logs it with the pid. The budget is an eighth of the
-memory magpie may use (`memLimit` on Linux, `proc.MemTotal` elsewhere), at
+memory blackpie may use (`memLimit` on Linux, `proc.MemTotal` elsewhere), at
 least 1 GiB, 4 GiB where neither is known. It is read once per process.
 
 - A whole turn (`ended`, stop) over the budget: the run is not kept idle.
@@ -846,17 +846,17 @@ least 1 GiB, 4 GiB where neither is known. It is read once per process.
 Each Claude Code a run starts logs its pid and model when it starts, and its
 run time, how it ended and its peak RSS (`proc.PeakRSS`, rusage
 `ru_maxrss`; not on Windows) when it ends: an OOM report's pid can be found
-in magpie's log.
+in blackpie's log.
 
 ## The run's working folder (`clientWorkDir`)
 
 Claude Code tells its model the folder it runs in as the "Primary working
 directory". A run has no tools of its own: the client's run in the
-client's folder. Run in magpie's shared work folder (`claudeWorkDir`,
-`<tmp>/magpie-claude-work-<uid>`), the model was told that folder. It then
+client's folder. Run in blackpie's shared work folder (`claudeWorkDir`,
+`<tmp>/blackpie-claude-work-<uid>`), the model was told that folder. It then
 wrote the client's files there, through the client's own tools, while the
 client's own prompt named another folder. Under a real Claude Code client,
-`pelican.html` landed in magpie's folder.
+`pelican.html` landed in blackpie's folder.
 
 A run therefore starts in the folder the caller names. `clientWorkDir`
 reads the system prompt and every message that is not the model's, and
@@ -894,7 +894,7 @@ block for the note alone. A caller on this computer that names no folder
 is told nothing more: Claude Code's platform and shell are its own.
 
 Claude Code has no option to leave its environment out. In 2.1.312 it
-is a `<system-reminder>` in the run's first message, before magpie's
+is a `<system-reminder>` in the run's first message, before blackpie's
 text, with `--system-prompt-file` too; the SDK's `excludeDynamicSections`
 only moves it there. So a lean run (`claudeLeanPrompt`) is told the same
 in its system prompt (`leanSystem`), the named-folder note worded as
@@ -917,14 +917,14 @@ Nothing else of the folder reaches the run. `--setting-sources ""` loads
 no CLAUDE.md, settings or skills from it. Auto memory is off, and
 `CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS=1` keeps the repository's status out
 of the prompt, which would change it, and Anthropic's cache with it,
-whenever a file changes. The system prompt magpie sends is unchanged; only
+whenever a file changes. The system prompt blackpie sends is unchanged; only
 the folder Claude Code runs in is.
 
 A run's sessions are saved in that folder's project
 (`<config>/projects/<the caller's folder>`), beside the user's own Claude
 Code sessions there when the run is on the user's own sign-in. Claude
 Code's `--resume` picker lists them while they last. That project is never
-swept: only magpie's own folder is (`sweepSessions`). A run's session is
+swept: only blackpie's own folder is (`sweepSessions`). A run's session is
 removed there by its id, when it ends or is discarded (`removeSession`).
 A session that a stopped gateway left there, and its temp files, stay
 there as the user's own sessions do; a sweep can't tell them apart.
@@ -934,7 +934,7 @@ there as the user's own sessions do; a sweep can't tell them apart.
 - Its session: `<config>/projects/<work project>/<session>.jsonl`, for
   `--resume` (`claudeSessions`). It is removed when the run ends unless
   shelved, and when a saved session is discarded (`removeSession`).
-  `sweepSessions` removes those a stopped gateway left in magpie's own
+  `sweepSessions` removes those a stopped gateway left in blackpie's own
   work folder's project, once older than `idleLongest`; a caller's folder
   is never swept (`clientWorkDir`).
 - Claude Code's temp files for the session, the images it was given:
@@ -947,7 +947,7 @@ there as the user's own sessions do; a sweep can't tell them apart.
 
 A run started anew still sends every image in the conversation. Replacing
 earlier images with a placeholder would change what the model sees, and
-magpie doesn't do it.
+blackpie doesn't do it.
 
 ## Tool results another request answers first
 
@@ -1073,7 +1073,7 @@ past call as a `[tool call <name> id=… args=…]` line and each result as
 text: Claude Code has no call to make, the turn ends with end_turn, and the
 client shows the lines as the reply's words while nothing runs (Zhenzhen on
 Discord: Claude Desktop on Fable 5.1 got
-`[tool call mcp__magpie__Bash id=toolu_0Validate bash args={…}]`).
+`[tool call mcp__blackpie__Bash id=toolu_0Validate bash args={…}]`).
 
 - Such a prompt ends with a note (`pastCallsNote`) that the lines record
   earlier calls and that writing one calls nothing. A prompt with no call in
@@ -1114,14 +1114,14 @@ week's ring went on a cold start, `TestNoteClaudeLimitsKeepsTheWeekOnDisk`).
 
 A Claude Code signed in to claude.ai (its sign-in field set to
 `claudeai`, `claudeSignIns` in `internal/agent/claude.go`) reads these into its status line's `rate_limits`, which
-claude-hud shows. One that signs in to magpie with magpie's key
+claude-hud shows. One that signs in to blackpie with blackpie's key
 (`ANTHROPIC_AUTH_TOKEN`) ignores them: Claude Code 2.1.293 reads the
 headers only for a claude.ai subscriber. A reply another provider answered
 carries none.
 
 ## A restart to update
 
-A run is a Claude Code process of this magpie's, so a restart to update
+A run is a Claude Code process of this blackpie's, so a restart to update
 that hands the gateway to the new version ([GUI shell](gui-shell.md#a-restart-to-update-hands-the-gateway-over))
 waits for the bridge's turns, and for none of the gateway's other requests
 (`restartBusy` in [`handover.go`](../../internal/gui/handover.go): `Busy.Bridge`,

@@ -9,15 +9,15 @@ import (
 	toml "github.com/pelletier/go-toml/v2"
 )
 
-// thisMagpie makes exe the magpie this computer runs.
-func thisMagpie(t *testing.T, exe string) {
+// thisBlackpie makes exe the blackpie this computer runs.
+func thisBlackpie(t *testing.T, exe string) {
 	t.Helper()
 	old := selfExe
 	selfExe = func() (string, error) { return exe, nil }
 	t.Cleanup(func() { selfExe = old })
 }
 
-// seedLibrary writes library.json as a magpie before #1439 left it, or
+// seedLibrary writes library.json as a blackpie before #1439 left it, or
 // as a sync from another computer brought it: the servers as they are.
 func seedLibrary(t *testing.T, servers ...Server) {
 	t.Helper()
@@ -62,30 +62,30 @@ func storedCommand(t *testing.T, name string) string {
 	return ""
 }
 
-// #1439: magpie-image was kept with one computer's magpie by full path. A
-// sync carried C:\Users\…\Downloads\magpie-windows-amd64.exe to a Mac, a
-// Mac's app to Windows, and a magpie moved out of Downloads left its old
+// #1439: blackpie-image was kept with one computer's blackpie by full path. A
+// sync carried C:\Users\…\Downloads\blackpie-windows-amd64.exe to a Mac, a
+// Mac's app to Windows, and a blackpie moved out of Downloads left its old
 // path behind: the page said it couldn't start, and the agents were given
-// a program that isn't there. The library now gives this computer's magpie,
+// a program that isn't there. The library now gives this computer's blackpie,
 // to the agents and to the check, and keeps it.
-func TestOwnServerFromElsewhereRunsThisMagpie(t *testing.T) {
+func TestOwnServerFromElsewhereRunsThisBlackpie(t *testing.T) {
 	for _, c := range []struct{ name, stored string }{
-		{"Windows' moepie", `C:\Users\xiaoqian\Downloads\moepie-windows-amd64.exe`},
-		{"a Mac's moepie", "/Volumes/gone-1439/moepie.app/Contents/MacOS/moepie"},
-		{"a sync from moepie", "moepie"},
-		{"Windows' magpie", `C:\Users\xiaoqian\Downloads\magpie-windows-amd64.exe`},
-		{"a Mac's magpie", "/Volumes/gone-1439/Magpie.app/Contents/MacOS/magpie"},
+		{"Windows' blackpie", `C:\Users\xiaoqian\Downloads\blackpie-windows-amd64.exe`},
+		{"a Mac's blackpie", "/Volumes/gone-1439/blackpie.app/Contents/MacOS/blackpie"},
+		{"a sync from blackpie", "blackpie"},
+		{"Windows' blackpie", `C:\Users\xiaoqian\Downloads\blackpie-windows-amd64.exe`},
+		{"a Mac's blackpie", "/Volumes/gone-1439/Blackpie.app/Contents/MacOS/blackpie"},
 		{"moved out of Downloads", ""},
-		{"a sync from a magpie that names it", "magpie"},
+		{"a sync from a blackpie that names it", "blackpie"},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			h := sandbox(t)
-			here := filepath.Join(h, "Programs", "Magpie", "magpie-windows-amd64.exe")
+			here := filepath.Join(h, "Programs", "Blackpie", "blackpie-windows-amd64.exe")
 			write(t, here, "")
-			thisMagpie(t, here)
+			thisBlackpie(t, here)
 			stored := c.stored
 			if stored == "" { // it was here, in Downloads, and has gone
-				stored = filepath.Join(h, "Downloads", "magpie-windows-amd64.exe")
+				stored = filepath.Join(h, "Downloads", "blackpie-windows-amd64.exe")
 				write(t, stored, "")
 				if err := os.Remove(stored); err != nil {
 					t.Fatal(err)
@@ -99,7 +99,7 @@ func TestOwnServerFromElsewhereRunsThisMagpie(t *testing.T) {
 				t.Fatal(err)
 			}
 			if got := v.server(selfServerName).Command; got != here {
-				t.Fatalf("read as %q, want this magpie %q", got, here)
+				t.Fatalf("read as %q, want this blackpie %q", got, here)
 			}
 			// the agents are given it, and library.json keeps it
 			ok(t)(Sync())
@@ -117,26 +117,26 @@ func TestOwnServerFromElsewhereRunsThisMagpie(t *testing.T) {
 	}
 }
 
-// Only magpie's own is pointed at this magpie: a server of the user's that
-// runs another program, one by a name like magpie's that isn't magpie's
-// MCP server, or a magpie build that is on this computer stays as it is,
+// Only blackpie's own is pointed at this blackpie: a server of the user's that
+// runs another program, one by a name like blackpie's that isn't blackpie's
+// MCP server, or a blackpie build that is on this computer stays as it is,
 // in the library and in the agents, gone or not.
 func TestUsersOwnServerStaysAsItIs(t *testing.T) {
 	h := sandbox(t)
-	here := filepath.Join(h, "Programs", "magpie")
+	here := filepath.Join(h, "Programs", "blackpie")
 	write(t, here, "")
-	thisMagpie(t, here)
-	otherBuild := filepath.Join(h, "dev", "magpie-dev")
+	thisBlackpie(t, here)
+	otherBuild := filepath.Join(h, "dev", "blackpie-dev")
 	write(t, otherBuild, "")
 	mine := map[string]string{
-		"gone-tool":    `C:\Users\me\tools\imagetool.exe`, // mcp image, but not magpie
-		"magpie-cli":   `C:\Users\me\tools\magpie-helper.exe`,
+		"gone-tool":    `C:\Users\me\tools\imagetool.exe`, // mcp image, but not blackpie
+		"blackpie-cli":   `C:\Users\me\tools\blackpie-helper.exe`,
 		"pinned-build": otherBuild,
 		"npx-server":   "npx",
 	}
 	seedLibrary(t,
 		Server{Name: "gone-tool", Transport: "stdio", Command: mine["gone-tool"], Args: []string{"mcp", "image"}, Agents: []string{"codex"}},
-		Server{Name: "magpie-cli", Transport: "stdio", Command: mine["magpie-cli"], Args: []string{"serve"}, Agents: []string{"codex"}},
+		Server{Name: "blackpie-cli", Transport: "stdio", Command: mine["blackpie-cli"], Args: []string{"serve"}, Agents: []string{"codex"}},
 		Server{Name: "pinned-build", Transport: "stdio", Command: mine["pinned-build"], Args: []string{"mcp", "image"}, Agents: []string{"codex"}},
 		Server{Name: "npx-server", Transport: "stdio", Command: "npx", Args: []string{"-y", "@mcp/fs"}, Agents: []string{"codex"}},
 	)
@@ -151,14 +151,14 @@ func TestUsersOwnServerStaysAsItIs(t *testing.T) {
 	}
 }
 
-// A library carried to another computer names magpie's own server's
-// program as plain "magpie", so two computers with the same library carry
+// A library carried to another computer names blackpie's own server's
+// program as plain "blackpie", so two computers with the same library carry
 // the same bundle, and a sync doesn't write one's path over the other's
-// each time. Put there, it runs that computer's magpie.
-func TestCarriedOwnServerIsEachComputersMagpie(t *testing.T) {
+// each time. Put there, it runs that computer's blackpie.
+func TestCarriedOwnServerIsEachComputersBlackpie(t *testing.T) {
 	h := sandbox(t)
-	mac := filepath.Join(h, "mac", "moepie.app", "Contents", "MacOS", "moepie")
-	win := filepath.Join(h, "win", "moepie-windows-amd64.exe")
+	mac := filepath.Join(h, "mac", "blackpie.app", "Contents", "MacOS", "blackpie")
+	win := filepath.Join(h, "win", "blackpie-windows-amd64.exe")
 	write(t, mac, "")
 	write(t, win, "")
 	own := func(cmd string) Server {
@@ -166,13 +166,13 @@ func TestCarriedOwnServerIsEachComputersMagpie(t *testing.T) {
 	}
 	user := Server{Name: "fs", Transport: "stdio", Command: "npx", Args: []string{"-y", "@mcp/fs"}, Agents: []string{"codex"}}
 
-	thisMagpie(t, mac)
+	thisBlackpie(t, mac)
 	seedLibrary(t, own(mac), user)
 	onMac, err := Collect()
 	if err != nil {
 		t.Fatal(err)
 	}
-	thisMagpie(t, win)
+	thisBlackpie(t, win)
 	seedLibrary(t, own(win), user)
 	onWin, err := Collect()
 	if err != nil {
@@ -182,15 +182,15 @@ func TestCarriedOwnServerIsEachComputersMagpie(t *testing.T) {
 		t.Fatalf("one library carried two ways:\n%s\n%s", a, b)
 	}
 	for _, s := range onMac.MCP {
-		if s.Name == selfServerName && s.Command != magpieCommand {
-			t.Errorf("carried as %q, want %q", s.Command, magpieCommand)
+		if s.Name == selfServerName && s.Command != blackpieCommand {
+			t.Errorf("carried as %q, want %q", s.Command, blackpieCommand)
 		}
 		if s.Name == "fs" && s.Command != "npx" {
 			t.Errorf("the user's server carried as %q", s.Command)
 		}
 	}
 
-	// the Mac's bundle put on Windows runs Windows' magpie
+	// the Mac's bundle put on Windows runs Windows' blackpie
 	ok(t)(Put(onMac))
 	if got := storedCommand(t, selfServerName); got != win {
 		t.Errorf("library.json keeps %q, want %q", got, win)
@@ -202,9 +202,9 @@ func TestCarriedOwnServerIsEachComputersMagpie(t *testing.T) {
 		t.Error("put and carried again, the bundle changed: the next sync would send it back")
 	}
 
-	// a bundle from a magpie before #1439, with the Mac's path in it
+	// a bundle from a blackpie before #1439, with the Mac's path in it
 	old := *onMac
-	old.MCP = []*Server{{Name: selfServerName, Transport: "stdio", Command: "/Volumes/gone-1439/Magpie.app/Contents/MacOS/magpie", Args: []string{"mcp", "image"}, Agents: []string{"codex"}}}
+	old.MCP = []*Server{{Name: selfServerName, Transport: "stdio", Command: "/Volumes/gone-1439/Blackpie.app/Contents/MacOS/blackpie", Args: []string{"mcp", "image"}, Agents: []string{"codex"}}}
 	ok(t)(Put(&old))
 	if got := codexCommand(t, h, selfServerName); got != win {
 		t.Errorf("an old bundle: Codex starts %q, want %q", got, win)

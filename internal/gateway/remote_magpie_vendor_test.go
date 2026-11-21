@@ -9,14 +9,14 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // fremontdango on Discord: a group of one model from two of a remote
-// magpie's providers, made on the magpie that uses the remote, kept its
+// blackpie's providers, made on the blackpie that uses the remote, kept its
 // conversations as if the two were one vendor, since both are the one
-// remote magpie key here. The same group made on the remote itself
-// doesn't. remoteVendors is the remote: a magpie serving m from two
+// remote blackpie key here. The same group made on the remote itself
+// doesn't. remoteVendors is the remote: a blackpie serving m from two
 // providers, "first/m" and "second/m", each answering "from <provider>",
 // first out of its usage (429) while breaking is set.
 type remoteVendors struct {
@@ -44,7 +44,7 @@ func newRemoteVendors(t *testing.T) *remoteVendors {
 		rv.tried = append(rv.tried, up)
 		br := rv.breaking && up == "first"
 		rv.mu.Unlock()
-		w.Header().Set("X-Magpie-Provider", up)
+		w.Header().Set("X-Blackpie-Provider", up)
 		if br {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusTooManyRequests)
@@ -76,7 +76,7 @@ func (rv *remoteVendors) post(t *testing.T, s *Server, session string) (string, 
 
 func remoteVendorsGroup(t *testing.T, rv *remoteVendors, affinity string, members ...string) {
 	t.Helper()
-	if err := provider.Save(provider.Provider{ID: "office", Name: "Office", Preset: provider.RemoteMagpiePreset, Key: "sk-office", Chat: rv.srv.URL, Models: []string{"first/m", "second/m", "third/m"}}); err != nil {
+	if err := provider.Save(provider.Provider{ID: "office", Name: "Office", Preset: provider.RemoteBlackpiePreset, Key: "sk-office", Chat: rv.srv.URL, Models: []string{"first/m", "second/m", "third/m"}}); err != nil {
 		t.Fatal(err)
 	}
 	if err := provider.SaveGroup(provider.Group{Name: "G", Members: members, Routing: provider.Ordered, Affinity: affinity}); err != nil {
@@ -88,7 +88,7 @@ func remoteVendorsGroup(t *testing.T, rv *remoteVendors, affinity string, member
 // on it when it runs out, its error the agent's, as the same group on the
 // remote keeps it: the remote's second provider is another vendor, not another model
 // of the same account, and isn't asked.
-func TestRemoteMagpieStrictKeepsTheRemotesProvider(t *testing.T) {
+func TestRemoteBlackpieStrictKeepsTheRemotesProvider(t *testing.T) {
 	fresh(t)
 	rv := newRemoteVendors(t)
 	remoteVendorsGroup(t, rv, provider.AffinityStrict, "office/first/m", "office/second/m")
@@ -114,7 +114,7 @@ func TestRemoteMagpieStrictKeepsTheRemotesProvider(t *testing.T) {
 // A conversation whose remote provider has left the group is gone, as on
 // the remote, not kept on the remote's other provider as its account: the
 // trace said "session", kept, where nothing of it was cached.
-func TestRemoteMagpieOtherProviderIsNotTheSameAccount(t *testing.T) {
+func TestRemoteBlackpieOtherProviderIsNotTheSameAccount(t *testing.T) {
 	fresh(t)
 	rv := newRemoteVendors(t)
 	remoteVendorsGroup(t, rv, provider.AffinitySession, "office/first/m", "office/second/m")
@@ -132,7 +132,7 @@ func TestRemoteMagpieOtherProviderIsNotTheSameAccount(t *testing.T) {
 }
 
 func TestRemoteUpstream(t *testing.T) {
-	remote := provider.Provider{ID: "office", Preset: provider.RemoteMagpiePreset, Key: "k"}
+	remote := provider.Provider{ID: "office", Preset: provider.RemoteBlackpiePreset, Key: "k"}
 	plain := provider.Provider{ID: "openrouter", Key: "k"}
 	for _, c := range []struct {
 		p           provider.Provider

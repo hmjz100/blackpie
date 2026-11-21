@@ -1,7 +1,7 @@
 package provider
 
 // What was left of each window over time (#651): each reading of an
-// account's windows that magpie makes anyway (the subscriptions', a minute
+// account's windows that blackpie makes anyway (the subscriptions', a minute
 // apart at most while something asks; the plans' bought with a key) is kept
 // as a point — when it was read, the percent left, when the window started
 // and when it starts again — so the Usage page can draw the cycle's curve
@@ -24,7 +24,7 @@ package provider
 
 import (
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"maps"
 	"math"
 	"os"
@@ -35,9 +35,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/filememo"
-	"github.com/yetone/magpie/internal/lastgood"
-	"github.com/yetone/magpie/internal/steady"
+	"github.com/hmjz100/blackpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/lastgood"
+	"github.com/hmjz100/blackpie/internal/steady"
 )
 
 const (
@@ -140,11 +140,11 @@ func writeQuotaHist(h quotaHist) {
 // quotaHistMu. A Codex or Claude account's windows are read a minute apart
 // while something asks, and each new reading read the whole file again,
 // parsed it, parsed it once more to see it could be written over, and
-// wrote it: with a 500 KB history, 1.9 GB of the 33 GB a live magpie
+// wrote it: with a 500 KB history, 1.9 GB of the 33 GB a live blackpie
 // allocated in 53 minutes. While the file is the one written, the history
 // written is used instead; another process's write — the usage sync's on
 // another computer reaches this one through MergeQuotaHistory, not the
-// file, but the plugin host and a second magpie do write it — moves its
+// file, but the plugin host and a second blackpie do write it — moves its
 // time, size or inode, and the file is read again.
 var quotaHistOwn quotaHistMine
 

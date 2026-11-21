@@ -96,7 +96,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
           return a;
         };
       });
-      await page.goto("http://magpie.test/?view=providers");
+      await page.goto("http://blackpie.test/?view=providers");
       const row = page.locator('.row.provider[data-id="delta"]');
       await row.waitFor();
       // the list still: at 420px its rows come in, a pixel or more each
@@ -196,7 +196,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
     page.setDefaultTimeout(5000);
     page.setDefaultNavigationTimeout(60000);
     await page.route("**/*", serve());
-    await page.goto("http://magpie.test/?view=providers");
+    await page.goto("http://blackpie.test/?view=providers");
     const row = page.locator('.row.provider[data-id="delta"]');
     await row.locator(".name, .who").first().click();
     await page.locator("#modal:not([hidden]) > .dialog").waitFor();

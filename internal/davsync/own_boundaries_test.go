@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/yetone/magpie/internal/backup"
+	"github.com/hmjz100/blackpie/internal/backup"
 )
 
 // A real encrypted DAV exchange, with one transient failure injected only
@@ -54,7 +54,7 @@ func TestOwnEmptyServerKeepsLocalFieldsPrivate(t *testing.T) {
 		t.Fatal(err)
 	}
 	f.mu.Lock()
-	data := append([]byte(nil), f.files["/dav/other/magpie/magpie.magpie-backup"]...)
+	data := append([]byte(nil), f.files["/dav/other/blackpie/blackpie.blackpie-backup"]...)
 	f.mu.Unlock()
 	b, err := backup.Open(data, c.Passphrase)
 	if err != nil {
@@ -125,7 +125,7 @@ func TestOwnRestoreEqualAgentsResumesFollowing(t *testing.T) {
 			if !enabled {
 				return
 			}
-			const at = "/dav/magpie/magpie.magpie-backup"
+			const at = "/dav/blackpie/blackpie.blackpie-backup"
 			f.mu.Lock()
 			data := append([]byte(nil), f.files[at]...)
 			f.mu.Unlock()

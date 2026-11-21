@@ -25,7 +25,7 @@ function server(lang, posts, over) {
   let cur = {
     theme: "light", lang, tray: "panel", quotaLeft: false, currency: "usd", dock: false, dockWindow: false, proxy: "",
     trayUsage: "claude|*", trayUsages: ["claude|*", "copilot", "usage:today"], trayUsageEvery: 3,
-    version: "0.1.400", dir: "~/.config/magpie", gateway: "http://127.0.0.1:3425", proxyNow: "none", proxySource: "none",
+    version: "0.1.400", dir: "~/.config/blackpie", gateway: "http://127.0.0.1:3425", proxyNow: "none", proxySource: "none",
     fx: { rate: 7.2, at: new Date().toISOString(), stale: false }, ...over,
   };
   return async (route) => {
@@ -56,7 +56,7 @@ async function open(browser, lang, posts, { platform = "MacIntel", width = 900, 
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.route("**/*", server(lang, posts, over));
-  await page.goto("http://magpie.test/?view=usage");
+  await page.goto("http://blackpie.test/?view=usage");
   await page.locator("#prefs").click();
   await openPart(page, "usage");
   await page.locator("#trayUsagePick button").waitFor();

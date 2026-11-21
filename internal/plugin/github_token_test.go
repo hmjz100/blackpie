@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/ghtoken"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/ghtoken"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // bingqilinweimaotai (#1942): a GitHub token saved in Settings did nothing

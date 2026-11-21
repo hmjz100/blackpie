@@ -35,7 +35,7 @@ func TestListeningOn(t *testing.T) {
 }
 
 // A port nothing listens on is no listener and no error, on every system:
-// the take-over reads exactly that to know an older magpie let the port go
+// the take-over reads exactly that to know an older blackpie let the port go
 // (#2231, where Windows answered "exit status 1").
 func TestNothingListeningIsNoError(t *testing.T) {
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
@@ -60,44 +60,44 @@ func evalPath(p string) string {
 	return p
 }
 
-// Only magpie's own programs are taken for magpie. An update moves a running
+// Only blackpie's own programs are taken for blackpie. An update moves a running
 // exe aside to exe.old, and to exe.old-2, -3 when that one is held too, so
-// every name it can take while it still runs is magpie's.
-func TestIsMagpie(t *testing.T) {
+// every name it can take while it still runs is blackpie's.
+func TestIsBlackpie(t *testing.T) {
 	for path, want := range map[string]bool{
-		"/Applications/moepie.app/Contents/MacOS/moepie": true,
-		"/opt/moepie-dev":                                true,
-		`C:\Tools\moepie-windows-amd64.exe.old-2`:        true,
-		"/usr/bin/moepies":                               false,
-		"/Applications/Magpie.app/Contents/MacOS/magpie": true,
-		"/usr/local/bin/magpie":                          true,
-		`C:\Users\u\AppData\Local\magpie\magpie.exe`:     true,
-		`C:\Users\u\AppData\Local\magpie\magpie.exe.old`: true,
+		"/Applications/blackpie.app/Contents/MacOS/blackpie": true,
+		"/opt/blackpie-dev":                                true,
+		`C:\Tools\blackpie-windows-amd64.exe.old-2`:        true,
+		"/usr/bin/blackpies":                               false,
+		"/Applications/Blackpie.app/Contents/MacOS/blackpie": true,
+		"/usr/local/bin/blackpie":                          true,
+		`C:\Users\u\AppData\Local\blackpie\blackpie.exe`:     true,
+		`C:\Users\u\AppData\Local\blackpie\blackpie.exe.old`: true,
 		// an update that finds .old still held leaves the running exe at
 		// .old-2, the name it holds the gateway port under
-		`C:\Users\u\AppData\Local\magpie\magpie.exe.old-2`: true,
-		`C:\Users\u\AppData\Local\magpie\magpie.exe.old-3`: true,
-		"/home/u/magpie.old-2":                             true,
+		`C:\Users\u\AppData\Local\blackpie\blackpie.exe.old-2`: true,
+		`C:\Users\u\AppData\Local\blackpie\blackpie.exe.old-3`: true,
+		"/home/u/blackpie.old-2":                             true,
 		"/home/u/dial.old-4":                               true,
 		// the numbered suffix is an update's, not another program's
 		`C:\Users\u\other-server.old-2`:   false,
-		`C:\Users\u\magpie.old-backup`:    false,
+		`C:\Users\u\blackpie.old-backup`:    false,
 		"/home/u/.local/bin/dial":         true,
-		"/opt/magpie-dev":                 true,
+		"/opt/blackpie-dev":                 true,
 		"/usr/bin/python3":                false,
-		"/usr/bin/magpies":                false,
+		"/usr/bin/blackpies":                false,
 		"/tmp/other-server":               false,
 		`C:\Windows\System32\svchost.exe`: false,
 		"":                                false,
 	} {
-		if IsMagpie(path) != want {
-			t.Errorf("IsMagpie(%q) = %v", path, !want)
+		if IsBlackpie(path) != want {
+			t.Errorf("IsBlackpie(%q) = %v", path, !want)
 		}
 	}
 }
 
 // The programs holding a port for a container are told apart from others:
-// a magpie answering there runs inside it, out of this one's reach.
+// a blackpie answering there runs inside it, out of this one's reach.
 func TestIsForwarder(t *testing.T) {
 	for path, want := range map[string]bool{
 		"/Applications/OrbStack.app/Contents/Frameworks/OrbStack Helper.app/Contents/MacOS/OrbStack Helper": true,
@@ -107,7 +107,7 @@ func TestIsForwarder(t *testing.T) {
 		`C:\Windows\System32\wslrelay.exe`:                                true,
 		"/opt/homebrew/bin/limactl":                                       true,
 		"/usr/libexec/podman/gvproxy":                                     true,
-		"/Applications/Magpie.app/Contents/MacOS/magpie":                  false,
+		"/Applications/Blackpie.app/Contents/MacOS/blackpie":                  false,
 		"/usr/bin/python3":                                                false,
 		"/tmp/other-server":                                               false,
 		"":                                                                false,

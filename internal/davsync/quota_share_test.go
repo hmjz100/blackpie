@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // Two computers sharing usage share what they read of their accounts'
@@ -62,7 +62,7 @@ func TestQuotaHistorySharedBetweenComputers(t *testing.T) {
 	var sealed []byte
 	for _, f := range fake.usageFiles() {
 		if strings.HasSuffix(f, quotasExt) {
-			sealed = fake.files["/dav/magpie/usage/"+f]
+			sealed = fake.files["/dav/blackpie/usage/"+f]
 		}
 	}
 	if sealed == nil || strings.Contains(string(sealed), "a@x.com") {

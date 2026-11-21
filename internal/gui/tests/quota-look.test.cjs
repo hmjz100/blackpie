@@ -89,11 +89,11 @@ const words = {
   en: { wide: "Wide cards", multi: "Columns", sum: "Summary", acct: "By account", week: "Weekly", five: "5 hours", now: "Now", today: "Today", day7: "7 days",
     cycle: (n) => n + " · this cycle", two: (n) => n + " · last 2 days", runsOut: /^≈ .+ runs out$/, eta: /^Runs out .+ at this pace$/, atReset: /^About \d+% used at the reset$/, used: (n) => n + "% used",
     even: "Even pace", pace: "At this pace", balance: "Balance over time", out: "Runs out", inDays: "Runs out in 3d at this pace", perDay: "about ¥10.00 a day",
-    avg: "Daily average 22.56", most: /Most on [^·]+: 60 · /, todays: "12.5 today", bar: /: 60 credits$/, unknown: /: not counted — magpie began counting on / },
+    avg: "Daily average 22.56", most: /Most on [^·]+: 60 · /, todays: "12.5 today", bar: /: 60 credits$/, unknown: /: not counted — blackpie began counting on / },
   zh: { wide: "宽卡片", multi: "多排卡片", sum: "汇总", acct: "按账号", week: "每周", five: "5 小时", now: "现在", today: "今天", day7: "7 天",
     cycle: (n) => n + " · 本周期", two: (n) => n + " · 最近 2 天", runsOut: /^≈ .+ 用完$/, eta: /^按此速度，预计 .+ 用完$/, atReset: /^重置时约用 \d+%$/, used: (n) => "已用 " + n + "%",
     even: "匀速", pace: "按现在速度", balance: "余额走势", out: "预计用完", inDays: "按此速度，预计 3 天后用完", perDay: "约每天 ¥10.00",
-    avg: "日均 22.56", most: /最多 [^·]+：60 · /, todays: "今天 12.5", bar: /：60 积分$/, unknown: /：未统计，magpie 从 .+ 开始统计$/ },
+    avg: "日均 22.56", most: /最多 [^·]+：60 · /, todays: "今天 12.5", bar: /：60 积分$/, unknown: /：未统计，blackpie 从 .+ 开始统计$/ },
 };
 
 // texts: an svg's labels, as laid out, for overlaps and colours
@@ -125,7 +125,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       const errors = [];
       page.on("pageerror", (e) => errors.push(e.message));
       await page.route("**/*", serve(lang, "light", fixtures(Date.now())));
-      await page.goto("http://magpie.test/?view=usage");
+      await page.goto("http://blackpie.test/?view=usage");
       const list = page.locator("#subscriptionUsage"), codex = page.locator('.subscription-card[data-key="codex"]');
       await codex.locator(".quota-curve").first().waitFor();
       const layout = page.locator("#quotaHead #quotaLayout");
@@ -156,7 +156,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       await page.setViewportSize({ width: 1280, height: 900 });
       await layout.locator(".opt", { hasText: w.wide }).click();
       await page.waitForFunction(() => document.querySelector("#subscriptionUsage").classList.contains("wide"));
-      assert.equal(await page.evaluate(() => localStorage.getItem("magpie.quotaLayout")), "wide");
+      assert.equal(await page.evaluate(() => localStorage.getItem("blackpie.quotaLayout")), "wide");
       assert.equal(await page.locator("#view-usage").evaluate((v) => v.scrollTop), y, "the picks don't scroll");
       await page.waitForFunction(() => { const l = document.querySelector("#subscriptionUsage"); return [...l.children].every((c) => Math.abs(c.getBoundingClientRect().width - l.clientWidth) < 2); });
       const wm = await codex.locator(".q-main").first().boundingBox(), wv = await codex.locator(".q-viz").first().boundingBox();
@@ -178,7 +178,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       // back to columns
       await layout.locator(".opt", { hasText: w.multi }).click();
       await page.waitForFunction(() => document.querySelector("#subscriptionUsage").classList.contains("multi"));
-      assert.equal(await page.evaluate(() => localStorage.getItem("magpie.quotaLayout")), "multi");
+      assert.equal(await page.evaluate(() => localStorage.getItem("blackpie.quotaLayout")), "multi");
       assert.deepEqual(errors, []);
     });
 
@@ -189,8 +189,8 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       page.setDefaultTimeout(5000);
       const errors = [];
       page.on("pageerror", (e) => errors.push(e.message));
-      await page.route("**/*", serve(lang, "dark", fixtures(Date.now()), { "magpie.quotaLayout": "wide" }));
-      await page.goto("http://magpie.test/?view=usage");
+      await page.route("**/*", serve(lang, "dark", fixtures(Date.now()), { "blackpie.quotaLayout": "wide" }));
+      await page.goto("http://blackpie.test/?view=usage");
       const codex = page.locator('.subscription-card[data-key="codex"]');
       await codex.locator(".quota-curve").first().waitFor();
       assert.equal(await codex.locator(".q-body").count(), 1);
@@ -200,7 +200,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       single.quotas = single.quotas.filter((q) => q.user !== "b@x.com");
       const one = await (await browser.newContext({ viewport: { width: 900, height: 900 }, reducedMotion: "reduce" })).newPage();
       await one.route("**/*", serve(lang, "light", single));
-      await one.goto("http://magpie.test/?view=usage");
+      await one.goto("http://blackpie.test/?view=usage");
       await one.locator(".quota-curve").first().waitFor();
       assert.equal(await one.locator(".brief").count(), 0);
       assert.equal(await one.locator("#quotaLayout").isHidden(), false);
@@ -216,8 +216,8 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         const page = await (await browser.newContext({ viewport: { width: 1280, height: 1000 }, reducedMotion: "reduce" })).newPage();
         page.setDefaultTimeout(5000);
         page.on("pageerror", (e) => errors.push(e.message));
-        await page.route("**/*", serve(lang, theme, fixtures(Date.now()), { "magpie.quotaLayout": "wide" }));
-        await page.goto("http://magpie.test/?view=usage");
+        await page.route("**/*", serve(lang, theme, fixtures(Date.now()), { "blackpie.quotaLayout": "wide" }));
+        await page.goto("http://blackpie.test/?view=usage");
         const codex = page.locator('.subscription-card[data-key="codex"]');
         const [a, b] = [codex.locator(".quota-curve").first(), codex.locator(".quota-curve").nth(1)];
         await b.waitFor();
@@ -358,7 +358,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
     data.quotas = data.quotas.filter((q) => q.provider === "codex" || q.provider === "workbuddy");
     // one day's 0.01 beside 60, and over 7 days a single day counted
     data.quotas[2].daily = { since: dayKey(1), days: [{ day: dayKey(1), used: 60 }, { day: dayKey(0), used: 0.01 }] };
-    const open = async (opts, store, url = "http://magpie.test/?view=usage") => {
+    const open = async (opts, store, url = "http://blackpie.test/?view=usage") => {
       const page = await (await browser.newContext({ reducedMotion: "reduce", ...opts })).newPage();
       page.setDefaultTimeout(5000);
       page.on("pageerror", (e) => errors.push(e.message));
@@ -399,7 +399,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
 
     // asked for from the menu bar: the account in brief opened in full, in
     // view
-    page = await open({ viewport: { width: 900, height: 500 } }, null, "http://magpie.test/?view=usage&card=" + encodeURIComponent("codex|b@x.com"));
+    page = await open({ viewport: { width: 900, height: 500 } }, null, "http://blackpie.test/?view=usage&card=" + encodeURIComponent("codex|b@x.com"));
     await page.locator('.subscription-account[data-card="codex|b@x.com"]:not(.brief)').waitFor();
     await page.waitForFunction(() => !quotaFocus);
     assert.equal(await page.locator('.subscription-card[data-key="codex"] .q-body').count(), 2);
@@ -418,7 +418,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
     data.quotas = [{ provider: "glm", name: "GLM", icon: "zhipu", windows: [{ name: "Monthly", used: 30 }] }];
     data.history = [{ provider: "glm", user: "", lines: [{ name: "Monthly", points: [{ at: iso(now - 30 * H), left: 90 }, { at: iso(now - 10 * H), left: 80 }, { at: iso(now), left: 70 }] }] }];
     await page.route("**/*", serve("en", "light", data));
-    await page.goto("http://magpie.test/?view=usage");
+    await page.goto("http://blackpie.test/?view=usage");
     const card = page.locator('.subscription-card[data-key="glm"]');
     await card.locator(".quota-windows").waitFor();
     // drawn from its readings to now, with nothing made up past it

@@ -1,11 +1,11 @@
 package gateway
 
 import (
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"net/http"
 	"strings"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // zcodeEndedWords and zcodeSpentWords are the ZCode plugin's own answers

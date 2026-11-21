@@ -23,7 +23,7 @@ const path = require("node:path");
 const { test } = require("node:test");
 const { chromium, webkit } = require("playwright");
 
-const assets = process.env.MAGPIE_OPEN_WHEEL_ASSETS || path.resolve(__dirname, "../assets");
+const assets = process.env.BLACKPIE_OPEN_WHEEL_ASSETS || path.resolve(__dirname, "../assets");
 const now = new Date();
 const day = [now.getFullYear(), now.getMonth() + 1, now.getDate()].map((n) => String(n).padStart(2, "0")).join("-");
 const at = (i) => new Date(now.getTime() - (i + 1) * 60e3).toISOString();
@@ -64,7 +64,7 @@ function server(lang, gate) {
       if (gate.on) await gate.wait;
       const n = gate.quotaReads = (gate.quotaReads || 0) + 1;
       const q = QUOTAS.map((x, i) => ({ ...x, windows: x.windows.map((w) => ({ ...w, used: w.used + n })) }));
-      return route.fulfill({ json: q, headers: { "X-Magpie-Reading": n < 6 ? "1" : "0", "Access-Control-Expose-Headers": "X-Magpie-Reading" } });
+      return route.fulfill({ json: q, headers: { "X-Blackpie-Reading": n < 6 ? "1" : "0", "Access-Control-Expose-Headers": "X-Blackpie-Reading" } });
     }
     if (url.pathname === "/api/usage") return json(USAGE, true);
     if (url.pathname === "/api/groups") return json({ groups: [], models: [] }, true);
@@ -101,8 +101,8 @@ const UPS = `{
     d.set.call(this, y);
   } });
 }`;
-// MAGPIE_OPEN_WHEEL_HEARD=late or unheard runs only that half
-const HEARD = process.env.MAGPIE_OPEN_WHEEL_HEARD ? [process.env.MAGPIE_OPEN_WHEEL_HEARD] : ["late", "unheard"];
+// BLACKPIE_OPEN_WHEEL_HEARD=late or unheard runs only that half
+const HEARD = process.env.BLACKPIE_OPEN_WHEEL_HEARD ? [process.env.BLACKPIE_OPEN_WHEEL_HEARD] : ["late", "unheard"];
 const LANGS = ["en", "zh", "zh-TW", "ja", "de"];
 
 for (const engine of ["chromium", "webkit"]) {
@@ -122,7 +122,7 @@ for (const engine of ["chromium", "webkit"]) {
         await p.addInitScript(UPS);
         const gate = { on: false };
         await p.route("**/*", server(lang, gate));
-        await p.goto("http://magpie.test/?view=agents");
+        await p.goto("http://blackpie.test/?view=agents");
         await p.locator("#view-agents .ag-lead").first().waitFor();
         await p.waitForTimeout(500);
         // unheard: the window learns it on the page before, as the reader's
@@ -132,7 +132,7 @@ for (const engine of ["chromium", "webkit"]) {
           await p.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
           for (let i = 0; i < 8; i++) { await p.mouse.wheel(0, 30); await p.waitForTimeout(16); }
           await p.waitForTimeout(400);
-          assert.equal(await p.evaluate(() => localStorage.getItem("magpie.unheardWheels")), "1", "wheels the page never heard are learned");
+          assert.equal(await p.evaluate(() => localStorage.getItem("blackpie.unheardWheels")), "1", "wheels the page never heard are learned");
         }
         const view = p.locator("#view-" + name);
         // opened again: what it drew the first time is there while it reads again

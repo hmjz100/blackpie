@@ -17,14 +17,14 @@ package gateway
 
 import (
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"net/http"
 	"slices"
 	"strconv"
 	"strings"
 	"unicode/utf8"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // The kinds of a prompt's parts, in the order they are shown.

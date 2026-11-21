@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/source"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/source"
 )
 
 // The Plugins page's 「国内镜像」 switch is kept in settings, which is
@@ -16,7 +16,7 @@ import (
 func TestPluginsMirrorSwitch(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 	t.Setenv("XDG_CACHE_HOME", t.TempDir())
-	t.Setenv("MAGPIE_PLUGIN_MARKET", "off")
+	t.Setenv("BLACKPIE_PLUGIN_MARKET", "off")
 	mux := http.NewServeMux()
 	pluginRoutes(mux, nil)
 	do := func(method, path, body string) map[string]any {

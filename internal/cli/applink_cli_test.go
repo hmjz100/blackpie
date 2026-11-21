@@ -4,10 +4,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/yetone/magpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/agent"
 )
 
-// sungt (10-29): with nothing here to open Cindy's links, `magpie cindy
+// sungt (10-29): with nothing here to open Cindy's links, `blackpie cindy
 // add` said "✓ Cindy opened" while nothing opened. It says why, and hands
 // nothing to the browser.
 func TestImportAddSaysNothingOpensIt(t *testing.T) {

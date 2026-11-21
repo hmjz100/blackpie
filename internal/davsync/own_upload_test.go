@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/yetone/magpie/internal/backup"
+	"github.com/hmjz100/blackpie/internal/backup"
 )
 
 func TestOwnUploadKeepsLocalFieldsPrivate(t *testing.T) {
 	f, c, _ := ownBoundaryFixture(t)
 	codexPick(t, "gpt-private", "low")
-	const at = "/dav/magpie/magpie.magpie-backup"
+	const at = "/dav/blackpie/blackpie.blackpie-backup"
 	f.mu.Lock()
 	delete(f.files, at)
 	f.mu.Unlock()

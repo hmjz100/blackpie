@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io"
 	"math"
 	"os"
@@ -19,8 +19,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/yetone/magpie/internal/proc"
-	"github.com/yetone/magpie/internal/redact"
+	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/redact"
 )
 
 // hello is the line pf-serve writes once the model is loaded.
@@ -40,11 +40,11 @@ type helper struct {
 	stderr *tail
 	hello  hello
 	exited chan struct{}
-	// slow says magpie ended it, given too long to answer
+	// slow says blackpie ended it, given too long to answer
 	slow atomic.Pointer[string]
 }
 
-// srv is the pf-serve magpie runs, one at a time. Its requests take
+// srv is the pf-serve blackpie runs, one at a time. Its requests take
 // turns on its one pipe: turn is held for each, from start to answer, and
 // a request's caller can stop waiting for it (FindContext). mu guards
 // only the fields below, and is never held while pf-serve loads or
@@ -59,7 +59,7 @@ var srv struct {
 	// hung there twice in a row: it runs on the CPU until gpuAgain, when
 	// the GPU is tried again (gpuRetryAfter); gpuLost says why, gpuFails
 	// how many times in a row the GPU was lost. A GPU that answers clears
-	// them. Before, nothing did short of a restart of magpie, and one
+	// them. Before, nothing did short of a restart of blackpie, and one
 	// request too slow for its time on a weak GPU left every request after
 	// it on a CPU 3x slower (#3682).
 	cpu      bool
@@ -226,14 +226,14 @@ func startOne(path string, cpu bool, stop <-chan struct{}) (*helper, error) {
 	// code page, where ggml's fopen reads UTF-8 and the GPU's weights
 	// are read again through a narrow ifstream, so a folder with a
 	// character outside ASCII (a Chinese user name in C:\Users) failed
-	// to load on every device, its error a path in mojibake. magpie's
+	// to load on every device, its error a path in mojibake. blackpie's
 	// own names are ASCII.
 	cmd := proc.Command(path, modelName())
 	cmd.Dir = filepath.Dir(modelPath())
 	// Without GGML_METAL_NO_RESIDENCY, ggml's Metal residency set keeps a
 	// heartbeat that woke an idle pf-serve ~146 times a second for the 10
 	// minutes it stays up after a request, and macOS's Energy Impact
-	// counted magpie among the top for it (#3185). With it set: 0.3 a
+	// counted blackpie among the top for it (#3185). With it set: 0.3 a
 	// second, and the first request after an idle spell takes 0.1-0.45s
 	// more (51-78ms hot either way).
 	cmd.Env = append(os.Environ(), "GGML_METAL_NO_RESIDENCY=1")
@@ -308,9 +308,9 @@ func onWhat(cpu bool) string {
 	return " on the GPU"
 }
 
-// died says why pf-serve ended: that magpie ended it, given too long to
+// died says why pf-serve ended: that blackpie ended it, given too long to
 // answer, or how it exited; and what it said last that isn't ggml's
-// startup lines. Those were all a user saw of a pf-serve magpie had
+// startup lines. Those were all a user saw of a pf-serve blackpie had
 // ended for being slow (lazyeo: "pf-serve ended: ggml_metal_device_init:
 // tensor API disabled for pre-M5 …", which every Mac before the M5
 // prints and means nothing).
@@ -445,7 +445,7 @@ func end(h *helper) {
 
 // classify asks pf-serve, started if it isn't, what is in texts. One that
 // fails is ended and started again; one that died on the GPU is started
-// on the CPU, until the GPU is tried again. One that magpie ended on the
+// on the CPU, until the GPU is tried again. One that blackpie ended on the
 // GPU for taking too long is started again on the GPU: a request too
 // slow for its time is no lost GPU. Twice in a row there is, and the CPU
 // is tried for the next. The caller holds turn.
@@ -607,7 +607,7 @@ func (h *helper) classify(texts []string) ([][]redact.Found, error) {
 		case <-done:
 		case <-time.After(timeout):
 			// a hung pf-serve: killed, its pipe ends the read below
-			s := fmt.Sprintf("didn't answer in %s (%d KB%s), so magpie ended it", timeout, (size+1023)/1024, onWhat(!h.hello.GPU))
+			s := fmt.Sprintf("didn't answer in %s (%d KB%s), so blackpie ended it", timeout, (size+1023)/1024, onWhat(!h.hello.GPU))
 			h.slow.Store(&s)
 			h.cmd.Process.Kill()
 		}

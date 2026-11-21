@@ -14,9 +14,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/davsync"
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/davsync"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // fakeArchive is a bucket of archived calls in memory; size, when set,
@@ -88,11 +88,11 @@ func TestArchivePreviewAndDownload(t *testing.T) {
 	rec = httptest.NewRecorder()
 	h.ServeHTTP(rec, httptest.NewRequest("GET", "/api/archive/file"+archiveQuery, nil))
 	if rec.Code != 200 || !bytes.Equal(rec.Body.Bytes(), obj) ||
-		rec.Header().Get("Content-Disposition") != `attachment; filename="magpie-request-2026-10-02-101010-00000000000000aa.json"` {
+		rec.Header().Get("Content-Disposition") != `attachment; filename="blackpie-request-2026-10-02-101010-00000000000000aa.json"` {
 		t.Fatalf("download %d %q, %d of %d bytes", rec.Code, rec.Header().Get("Content-Disposition"), rec.Body.Len(), len(obj))
 	}
 
-	for _, want := range []string{"magpie-request-2026-10-02-101010-00000000000000aa.json", "magpie-request-2026-10-02-101010-00000000000000aa-2.json"} {
+	for _, want := range []string{"blackpie-request-2026-10-02-101010-00000000000000aa.json", "blackpie-request-2026-10-02-101010-00000000000000aa-2.json"} {
 		rec = httptest.NewRecorder()
 		h.ServeHTTP(rec, httptest.NewRequest("POST", "/api/archive/export"+archiveQuery, strings.NewReader("{}")))
 		var out struct{ Path string }

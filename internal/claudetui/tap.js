@@ -1,23 +1,23 @@
-// magpie's tap on Claude Code's stream (internal/claudetui/tap.go). Claude
+// blackpie's tap on Claude Code's stream (internal/claudetui/tap.go). Claude
 // Code, a Bun program, loads this before itself (BUN_OPTIONS --preload).
 // Its requests to Anthropic go through Bun.FetchSession: this makes that
 // a FetchSession whose fetch is the real one's, the request, connection
 // and TLS untouched, and copies the reply of each of the main turn's
 // requests (x-claude-code-request-class: main), as it streams, to the
-// file MAGPIE_CLAUDE_TAP names: a JSON line an event. Claude Code reads
+// file BLACKPIE_CLAUDE_TAP names: a JSON line an event. Claude Code reads
 // its own copy of the stream as before.
 (() => {
-  const file = process.env.MAGPIE_CLAUDE_TAP;
+  const file = process.env.BLACKPIE_CLAUDE_TAP;
   if (!file) return;
   // none of it is handed on to what Claude Code runs, nor says it is here
-  delete process.env.MAGPIE_CLAUDE_TAP;
-  const ours = /(^|\s)--preload(=|\s+)\S*magpie-claude-tap-\S*/;
+  delete process.env.BLACKPIE_CLAUDE_TAP;
+  const ours = /(^|\s)--preload(=|\s+)\S*blackpie-claude-tap-\S*/;
   const opts = (process.env.BUN_OPTIONS || "").replace(ours, "").trim();
   if (opts) process.env.BUN_OPTIONS = opts;
   else delete process.env.BUN_OPTIONS;
   const argv = process.execArgv;
   for (let i = argv.length - 1; i >= 0; i--) {
-    if (!/magpie-claude-tap-/.test(argv[i])) continue;
+    if (!/blackpie-claude-tap-/.test(argv[i])) continue;
     if (argv[i].startsWith("--preload=")) argv.splice(i, 1);
     else if (argv[i - 1] === "--preload") argv.splice(--i, 2);
   }

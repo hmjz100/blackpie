@@ -57,7 +57,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         page.on("pageerror", (e) => errors.push(e.message));
         await page.route("**/*", serve(lang, gatewayOn));
         await watchSettingsReads(page);
-        await page.goto("http://magpie.test/?view=settings&tab=network");
+        await page.goto("http://blackpie.test/?view=settings&tab=network");
         await settingsDrawn(page);
         return { context, page };
       };

@@ -13,9 +13,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/gwmw"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/gwmw"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // use makes plugins.json list entries, and the middleware load afresh.
@@ -68,7 +68,7 @@ func TestRequestChain(t *testing.T) {
 	// a folder package whose middleware imports a file beside it, and a
 	// plugin that is only middleware
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"name":"alias","magpie":{"middleware":"./mw/index.js"}}`), 0o644)
+	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"name":"alias","blackpie":{"middleware":"./mw/index.js"}}`), 0o644)
 	os.MkdirAll(filepath.Join(dir, "mw"), 0o755)
 	os.WriteFile(filepath.Join(dir, "mw", "names.js"), []byte(`export const names = {"m1": "m2"};`), 0o644)
 	os.WriteFile(filepath.Join(dir, "mw", "index.js"), []byte(`
@@ -270,7 +270,7 @@ func TestOffAndHostSkip(t *testing.T) {
 	}
 	// a package with a main is an OpenCode plugin too
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"main":"index.js","magpie":{"middleware":"mw.js"}}`), 0o644)
+	os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"main":"index.js","blackpie":{"middleware":"mw.js"}}`), 0o644)
 	if f, only := plugin.Middleware(dir); f == "" || only {
 		t.Fatalf("Middleware = %q, %v", f, only)
 	}
@@ -367,7 +367,7 @@ func TestStreamUnchangedPassesBytes(t *testing.T) {
 }
 
 // A keepalive comment goes to the agent as it is written, not with the
-// event after it: held, a proxy in front of magpie heard nothing while the
+// event after it: held, a proxy in front of blackpie heard nothing while the
 // vendor reasoned silently and hung up (#2402).
 func TestStreamKeepaliveNotHeld(t *testing.T) {
 	use(t, file(t, `export function onEvent(ev) { ev.seen = true; return ev; }`))

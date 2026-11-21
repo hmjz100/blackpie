@@ -18,22 +18,22 @@ import (
 // (its custom-3p:keys sweep; protect is the user's DPAPI on Windows, its
 // native userDpapiProtect, and Electron's safeStorage, the Keychain, on
 // macOS), and opens it again when it reads the profile.
-// It sends the gateway the key as it was, so the value magpie wrote no
-// longer reads as magpie's key in the file while Desktop still runs on it:
-// magpie said the key "was changed", Reconnect wrote it in the clear and
+// It sends the gateway the key as it was, so the value blackpie wrote no
+// longer reads as blackpie's key in the file while Desktop still runs on it:
+// blackpie said the key "was changed", Reconnect wrote it in the clear and
 // Desktop sealed it again at its next start (a Windows user on Discord).
 const (
 	desktopSealed     = "__sealed__:v1:"
 	desktopSealedWith = "anthropic.claude.crossProfileSecret.v1:"
 )
 
-// errDesktopSealed: Desktop sealed a value with a keystore magpie can't
+// errDesktopSealed: Desktop sealed a value with a keystore blackpie can't
 // open here.
 var errDesktopSealed = errors.New("sealed by Claude Desktop")
 
 // desktopOpen is the value v Desktop keeps at key k of a configLibrary
 // profile, as Desktop reads it: v itself, or what a sealed v opens to.
-// known is false for a sealed value magpie can't open (another system's
+// known is false for a sealed value blackpie can't open (another system's
 // keystore, another user's, or not one of Desktop's): what it holds is
 // unknown, which is not the same as changed.
 func desktopOpen(k, v string) (open string, known bool) {

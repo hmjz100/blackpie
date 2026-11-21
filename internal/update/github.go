@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io"
 	"net/http"
 	"net/url"
@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/source"
+	"github.com/hmjz100/blackpie/internal/source"
 )
 
 // githubRelease is GitHub's wire format. The custom feed overrides keep
@@ -41,7 +41,7 @@ func githubGet(ctx context.Context, address string, out any) error {
 		return err
 	}
 	req.Header.Set("Accept", "application/vnd.github+json")
-	req.Header.Set("User-Agent", "moepie-updater")
+	req.Header.Set("User-Agent", "blackpie-updater")
 	res, err := source.DoOfficial(client, req)
 	if err != nil {
 		return err

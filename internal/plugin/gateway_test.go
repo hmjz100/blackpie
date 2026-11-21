@@ -12,13 +12,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/filememo"
 )
 
 func gatewayFixture(t *testing.T, source string) string {
 	t.Helper()
 	dir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"magpie":{"hooks":"./request.js"}}`), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"blackpie":{"hooks":"./request.js"}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(dir, "request.js"), []byte(source), 0o644); err != nil {
@@ -31,7 +31,7 @@ func gatewayFixture(t *testing.T, source string) string {
 }
 
 // TestHasGatewayLooksOnceASecond: every request asks HasGateway, so it
-// reads the plugins at most once a second (#3725), and at once after magpie
+// reads the plugins at most once a second (#3725), and at once after blackpie
 // wrote a file of its own.
 func TestHasGatewayLooksOnceASecond(t *testing.T) {
 	sandbox(t)
@@ -48,9 +48,9 @@ func TestHasGatewayLooksOnceASecond(t *testing.T) {
 	}
 	filememo.Forget()
 	if HasGateway() {
-		t.Fatal("magpie's own write wasn't looked at")
+		t.Fatal("blackpie's own write wasn't looked at")
 	}
-	if err := os.WriteFile(pkg, []byte(`{"magpie":{"hooks":"./request.js"}}`), 0o644); err != nil {
+	if err := os.WriteFile(pkg, []byte(`{"blackpie":{"hooks":"./request.js"}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	// a second later: the look is due
@@ -280,7 +280,7 @@ func TestGatewayHookChainRollbackAndOptions(t *testing.T) {
 func TestGatewayHookMixedProviderPackage(t *testing.T) {
 	sandbox(t)
 	dir := gatewayFixture(t, `export function onRequest(body) { body.note="recalled";return body }`)
-	if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"type":"module","main":"./provider.js","magpie":{"hooks":"./request.js"}}`), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"type":"module","main":"./provider.js","blackpie":{"hooks":"./request.js"}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(dir, "provider.js"), []byte(`export default async function(){return {auth:{provider:"fixture",methods:[]},config(config){config.provider.fixture={name:"Gateway fixture",models:{m1:{name:"m1"}}}}}}`), 0o644); err != nil {
@@ -315,7 +315,7 @@ func TestGatewayHookMixedPiPackage(t *testing.T) {
 			if err := json.Unmarshal(b, &pkg); err != nil {
 				t.Fatal(err)
 			}
-			pkg["magpie"] = map[string]string{"hooks": "./request.js"}
+			pkg["blackpie"] = map[string]string{"hooks": "./request.js"}
 			b = mustJSON(t, pkg)
 		}
 		if err := os.WriteFile(filepath.Join(dir, filepath.FromSlash(file)), b, 0o644); err != nil {
@@ -460,7 +460,7 @@ func TestGatewayHookInvalidOrUndefinedResult(t *testing.T) {
 }
 
 // Bun loads TypeScript itself: a direct *.hooks.ts file and a package
-// whose magpie.hooks names a .ts entry both run without a build step.
+// whose blackpie.hooks names a .ts entry both run without a build step.
 func TestGatewayHookTypeScript(t *testing.T) {
 	sandbox(t)
 	direct := filepath.Join(t.TempDir(), "recall.hooks.ts")
@@ -475,7 +475,7 @@ export async function onRequest(body: Body): Promise<Body> { body.note += "-dire
 		t.Fatal(err)
 	}
 	dir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"magpie":{"hooks":"./src/request.ts"}}`), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"blackpie":{"hooks":"./src/request.ts"}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.MkdirAll(filepath.Join(dir, "src"), 0o755); err != nil {
@@ -504,8 +504,8 @@ func gatewayRequest(ctx context.Context, body []byte, info GatewayContext) []byt
 	return run.Body
 }
 
-// A JS gateway middleware (*.gateway.js, magpie.gateway) and a request hook
-// (*.hooks.js, magpie.hooks) never claim the same entry: a hook importing
+// A JS gateway middleware (*.gateway.js, blackpie.gateway) and a request hook
+// (*.hooks.js, blackpie.hooks) never claim the same entry: a hook importing
 // node:fs loaded as middleware too would show "didn't load" for a plugin
 // that works.
 func TestGatewayHookNamesApartFromMiddleware(t *testing.T) {
@@ -524,17 +524,17 @@ func TestGatewayHookNamesApartFromMiddleware(t *testing.T) {
 	}
 	for key, hook := range map[string]bool{"hooks": true, "gateway": false, "middleware": false} {
 		dir := t.TempDir()
-		if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"magpie":{"`+key+`":"./entry.js"}}`), 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"blackpie":{"`+key+`":"./entry.js"}}`), 0o644); err != nil {
 			t.Fatal(err)
 		}
 		if err := os.WriteFile(filepath.Join(dir, "entry.js"), []byte(`export async function onRequest(b) { return b }`), 0o644); err != nil {
 			t.Fatal(err)
 		}
 		if got := Gateway(dir) != ""; got != hook {
-			t.Errorf("magpie.%s: hook %v, want %v", key, got, hook)
+			t.Errorf("blackpie.%s: hook %v, want %v", key, got, hook)
 		}
 		if f, _ := Middleware(dir); hook && f != "" {
-			t.Errorf("magpie.%s is loaded as middleware too", key)
+			t.Errorf("blackpie.%s is loaded as middleware too", key)
 		}
 	}
 }

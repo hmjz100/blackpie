@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/redact"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/redact"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // A masking rule is changed in place (nf1qaz2w on Discord: rules could only

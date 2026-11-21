@@ -10,10 +10,10 @@
 package redact
 
 import (
-	"github.com/yetone/magpie/internal/gwmw"
-	"github.com/yetone/magpie/internal/masking"
-	"github.com/yetone/magpie/internal/pluginrt"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/gwmw"
+	"github.com/hmjz100/blackpie/internal/masking"
+	"github.com/hmjz100/blackpie/internal/pluginrt"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 func init() {

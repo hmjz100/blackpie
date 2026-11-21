@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/lastgood"
+	"github.com/hmjz100/blackpie/internal/lastgood"
 )
 
 // Show in Dock's Hide (DockNever) is this computer's own, as Dock and

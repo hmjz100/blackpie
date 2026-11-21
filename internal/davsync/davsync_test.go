@@ -3,7 +3,7 @@ package davsync
 import (
 	"context"
 	"fmt"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/testenv"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -16,14 +16,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/agentenv"
-	"github.com/yetone/magpie/internal/backup"
-	"github.com/yetone/magpie/internal/library"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/pluginrt"
-	"github.com/yetone/magpie/internal/profile"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/agentenv"
+	"github.com/hmjz100/blackpie/internal/backup"
+	"github.com/hmjz100/blackpie/internal/library"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/pluginrt"
+	"github.com/hmjz100/blackpie/internal/profile"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // fakeDAV is a WebDAV server with one user, keeping files in memory.
@@ -134,7 +134,7 @@ func (f *fakeDAV) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // urlDir is the folder a URL path is in: a URL's, with / on every system
 func urlDir(p string) string { return p[:max(strings.LastIndex(p, "/"), 1)] }
 
-// computer is one machine's magpie: its own home, which the test moves
+// computer is one machine's blackpie: its own home, which the test moves
 // between.
 type computer string
 
@@ -209,7 +209,7 @@ func TestSync(t *testing.T) {
 	if v := now(t); v.Error != "" || v.Last.IsZero() || v.Notice != nil {
 		t.Fatalf("first: %+v", v)
 	}
-	up := fake.files["/dav/magpie/magpie.magpie-backup"]
+	up := fake.files["/dav/blackpie/blackpie.blackpie-backup"]
 	if len(up) == 0 || strings.Contains(string(up), "deepseek") || strings.Contains(string(up), `"providers"`) {
 		t.Fatalf("on the server: %q", up)
 	}
@@ -334,7 +334,7 @@ func TestSync(t *testing.T) {
 	if ps, _ := provider.Stored(); len(ps) != 1 || ps[0].Name != "Kimi 2" || ps[0].Key != "k2" {
 		t.Fatalf("a after c renamed: %+v", ps)
 	}
-	remote, _ := backup.Open(fake.files["/dav/magpie/magpie.magpie-backup"], "correct horse")
+	remote, _ := backup.Open(fake.files["/dav/blackpie/blackpie.blackpie-backup"], "correct horse")
 	if remote.Providers[0].Key != "k2" {
 		t.Fatalf("the server lost the key: %+v", remote.Providers)
 	}
@@ -378,7 +378,7 @@ func TestSyncNutstore(t *testing.T) {
 	if err := Now(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	if v := Status(); v.Error != "" || len(fake.files["/dav/magpie/magpie.magpie-backup"]) == 0 || !fake.dirs["/dav/magpie"] {
+	if v := Status(); v.Error != "" || len(fake.files["/dav/blackpie/blackpie.blackpie-backup"]) == 0 || !fake.dirs["/dav/blackpie"] {
 		t.Fatalf("first sync: %+v", v)
 	}
 }
@@ -605,7 +605,7 @@ func TestSyncLibrary(t *testing.T) {
 	if got := shared(); got != "Mine alone." {
 		t.Fatalf("c's library was synced: %q", got)
 	}
-	remote, _ := backup.Open(fake.files["/dav/magpie/magpie.magpie-backup"], "correct horse")
+	remote, _ := backup.Open(fake.files["/dav/blackpie/blackpie.blackpie-backup"], "correct horse")
 	if remote.Library == nil || remote.Library.Texts["default"] != "Be thorough." {
 		t.Fatalf("the server's library: %+v", remote.Library)
 	}
@@ -614,11 +614,11 @@ func TestSyncLibrary(t *testing.T) {
 // Another computer syncing between this one's read and write: the write
 // is refused, and it syncs again over the other's.
 func TestSyncRace(t *testing.T) {
-	fake := &fakeDAV{files: map[string][]byte{}, etags: map[string]string{}, dirs: map[string]bool{"/dav": true, "/dav/magpie": true}}
+	fake := &fakeDAV{files: map[string][]byte{}, etags: map[string]string{}, dirs: map[string]bool{"/dav": true, "/dav/blackpie": true}}
 	var once sync.Once
 	var raced []byte
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPut && fake.files["/dav/magpie/magpie.magpie-backup"] != nil {
+		if r.Method == http.MethodPut && fake.files["/dav/blackpie/blackpie.blackpie-backup"] != nil {
 			once.Do(func() { // someone else's write lands first
 				fake.mu.Lock()
 				fake.n++
@@ -655,7 +655,7 @@ func TestSyncRace(t *testing.T) {
 	if n := Status().Notice; n == nil || !slices.Equal(n.There, []string{"providers"}) {
 		t.Fatalf("notice: %+v", n)
 	}
-	remote, err := backup.Open(fake.files["/dav/magpie/magpie.magpie-backup"], "p")
+	remote, err := backup.Open(fake.files["/dav/blackpie/blackpie.blackpie-backup"], "p")
 	if err != nil || !slices.ContainsFunc(remote.Providers, func(p provider.Provider) bool { return p.ID == "three" }) {
 		t.Fatalf("server: %v %+v", err, remote.Providers)
 	}

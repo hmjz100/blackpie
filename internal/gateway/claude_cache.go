@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // clientCache owns the marks of an explicitly opted-in Messages request.
@@ -28,12 +28,12 @@ type clientCache struct {
 }
 
 func wantsClientCache(r *http.Request, from provider.Protocol) bool {
-	return from == provider.Anthropic && r.Header.Get("X-Magpie-Cache-Marks") == "client"
+	return from == provider.Anthropic && r.Header.Get("X-Blackpie-Cache-Marks") == "client"
 }
 
 // classifierClientCache reports whether a Messages body is Claude Code's
 // auto mode classifier carrying cache marks of its own. Desktop's
-// classifier marks its blocks but knows nothing of magpie's private header
+// classifier marks its blocks but knows nothing of blackpie's private header
 // (#3835): its marks are kept like an opted-in client's, validated as
 // theirs are. The bytes are looked at before the request is parsed, and
 // only a classifier-shaped body carrying a cache_control field is parsed
@@ -59,7 +59,7 @@ func (c *clientCache) selected(fresh bool) {
 // cacheReportTry scopes the report and selection hold to this candidate.
 // A non-Claude try leaves no report from an earlier subscription try.
 func cacheReportTry(hw *holdWriter, req *Request) {
-	hw.w.Header().Del("X-Magpie-Cache-Marks-Dropped")
+	hw.w.Header().Del("X-Blackpie-Cache-Marks-Dropped")
 	hw.alive.cacheReportUntil = time.Time{}
 	if req != nil {
 		hw.alive.cacheReportUntil = time.Now().Add(2 * time.Second)
@@ -97,7 +97,7 @@ func cacheTTL(cc map[string]string) string {
 // ask for, on its tools, its system, its messages or the request itself,
 // "" for one that marks nothing. A Claude bridge run started for it keeps
 // its cache that long (runTTLFor): the client's Claude Code marks as its
-// user picked, an hour only when asked (Linka, a Docker magpie's relay
+// user picked, an hour only when asked (Linka, a Docker blackpie's relay
 // writing an hour's cache for a Mac set to 5m).
 func askedCacheTTL(a *aRequest) string {
 	ttl := ""
@@ -316,9 +316,9 @@ func cacheDropped(w http.ResponseWriter, req *Request) {
 	if len(fields) > 0 {
 		value := strings.Join(fields, ",")
 		if hw, ok := w.(*holdWriter); ok {
-			hw.note("X-Magpie-Cache-Marks-Dropped", value)
+			hw.note("X-Blackpie-Cache-Marks-Dropped", value)
 		} else {
-			w.Header().Set("X-Magpie-Cache-Marks-Dropped", value)
+			w.Header().Set("X-Blackpie-Cache-Marks-Dropped", value)
 		}
 	}
 }

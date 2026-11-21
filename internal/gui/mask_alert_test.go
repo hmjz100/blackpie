@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/maskrec"
-	"github.com/yetone/magpie/internal/redact"
+	"github.com/hmjz100/blackpie/internal/maskrec"
+	"github.com/hmjz100/blackpie/internal/redact"
 )
 
 // fakeMaskAlerts is maskAlerts on a clock the test moves, its flush run

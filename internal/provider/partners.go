@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io"
 	"log"
 	"net/http"
@@ -19,9 +19,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/lastgood"
-	"github.com/yetone/magpie/internal/source"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/lastgood"
+	"github.com/hmjz100/blackpie/internal/source"
 )
 
 // Partners are services that pay to be listed first in the add sheet,
@@ -31,7 +31,7 @@ import (
 // from, so adding one, its editor and its key page work as a preset's do.
 
 // PartnersURL disables sponsored discovery in this fork. An explicit
-// MAGPIE_PARTNERS feed can still be used by the compatibility tests.
+// BLACKPIE_PARTNERS feed can still be used by the compatibility tests.
 const PartnersURL = "off"
 
 // KindPartner is a partner's Kind: the add sheet lists them apart.
@@ -107,7 +107,7 @@ var partnerID = lazyre.New(`^[a-z0-9][a-z0-9-]{1,40}$`)
 func partnerCacheFile() string { return filepath.Join(appdir.Cache(), "partners.json") }
 
 func partnersSource() string {
-	src := os.Getenv("MAGPIE_PARTNERS")
+	src := os.Getenv("BLACKPIE_PARTNERS")
 	if src == "" {
 		if testing.Testing() {
 			// a test never asks the real site; one that wants a list
@@ -169,7 +169,7 @@ func PartnersNow(wait time.Duration) []Partner {
 	return Partners()
 }
 
-// KeepPartnersFresh fetches the partner list when the magpie serving the
+// KeepPartnersFresh fetches the partner list when the blackpie serving the
 // gateway starts, and again whenever it is due (every hour, ten minutes
 // after a failed fetch), whether or not a page asks for it, so a partner
 // added reaches an app left running within the hour, and the list kept on
@@ -349,7 +349,7 @@ func fetchPartners(ctx context.Context, src string) ([]Partner, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "magpie")
+	req.Header.Set("User-Agent", "blackpie")
 	req.Header.Set("Accept", "application/json")
 	res, err := source.Do(http.DefaultClient, req)
 	if err != nil {
@@ -366,7 +366,7 @@ func fetchPartners(ctx context.Context, src string) ([]Partner, error) {
 	return validPartners(f.Partners), nil
 }
 
-// validPartners keeps the entries magpie can list safely, at most
+// validPartners keeps the entries blackpie can list safely, at most
 // MaxPartners: an id of its own that no built-in preset has, a name, and
 // https addresses only. What a partner may not set (a decision API, no
 // key, an endpoint of the user's own) is cleared.
@@ -560,7 +560,7 @@ func keptPartnerIcons() []string {
 func partnerPreset(id string) *PresetDef {
 	// Keep cached definitions for services already added. Explicit off
 	// keeps its upstream meaning; the fork default only stops discovery.
-	if os.Getenv("MAGPIE_PARTNERS") == "off" {
+	if os.Getenv("BLACKPIE_PARTNERS") == "off" {
 		return nil
 	}
 	partnerMu.Lock()

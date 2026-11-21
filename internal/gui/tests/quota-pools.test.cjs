@@ -20,7 +20,7 @@ const assets = path.resolve(__dirname, "../assets");
 const at = (h) => new Date(Date.now() + h * 36e5).toISOString();
 const model = (name, family, pool, used, h) => ({ name, family, pool, used, resetsAt: at(h) });
 const pool = (pool, name, used, h) => ({ name, pool, used, resetsAt: at(h) });
-// as magpie reports an Antigravity account with retrieveUserQuotaSummary
+// as blackpie reports an Antigravity account with retrieveUserQuotaSummary
 // read: a window a model, then each pool's weekly and 5-hour windows
 const ag = (user, [g5, g7, c5, c7]) => ({
   provider: "antigravity", name: "Antigravity", icon: "antigravity-color", user, plan: "Google AI Pro",
@@ -97,8 +97,8 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         page.on("pageerror", (e) => errors.push(e.message));
         await page.route("**/*", serve(lang, url.includes("mode=panel")));
         // every account in full, each its own meters: the cards' accounts
-        // opened as upstream keeps them (magpie.usageOpen)
-        await page.addInitScript(() => { try { localStorage.setItem("magpie.usageOpen", JSON.stringify(["antigravity", "claude"])); } catch {} });
+        // opened as upstream keeps them (blackpie.usageOpen)
+        await page.addInitScript(() => { try { localStorage.setItem("blackpie.usageOpen", JSON.stringify(["antigravity", "claude"])); } catch {} });
         await page.goto(url);
         return page;
       };
@@ -107,7 +107,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       const names = [`Gemini · ${w.week}`, `Gemini · ${w.five}`, `Claude & GPT · ${w.week}`, `Claude & GPT · ${w.five}`];
 
       // the Usage page: each pool's 5 hours then its 7 days, Gemini first
-      const page = await open("usage", "http://magpie.test/?view=usage", { width: 900, height: 700 });
+      const page = await open("usage", "http://blackpie.test/?view=usage", { width: 900, height: 700 });
       const card = page.locator(".subscription-card", { hasText: "Antigravity" });
       await card.locator(".quota-windows").first().waitFor();
       const boxes = card.locator(".quota-windows");
@@ -149,7 +149,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       assert.deepEqual(border, [], "no left-border accent");
 
       // the menu bar panel: four rings an account, 5h and 7d a pool
-      const panel = await open("panel", "http://magpie.test/?mode=panel", { width: 440, height: 640 });
+      const panel = await open("panel", "http://blackpie.test/?mode=panel", { width: 440, height: 640 });
       await panel.locator('#ptabs [data-ptab="usage"]').click();
       // its second account is behind the button, as several accounts are;
       // the panel opens it from the keyboard's activation (a pointer's click
@@ -176,7 +176,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       assert(fits, "the four rings fit the card");
 
       // the provider's accounts: each pool with its 5h and 7d meters
-      const prov = await open("accounts", "http://magpie.test/?view=providers", { width: 900, height: 700 });
+      const prov = await open("accounts", "http://blackpie.test/?view=providers", { width: 900, height: 700 });
       await prov.locator(".row.provider", { hasText: "Antigravity" }).click();
       await prov.locator(".accts .acc .aq-w").first().waitFor();
       for (const user of ["ada@example.com", "bob@example.com"]) {

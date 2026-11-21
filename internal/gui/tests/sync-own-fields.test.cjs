@@ -14,11 +14,11 @@ const { test } = require("node:test");
 const { chromium, webkit } = require("playwright");
 const { openPart } = require("./reader.cjs");
 
-const assets = process.env.MAGPIE_REPAIR_ASSETS || path.resolve(__dirname, "../assets");
+const assets = process.env.BLACKPIE_REPAIR_ASSETS || path.resolve(__dirname, "../assets");
 
 function serve(lang, sync, posts) {
   const settings = {
-    theme: "light", lang, tray: "panel", version: "test", dir: "/tmp/magpie",
+    theme: "light", lang, tray: "panel", version: "test", dir: "/tmp/blackpie",
     gateway: "http://127.0.0.1:3425", visionModels: [], imageGenModels: [],
     fx: { rate: 7.2, stale: false },
   };
@@ -73,7 +73,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
     });
     page.setDefaultTimeout(5000);
     page.setDefaultNavigationTimeout(60000);
-    await page.goto("http://magpie.test/");
+    await page.goto("http://blackpie.test/");
     await page.locator("#prefs").click();
     await openPart(page, "sync");
     await page.locator("#syncList .row").first().waitFor({ state: "visible" });

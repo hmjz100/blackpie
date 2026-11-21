@@ -16,10 +16,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/gwmw"
-	"github.com/yetone/magpie/internal/pii"
-	"github.com/yetone/magpie/internal/redact"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/gwmw"
+	"github.com/hmjz100/blackpie/internal/pii"
+	"github.com/hmjz100/blackpie/internal/redact"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Masker masks as the settings say, read on each call.
@@ -261,7 +261,7 @@ func find(ctx context.Context, m pii.Model, texts []string) ([][]redact.Found, e
 	ch := make(chan res, 1)
 	go func() {
 		// a panic in the model is this request's error: on a goroutine
-		// of its own it would end magpie (#4553)
+		// of its own it would end blackpie (#4553)
 		defer func() {
 			if r := recover(); r != nil {
 				log.Printf("masking: the local model panicked: %v\n%s", r, debug.Stack())

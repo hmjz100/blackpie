@@ -10,7 +10,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // sharesBody says whether part's bytes lie inside whole's.

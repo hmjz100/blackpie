@@ -13,9 +13,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/update"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/update"
 )
 
 // updater keeps the app current. It asks the feed at start-up and every six
@@ -78,7 +78,7 @@ type updater struct {
 	onWait   func()
 	loops    sync.WaitGroup // the waits going on
 	// With Settings' AutoRestart, the clock has autoRestart run (the app's
-	// or magpie web's restart) once a downloaded update is ready and the
+	// or blackpie web's restart) once a downloaded update is ready and the
 	// gateway idle (#2096); autoSkip is the version whose wait the user
 	// called off, which isn't restarted into by itself again.
 	autoRestart func() bool
@@ -93,10 +93,10 @@ type updateJSON struct {
 	Notes   string `json:"notes,omitempty"`
 	URL     string `json:"url,omitempty"`
 	Stuck   string `json:"stuck,omitempty"` // available: why it can't update itself
-	// available, stuck "not-writable": the folder magpie may not write to
+	// available, stuck "not-writable": the folder blackpie may not write to
 	StuckDir string `json:"stuckDir,omitempty"`
 	// available, stuck "package": the package manager that installed
-	// magpie and updates it (pacman's magpie-bin from the AUR, say), and
+	// blackpie and updates it (pacman's blackpie-bin from the AUR, say), and
 	// the command that does
 	Packaged *packagedJSON `json:"packaged,omitempty"`
 	Retry    bool          `json:"retry,omitempty"` // error: a click downloads it again
@@ -138,7 +138,7 @@ func updateDue(s settings.Settings, last, now time.Time) bool {
 
 func (u *updater) start() {
 	u.place(runtime.GOOS, update.GUI)
-	gateway.SetRestarter(u.restartBeside) // magpie update in a terminal
+	gateway.SetRestarter(u.restartBeside) // blackpie update in a terminal
 	if u.bundle != "" {
 		go update.ForgetOldStaging(u.bundle) // #3965
 	}
@@ -167,15 +167,15 @@ var (
 
 // place takes what an update replaces on goos: the .app the binary is in,
 // else the binary itself. On a Mac that is the terminal build too (gui
-// false: magpie-cli-darwin, or `magpie web` from it), which has no .app to
-// be in and which `magpie update` replaces the same way; before, its page
+// false: blackpie-cli-darwin, or `blackpie web` from it), which has no .app to
+// be in and which `blackpie update` replaces the same way; before, its page
 // only ever offered the release page. The app's own binary copied out of
 // its .app isn't replaced by the terminal build.
 func (u *updater) place(goos string, gui bool) {
 	if b := bundleOf(); b != "" {
 		if u.stuck = update.Stuck(b); u.stuck == "" {
 			u.bundle = b
-			// what `magpie update` replacing the .app is told by
+			// what `blackpie update` replacing the .app is told by
 			// (replaced)
 			if exe, err := executable(); err == nil {
 				u.bundleExe = exe
@@ -191,9 +191,9 @@ func (u *updater) place(goos string, gui bool) {
 
 // placeExe takes exe as the binary an update replaces, or
 // says why it can't be (stuck). A binary a package manager installed is
-// left to it ("package"), even where magpie may write or ask for the
+// left to it ("package"), even where blackpie may write or ask for the
 // administrator's password: replacing it under the manager is what made
-// the two fight (shuhai on Discord, the AUR's magpie-bin).
+// the two fight (shuhai on Discord, the AUR's blackpie-bin).
 func (u *updater) placeExe(exe string) {
 	u.exeDir = filepath.Dir(exe)
 	if p := packagedBy(exe); p != nil {
@@ -206,16 +206,16 @@ func (u *updater) placeExe(exe string) {
 	u.exe = exe
 	u.self, _ = os.Stat(exe)
 	update.RemoveOld(exe)       // what the last updates on Windows moved aside
-	update.RemoveStaleNew(exe)  // what a magpie left running downloaded again
-	update.EnsureCompanion(exe) // Windows: the magpie.com a terminal runs, of this version (#3737)
+	update.RemoveStaleNew(exe)  // what a blackpie left running downloaded again
+	update.EnsureCompanion(exe) // Windows: the blackpie.com a terminal runs, of this version (#3737)
 	u.blocked = update.ReadBlocked(Version)
 }
 
 // exeStuck says why the binary in dir can't be replaced, or "" when it
-// can: "not-writable" when magpie may not write to dir and this system
-// can't ask for the administrator's password. On Windows a magpie.exe kept
+// can: "not-writable" when blackpie may not write to dir and this system
+// can't ask for the administrator's password. On Windows a blackpie.exe kept
 // at C:\ updated only by opening the release page, with nothing saying why
-// (#1277). "container" is that in a container (the Docker image's /magpie,
+// (#1277). "container" is that in a container (the Docker image's /blackpie,
 // run as nonroot): there the new image is pulled, and "move it to a folder
 // you can write to" was the wrong advice.
 func exeStuck(dir string) string {
@@ -335,7 +335,7 @@ func (u *updater) freshen() {
 	}
 }
 
-// An answer of "latest" is about the moment the feed was asked, and magpie
+// An answer of "latest" is about the moment the feed was asked, and blackpie
 // releases many times a day: Settings' Version row said 已是最新 on
 // v0.1.1402 with v0.1.1517 out (RickyWei on Discord, Windows), the answer
 // of a check made while 1402 was the newest and never made again (automatic
@@ -451,7 +451,7 @@ func (u *updater) run() {
 		u.state = "blocked"
 		return
 	case u.replaced():
-		// another magpie put the update in already: a restart is all
+		// another blackpie put the update in already: a restart is all
 		u.state = "ready"
 		if u.onReady != nil {
 			go u.onReady(rel.Version)
@@ -498,7 +498,7 @@ func (u *updater) install(ask bool) bool {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	if u.replaced() {
-		// another magpie updated the binary after this one started: it is
+		// another blackpie updated the binary after this one started: it is
 		// in, and swapping this one's download in would move it aside (the
 		// download is left: it may be the other's, staged at the same name)
 		u.staged = ""
@@ -560,7 +560,7 @@ func (u *updater) assetSize(rel *update.Release) int64 {
 }
 
 // replaced is whether the binary, or the .app, was updated by another
-// magpie since this one started (`magpie update` in a terminal), which
+// blackpie since this one started (`blackpie update` in a terminal), which
 // runs on from where it was moved aside.
 func (u *updater) replaced() bool {
 	switch {
@@ -624,7 +624,7 @@ func (u *updater) jsonIn(lang string) updateJSON {
 		}
 	}
 	if u.latest != nil {
-		// the notes without their download links: magpie downloads it itself
+		// the notes without their download links: blackpie downloads it itself
 		j.Latest, j.Notes, j.URL = u.latest.Version, update.StripInstall(u.latest.Notes), u.latest.URL
 	}
 	return j
@@ -786,7 +786,7 @@ func restartFrom(w Windows, view string) bool {
 }
 
 // restartToUpdate installs the staged version and arranges for it to open
-// once this process is gone; the caller then quits. magpie web runs on as
+// once this process is gone; the caller then quits. blackpie web runs on as
 // the new version in its own place (Web.Wait) instead of opening the app.
 // Off the Mac, the new one opens its window on view when window is set, and
 // only the tray icon when not; the Mac's always opens its window.
@@ -803,7 +803,7 @@ func restartInto(web, window bool, view string, bySelf bool) bool {
 		return false // a handover under way restarts already
 	}
 	if moving.Load() {
-		return false // a data move quits this one, and its helper opens magpie
+		return false // a data move quits this one, and its helper opens blackpie
 	}
 	bundle, exe := updates.bundle, updates.exe
 	updates.mu.Lock()

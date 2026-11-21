@@ -113,7 +113,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await browser.close();
       });
 
-      await page.goto("http://magpie.test/?view=usage&tab=requests");
+      await page.goto("http://blackpie.test/?view=usage&tab=requests");
       const rows = page.locator("#ledWrap .led tbody tr.led-row");
       await rows.first().waitFor();
       // a row's response body, in its details
@@ -246,7 +246,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       assert.match(await shown(4), /^\{\n  "id": "x",/);
 
       // the pick is remembered across a reload
-      await page.goto("http://magpie.test/?view=usage&tab=requests");
+      await page.goto("http://blackpie.test/?view=usage&tab=requests");
       await rows.first().waitFor();
       await open(0);
       assert.equal(await body(0).locator(".segs .opt.on").innerText(), w.events);

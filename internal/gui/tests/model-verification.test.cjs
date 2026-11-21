@@ -3,7 +3,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { test } = require('node:test');
 const { chromium, webkit } = require('playwright');
-const assets = process.env.MAGPIE_TEST_ASSETS || path.resolve(__dirname, '../assets');
+const assets = process.env.BLACKPIE_TEST_ASSETS || path.resolve(__dirname, '../assets');
 const link = 'https://accounts.example.invalid/verify?token=fixture&next=1';
 const refusal = (url) => `Verify your account — this Google account needs to be verified: open ${url} in a browser signed in to it, verify it, then try again`;
 
@@ -32,12 +32,12 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ['chromium',
           return openFails ? route.fulfill({ status: 500, json: { error: 'fixture open failed' } }) : json({});
         }
         if (u.pathname.startsWith('/api/')) return json({});
-        if (u.hostname !== 'magpie.test') return route.abort();
+        if (u.hostname !== 'blackpie.test') return route.abort();
         const file = path.join(assets, u.pathname === '/' ? 'index.html' : u.pathname);
         try { await route.fulfill({ body: await fs.readFile(file), contentType: { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png' }[path.extname(file)] }); }
         catch { await route.fulfill({ status: 404, body: '' }); }
       });
-      await page.goto('http://magpie.test/?view=providers');
+      await page.goto('http://blackpie.test/?view=providers');
       await page.locator('.row.provider[data-id="relay"]').click();
       const L = await page.evaluate((lang) => {
         const keys = ['Test models', 'Open verification', 'Test this model'];

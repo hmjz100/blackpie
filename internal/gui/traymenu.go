@@ -4,50 +4,50 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/yetone/magpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/gateway"
 )
 
 // trayZh is the tray menu in Chinese; the page has its own words
 // (i18n.js), and these few are all the menu shows (#301).
 var trayZh = map[string]string{
-	"Open moepie":                          "打开 moepie",
+	"Open blackpie":                          "打开 blackpie",
 	"Version %s":                           "版本 %s",
 	"Restart to Update":                    "重启以更新",
 	"Restart to Update to %s":              "重启以更新到 %s",
-	"Quit moepie":                          "退出 moepie",
+	"Quit blackpie":                          "退出 blackpie",
 	"Restart Now to Update":                "立即重启以更新",
 	"Restart Now to Update (%d in flight)": "立即重启以更新（%d 个进行中）",
 }
 
 // trayZhTW is the tray menu in Traditional Chinese, with Taiwan's words.
 var trayZhTW = map[string]string{
-	"Open moepie":                          "開啟 moepie",
+	"Open blackpie":                          "開啟 blackpie",
 	"Version %s":                           "版本 %s",
 	"Restart to Update":                    "重新啟動以更新",
 	"Restart to Update to %s":              "重新啟動以更新到 %s",
-	"Quit moepie":                          "結束 moepie",
+	"Quit blackpie":                          "結束 blackpie",
 	"Restart Now to Update":                "立即重新啟動以更新",
 	"Restart Now to Update (%d in flight)": "立即重新啟動以更新（%d 個進行中）",
 }
 
 // trayJa is the tray menu in Japanese.
 var trayJa = map[string]string{
-	"Open moepie":                          "moepie を開く",
+	"Open blackpie":                          "blackpie を開く",
 	"Version %s":                           "バージョン %s",
 	"Restart to Update":                    "再起動してアップデート",
 	"Restart to Update to %s":              "再起動して %s にアップデート",
-	"Quit moepie":                          "moepie を終了",
+	"Quit blackpie":                          "blackpie を終了",
 	"Restart Now to Update":                "今すぐ再起動してアップデート",
 	"Restart Now to Update (%d in flight)": "今すぐ再起動してアップデート（%d 件処理中）",
 }
 
 // trayDe is the tray menu in German.
 var trayDe = map[string]string{
-	"Open moepie":                          "moepie öffnen",
+	"Open blackpie":                          "blackpie öffnen",
 	"Version %s":                           "Version %s",
 	"Restart to Update":                    "Zum Aktualisieren neu starten",
 	"Restart to Update to %s":              "Zum Aktualisieren auf %s neu starten",
-	"Quit moepie":                          "moepie beenden",
+	"Quit blackpie":                          "blackpie beenden",
 	"Restart Now to Update":                "Jetzt neu starten und aktualisieren",
 	"Restart Now to Update (%d in flight)": "Jetzt neu starten und aktualisieren (%d laufend)",
 }
@@ -123,10 +123,10 @@ type trayLabels struct{ open, version, restart, quit string }
 // waiting for a restart, if there is one.
 func trayMenuLabels(lang, version, update string) trayLabels {
 	l := trayLabels{
-		open:    trayText(lang, "Open moepie"),
+		open:    trayText(lang, "Open blackpie"),
 		version: trayText(lang, "Version %s", version),
 		restart: trayText(lang, "Restart to Update"),
-		quit:    trayText(lang, "Quit moepie"),
+		quit:    trayText(lang, "Quit blackpie"),
 	}
 	if update != "" {
 		l.restart = trayText(lang, "Restart to Update to %s", update)

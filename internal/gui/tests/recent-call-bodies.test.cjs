@@ -14,7 +14,7 @@ const path = require("node:path");
 const { test } = require("node:test");
 const { chromium, webkit } = require("playwright");
 
-const assets = process.env.MAGPIE_RECENT_ASSETS || path.resolve(__dirname, "../assets");
+const assets = process.env.BLACKPIE_RECENT_ASSETS || path.resolve(__dirname, "../assets");
 const now = Date.now();
 const row = (i, more) => ({ t: new Date(now - (i + 1) * 60e3).toISOString(), agent: "codex", agentName: "Codex", icon: "codex-color", provider: "fixture", providerName: "Fixture", req: "m", model: "m", served: "m", in: 10, out: 5, ms: 900, status: 200, rid: "req_" + i, ep: "/v1/responses", route_id: 101 + i, cost: 0, priced: false, ...more });
 const ROWS = [
@@ -86,7 +86,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       await page.route("**/*", server(lang, s));
 
       // the Gateway page says where its calls went, and takes the reader there
-      await page.goto("http://magpie.test/?view=gateway");
+      await page.goto("http://blackpie.test/?view=gateway");
       const link = page.locator(".gw-requests");
       await link.waitFor();
       assert.equal(await page.locator("#activity").count(), 0, "no Recent calls on the Gateway page");
@@ -142,8 +142,8 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
 
       // let go of by the ring: says how to keep them, in the page's
       // language, not an error or an empty body
-      const gone = await page.evaluate(() => t("magpie keeps the request and response of only the last 40 requests, until it quits. To keep every request's, turn on Request archive at the top of Usage › Requests."));
-      if (lang !== "en") assert(!gone.startsWith("magpie keeps"), gone);
+      const gone = await page.evaluate(() => t("blackpie keeps the request and response of only the last 40 requests, until it quits. To keep every request's, turn on Request archive at the top of Usage › Requests."));
+      if (lang !== "en") assert(!gone.startsWith("blackpie keeps"), gone);
       await rows.nth(2).click();
       await bx(2).getByText(gone, { exact: true }).waitFor();
       assert.deepEqual(s.seen, [101, 102, 102, 103]);
@@ -180,7 +180,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
     await page.route("**/*", server("en", { seen: [], more: 0, off: ["usage"] }));
-    await page.goto("http://magpie.test/?view=gateway");
+    await page.goto("http://blackpie.test/?view=gateway");
     await page.locator("#gwRequests").waitFor({ state: "attached" });
     assert.equal(await page.locator(".gw-requests").isVisible(), false);
     assert.deepEqual(errors, []);

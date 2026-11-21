@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // openCodeBareBody is what OpenCode's gateway answered s-leeq's turn-start
-// requests (yetone/magpie#3740): a 400 whose body names the model and
+// requests (hmjz100/blackpie#3740): a 400 whose body names the model and
 // nothing else — no error in it, no reason, no request id.
 const openCodeBareBody = `{"model":"deepseek-v4.1-flash"}`
 

@@ -12,7 +12,7 @@ package provider
 
 import (
 	"errors"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"net/url"
 	"strings"
 )
@@ -53,7 +53,7 @@ var copilotGHEOrigin = func(host, sub string) string {
 }
 
 // copilotHostOf is an account's host from the Copilot CLI's
-// ("https://acme.ghe.com"); ok is false for one magpie can't serve.
+// ("https://acme.ghe.com"); ok is false for one blackpie can't serve.
 func copilotHostOf(cli string) (string, bool) {
 	if cli == "" {
 		return "", true

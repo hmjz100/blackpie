@@ -1,6 +1,6 @@
 package provider
 
-// A key's balance over time (TJHHHH on Discord): each balance magpie reads
+// A key's balance over time (TJHHHH on Discord): each balance blackpie reads
 // anyway (KeyBalances, a minute apart at most while something asks) is kept
 // as a point — when it was read and the amount — so the balance's card can
 // draw it, as the subscriptions' windows are (quota_history.go), and say
@@ -19,7 +19,7 @@ package provider
 
 import (
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"math"
 	"os"
 	"path/filepath"
@@ -29,7 +29,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/lastgood"
+	"github.com/hmjz100/blackpie/internal/lastgood"
 )
 
 const (

@@ -83,13 +83,13 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       page.on("pageerror", (e) => errors.push(e.message));
       await page.route("**/*", serve(lang, posts));
       // the trace sits on the live tab: the rule that matched, told by its hours
-      await page.goto("http://magpie.test/?view=routing&tab=view");
+      await page.goto("http://blackpie.test/?view=routing&tab=view");
       await page.waitForFunction((s) => document.documentElement.innerText.includes(s), w.cond);
       const said = await page.evaluate(() => document.documentElement.innerText);
       assert(said.includes(w.story), `the rule that matched is told: ${said.slice(0, 400)}`);
 
       // then the groups' pane (picked from the sidebar's Routing submenu)
-      await page.goto("http://magpie.test/?view=routing&tab=groups");
+      await page.goto("http://blackpie.test/?view=routing&tab=groups");
       const group = page.locator(".rt-group").first();
       await group.waitFor();
 

@@ -9,19 +9,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
-// #1603 (SwimmingLiu): two Codex accounts on in magpie, Codex on CC
-// Switch's custom relay and not through magpie. Codex's picker had its
-// GPT models direct only: the ones magpie serves on those accounts
+// #1603 (SwimmingLiu): two Codex accounts on in blackpie, Codex on CC
+// Switch's custom relay and not through blackpie. Codex's picker had its
+// GPT models direct only: the ones blackpie serves on those accounts
 // (codex/…) were left out as "Codex's own sign-in, one more hop". They
 // are not Codex's sign-in while it is on a relay, and with several
-// accounts magpie routes over them; they are offered via magpie, beside
+// accounts blackpie routes over them; they are offered via blackpie, beside
 // the direct ones. Listing them writes nothing. With Codex on its own
-// ChatGPT sign-in and that one account alone in magpie, they still add
+// ChatGPT sign-in and that one account alone in blackpie, they still add
 // only a hop and stay out.
-func TestCodexAccountsOfferedViaMagpie(t *testing.T) {
+func TestCodexAccountsOfferedViaBlackpie(t *testing.T) {
 	claims := func(m map[string]any) string {
 		b, _ := json.Marshal(m)
 		return "h." + base64.RawURLEncoding.EncodeToString(b) + ".s"
@@ -40,13 +40,13 @@ func TestCodexAccountsOfferedViaMagpie(t *testing.T) {
 		os.MkdirAll(filepath.Dir(provider.Path()), 0o755)
 		os.WriteFile(filepath.Join(filepath.Dir(provider.Path()), "logins.json"), b, 0o600)
 	}
-	via := func(a *Agent) (direct, magpie []Option) {
+	via := func(a *Agent) (direct, blackpie []Option) {
 		for _, o := range a.Fields[0].Options(nil) {
 			switch {
 			case o.Value == "gpt-5.5" && o.Direct != "":
 				direct = append(direct, o)
-			case strings.HasPrefix(o.Value, "codex/") && o.Direct == "" && strings.HasSuffix(o.Note, "via magpie"):
-				magpie = append(magpie, o)
+			case strings.HasPrefix(o.Value, "codex/") && o.Direct == "" && strings.HasSuffix(o.Note, "via blackpie"):
+				blackpie = append(blackpie, o)
 			}
 		}
 		return
@@ -57,12 +57,12 @@ func TestCodexAccountsOfferedViaMagpie(t *testing.T) {
 		os.WriteFile(filepath.Join(home, ".codex", "models_cache.json"), cache, 0o644)
 		logins(true)
 		before := read()
-		direct, magpie := via(codex(home))
+		direct, blackpie := via(codex(home))
 		if len(direct) == 0 {
 			t.Error("the relay's own gpt-5.5 isn't offered direct")
 		}
-		if !hasValue(magpie, "codex/gpt-5.5") {
-			t.Errorf("no codex/gpt-5.5 via magpie: %+v", magpie)
+		if !hasValue(blackpie, "codex/gpt-5.5") {
+			t.Errorf("no codex/gpt-5.5 via blackpie: %+v", blackpie)
 		}
 		if read() != before {
 			t.Errorf("listing the models wrote config.toml:\n%s", read())
@@ -73,8 +73,8 @@ func TestCodexAccountsOfferedViaMagpie(t *testing.T) {
 		home, _ := codexHome(t, string(me), ccSwitchCodex)
 		os.WriteFile(filepath.Join(home, ".codex", "models_cache.json"), cache, 0o644)
 		logins(false)
-		if _, magpie := via(codex(home)); !hasValue(magpie, "codex/gpt-5.5") {
-			t.Errorf("the account in magpie isn't the relay Codex is on: %+v", magpie)
+		if _, blackpie := via(codex(home)); !hasValue(blackpie, "codex/gpt-5.5") {
+			t.Errorf("the account in blackpie isn't the relay Codex is on: %+v", blackpie)
 		}
 	})
 
@@ -82,8 +82,8 @@ func TestCodexAccountsOfferedViaMagpie(t *testing.T) {
 		home, _ := codexHome(t, string(me), "model = \"gpt-5.5\"\n")
 		os.WriteFile(filepath.Join(home, ".codex", "models_cache.json"), cache, 0o644)
 		logins(false)
-		if _, magpie := via(codex(home)); len(magpie) != 0 {
-			t.Errorf("Codex's own sign-in, again via magpie: %+v", magpie)
+		if _, blackpie := via(codex(home)); len(blackpie) != 0 {
+			t.Errorf("Codex's own sign-in, again via blackpie: %+v", blackpie)
 		}
 	})
 }

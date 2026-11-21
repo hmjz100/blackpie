@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io"
 	"io/fs"
 	"net/url"
@@ -21,21 +21,21 @@ import (
 	toml "github.com/pelletier/go-toml/v2"
 	"github.com/tidwall/gjson"
 
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/filelock"
-	"github.com/yetone/magpie/internal/filememo"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/steady"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/filelock"
+	"github.com/hmjz100/blackpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/steady"
 )
 
 // Codex lists, in its history and its resume picker, only the sessions made
 // with the provider it uses now: a rollout's session_meta names its
 // model_provider, and so does the thread's row in Codex's state database
 // (state_<n>.sqlite). Sessions made through CC Switch ("custom") are gone
-// from that list once Codex uses magpie, though their files are all there
+// from that list once Codex uses blackpie, though their files are all there
 // (#887). MoveCodexProvider changes a session's provider, in its files and
 // in that row, and nothing else: its messages, id, title and archive stay as
-// they were. A copy of each file as it was is kept in magpie's trash folder
+// they were. A copy of each file as it was is kept in blackpie's trash folder
 // first, and moving it back to the provider it had is the undo.
 
 // codexProviderRe is what a provider id may be: a key of config.toml's
@@ -191,7 +191,7 @@ func codexProviders(out []Managed, groups map[string][]file) {
 // Codex's state database. A session written to in the last minute is left
 // as it is (ErrActive), as Codex may be running it, and so is one a Codex
 // has open (holdCodexThread). Each file is copied to
-// <magpie dir>/trash/codex-provider/ before it is changed, and rewritten
+// <blackpie dir>/trash/codex-provider/ before it is changed, and rewritten
 // whole into a file beside it that then takes its place, keeping its time.
 func MoveCodexProvider(id, to string) (CodexMove, error) {
 	if !safeID.MatchString(id) {
@@ -452,10 +452,10 @@ func codexThreadsOn(home, p string) []string {
 // MoveCodexThreads moves every thread of a Codex folder its state database
 // keeps on the provider from to the provider to, each as MoveCodexProvider
 // moves one: its files' session_meta and its row, a copy of the files kept
-// in magpie's trash first. Codex lists only the threads of the provider it
+// in blackpie's trash first. Codex lists only the threads of the provider it
 // is on (app-server thread/list, the TUI's resume picker), so the threads
-// started while magpie was Codex's provider were gone from Codex's lists
-// once Codex was off magpie (kaizaoji on X: "the context doesn't exist").
+// started while blackpie was Codex's provider were gone from Codex's lists
+// once Codex was off blackpie (kaizaoji on X: "the context doesn't exist").
 // A thread written to in the last minute, or one a Codex has open, is left
 // for the next call, and so is one whose files can't be found; it says
 // what it moved and the first error it met, having gone on past it.
@@ -574,7 +574,7 @@ func rewriteCodexProvider(path, to string) (bool, error) {
 		return false, err
 	}
 	defer in.Close()
-	tmp, err := os.CreateTemp(filepath.Dir(path), ".magpie-"+filepath.Base(path)+"-*")
+	tmp, err := os.CreateTemp(filepath.Dir(path), ".blackpie-"+filepath.Base(path)+"-*")
 	if err != nil {
 		return false, err
 	}
@@ -677,8 +677,8 @@ func moveCodexThread(path, id, to string) (bool, error) {
 
 // RelabelCodexThreads moves the threads of a Codex folder its state
 // databases keep on the provider from to the provider to, where that can
-// be done in place: ids of one length (Codex's "openai" and magpie's
-// "magpie"), and a rollout Codex keeps as plain lines. The id in the
+// be done in place: ids of one length (Codex's "openai" and blackpie's
+// "blackpie"), and a rollout Codex keeps as plain lines. The id in the
 // first line's session_meta, which Codex's thread/list and resume picker
 // filter on, is written over byte for byte, the file's time kept, and the
 // thread's row follows. Nothing else of the file is read or written, so a

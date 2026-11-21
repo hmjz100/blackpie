@@ -3,7 +3,7 @@ package sessions
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"slices"
 	"strings"
 	"time"

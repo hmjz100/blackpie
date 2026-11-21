@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Historical default used by the existing no-picks regression fixtures.
@@ -56,9 +56,9 @@ func TestExposedDefaultModelLimit(t *testing.T) {
 			t.Errorf("limit %d exposed Usage only models", limit)
 		}
 		remote := p
-		remote.Preset = RemoteMagpiePreset
+		remote.Preset = RemoteBlackpiePreset
 		if n := len(remote.Exposed()); n != 60 || remote.ModelListLimit() != 0 {
-			t.Errorf("limit %d capped remote magpie: %d", limit, n)
+			t.Errorf("limit %d capped remote blackpie: %d", limit, n)
 		}
 	}
 }

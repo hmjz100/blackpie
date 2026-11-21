@@ -8,17 +8,17 @@ import (
 	"testing"
 )
 
-func TestMoepieAssets(t *testing.T) {
-	if got, want := AppAsset(), "moepie-darwin-"+runtime.GOARCH+".zip"; got != want {
+func TestBlackpieAssets(t *testing.T) {
+	if got, want := AppAsset(), "blackpie-darwin-"+runtime.GOARCH+".zip"; got != want {
 		t.Fatalf("app asset %q, want %q", got, want)
 	}
 	before := GUI
 	t.Cleanup(func() { GUI = before })
 	for _, gui := range []bool{false, true} {
 		GUI = gui
-		prefix := "moepie-cli-"
+		prefix := "blackpie-cli-"
 		if gui && runtime.GOOS != "darwin" {
-			prefix = "moepie-"
+			prefix = "blackpie-"
 		}
 		want := prefix + runtime.GOOS + "-" + runtime.GOARCH
 		if runtime.GOOS == "windows" {
@@ -30,16 +30,16 @@ func TestMoepieAssets(t *testing.T) {
 	}
 }
 
-func TestMoepieBundleExecutable(t *testing.T) {
-	bundle := filepath.Join(t.TempDir(), "moepie.app")
-	if got := bundleExecutable(bundle); got != "moepie" {
+func TestBlackpieBundleExecutable(t *testing.T) {
+	bundle := filepath.Join(t.TempDir(), "blackpie.app")
+	if got := bundleExecutable(bundle); got != "blackpie" {
 		t.Fatalf("fallback executable %q", got)
 	}
 	plist, err := os.ReadFile("../../build/darwin/Info.plist")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(plist), "<string>io.github.lingqiqi5211.moepie</string>") || !strings.Contains(string(plist), "<string>magpie</string></array>") {
+	if !strings.Contains(string(plist), "<string>io.github.hmjz100.blackpie</string>") || !strings.Contains(string(plist), "<string>blackpie</string></array>") {
 		t.Fatal("bundle identity or compatible import scheme missing")
 	}
 	if err := os.MkdirAll(filepath.Join(bundle, "Contents"), 0o755); err != nil {
@@ -48,16 +48,16 @@ func TestMoepieBundleExecutable(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(bundle, "Contents", "Info.plist"), plist, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if got := bundleExecutable(bundle); got != "moepie" {
+	if got := bundleExecutable(bundle); got != "blackpie" {
 		t.Fatalf("bundled executable %q", got)
 	}
 }
 
-func TestMoepieAndLegacyCLIVersions(t *testing.T) {
+func TestBlackpieAndLegacyCLIVersions(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("shell fixture")
 	}
-	for _, name := range []string{"moepie", "magpie"} {
+	for _, name := range []string{"blackpie", "blackpie"} {
 		t.Run(name, func(t *testing.T) {
 			path := filepath.Join(t.TempDir(), name)
 			if err := os.WriteFile(path, []byte("#!/bin/sh\nprintf '"+name+" 0.1.2000\\n'\n"), 0o755); err != nil {
@@ -70,13 +70,13 @@ func TestMoepieAndLegacyCLIVersions(t *testing.T) {
 	}
 }
 
-func TestMoepieKeepsConsoleCompanion(t *testing.T) {
-	if comName != "magpie.com" || ComEnv != "MAGPIE_COM" {
+func TestBlackpieKeepsConsoleCompanion(t *testing.T) {
+	if comName != "blackpie.com" || ComEnv != "BLACKPIE_COM" {
 		t.Fatal("console companion compatibility changed")
 	}
-	exe := filepath.Join(t.TempDir(), "moepie-windows-amd64.exe")
+	exe := filepath.Join(t.TempDir(), "blackpie-windows-amd64.exe")
 	p, err := writeCom([]byte("launcher"), exe)
-	if err != nil || filepath.Base(p) != "magpie.com" || !comRuns(p, exe) {
+	if err != nil || filepath.Base(p) != "blackpie.com" || !comRuns(p, exe) {
 		t.Fatalf("companion %q, %v, must run renamed app", p, err)
 	}
 }

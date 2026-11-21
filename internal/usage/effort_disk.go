@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/sessions"
+	"github.com/hmjz100/blackpie/internal/sessions"
 )
 
 const effortDiskPeriods = 4
@@ -30,7 +30,7 @@ type codexEffortDiskEntry struct {
 }
 
 func codexEffortDiskPath() string {
-	return filepath.Join(filepath.Dir(sessions.CachePath()), "moepie-effort-v1.json")
+	return filepath.Join(filepath.Dir(sessions.CachePath()), "blackpie-effort-v1.json")
 }
 
 // effortDiskKey covers the same inputs as requestState.key, replacing its

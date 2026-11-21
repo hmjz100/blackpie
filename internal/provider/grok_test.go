@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 // Codex's freeform apply_patch is left out: Grok's backend turns away a

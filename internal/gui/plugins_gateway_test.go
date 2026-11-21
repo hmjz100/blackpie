@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/plugin"
 )
 
 func TestGatewayPluginOptionsAndKind(t *testing.T) {
@@ -13,10 +13,10 @@ func TestGatewayPluginOptionsAndKind(t *testing.T) {
 	t.Setenv("USERPROFILE", t.TempDir())
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 	t.Setenv("XDG_CACHE_HOME", t.TempDir())
-	t.Setenv("MAGPIE_PLUGIN_MARKET", "off")
+	t.Setenv("BLACKPIE_PLUGIN_MARKET", "off")
 	t.Cleanup(plugin.Settle)
 	dir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"name":"gateway-fixture","magpie":{"hooks":"./hooks.js","options":{"serverUrl":"http://127.0.0.1:8000"}}}`), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(`{"name":"gateway-fixture","blackpie":{"hooks":"./hooks.js","options":{"serverUrl":"http://127.0.0.1:8000"}}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(dir, "hooks.js"), []byte(`export function onRequest() {}`), 0o644); err != nil {

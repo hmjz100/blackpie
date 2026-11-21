@@ -1,8 +1,8 @@
-// Package wslrun runs, from magpie on Windows, a command that is installed
+// Package wslrun runs, from blackpie on Windows, a command that is installed
 // only in a WSL distro: Claude Code signed in to inside Ubuntu, say. The
 // command is found in a distro that is running (a stopped one is never
 // started to look), and run there through wsl.exe, in the distro's own
-// home and login, with what magpie hands it (its config directory, the
+// home and login, with what blackpie hands it (its config directory, the
 // files it writes, its own executable for a helper) told by their paths
 // inside the distro.
 package wslrun
@@ -11,7 +11,7 @@ import (
 	"bufio"
 	"context"
 	"errors"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"net"
 	"net/url"
 	"os"
@@ -25,8 +25,8 @@ import (
 	"time"
 	"unicode/utf16"
 
-	"github.com/yetone/magpie/internal/proc"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // A Tool is a command of a WSL distro's own.
@@ -211,7 +211,7 @@ func running() (names []string, ok bool) {
 	return slices.Clone(up.names), up.ok
 }
 
-// Up is whether distro runs now. Anything magpie does in a distro on its
+// Up is whether distro runs now. Anything blackpie does in a distro on its
 // own (not the user's asking) asks first: wsl.exe -d, or opening its files
 // through \\wsl.localhost, starts a stopped one (TJHHHH on Discord: WSL
 // kept starting while they repaired it). False off Windows, without WSL,
@@ -364,7 +364,7 @@ func (t Tool) Probe(ctx context.Context, args ...string) *exec.Cmd {
 
 // runVar marks the processes of a run in the distro, which they and what
 // they start have in their environment.
-const runVar = "MAGPIE_WSL_RUN"
+const runVar = "BLACKPIE_WSL_RUN"
 
 func (t Tool) cancelable(cmd *exec.Cmd) *exec.Cmd {
 	mark := cmd.Args[len(cmd.Args)-1]
@@ -527,7 +527,7 @@ func decode(b []byte) string {
 	return string(utf16.Decode(u))
 }
 
-// Exe is magpie's own executable as a run in the distro starts it (a
+// Exe is blackpie's own executable as a run in the distro starts it (a
 // Windows program, which WSL runs on Windows).
 func (t Tool) Exe() (string, error) {
 	exe, err := os.Executable()

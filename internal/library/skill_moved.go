@@ -13,7 +13,7 @@ package library
 // that isn't a version the app has moved on from, is left as it is.
 
 import (
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"log"
 	"os"
 	"path/filepath"

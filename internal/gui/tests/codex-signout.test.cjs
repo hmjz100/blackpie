@@ -70,7 +70,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       const posts = [];
       page.on("pageerror", (e) => errors.push(e.message));
       await page.route("**/*", serve(lang, logins, posts, refuse, agent));
-      await page.goto("http://magpie.test/?view=providers");
+      await page.goto("http://blackpie.test/?view=providers");
       await page.locator(".row.provider", { hasText: agent === "claude" ? "Claude Code" : "Codex" }).first().click();
       await page.locator(".editor .acc").first().waitFor();
       return { page, errors, posts };
@@ -114,7 +114,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       assert.equal(await page.evaluate(() => document.scrollingElement.scrollTop), top, "the page doesn't move");
       const missing = await page.evaluate(() => [
         "Sign out", "Signs Codex out of this account, as codex logout does", "Sign {agent} out of {user}?",
-        "{agent} is signed out, as codex logout does, and magpie forgets the account. Sign in again to use it; an open {agent} may need quitting and opening again. The account itself is left as it is.",
+        "{agent} is signed out, as codex logout does, and blackpie forgets the account. Sign in again to use it; an open {agent} may need quitting and opening again. The account itself is left as it is.",
         "{agent} signed out of {user}", "Codex itself is signed out too, as codex logout does.",
         "{agent} is signed in to {user} now: sign it in to another of its accounts first (Use on that account), then remove this one",
       ].filter((k) => !I18N.zh[k] || !I18N.ja[k] || !I18N.de[k]));
@@ -145,7 +145,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       await confirm.getByRole("button", { name: w.remove, exact: true }).click();
       await page.waitForFunction(() => document.querySelector("#status")?.textContent.includes("me@example.com"));
       assert.deepEqual(posts, [{ agent: "codex", user: "me@example.com" }]);
-      const missing = await page.evaluate(() => ["{agent} is signed in to another of its accounts, and magpie forgets this one; the account itself is untouched"]
+      const missing = await page.evaluate(() => ["{agent} is signed in to another of its accounts, and blackpie forgets this one; the account itself is untouched"]
         .filter((k) => !I18N.zh[k] || !I18N.ja[k] || !I18N.de[k]));
       assert.deepEqual(missing, [], "every string has its zh, ja and de");
       assert.deepEqual(errors, []);
@@ -171,7 +171,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await confirm.getByRole("button", { name: w.remove, exact: true }).click();
         await page.waitForFunction(() => [...document.querySelectorAll(".editor-error, #status")].some(n => n.textContent.includes("me@example.com")));
         const said = await page.locator(".editor-error, #status").allTextContents();
-        assert.match(said.join(" "), lang === "zh" ? /唯一能登录的账号/ : /the only account in magpie/);
+        assert.match(said.join(" "), lang === "zh" ? /唯一能登录的账号/ : /the only account in blackpie/);
         assert.doesNotMatch(said.join(" "), /\{agent\}|\{user\}/);
         assert.deepEqual(posts, [{ agent: "claude", user: "me@example.com" }]);
         assert.equal(await row.count(), 1, "a refusal keeps the account visible");

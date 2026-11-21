@@ -6,27 +6,27 @@ package agent
 // apiKey, provider, …}, provider being "anthropic" (Messages), "openai"
 // (Responses) or "generic-chat-completion-api" (Chat Completions); the
 // older ~/.factory/config.json custom_models is still read, merged under
-// settings.json, and magpie leaves it alone. A custom model is picked as
+// settings.json, and blackpie leaves it alone. A custom model is picked as
 // "custom:<id>": its "id" when it has one, else its displayName with
 // whitespace as dashes and a count of the same names before it
 // ("custom:Kimi-K2-[Groq]-0"). The model sessions start on is
 // sessionDefaultSettings.model; a top-level "model", as the docs show it,
 // is moved there by droid when that is unset.
 //
-// magpie appends one entry per catalog model, id "custom:magpie/<ref>", so
+// blackpie appends one entry per catalog model, id "custom:blackpie/<ref>", so
 // the catalog joins droid's /model picker under Custom models, each on the
 // API its provider speaks natively so the gateway relays it as it is, and
 // sets sessionDefaultSettings.model; the user's entries stay as they were
 // and in front, so their own ids don't move, and the default they had is
-// stashed and put back when magpie steps out.
+// stashed and put back when blackpie steps out.
 //
 // droid judges a custom model by its "model" too: one whose name reads as
 // OpenAI's on another provider, or as a Claude off "anthropic", gets a
 // warning at every session start (droidWants). Such a model is written on
 // the provider droid asks for, and the gateway translates.
 //
-// A field of one of magpie's entries the user changed in settings.json
-// stays theirs (droidKept): what magpie last wrote is stashed, and a value
+// A field of one of blackpie's entries the user changed in settings.json
+// stays theirs (droidKept): what blackpie last wrote is stashed, and a value
 // other than it is the user's. baseUrl and apiKey are the wiring, put back
 // at every sync.
 
@@ -42,20 +42,20 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/jsonc"
 
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/lazyre"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 const (
 	droidModels = "customModels"
 	droidModel  = "sessionDefaultSettings.model"
-	// droidID is how every id magpie gives a custom model begins
-	droidID = "custom:" + magpieID + "/"
+	// droidID is how every id blackpie gives a custom model begins
+	droidID = "custom:" + blackpieID + "/"
 )
 
-// droidEntry is one custom model magpie writes, in droid's key order.
+// droidEntry is one custom model blackpie writes, in droid's key order.
 type droidEntry struct {
 	Model           string `json:"model"`
 	ID              string `json:"id"`
@@ -70,7 +70,7 @@ type droidEntry struct {
 	NoImageSupport bool `json:"noImageSupport"`
 }
 
-// droidEntries are magpie's custom models as the catalog is now.
+// droidEntries are blackpie's custom models as the catalog is now.
 func droidEntries() []droidEntry { return droidEntriesAt(gateway.URL()) }
 
 // droidEntriesAt are droidEntries for a droid reaching the gateway at gw.
@@ -141,11 +141,11 @@ func droidWants(model string) string {
 	return ""
 }
 
-// droidKept are the fields of magpie's entries a value the user set stays
+// droidKept are the fields of blackpie's entries a value the user set stays
 // in. baseUrl follows the provider; apiKey is the wiring.
 var droidKept = []string{"provider", "displayName", "maxContextLimit", "maxOutputTokens", "noImageSupport"}
 
-// droidWrote is what magpie gave the droidKept fields of an entry, as JSON,
+// droidWrote is what blackpie gave the droidKept fields of an entry, as JSON,
 // a field it left out missing.
 func droidWrote(e droidEntry) map[string]json.RawMessage {
 	b, _ := json.Marshal(e)
@@ -159,10 +159,10 @@ func droidWrote(e droidEntry) map[string]json.RawMessage {
 	return out
 }
 
-// droidMerge is magpie's entry e over the one the file has (had): a
-// droidKept field whose value there isn't what magpie last wrote (last)
-// keeps the file's, and keys magpie doesn't write stay, droid's "index"
-// aside. With no record of the entry, magpie's values are taken: before
+// droidMerge is blackpie's entry e over the one the file has (had): a
+// droidKept field whose value there isn't what blackpie last wrote (last)
+// keeps the file's, and keys blackpie doesn't write stay, droid's "index"
+// aside. With no record of the entry, blackpie's values are taken: before
 // the record, every sync wrote them over anyway.
 func droidMerge(gw string, e droidEntry, had gjson.Result, last map[string]json.RawMessage) json.RawMessage {
 	b, _ := json.Marshal(e)
@@ -287,7 +287,7 @@ func droidIn(at place) *Agent {
 	path := filepath.Join(dir, "settings.json")
 	legacy := filepath.Join(dir, "config.json")
 	key := "droid:" + path + ":" + droidModel
-	// keyWrote is what magpie last gave the droidKept fields of each of
+	// keyWrote is what blackpie last gave the droidKept fields of each of
 	// its entries, so a value other than it is the user's
 	keyWrote := "droid:" + path + ":wrote"
 	// raw is the model droid starts on as written: sessionDefaultSettings'
@@ -299,16 +299,16 @@ func droidIn(at place) *Agent {
 		v, _ := edit.GetJSON(path, "model")
 		return v
 	}
-	// get spells magpie's custom models as the catalog does
+	// get spells blackpie's custom models as the catalog does
 	get := func() string {
 		v := raw()
 		if ref, ok := strings.CutPrefix(v, droidID); ok {
-			return magpieID + "/" + ref
+			return blackpieID + "/" + ref
 		}
 		return v
 	}
 	// setModels writes customModels with the user's own and, when with,
-	// magpie's after them; none left takes the key out
+	// blackpie's after them; none left takes the key out
 	setModels := func(with bool) error {
 		var ms []any
 		had := map[string]gjson.Result{}
@@ -359,7 +359,7 @@ func droidIn(at place) *Agent {
 		}
 		return nil
 	}
-	// mine finds a custom model of magpie's by id
+	// mine finds a custom model of blackpie's by id
 	mine := func(id string) (droidCustom, bool) {
 		for _, c := range droidCustoms(path, droidModels) {
 			if c.id == id {
@@ -395,7 +395,7 @@ func droidIn(at place) *Agent {
 			}
 			c, ok := mine(v)
 			if !ok {
-				return "Droid's custom model " + v + " (settings.json) is gone, so it no longer reaches magpie"
+				return "Droid's custom model " + v + " (settings.json) is gone, so it no longer reaches blackpie"
 			}
 			r := gjson.ParseBytes(c.raw)
 			base := at.v1()
@@ -411,7 +411,7 @@ func droidIn(at place) *Agent {
 			Set: func(v string) error {
 				cur := raw()
 				ours := strings.HasPrefix(cur, droidID)
-				if ref, ok := strings.CutPrefix(v, magpieID+"/"); ok && isMagpie(ref) {
+				if ref, ok := strings.CutPrefix(v, blackpieID+"/"); ok && isBlackpie(ref) {
 					if !ours {
 						if sd, ok := edit.GetJSON(path, droidModel); ok {
 							stash(map[string]string{key: sd})
@@ -447,10 +447,10 @@ func droidIn(at place) *Agent {
 					seen[c.id] = true
 					own = append(own, Option{Value: c.id, Label: c.name, Icon: modelIcon("", c.of)})
 				}
-				if c := cur["model"]; c != "" && !usesMagpie(c) && !seen[c] {
+				if c := cur["model"]; c != "" && !usesBlackpie(c) && !seen[c] {
 					own = append([]Option{{Value: c, Icon: modelIcon("", c)}}, own...)
 				}
-				return withVia(group("Droid", own), "droid", magpieID+"/")
+				return withVia(group("Droid", own), "droid", blackpieID+"/")
 			},
 		}},
 	}

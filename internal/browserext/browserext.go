@@ -1,6 +1,6 @@
-// Package browserext is Magpie Browser, the browser extension through which
-// the agents magpie serves use the user's own browser: their tabs, signed
-// in to the sites they use (gateway/browser.go relays the calls). magpie
+// Package browserext is Blackpie Browser, the browser extension through which
+// the agents blackpie serves use the user's own browser: their tabs, signed
+// in to the sites they use (gateway/browser.go relays the calls). blackpie
 // writes it to a folder of its own, pointed at its gateway, for the user to
 // load in chrome://extensions.
 package browserext
@@ -37,11 +37,11 @@ func Version() string {
 	return string(v)
 }
 
-// File is one of the extension's files as magpie has it.
+// File is one of the extension's files as blackpie has it.
 func File(name string) ([]byte, error) { return files.ReadFile("ext/" + name) }
 
 // Write puts the extension in dir, pointed at the gateway at gatewayURL
-// (http://127.0.0.1:3425), replacing what an older magpie wrote there.
+// (http://127.0.0.1:3425), replacing what an older blackpie wrote there.
 // A file is written only when it changed, so a browser that has the folder
 // loaded sees no change it has to reload for.
 func Write(dir, gatewayURL string) error {
@@ -62,7 +62,7 @@ func Write(dir, gatewayURL string) error {
 		}
 		name := strings.TrimPrefix(p, "ext/")
 		if name == "config.js" {
-			b = fmt.Appendf(nil, "// The gateway this extension talks to, written by magpie.\nexport const GATEWAY = %q;\n", ws)
+			b = fmt.Appendf(nil, "// The gateway this extension talks to, written by blackpie.\nexport const GATEWAY = %q;\n", ws)
 		}
 		to := filepath.Join(dir, filepath.FromSlash(name))
 		if old, err := os.ReadFile(to); err == nil && bytes.Equal(old, b) {

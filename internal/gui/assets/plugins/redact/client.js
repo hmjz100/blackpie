@@ -13,7 +13,7 @@
 // hooks are what the shell asks of it: open, refresh (the window came
 // back), reload (Refresh in the sidebar), leave, and focus (a masked
 // call's badge opens its request).
-magpie.plugin("redact", (ctx) => {
+blackpie.plugin("redact", (ctx) => {
   ctx.slots.add("page", {
     key: "masking",
     title: "Masking",

@@ -15,19 +15,19 @@ import (
 	"testing/synctest"
 	"time"
 
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 func otelConfig(t *testing.T, config settings.OTel) {
 	t.Helper()
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(t.TempDir(), "config"))
-	t.Setenv("MAGPIE_OTEL_ENABLED", "true")
-	t.Setenv("MAGPIE_OTEL_ENDPOINT", config.Endpoint)
-	t.Setenv("MAGPIE_OTEL_HEADERS", "Authorization=Bearer%20collector-test")
-	t.Setenv("MAGPIE_OTEL_METRICS", "false")
+	t.Setenv("BLACKPIE_OTEL_ENABLED", "true")
+	t.Setenv("BLACKPIE_OTEL_ENDPOINT", config.Endpoint)
+	t.Setenv("BLACKPIE_OTEL_HEADERS", "Authorization=Bearer%20collector-test")
+	t.Setenv("BLACKPIE_OTEL_METRICS", "false")
 	if config.Metrics {
-		t.Setenv("MAGPIE_OTEL_METRICS", "true")
+		t.Setenv("BLACKPIE_OTEL_METRICS", "true")
 	}
 }
 
@@ -116,7 +116,7 @@ func TestOTelBatchWireAndPrivacy(t *testing.T) {
 	for _, a := range spans[0].Attributes {
 		values[a.Key] = a.Value["stringValue"] + a.Value["intValue"]
 	}
-	if values["gen_ai.usage.input_tokens"] != "15" || values["gen_ai.usage.output_tokens"] != "4" || values["magpie.route.id"] != "42" || values["magpie.ttft_ms"] != "200" {
+	if values["gen_ai.usage.input_tokens"] != "15" || values["gen_ai.usage.output_tokens"] != "4" || values["blackpie.route.id"] != "42" || values["blackpie.ttft_ms"] != "200" {
 		t.Fatalf("attributes: %v", values)
 	}
 	var metrics struct {
@@ -194,10 +194,10 @@ func TestOTelDisabledAndChangedDestination(t *testing.T) {
 	defer e.cancel()
 	cfg, _ := settings.OTelExport()
 	batch := []otelItem{{record: Record{Time: time.Now(), Status: 200}, config: cfg}}
-	t.Setenv("MAGPIE_OTEL_ENABLED", "false")
+	t.Setenv("BLACKPIE_OTEL_ENABLED", "false")
 	e.flush(batch)
-	t.Setenv("MAGPIE_OTEL_ENABLED", "true")
-	t.Setenv("MAGPIE_OTEL_ENDPOINT", collector.URL+"/other")
+	t.Setenv("BLACKPIE_OTEL_ENABLED", "true")
+	t.Setenv("BLACKPIE_OTEL_ENDPOINT", collector.URL+"/other")
 	e.flush(batch)
 	if calls.Load() != 0 {
 		t.Fatal("sent a disabled batch or sent it to a new destination")
@@ -405,7 +405,7 @@ func TestOTelQueueBodiesBudgetConcurrent(t *testing.T) {
 
 // Settings › Observability's Langfuse setup saves an endpoint and headers
 // made from the host and the project's keys (plugins/otel/page.js); sent
-// from saved settings, with no MAGPIE_OTEL_* in the way, a batch reaches
+// from saved settings, with no BLACKPIE_OTEL_* in the way, a batch reaches
 // Langfuse's OTLP traces path with the Basic sign-in and the ingestion
 // header, and metrics, off, send nothing.
 func TestOTelLangfuseSetup(t *testing.T) {
@@ -420,7 +420,7 @@ func TestOTelLangfuseSetup(t *testing.T) {
 	}))
 	defer collector.Close()
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(t.TempDir(), "config"))
-	for _, k := range []string{"MAGPIE_OTEL_ENABLED", "MAGPIE_OTEL_ENDPOINT", "MAGPIE_OTEL_HEADERS", "MAGPIE_OTEL_METRICS", "MAGPIE_OTEL_SESSIONS", "MAGPIE_OTEL_BODIES", "MAGPIE_OTEL_BODIES_WHOLE"} {
+	for _, k := range []string{"BLACKPIE_OTEL_ENABLED", "BLACKPIE_OTEL_ENDPOINT", "BLACKPIE_OTEL_HEADERS", "BLACKPIE_OTEL_METRICS", "BLACKPIE_OTEL_SESSIONS", "BLACKPIE_OTEL_BODIES", "BLACKPIE_OTEL_BODIES_WHOLE"} {
 		t.Setenv(k, "")
 		os.Unsetenv(k)
 	}

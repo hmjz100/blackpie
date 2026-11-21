@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/wslrun"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/wslrun"
 )
 
 // leanRun is what a run of a leanHarness was started with and told (its
@@ -120,7 +120,7 @@ func TestClaudeLeanPromptNotWithClientCacheMarks(t *testing.T) {
 	h, runs := newLeanHarness(t)
 	leanSetting(t, true)
 	h.post(`{"model":"claude-sonnet-5","max_tokens":100,"system":[{"type":"text","text":"Rules.","cache_control":{"type":"ephemeral"}}],"messages":[{"role":"user","content":"turn-one"}]}`,
-		"X-Magpie-Cache-Marks", "client")
+		"X-Blackpie-Cache-Marks", "client")
 	if r := told(t, runs(), "turn-one"); r.hasSys || !strings.Contains(r.log, "external_system_instructions") {
 		t.Fatalf("a client cache marks request was given a system prompt (%t):\n%s", r.hasSys, r.log)
 	}
@@ -153,7 +153,7 @@ func TestClaudeLeanPromptRunNotResumedAcrossTheSetting(t *testing.T) {
 // mount of the drive.
 func TestClaudeLeanPromptFileInWSL(t *testing.T) {
 	c := claudeCLI{wsl: &wslrun.Tool{Path: "/usr/bin/claude"}}
-	if got := c.file(`C:\Users\me\AppData\Local\Temp\magpie-claude-1\system.md`); got != "/mnt/c/Users/me/AppData/Local/Temp/magpie-claude-1/system.md" {
+	if got := c.file(`C:\Users\me\AppData\Local\Temp\blackpie-claude-1\system.md`); got != "/mnt/c/Users/me/AppData/Local/Temp/blackpie-claude-1/system.md" {
 		t.Fatalf("%q", got)
 	}
 	if got := (claudeCLI{}).file("/tmp/x/system.md"); got != "/tmp/x/system.md" {

@@ -2,7 +2,7 @@
 
 package update
 
-// Only a Windows magpie is opened from a folder the user watches, so a
+// Only a Windows blackpie is opened from a folder the user watches, so a
 // download is never staged beside one here (StageBinary puts it in the
 // cache).
 func isDownloadFolder(string) bool { return false }

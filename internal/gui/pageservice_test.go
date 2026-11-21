@@ -17,8 +17,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // fakeService is a plugin's local service on 127.0.0.1, as the chat
@@ -91,7 +91,7 @@ func servicePlugins(t *testing.T, service string, options map[string]any) {
 	if err := os.CopyFS(hosted, os.DirFS("testdata/page-plugin")); err != nil {
 		t.Fatal(err)
 	}
-	pkg := `{"name": "page-chat", "main": "./index.mjs", "magpie": {"page": {"title": "Chat", "file": "page/index.html", "service": ` + service + `}}}`
+	pkg := `{"name": "page-chat", "main": "./index.mjs", "blackpie": {"page": {"title": "Chat", "file": "page/index.html", "service": ` + service + `}}}`
 	if err := os.WriteFile(filepath.Join(hosted, "package.json"), []byte(pkg), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -124,9 +124,9 @@ func listed(t *testing.T, h http.Handler) pluginPage {
 	return pages[0]
 }
 
-// aigcfree on Discord: `magpie web` on a server, opened from a Windows
+// aigcfree on Discord: `blackpie web` on a server, opened from a Windows
 // PC's browser, sent the chat page's frame to 127.0.0.1, the PC itself. A
-// page served to a browser is told where its service is on magpie web's
+// page served to a browser is told where its service is on blackpie web's
 // own address, and the desktop window is told nothing and keeps going
 // to 127.0.0.1 itself.
 func TestPluginPageServiceListedToBrowserOnly(t *testing.T) {
@@ -171,7 +171,7 @@ func TestPluginPageServiceSpec(t *testing.T) {
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			servicePlugins(t, c.service, c.options)
-			t.Setenv("MAGPIE_ADDR", "127.0.0.1:3425")
+			t.Setenv("BLACKPIE_ADDR", "127.0.0.1:3425")
 			ps := pluginPages()
 			if len(ps) != 1 {
 				t.Fatalf("a wrong service lost the page: %+v", ps)
@@ -184,7 +184,7 @@ func TestPluginPageServiceSpec(t *testing.T) {
 	// a page-only plugin's page gets no service, whatever it names
 	pagePlugins(t)
 	on := filepath.Join(os.Getenv("HOME"), "src", "glance")
-	pkg := `{"name": "glance", "magpie": {"page": {"title": "G", "file": "page/index.html", "service": {"port": ` + strconv.Itoa(f.port) + `}}}}`
+	pkg := `{"name": "glance", "blackpie": {"page": {"title": "G", "file": "page/index.html", "service": {"port": ` + strconv.Itoa(f.port) + `}}}}`
 	if err := os.WriteFile(filepath.Join(on, "package.json"), []byte(pkg), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -202,7 +202,7 @@ func TestPluginPageServiceSpec(t *testing.T) {
 	}
 }
 
-// The service through `magpie web`'s whole chain, with no cookie (a
+// The service through `blackpie web`'s whole chain, with no cookie (a
 // sandboxed frame sends none): the page's token lets it in, a made-up one
 // doesn't; the service sees its own Host and no cookie; what comes back
 // is sandboxed, sets no cookie here, and an event stream arrives as it is
@@ -210,7 +210,7 @@ func TestPluginPageServiceSpec(t *testing.T) {
 func TestPluginPageServiceProxied(t *testing.T) {
 	f := newFakeService(t)
 	servicePlugins(t, `{"port": `+strconv.Itoa(f.port)+`}`, nil)
-	t.Setenv("MAGPIE_ADDR", "127.0.0.1:3425")
+	t.Setenv("BLACKPIE_ADDR", "127.0.0.1:3425")
 	page := serviceMux(true)
 	p := listed(t, page)
 	srv := httptest.NewServer(webHandler("3430", onePortWebKey, 0, page))
@@ -231,7 +231,7 @@ func TestPluginPageServiceProxied(t *testing.T) {
 		return res
 	}
 
-	res := get(base, "Cookie", "magpie_web_3430=the-window", "Origin", "null")
+	res := get(base, "Cookie", "blackpie_web_3430=the-window", "Origin", "null")
 	body, _ := io.ReadAll(res.Body)
 	if res.StatusCode != 200 || !strings.Contains(string(body), "<title>chat</title>") {
 		t.Fatalf("the service's page: %d %s", res.StatusCode, body)
@@ -247,7 +247,7 @@ func TestPluginPageServiceProxied(t *testing.T) {
 		t.Errorf("the window's cookie reached the service: %q", seen.Get("Cookie"))
 	}
 	if res.Header.Get("Set-Cookie") != "" {
-		t.Errorf("the service set a cookie on magpie web's address: %q", res.Header.Get("Set-Cookie"))
+		t.Errorf("the service set a cookie on blackpie web's address: %q", res.Header.Get("Set-Cookie"))
 	}
 	if csp := strings.Join(res.Header.Values("Content-Security-Policy"), ", "); !strings.Contains(csp, "sandbox allow-scripts") || strings.Contains(csp, "allow-same-origin") {
 		t.Errorf("the service's page isn't sandboxed: %q", csp)
@@ -270,7 +270,7 @@ func TestPluginPageServiceProxied(t *testing.T) {
 		t.Errorf("a made-up token: %d, want 404", res.StatusCode)
 	}
 
-	// redirects to the service's own address stay on magpie web's
+	// redirects to the service's own address stay on blackpie web's
 	res = get(base + "go")
 	if loc := res.Header.Get("Location"); loc != "api/x?a=1" {
 		t.Errorf("a redirect to the service's own address: Location %q, want api/x?a=1", loc)
@@ -343,7 +343,7 @@ func TestPluginPageServiceDown(t *testing.T) {
 	}()
 	_, ps, _ := net.SplitHostPort(l.Addr().String())
 	servicePlugins(t, `{"port": `+ps+`}`, nil)
-	t.Setenv("MAGPIE_ADDR", "127.0.0.1:3425")
+	t.Setenv("BLACKPIE_ADDR", "127.0.0.1:3425")
 	page := serviceMux(true)
 	p := listed(t, page)
 	base := strings.TrimSuffix(p.URL, "index.html") + pageServicePath

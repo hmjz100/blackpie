@@ -1,9 +1,9 @@
-/moepie
-/moepie.exe
-/moepie.app/
+/blackpie
+/blackpie.exe
+/blackpie.app/
 /dist/
-/moepie-dev
+/blackpie-dev
 /rsrc_windows_*.syso
-/moepie-dev-backend
-/moepie-dev.new
+/blackpie-dev-backend
+/blackpie-dev.new
 /internal/update/launcher-*.com

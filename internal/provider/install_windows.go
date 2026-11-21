@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/yetone/magpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/proc"
 )
 
 // refreshPath takes up the PATH an installer just wrote to the registry,

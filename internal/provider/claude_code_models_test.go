@@ -10,13 +10,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/agentenv"
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/agentenv"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/filememo"
 )
 
 // mythosCatalogs puts models.dev's catalogs as they were on 10-27, cut to
-// Claude, where magpie keeps them: Claude Mythos 5.1 is in the anthropic
+// Claude, where blackpie keeps them: Claude Mythos 5.1 is in the anthropic
 // lab (models.json) and in no provider's list (api.json).
 func mythosCatalogs(t *testing.T) {
 	t.Helper()

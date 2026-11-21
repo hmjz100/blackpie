@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/ghtoken"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/ghtoken"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // fakeGitHub stands in for GitHub's API and codeload: it notes the

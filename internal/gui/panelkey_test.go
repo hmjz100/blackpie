@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 func TestPanelShortcutNames(t *testing.T) {
@@ -79,7 +79,7 @@ func TestWaylandSession(t *testing.T) {
 			t.Errorf("waylandSession(%s, %v) = %v", c.goos, c.env, got)
 		}
 	}
-	if got := shellWord("/opt/My Apps/magpie"); got != `'/opt/My Apps/magpie'` {
+	if got := shellWord("/opt/My Apps/blackpie"); got != `'/opt/My Apps/blackpie'` {
 		t.Errorf("shellWord: %s", got)
 	}
 }

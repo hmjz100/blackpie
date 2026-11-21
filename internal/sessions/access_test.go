@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // consentHome is setupCalls with settings of its own, and the gate as a
-// user's magpie has it: nothing settled reads as unsettled, not all-on.
+// user's blackpie has it: nothing settled reads as unsettled, not all-on.
 func consentHome(t *testing.T) callDirs {
 	t.Helper()
 	d := setupCalls(t)

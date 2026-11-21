@@ -103,8 +103,8 @@ const L = {
     groups: ["No grouping", "Agents", "Models asked for", "Sessions"], sum: "1 served-model mismatch", mis: "Model mismatches 1",
     lines: [["swapped", "⚠ Served model:gpt-6-luna"], ["renamed", "Reply named:claude-sonnet-5-20260801"], ["routed", "Group picked:glm-fast"]],
     head: "⚠ Served model: gpt-6-luna", dts: ["Model requested", "Upstream request model", "Served model", "Actual provider"],
-    why: "The model name the upstream returned doesn't match the upstream request model, under any spelling magpie recognizes. An alias or a dated version can also differ, so this warning alone doesn't prove the model was replaced.",
-    rule: ["The served model is read from the reply's response.model (Responses).", "Not counted as a mismatch: only a date or version suffix, a vendor's own serving name, a relay's renaming, an alias listed in the provider's model list, the member a magpie group picked, auto."],
+    why: "The model name the upstream returned doesn't match the upstream request model, under any spelling blackpie recognizes. An alias or a dated version can also differ, so this warning alone doesn't prove the model was replaced.",
+    rule: ["The served model is read from the reply's response.model (Responses).", "Not counted as a mismatch: only a date or version suffix, a vendor's own serving name, a relay's renaming, an alias listed in the provider's model list, the member a blackpie group picked, auto."],
     none: "No served model", failed: "The request failed with no response body, so there is no served model.",
     local: "This one was imported from OpenCode's local session, whose record has no served model.",
     legend: ["3 groups listed", "Header figures are totals for the whole period; an opened group loads its rows a page at a time"],
@@ -116,8 +116,8 @@ const L = {
     groups: ["不分组", "Agent", "请求的模型", "会话"], sum: "响应模型不一致 1", mis: "模型不一致 1",
     lines: [["swapped", "⚠ 响应模型：gpt-6-luna"], ["renamed", "响应：claude-sonnet-5-20260801"], ["routed", "分组挑中：glm-fast"]],
     head: "⚠ 响应模型：gpt-6-luna", dts: ["请求模型", "上游请求模型", "响应模型", "实际供应商"],
-    why: "上游返回的模型名与上游请求模型不一致（magpie 能识别的写法差异已排除）。别名或日期版本也可能导致差异，不能仅凭此警示认定模型被替换。",
-    rule: ["响应模型取自响应里的 response.model（Responses）。", "不算不一致：只差日期或版本后缀、厂商自己的服务名、中转站改名、供应商模型列表里登记的别名、magpie 分组挑中的成员、auto。"],
+    why: "上游返回的模型名与上游请求模型不一致（blackpie 能识别的写法差异已排除）。别名或日期版本也可能导致差异，不能仅凭此警示认定模型被替换。",
+    rule: ["响应模型取自响应里的 response.model（Responses）。", "不算不一致：只差日期或版本后缀、厂商自己的服务名、中转站改名、供应商模型列表里登记的别名、blackpie 分组挑中的成员、auto。"],
     none: "没有拿到响应模型", failed: "请求失败，没有响应体，拿不到响应模型。",
     local: "这条是从 OpenCode 本地会话导入的，本地记录里没有响应模型。",
     legend: ["3 组", "组头数字是整个时间段的合计；展开后按组分页加载"],
@@ -141,9 +141,9 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         const p = await ctx.newPage();
         p.setDefaultTimeout(5000);
         p.on("pageerror", (e) => errors.push(e.message));
-        await p.addInitScript(() => localStorage.setItem('magpie.ledGroup', ''));
+        await p.addInitScript(() => localStorage.setItem('blackpie.ledGroup', ''));
         await p.route("**/*", server(lang, asked));
-        await p.goto("http://magpie.test/");
+        await p.goto("http://blackpie.test/");
         await p.locator('[data-view="usage"]').first().click();
         await p.locator(":is(#usageTab .opt, .nav-s):visible").nth(1).click();
         await p.locator("#ledWrap .led tbody tr").first().waitFor();
@@ -249,7 +249,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         assert.equal(await head.locator(".led-gs").nth(5).evaluate((e) => e.classList.contains("mis")), true);
         assert.equal(await p.locator(".led-gh").nth(1).locator(".led-gs").nth(5).evaluate((e) => e.classList.contains("zero")), true);
         assert.match(await head.locator(".led-share").getAttribute("title"), /98/);
-        assert.equal(await p.evaluate(() => localStorage.getItem("magpie.ledGroup")), "agent", "kept for the next time");
+        assert.equal(await p.evaluate(() => localStorage.getItem("blackpie.ledGroup")), "agent", "kept for the next time");
         // opened: its rows, a page at a time
         await press(head);
         await last((q) => q.get("agent") === "codex" && q.get("offset") === "0" && q.get("limit") === "100" && !q.has("group"), "the group's rows");
@@ -340,7 +340,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ['chromium',
   test(`${engine}: Requests starts with categories and retains an explicit flat view`, async t => {
     const b=await(engine==='webkit'?webkit.launch():chromium.launch({channel:'chromium'}));t.after(()=>b.close());
     const p=await b.newPage({viewport:{width:1280,height:1000}}), asked=[],errors=[];p.setDefaultTimeout(5000);p.on('pageerror',e=>errors.push(e.message));
-    await p.route('**/*',server('en',asked));await p.goto('http://magpie.test/');
+    await p.route('**/*',server('en',asked));await p.goto('http://blackpie.test/');
     await p.locator('[data-view="usage"]').first().click();await p.locator(':is(#usageTab .opt, .nav-s):visible').nth(1).click();
     await p.locator('.led-grp').first().waitFor();
     assert.equal((await p.locator('#ledGroup').textContent()).trim(),'Group by · Agents');
@@ -355,7 +355,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ['chromium',
     assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth),false);
     await p.locator('#ledGroup').click();await p.locator('.sess-menu .pm-item').filter({hasText:/^No grouping$/}).click();
     await p.locator('#ledWrap .led-row').first().waitFor();
-    assert.equal(await p.evaluate(()=>localStorage.getItem('magpie.ledGroup')),'');
+    assert.equal(await p.evaluate(()=>localStorage.getItem('blackpie.ledGroup')),'');
     await p.reload();await p.locator('#ledWrap .led-row').first().waitFor();
     assert.equal((await p.locator('#ledGroup').textContent()).trim(),'No grouping','explicit flat preference survives reload');
     assert.deepEqual(errors,[]);
@@ -369,7 +369,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ['chromium',
       const p=await b.newPage({viewport:{width:1440,height:1000}});p.setDefaultTimeout(5000);
       await p.route('**/*',server(lang,[]));
       await p.route('**/api/usage/requests?**',route=>{const d=page(new URL(route.request().url()).searchParams);for(const g of d.groups||[])Object.assign(g,{decode_ms:1000,decode_out:14,decode_n:22869});return route.fulfill({json:d});});
-      await p.goto('http://magpie.test/');await p.locator('[data-view="usage"]').first().click();await p.locator(':is(#usageTab .opt, .nav-s):visible').nth(1).click();await p.locator('.led-gh .speed').first().waitFor();
+      await p.goto('http://blackpie.test/');await p.locator('[data-view="usage"]').first().click();await p.locator(':is(#usageTab .opt, .nav-s):visible').nth(1).click();await p.locator('.led-gh .speed').first().waitFor();
       const expected=(100*sum(ROWS.filter(r=>r.agent==='codex')).calls/sum(ROWS).calls).toFixed(1)+'%';
       assert.equal(await p.locator('.led-gh .led-share-value').first().textContent(),expected,'the visible percentage uses the whole-period request count');
       assert((await p.locator('.led-gh .led-share').first().getAttribute('title')).includes(expected.slice(0,-1)),'tooltip uses the same percentage with localized spacing');

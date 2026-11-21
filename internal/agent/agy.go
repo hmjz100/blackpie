@@ -4,25 +4,25 @@ package agent
 // ~/.gemini/antigravity-cli/settings.json. With "modelProvider": "gemini" it
 // asks a Gemini API endpoint rather than Google's own backend, and lists the
 // models of customModelsConfig.customModels, each {apiProvider, modelName},
-// the one picked being "model". magpie's gateway speaks the Gemini API, so
-// magpie adds one custom model per catalog model, keyed
-// "magpie/<provider>/<model>", and sets modelProvider and model; the user's
-// own are stashed and put back when magpie steps out. The endpoint and key
+// the one picked being "model". blackpie's gateway speaks the Gemini API, so
+// blackpie adds one custom model per catalog model, keyed
+// "blackpie/<provider>/<model>", and sets modelProvider and model; the user's
+// own are stashed and put back when blackpie steps out. The endpoint and key
 // agy takes only from its environment (GOOGLE_GEMINI_BASE_URL and
-// GEMINI_API_KEY; no .env file), so magpie can't set them: the agent's row
+// GEMINI_API_KEY; no .env file), so blackpie can't set them: the agent's row
 // gives the command that starts agy with them (see Agent.Launch). That
 // names the model with --model too: agy 1.2 asks for a custom model picked
 // in settings.json or its /model picker with no model name ("model is
 // empty"); only one given on the command line resolves.
 //
 // So that typing agy just works (bestony on Discord: the command was
-// copied at each start), magpie puts a function named agy in the profile
-// of each shell the user has, between "# >>> magpie agy >>>" and
-// "# <<< magpie agy <<<" (update.ShellFunction), while agy is on one of
-// magpie's models. It runs `magpie agy run`, which starts the real agy
+// copied at each start), blackpie puts a function named agy in the profile
+// of each shell the user has, between "# >>> blackpie agy >>>" and
+// "# <<< blackpie agy <<<" (update.ShellFunction), while agy is on one of
+// blackpie's models. It runs `blackpie agy run`, which starts the real agy
 // with the two variables and --model when settings.json's model is still
-// magpie's and as it is otherwise (cli/agy_cli.go); PowerShell's asks
-// `magpie agy env` for them, since the app it would run is a GUI program
+// blackpie's and as it is otherwise (cli/agy_cli.go); PowerShell's asks
+// `blackpie agy env` for them, since the app it would run is a GUI program
 // PowerShell doesn't wait for. A terminal open before takes the command
 // from the row.
 
@@ -38,19 +38,19 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/jsonc"
 
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/update"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/update"
 )
 
 const agyModels = "customModelsConfig.customModels"
 
-// AgyLaunch is the command that starts agy on magpie's gateway and one of
+// AgyLaunch is the command that starts agy on blackpie's gateway and one of
 // its custom models, in the shell of this system. Its key names agy: its
 // requests go out as Google's Gemini SDK's (User-Agent google-genai-sdk/…),
 // with nothing of agy's own, so the gateway knows them by the key
 // (x-goog-api-key) alone. A command copied before, with the plain token,
-// still reaches magpie.
+// still reaches blackpie.
 func AgyLaunch(model string) string {
 	return agyLaunchAt(gateway.URL(), agentKey("agy"), model, runtime.GOOS == "windows")
 }
@@ -64,13 +64,13 @@ func agyLaunchAt(gw, key, model string, powershell bool) string {
 	return "GEMINI_API_KEY=" + key + " GOOGLE_GEMINI_BASE_URL=" + gw + " agy --model '" + strings.ReplaceAll(model, "'", `'\''`) + "'"
 }
 
-// AgyStart is what starts agy on magpie, the variables and the model,
-// while settings.json's model is one of magpie's; nil and "" otherwise,
+// AgyStart is what starts agy on blackpie, the variables and the model,
+// while settings.json's model is one of blackpie's; nil and "" otherwise,
 // when agy starts as it is.
 func AgyStart() (env []string, model string) {
 	home, _ := homes()
 	m := jsonGet(filepath.Join(home, ".gemini", "antigravity-cli", "settings.json"), "model")()
-	if !usesMagpie(m) {
+	if !usesBlackpie(m) {
 		return nil, ""
 	}
 	return []string{"GEMINI_API_KEY=" + agentKey("agy"), "GOOGLE_GEMINI_BASE_URL=" + gateway.URL()}, m
@@ -91,7 +91,7 @@ func agyShell(home string, on bool) {
 }
 
 // agyFunction is the function agy in a shell of kind, which runs prog
-// (this magpie) to start it; the agy on PATH when prog is gone.
+// (this blackpie) to start it; the agy on PATH when prog is gone.
 func agyFunction(kind, prog string) string {
 	switch kind {
 	case "fish":
@@ -127,7 +127,7 @@ func agyFunction(kind, prog string) string {
 const agyPosixHead = "unalias agy 2>/dev/null || true\nagy() {\n"
 
 // agyDistroProfiles are the profiles of a WSL distro's shells the
-// function goes in, as magpie opens them: bash's ~/.bashrc (which the
+// function goes in, as blackpie opens them: bash's ~/.bashrc (which the
 // ~/.profile of a login bash reads on Debian and Ubuntu), zsh's ~/.zshrc
 // and fish's config.fish, each where it is already, and the one of the
 // user's login shell in the distro's /etc/passwd (bash when it says
@@ -164,16 +164,16 @@ func distroLoginShell(at place) string {
 }
 
 // agyDistroModel is the sed script that prints settings.json's model while
-// it is one of magpie's, for the function in a distro, where no magpie
-// runs to read it. Its model is a line of its own as magpie writes the
+// it is one of blackpie's, for the function in a distro, where no blackpie
+// runs to read it. Its model is a line of its own as blackpie writes the
 // file; one written on a single line is found too, so long as nothing
 // after it is named "model".
-const agyDistroModel = `s|^.*"model"[[:space:]]*:[[:space:]]*"\(` + magpieID + `/[^"]*\)".*$|\1|p`
+const agyDistroModel = `s|^.*"model"[[:space:]]*:[[:space:]]*"\(` + blackpieID + `/[^"]*\)".*$|\1|p`
 
 // agyDistroFunction is the function agy in a distro's shell of kind:
-// while settings.json's model is magpie's, the agy on PATH started with
+// while settings.json's model is blackpie's, the agy on PATH started with
 // the gateway at gw, its key and --model (none when one is given), as
-// `magpie agy run` does on this machine; as it is otherwise.
+// `blackpie agy run` does on this machine; as it is otherwise.
 func agyDistroFunction(kind, key, gw string) string {
 	q := func(v string) string { return "'" + strings.ReplaceAll(v, "'", `'\''`) + "'" }
 	settings := `"$HOME/.gemini/antigravity-cli/settings.json"`
@@ -221,17 +221,17 @@ func agyIn(at place) *Agent {
 	provider := jsonGet(path, "modelProvider")
 	stashModel, stashProvider := "agy:"+path+":model", "agy:"+path+":modelProvider"
 	// setModels writes customModels with the user's own and, when with,
-	// magpie's; none left takes the key out
+	// blackpie's; none left takes the key out
 	setModels := func(with bool) error {
 		ms := map[string]any{}
 		for k, v := range agyCustom(path) {
-			if !strings.HasPrefix(k, magpieID+"/") {
+			if !strings.HasPrefix(k, blackpieID+"/") {
 				ms[k] = v
 			}
 		}
 		if with {
 			for _, m := range sharedModels("agy") {
-				ms[magpieID+"/"+m.ID] = map[string]string{"apiProvider": "API_PROVIDER_GOOGLE_GEMINI", "modelName": m.ID}
+				ms[blackpieID+"/"+m.ID] = map[string]string{"apiProvider": "API_PROVIDER_GOOGLE_GEMINI", "modelName": m.ID}
 			}
 		}
 		if len(ms) > 0 {
@@ -283,19 +283,19 @@ func agyIn(at place) *Agent {
 		ID: "agy", Name: "Antigravity CLI", Icon: "antigravity-color", Aliases: []string{"antigravity-cli"}, Spelled: prefixed, NoNames: true,
 		Bin: "agy", Dir: dir, Path: path,
 		Launch: func() string {
-			if v := get(); usesMagpie(v) {
+			if v := get(); usesBlackpie(v) {
 				return launch(v)
 			}
 			return ""
 		},
 		Typed: func() string {
-			if !usesMagpie(get()) || len(shellIn()) == 0 {
+			if !usesBlackpie(get()) || len(shellIn()) == 0 {
 				return ""
 			}
 			return "agy"
 		},
 		Sync: func() error {
-			on := usesMagpie(get())
+			on := usesBlackpie(get())
 			shell(on)
 			if !on {
 				return nil
@@ -304,7 +304,7 @@ func agyIn(at place) *Agent {
 		},
 		Notice: func() string {
 			v := get()
-			if !usesMagpie(v) {
+			if !usesBlackpie(v) {
 				return ""
 			}
 			if in := shellIn(); len(in) > 0 {
@@ -321,11 +321,11 @@ func agyIn(at place) *Agent {
 		},
 		Check: func() string {
 			v := get()
-			if !usesMagpie(v) {
+			if !usesBlackpie(v) {
 				return ""
 			}
 			if _, ok := agyCustom(path)[v]; !ok {
-				return "Antigravity CLI's custom model " + v + " (settings.json) is gone, so it no longer reaches magpie"
+				return "Antigravity CLI's custom model " + v + " (settings.json) is gone, so it no longer reaches blackpie"
 			}
 			if p := provider(); p != "gemini" {
 				return "Antigravity CLI's modelProvider (settings.json) is " + orDefault(p) + ", not gemini, so it asks Google directly"
@@ -335,7 +335,7 @@ func agyIn(at place) *Agent {
 			if distro {
 				for _, p := range shellIn() {
 					if b, err := os.ReadFile(p); err == nil && !strings.Contains(string(b), "GOOGLE_GEMINI_BASE_URL='"+gw()+"'") {
-						return "Antigravity CLI's function agy in " + at.native(p) + " names magpie at an address it no longer has"
+						return "Antigravity CLI's function agy in " + at.native(p) + " names blackpie at an address it no longer has"
 					}
 				}
 			}
@@ -346,8 +346,8 @@ func agyIn(at place) *Agent {
 			Get: get,
 			Set: func(v string) error {
 				cur := get()
-				if ref, ok := strings.CutPrefix(v, magpieID+"/"); ok && isMagpie(ref) {
-					if !usesMagpie(cur) {
+				if ref, ok := strings.CutPrefix(v, blackpieID+"/"); ok && isBlackpie(ref) {
+					if !usesBlackpie(cur) {
 						stash(map[string]string{stashModel: cur, stashProvider: provider()})
 					}
 					if err := setModels(true); err != nil {
@@ -359,7 +359,7 @@ func agyIn(at place) *Agent {
 					shell(true)
 					return nil
 				}
-				if usesMagpie(cur) {
+				if usesBlackpie(cur) {
 					// back to what the user had
 					if v == "" {
 						v = unstash(stashModel)
@@ -373,18 +373,18 @@ func agyIn(at place) *Agent {
 				if err := put("model", v); err != nil {
 					return err
 				}
-				if usesMagpie(cur) {
+				if usesBlackpie(cur) {
 					shell(false)
 				}
 				return setModels(false)
 			},
 			Options: func(cur map[string]string) []Option {
 				custom := agyCustom(path)
-				// its own say they go to their provider, not through magpie,
+				// its own say they go to their provider, not through blackpie,
 				// as every agent's own do (EZN7L2C3, #834)
 				var own []Option
 				for k := range custom {
-					if !strings.HasPrefix(k, magpieID+"/") {
+					if !strings.HasPrefix(k, blackpieID+"/") {
 						to := "Google"
 						if p := gjson.GetBytes(custom[k], "apiProvider").String(); strings.Contains(p, "ANTHROPIC") {
 							to = "Anthropic"
@@ -395,10 +395,10 @@ func agyIn(at place) *Agent {
 					}
 				}
 				sort.Slice(own, func(i, j int) bool { return own[i].Value < own[j].Value })
-				if c := cur["model"]; c != "" && !usesMagpie(c) && custom[c] == nil {
+				if c := cur["model"]; c != "" && !usesBlackpie(c) && custom[c] == nil {
 					own = append([]Option{{Value: c, Icon: modelIcon("", c), Direct: "Google"}}, own...)
 				}
-				return withVia(group("Antigravity CLI", own), "agy", magpieID+"/")
+				return withVia(group("Antigravity CLI", own), "agy", blackpieID+"/")
 			},
 		}},
 	}
@@ -406,6 +406,6 @@ func agyIn(at place) *Agent {
 
 // what agy says after a change (notice.go)
 var (
-	noticeAgy      = newNotice("agy takes magpie's gateway and model only from how it is started — start it with {command}")
-	noticeAgyTyped = newNotice("Type agy in a new terminal: magpie added it to {profiles}, to start agy on magpie's gateway and model (in a terminal open now: {command}).")
+	noticeAgy      = newNotice("agy takes blackpie's gateway and model only from how it is started — start it with {command}")
+	noticeAgyTyped = newNotice("Type agy in a new terminal: blackpie added it to {profiles}, to start agy on blackpie's gateway and model (in a terminal open now: {command}).")
 )

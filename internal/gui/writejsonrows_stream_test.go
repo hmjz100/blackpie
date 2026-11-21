@@ -39,21 +39,21 @@ func TestJSONRowsTagAndInvalidRow(t *testing.T) {
 	w := httptest.NewRecorder()
 	writeJSONRows(w, httptest.NewRequest("GET", "/x", nil), "rows", rows, struct{}{})
 	sum := sha256.Sum256(w.Body.Bytes())
-	tag := w.Header().Get("X-Magpie-Tag")
+	tag := w.Header().Get("X-Blackpie-Tag")
 	if tag != hex.EncodeToString(sum[:16]) {
 		t.Fatalf("tag %q does not describe the response bytes", tag)
 	}
 	r := httptest.NewRequest("GET", "/x", nil)
-	r.Header.Set("X-Magpie-Had", tag)
+	r.Header.Set("X-Blackpie-Had", tag)
 	w = httptest.NewRecorder()
 	writeJSONRows(w, r, "rows", rows, struct{}{})
-	if w.Code != http.StatusOK || w.Body.Len() != 0 || w.Header().Get("X-Magpie-Same") != "1" || w.Header().Get("X-Magpie-Tag") != tag {
+	if w.Code != http.StatusOK || w.Body.Len() != 0 || w.Header().Get("X-Blackpie-Same") != "1" || w.Header().Get("X-Blackpie-Tag") != tag {
 		t.Fatalf("unchanged response: status %d, headers %v, body %q", w.Code, w.Header(), w.Body.String())
 	}
 	rows = append(rows, rowsBufRow{N: math.NaN()})
 	w = httptest.NewRecorder()
 	writeJSONRows(w, httptest.NewRequest("GET", "/x", nil), "rows", rows, struct{}{})
-	if w.Code != http.StatusBadRequest || w.Header().Get("X-Magpie-Tag") != "" || bytes.Contains(w.Body.Bytes(), []byte(`"rows":`)) {
+	if w.Code != http.StatusBadRequest || w.Header().Get("X-Blackpie-Tag") != "" || bytes.Contains(w.Body.Bytes(), []byte(`"rows":`)) {
 		t.Fatalf("invalid row leaked a partial success: status %d, headers %v, body %q", w.Code, w.Header(), w.Body.String())
 	}
 }

@@ -10,11 +10,11 @@ import (
 // A child that starts a grandchild and both sleep: a tree with more in it
 // than the command.
 func init() {
-	switch os.Getenv("MAGPIE_TEST_TREE") {
+	switch os.Getenv("BLACKPIE_TEST_TREE") {
 	case "parent":
 		exe, _ := os.Executable()
 		c := Command(exe, "-test.run=^$")
-		c.Env = append(os.Environ(), "MAGPIE_TEST_TREE=child")
+		c.Env = append(os.Environ(), "BLACKPIE_TEST_TREE=child")
 		if c.Start() == nil {
 			os.Stdout.WriteString(strconv.Itoa(c.Process.Pid) + "\n")
 		}
@@ -34,7 +34,7 @@ func TestEndedWaitsForTheWholeTree(t *testing.T) {
 		t.Fatal(err)
 	}
 	cmd := Command(exe, "-test.run=^$")
-	cmd.Env = append(os.Environ(), "MAGPIE_TEST_TREE=parent")
+	cmd.Env = append(os.Environ(), "BLACKPIE_TEST_TREE=parent")
 	out, err := cmd.StdoutPipe()
 	if err != nil {
 		t.Fatal(err)

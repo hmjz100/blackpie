@@ -1,7 +1,7 @@
 package library
 
 // A server run with `npx -y pkg` is given to an agent as node running the
-// package's own program, from a folder magpie installs the package in.
+// package's own program, from a folder blackpie installs the package in.
 // npx stays running as the server's parent for as long as the server
 // does: on Windows a cmd.exe, npx's node (76 MB) and a second cmd.exe
 // beside a 51 MB server, ~92 MB of wrapper a server for each instance an
@@ -15,7 +15,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"log"
 	"os"
 	"os/exec"
@@ -25,8 +25,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/proc"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // npxRun is an `npx -y <spec> args…` line: the package and its arguments.
@@ -75,7 +75,7 @@ func (r npxRun) pinned() bool {
 
 var exactVersion = lazyre.New(`^\d+\.\d+\.\d+([-+].*)?$`)
 
-// npxDir is where magpie installs a spec: a folder of its own each.
+// npxDir is where blackpie installs a spec: a folder of its own each.
 func npxDir(spec string) string {
 	h := sha256.Sum256([]byte(spec))
 	return filepath.Join(settings.Dir(), "mcp-npm", hex.EncodeToString(h[:8]))
@@ -151,7 +151,7 @@ func npxBin(dir, name string) string {
 	return bin
 }
 
-// npxDirect is s as node running the package's program, when magpie has
+// npxDirect is s as node running the package's program, when blackpie has
 // the package installed; s when it hasn't, with the install started.
 func npxDirect(s *Server) *Server {
 	r, ok := readNpx(s)

@@ -1,53 +1,53 @@
 #!/bin/sh
-# magpie installer: curl -fsSL https://usemagpie.ai/install.sh | sh
+# blackpie installer: curl -fsSL https://useblackpie.ai/install.sh | sh
 #
-# macOS: puts magpie.app in /Applications (~/Applications when that is not
-# writable) and links the magpie command into ~/.local/bin.
-# Linux: puts magpie in ~/.local/bin — the desktop app (with a menu entry)
+# macOS: puts blackpie.app in /Applications (~/Applications when that is not
+# writable) and links the blackpie command into ~/.local/bin.
+# Linux: puts blackpie in ~/.local/bin — the desktop app (with a menu entry)
 # when GTK 3 and WebKitGTK 4.1 are installed, the terminal build otherwise.
 # A computer with a desktop but without them gets the terminal build and
 # the command that installs them on its distribution; --gui and --tui
-# choose instead (MAGPIE_CLI=1 is --tui). Nothing is asked.
+# choose instead (BLACKPIE_CLI=1 is --tui). Nothing is asked.
 # Termux: installs the Android terminal build into $PREFIX/bin.
 # Every download is checked against the release's SHA-256.
 #
-# Options (curl -fsSL https://usemagpie.ai/install.sh | sh -s -- --proxy …):
+# Options (curl -fsSL https://useblackpie.ai/install.sh | sh -s -- --proxy …):
 #   --proxy <url>      a proxy for every download: http://, https://,
-#                      socks5:// or socks5h:// (MAGPIE_PROXY= does the same;
+#                      socks5:// or socks5h:// (BLACKPIE_PROXY= does the same;
 #                      without either, curl's own https_proxy / HTTPS_PROXY /
 #                      ALL_PROXY are used as usual)
 #   --mirror <prefix>  a GitHub download mirror: the release file is fetched
-#                      from <prefix><its github.com URL> (MAGPIE_MIRROR= does
+#                      from <prefix><its github.com URL> (BLACKPIE_MIRROR= does
 #                      the same). None is used unless given. The release
-#                      list and its SHA-256 still come from usemagpie.ai,
+#                      list and its SHA-256 still come from useblackpie.ai,
 #                      never from the mirror, so a file the mirror changed is
 #                      refused.
 #   --gui              the desktop app, on Linux even before its libraries are
 #                      installed (it opens once they are)
 #   --tui              the terminal build (TUI, web UI and CLI), on Linux even
-#                      with a desktop (MAGPIE_CLI=1 does the same)
-#   --uninstall        takes off what this script put there: the magpie
+#                      with a desktop (BLACKPIE_CLI=1 does the same)
+#   --uninstall        takes off what this script put there: the blackpie
 #                      command, and the app (macOS) or its menu entry, icon
-#                      and magpie:// handler (Linux), and the service and
-#                      opening at login that would start a magpie no longer
+#                      and blackpie:// handler (Linux), and the service and
+#                      opening at login that would start a blackpie no longer
 #                      there. Your settings, providers and usage in
-#                      ~/.config/magpie stay, for when you install again.
-#   --purge            --uninstall, and before it `magpie uninstall --yes`:
+#                      ~/.config/blackpie stay, for when you install again.
+#   --purge            --uninstall, and before it `blackpie uninstall --yes`:
 #                      every agent disconnected and put back as it was, and
-#                      magpie's settings, providers and usage deleted.
+#                      blackpie's settings, providers and usage deleted.
 set -eu
 
-site=https://usemagpie.ai
-bin="${MAGPIE_BIN_DIR:-$HOME/.local/bin}"
-proxy="${MAGPIE_PROXY:-}"
-mirror="${MAGPIE_MIRROR:-}"
+site=https://useblackpie.ai
+bin="${BLACKPIE_BIN_DIR:-$HOME/.local/bin}"
+proxy="${BLACKPIE_PROXY:-}"
+mirror="${BLACKPIE_MIRROR:-}"
 uninstall=
 build=
 nolibs=
-[ -z "${MAGPIE_CLI:-}" ] || build=tui
+[ -z "${BLACKPIE_CLI:-}" ] || build=tui
 
 say() { printf '  %s\n' "$*"; }
-die() { printf 'magpie: %s\n' "$*" >&2; exit 1; }
+die() { printf 'blackpie: %s\n' "$*" >&2; exit 1; }
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -62,13 +62,13 @@ while [ $# -gt 0 ]; do
     -h|--help)
       printf '%s\n' "usage: curl -fsSL $site/install.sh | sh -s -- [--gui | --tui] [--proxy <url>] [--mirror <prefix>]" \
         "       curl -fsSL $site/install.sh | sh -s -- --uninstall [--purge]" \
-        "  --proxy <url>      http://, https://, socks5:// or socks5h:// proxy for the downloads (or MAGPIE_PROXY=)" \
-        "  --mirror <prefix>  GitHub download mirror put before the release's github.com URL (or MAGPIE_MIRROR=);" \
+        "  --proxy <url>      http://, https://, socks5:// or socks5h:// proxy for the downloads (or BLACKPIE_PROXY=)" \
+        "  --mirror <prefix>  GitHub download mirror put before the release's github.com URL (or BLACKPIE_MIRROR=);" \
         "                     the SHA-256 is still checked against $site's" \
         "  --gui              Linux: the desktop app, even before GTK 3 and WebKitGTK 4.1 are installed" \
-        "  --tui              Linux: the terminal build (TUI, web UI, CLI), even on a desktop (or MAGPIE_CLI=1)" \
-        "  --uninstall        take off what this script installed; your settings in ~/.config/magpie stay" \
-        "  --purge            with --uninstall: also disconnect every agent and delete magpie's settings (magpie uninstall)"
+        "  --tui              Linux: the terminal build (TUI, web UI, CLI), even on a desktop (or BLACKPIE_CLI=1)" \
+        "  --uninstall        take off what this script installed; your settings in ~/.config/blackpie stay" \
+        "  --purge            with --uninstall: also disconnect every agent and delete blackpie's settings (blackpie uninstall)"
       exit 0 ;;
     *) die "unknown option $1 (--gui, --tui, --proxy <url>, --mirror <prefix>, --uninstall, --purge)" ;;
   esac
@@ -96,7 +96,7 @@ case "$(uname -s)" in
     if [ -n "$termux" ]; then
       [ -n "${PREFIX:-}" ] || die "Termux requires PREFIX to locate its bin directory"
       os=android
-      bin="${MAGPIE_BIN_DIR:-$PREFIX/bin}"
+      bin="${BLACKPIE_BIN_DIR:-$PREFIX/bin}"
     else
       os=linux
     fi ;;
@@ -113,61 +113,61 @@ runs() {
 
 # --uninstall: what the install below puts there, and nothing of the
 # user's. The service and login entry go too while they start this
-# magpie: left, they would start a program that is gone at each login.
+# blackpie: left, they would start a program that is gone at each login.
 if [ -n "$uninstall" ]; then
-  exe="$bin/magpie"
+  exe="$bin/blackpie"
   if [ "$uninstall" = purge ]; then
-    # magpie disconnects the agents it connected and deletes its own
+    # blackpie disconnects the agents it connected and deletes its own
     # folders; deleting them here by hand would leave the agents pointed
     # at a gateway that is gone
-    [ -x "$exe" ] || die "no magpie at $exe to disconnect your agents and delete its settings: install it again and run this again, or run --uninstall alone to keep them"
-    "$exe" uninstall --yes || die "magpie uninstall didn't finish (see above), so the magpie command and app are left: run this again once it does"
+    [ -x "$exe" ] || die "no blackpie at $exe to disconnect your agents and delete its settings: install it again and run this again, or run --uninstall alone to keep them"
+    "$exe" uninstall --yes || die "blackpie uninstall didn't finish (see above), so the blackpie command and app are left: run this again once it does"
   fi
   removed=
   gone() { rm -rf "$1"; removed=1; say "removed $1"; }
   if [ "$os" = darwin ]; then
     for apps in /Applications "$HOME/Applications"; do
-      [ ! -d "$apps/magpie.app" ] || gone "$apps/magpie.app"
+      [ ! -d "$apps/blackpie.app" ] || gone "$apps/blackpie.app"
     done
     case "$(readlink "$exe" 2>/dev/null)" in
-      */magpie.app/Contents/MacOS/magpie) gone "$exe" ;;
+      */blackpie.app/Contents/MacOS/blackpie) gone "$exe" ;;
     esac
   else
     if [ "$os" = linux ]; then
-      unit="$config/systemd/user/magpie.service"
+      unit="$config/systemd/user/blackpie.service"
       if [ "$(runs "$unit" ExecStart)" = "$exe" ]; then
         if ! "$exe" daemon uninstall >/dev/null 2>&1; then
-          command -v systemctl >/dev/null && systemctl --user disable --now magpie.service >/dev/null 2>&1 || true
+          command -v systemctl >/dev/null && systemctl --user disable --now blackpie.service >/dev/null 2>&1 || true
           rm -f "$unit"
         fi
-        removed=1; say "removed magpie's service ($unit)"
+        removed=1; say "removed blackpie's service ($unit)"
       fi
-      login="$config/autostart/magpie.desktop"
+      login="$config/autostart/blackpie.desktop"
       [ "$(runs "$login" Exec)" != "$exe" ] || gone "$login"
     fi
     [ ! -f "$exe" ] || gone "$exe"
     if [ "$os" = linux ]; then
       apps="$share/applications"
-      # the menu entry and its icon while they start this magpie, or one
-      # that is gone; another magpie's stays
-      run=$(runs "$apps/magpie.desktop" Exec)
-      if [ -f "$apps/magpie.desktop" ] && { [ "$run" = "$exe" ] || [ ! -e "$run" ]; }; then
-        gone "$apps/magpie.desktop"
+      # the menu entry and its icon while they start this blackpie, or one
+      # that is gone; another blackpie's stays
+      run=$(runs "$apps/blackpie.desktop" Exec)
+      if [ -f "$apps/blackpie.desktop" ] && { [ "$run" = "$exe" ] || [ ! -e "$run" ]; }; then
+        gone "$apps/blackpie.desktop"
       fi
-      # with no menu entry (this one, or the one magpie uninstall took),
-      # what came with it: the icon, the magpie:// default xdg-mime set
+      # with no menu entry (this one, or the one blackpie uninstall took),
+      # what came with it: the icon, the blackpie:// default xdg-mime set
       # (that line only) and the menu's cache when it lists nothing else
-      if [ ! -e "$apps/magpie.desktop" ]; then
+      if [ ! -e "$apps/blackpie.desktop" ]; then
         icons="$share/icons/hicolor/256x256/apps"
-        [ ! -f "$icons/magpie.png" ] || gone "$icons/magpie.png"
+        [ ! -f "$icons/blackpie.png" ] || gone "$icons/blackpie.png"
         rmdir "$icons" "$share/icons/hicolor/256x256" "$share/icons/hicolor" "$share/icons" 2>/dev/null || true
         list="$config/mimeapps.list"
-        if [ -f "$list" ] && grep -qx 'x-scheme-handler/magpie=magpie\.desktop;\{0,1\}' "$list"; then
-          grep -vx 'x-scheme-handler/magpie=magpie\.desktop;\{0,1\}' "$list" > "$list.magpie-new" || true
-          mv "$list.magpie-new" "$list"
+        if [ -f "$list" ] && grep -qx 'x-scheme-handler/blackpie=blackpie\.desktop;\{0,1\}' "$list"; then
+          grep -vx 'x-scheme-handler/blackpie=blackpie\.desktop;\{0,1\}' "$list" > "$list.blackpie-new" || true
+          mv "$list.blackpie-new" "$list"
           # a list left with no entry at all (the one xdg-mime made) goes
           grep -qv -e '^\[.*\]$' -e '^[[:space:]]*$' "$list" || rm -f "$list"
-          removed=1; say "removed magpie:// from $list"
+          removed=1; say "removed blackpie:// from $list"
         fi
         if [ -d "$apps" ] && ! ls "$apps" | grep -q '\.desktop$'; then
           rm -f "$apps/mimeinfo.cache"
@@ -178,15 +178,15 @@ if [ -n "$uninstall" ]; then
       fi
     fi
   fi
-  [ "$removed" ] || say "no magpie installed by this script at $exe"
+  [ "$removed" ] || say "no blackpie installed by this script at $exe"
   if [ "$uninstall" != purge ]; then
-    say "kept your settings, providers and usage in $config/magpie: install again to have them back, or run with --purge to delete them"
+    say "kept your settings, providers and usage in $config/blackpie: install again to have them back, or run with --purge to delete them"
     if pid=$(pgrep -f "^$exe( |\$)" 2>/dev/null) && [ -n "$pid" ]; then
-      say "magpie is still running (pid $(printf '%s' "$pid" | tr '\n' ' ' | sed 's/ $//')) and ends when you quit it; agents connected to it reach its gateway until then"
+      say "blackpie is still running (pid $(printf '%s' "$pid" | tr '\n' ' ' | sed 's/ $//')) and ends when you quit it; agents connected to it reach its gateway until then"
     fi
   fi
-  # magpie uninstall said so already
-  [ "$uninstall" = purge ] || say "magpie is uninstalled"
+  # blackpie uninstall said so already
+  [ "$uninstall" = purge ] || say "blackpie is uninstalled"
   exit 0
 fi
 
@@ -252,8 +252,8 @@ has_desktop() {
 # this distribution, or nothing when it isn't one we know
 gui_packages() {
   id='' like=''
-  # MAGPIE_OS_RELEASE: another os-release, for the installer's tests
-  rel=${MAGPIE_OS_RELEASE:-/etc/os-release}
+  # BLACKPIE_OS_RELEASE: another os-release, for the installer's tests
+  rel=${BLACKPIE_OS_RELEASE:-/etc/os-release}
   [ -r "$rel" ] || rel=/usr/lib/os-release
   if [ -r "$rel" ]; then
     id=$(sed -n 's/^ID=//p' "$rel" | tr -d "\"'" | head -n 1)
@@ -283,16 +283,16 @@ case "$(uname -m)" in
   *) die "unsupported CPU: $(uname -m)" ;;
 esac
 case "$os" in
-  darwin) file="magpie-darwin-$arch.zip" ;;
-  android) file="magpie-cli-android-$arch" ;;
+  darwin) file="blackpie-darwin-$arch.zip" ;;
+  android) file="blackpie-cli-android-$arch" ;;
   *)
-    file="magpie-cli-linux-$arch"
+    file="blackpie-cli-linux-$arch"
     case "$build" in
       gui) ! musl || die "the desktop app is built for glibc and can't run on musl (Alpine): install the terminal build with --tui"
-           file="magpie-linux-$arch" ;;
+           file="blackpie-linux-$arch" ;;
       tui) ;;
       *) if musl; then :
-         elif has_gui_libs; then file="magpie-linux-$arch"
+         elif has_gui_libs; then file="blackpie-linux-$arch"
          elif has_desktop; then nolibs=1; fi ;;
     esac ;;
 esac
@@ -316,8 +316,8 @@ from=$url
 case "$url" in
   https://github.com/*) [ -z "$mirror" ] || from="$mirror$url" ;;
 esac
-if [ "$from" != "$url" ]; then say "downloading magpie $version ($file) through $mirror"
-else say "downloading magpie $version ($file)"; fi
+if [ "$from" != "$url" ]; then say "downloading blackpie $version ($file) through $mirror"
+else say "downloading blackpie $version ($file)"; fi
 get -o "$tmp/$file" "$from" || die "could not download $from"
 if command -v sha256sum >/dev/null; then got=$(sha256sum "$tmp/$file" | cut -d' ' -f1)
 else got=$(shasum -a 256 "$tmp/$file" | cut -d' ' -f1); fi
@@ -333,53 +333,53 @@ if [ "$os" = darwin ]; then
   ditto -x -k "$tmp/$file" "$tmp/x"
   # the new app beside the old one first: a move failing (a full disk)
   # leaves the old app in place
-  rm -rf "$apps/.magpie.app.new"
-  mv "$tmp/x/magpie.app" "$apps/.magpie.app.new"
-  rm -rf "$apps/magpie.app"
-  mv "$apps/.magpie.app.new" "$apps/magpie.app"
-  ln -sf "$apps/magpie.app/Contents/MacOS/magpie" "$bin/magpie"
-  say "installed $apps/magpie.app"
+  rm -rf "$apps/.blackpie.app.new"
+  mv "$tmp/x/blackpie.app" "$apps/.blackpie.app.new"
+  rm -rf "$apps/blackpie.app"
+  mv "$apps/.blackpie.app.new" "$apps/blackpie.app"
+  ln -sf "$apps/blackpie.app/Contents/MacOS/blackpie" "$bin/blackpie"
+  say "installed $apps/blackpie.app"
 else
-  install -m 755 "$tmp/$file" "$bin/magpie"
-  if [ "$file" = "magpie-linux-$arch" ]; then
+  install -m 755 "$tmp/$file" "$bin/blackpie"
+  if [ "$file" = "blackpie-linux-$arch" ]; then
     mkdir -p "$share/applications" "$share/icons/hicolor/256x256/apps"
-    get -o "$share/icons/hicolor/256x256/apps/magpie.png" "$site/img/icon-256.png" || true
-    cat > "$share/applications/magpie.desktop" <<EOF
+    get -o "$share/icons/hicolor/256x256/apps/blackpie.png" "$site/img/icon-256.png" || true
+    cat > "$share/applications/blackpie.desktop" <<EOF
 [Desktop Entry]
 Type=Application
-Name=magpie
+Name=blackpie
 Comment=Every agent's model. One place.
-Exec=$bin/magpie %u
-Icon=magpie
-StartupWMClass=magpie
+Exec=$bin/blackpie %u
+Icon=blackpie
+StartupWMClass=blackpie
 Categories=Development;Utility;
-MimeType=x-scheme-handler/magpie;
+MimeType=x-scheme-handler/blackpie;
 Terminal=false
 EOF
-    # magpie://import links open in magpie
+    # blackpie://import links open in blackpie
     command -v update-desktop-database >/dev/null && update-desktop-database "$share/applications" 2>/dev/null || true
-    command -v xdg-mime >/dev/null && xdg-mime default magpie.desktop x-scheme-handler/magpie 2>/dev/null || true
-    say "installed the magpie desktop app (menu entry: magpie)"
+    command -v xdg-mime >/dev/null && xdg-mime default blackpie.desktop x-scheme-handler/blackpie 2>/dev/null || true
+    say "installed the blackpie desktop app (menu entry: blackpie)"
   elif [ "$os" = android ]; then
-    say "installed the Termux build; use magpie web for the browser UI or magpie tui for the terminal UI"
+    say "installed the Termux build; use blackpie web for the browser UI or blackpie tui for the terminal UI"
   else
     say "installed the terminal build (TUI, web UI and CLI)"
   fi
 fi
-say "installed $bin/magpie"
+say "installed $bin/blackpie"
 case ":$PATH:" in
   *":$bin:"*) ;;
-  *) say "add $bin to your PATH to run magpie from a terminal" ;;
+  *) say "add $bin to your PATH to run blackpie from a terminal" ;;
 esac
 case "$file" in
-  *.zip) say "open it: open -a magpie" ;;
-  magpie-cli-android-*) say "run it: magpie web" ;;
-  magpie-linux-*) say "open it from your app menu, or run: magpie app" ;;
-  *) say "run it: magpie" ;;
+  *.zip) say "open it: open -a blackpie" ;;
+  blackpie-cli-android-*) say "run it: blackpie web" ;;
+  blackpie-linux-*) say "open it from your app menu, or run: blackpie app" ;;
+  *) say "run it: blackpie" ;;
 esac
 # the desktop app without what it needs: what installs it, said last so it
 # is what the user reads
-if [ "$file" = "magpie-linux-$arch" ] && ! has_gui_libs; then
+if [ "$file" = "blackpie-linux-$arch" ] && ! has_gui_libs; then
   pkgs=$(gui_packages)
   say ""
   say "the desktop app needs GTK 3 and WebKitGTK 4.1, which aren't installed; it opens once they are:"

@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // Keep an official checkpoint through a quota failover and a second
@@ -64,7 +64,7 @@ func TestCodexNativeCompactionPoolFailover(t *testing.T) {
 		t.Fatalf("checkpoint was not retained across the account switch: %q", got)
 	}
 	body = `{"model":"codex/gpt-5.5","stream":true,"input":[{"type":"compaction","encrypted_content":"checkpoint-acct-1"},{"type":"compaction_trigger"}]}`
-	if code, reply := codexPost(t, body); code != 200 || !strings.Contains(reply, "checkpoint-acct-2") || strings.Contains(reply, magpieCompaction) {
+	if code, reply := codexPost(t, body); code != 200 || !strings.Contains(reply, "checkpoint-acct-2") || strings.Contains(reply, blackpieCompaction) {
 		t.Fatalf("recompact on spare: %d %s", code, reply)
 	}
 	body = `{"model":"codex/gpt-5.5","stream":true,"input":[{"type":"compaction","encrypted_content":"checkpoint-acct-2"},{"type":"message","role":"user","content":[{"type":"input_text","text":"continue"}]}]}`

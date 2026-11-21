@@ -11,19 +11,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/gateway"
 )
 
 // A plugin's page can be the way into a local service its host part runs
-// (package.json's magpie.page.service, plugin.ServiceSpec): the community
+// (package.json's blackpie.page.service, plugin.ServiceSpec): the community
 // chat page (@magpie-community/page-chat) sends its frame to the chat
 // server on 127.0.0.1. In the desktop window that is this computer. In a
-// browser on another computer, opening `magpie web` (aigcfree on Discord:
+// browser on another computer, opening `blackpie web` (aigcfree on Discord:
 // a server behind nginx, a Windows PC's browser), 127.0.0.1 is that
 // computer, and the frame showed "127.0.0.1 refused to connect".
 //
 // So a page served to a browser is told (/api/plugin-pages' service, the
-// bridge's magpie.service) where the same service is on this server's own
+// bridge's blackpie.service) where the same service is on this server's own
 // address: pageServicePath under the page's token. The service stays on
 // 127.0.0.1, and reaching it takes what reaching the page's files takes:
 // the token, which only a signed-in /api hands out (webGuard), and the
@@ -31,7 +31,7 @@ import (
 
 // pageServicePath is where a page's service is, under the page's token:
 // pluginPagePrefix + token + "/" + pageServicePath + the service's path.
-const pageServicePath = "_magpie/service/"
+const pageServicePath = "_blackpie/service/"
 
 // pageServicePolicy is added to everything the service sends: whatever
 // it serves runs sandboxed, in an origin of its own, as the page's frame

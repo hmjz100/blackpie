@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Codex is told the threshold the user set (#876, hisiling: 272K was the
@@ -70,10 +70,10 @@ func TestCodexCatalogCompactAt(t *testing.T) {
 }
 
 // Codex shows a model's context_window (95% of it) as the conversation's
-// context, so a 1M model of a plugin's told magpie's 272K threshold there
+// context, so a 1M model of a plugin's told blackpie's 272K threshold there
 // showed 258K (01huadalang on Discord, Command Code's 1M models). The
 // window is the model's own, and the threshold goes where Codex compacts
-// (auto_compact_token_limit), for a model magpie describes and for a
+// (auto_compact_token_limit), for a model blackpie describes and for a
 // relay's own entry alike.
 func TestCodexWindowShownCompactApart(t *testing.T) {
 	t.Setenv("HOME", t.TempDir())
@@ -108,7 +108,7 @@ func TestCodexWindowShownCompactApart(t *testing.T) {
 			}
 		}
 	}
-	// magpie's default: the plugin's 1M model shows 1M and compacts at
+	// blackpie's default: the plugin's 1M model shows 1M and compacts at
 	// 272K; a relay's entry is the vendor's (its null), unless the user
 	// set a threshold on it
 	check("default", map[string][2]any{

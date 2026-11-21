@@ -78,7 +78,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         const feed = {};
         const previous = { ...answered, id: 6, seq: 6, session: "019a-session", prompt: { ...prompt, tokens: 39000 }, usage: [{ in: 3000, cache_read: 36000, out: 10 }] };
         await page.route('**/*', serve('dark', [previous, answered], feed, lang));
-        await page.goto('http://magpie.test/?view=routing');
+        await page.goto('http://blackpie.test/?view=routing');
         await page.locator('.rt-selected').waitFor();
         const ctx = page.locator('.rt-ctx .ctx-card');
         await ctx.waitFor();
@@ -162,7 +162,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ['chromium',
     page.setDefaultTimeout(5000);page.on('pageerror',e=>errors.push(e.message));
     await page.route('**/*',serve('light',[answered],feed,'en'));
     await page.route('**/api/gateway/call?*',route=>{calls.push(new URL(route.request().url()).searchParams.get('route'));return route.fulfill({json:{requestBody:'{"marker":"inspected-request-7"}',responseBody:'{"marker":"inspected-response-7"}',requestTruncated:false,responseTruncated:false}});});
-    await page.goto('http://magpie.test/?view=routing');await page.locator('.rt-selected').waitFor();
+    await page.goto('http://blackpie.test/?view=routing');await page.locator('.rt-selected').waitFor();
     const radius=await page.locator('.rt-selected').evaluate(e=>parseFloat(getComputedStyle(e).borderTopLeftRadius));
     assert(radius>=6,'selected-account surface has rounded corners');
     await page.locator('.rt-bodies-b').dispatchEvent('click');

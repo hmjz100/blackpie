@@ -1,27 +1,25 @@
-# magpie reference
+# blackpie reference
 
-The full manual: every agent magpie wires, every provider option, the gateway, routing, plugins, the CLI, Docker, sync and the files magpie keeps. For the overview, see the [README](../README.md).
+The full manual: every agent blackpie wires, every provider option, the gateway, routing, plugins, the CLI, Docker, sync and the files blackpie keeps. For the overview, see the [README](../README.md).
 
 Renamed a project folder? See [relocating Claude Code sessions](session-relocation.md).
 
 One place to pick every agent's model: Codex on DeepSeek, Claude Code
-on Kimi, Gemini CLI on GLM, from the menu bar. [usemagpie.ai](https://usemagpie.ai)
+on Kimi, Gemini CLI on GLM, from the menu bar. [useblackpie.ai](https://useblackpie.ai)
 
-[![Discord](https://img.shields.io/badge/Discord-join%20the%20community-5865F2?logo=discord&logoColor=white)](https://discord.gg/vGSnD3ZKQF)
-
-`magpie` is a single screen that lists each AI agent on your machine and
+`blackpie` is a single screen that lists each AI agent on your machine and
 the model it is set to. Click a value, pick a model. That is the whole app.
 
 It lives in the menu bar: click the icon and a panel drops down; the same
-screen also opens as a normal window (`magpie`, or *Open magpie* in the tray menu),
+screen also opens as a normal window (`blackpie`, or *Open blackpie* in the tray menu),
 which opens on the page you last left, as a Mac app comes back as it was,
-and there is a terminal version (`magpie tui`) and a plain CLI. The
-terminal version serves the gateway while it is open when no other magpie
-(the app, `magpie web`, `magpie serve`) does, and says so on its status
-line; agents connected to magpie lose it when it quits.
+and there is a terminal version (`blackpie tui`) and a plain CLI. The
+terminal version serves the gateway while it is open when no other blackpie
+(the app, `blackpie web`, `blackpie serve`) does, and says so on its status
+line; agents connected to blackpie lose it when it quits.
 
 ```
-  ◉ magpie
+  ◉ blackpie
 
   ▸ Claude Code   claude-fable-5-1[1m]                        ~/.claude/settings.json
     Codex         gpt-6-astra   effort medium
@@ -43,11 +41,11 @@ line; agents connected to magpie lose it when it quits.
 - **Edits config files surgically.** Only the one key you change is touched;
   comments, ordering and indentation in your `settings.json`, `config.toml`,
   `opencode.jsonc` or `config.yaml` survive intact. Writes are atomic.
-- **One endpoint for every agent.** magpie runs a local gateway that speaks
+- **One endpoint for every agent.** blackpie runs a local gateway that speaks
   OpenAI chat completions, OpenAI Responses and the Anthropic Messages API,
   and forwards to whichever vendor serves the model. Codex, Claude Code,
   OpenCode and the rest all point at `http://127.0.0.1:3425/v1` and pick
-  from one catalog; the translation between APIs happens in magpie, streaming
+  from one catalog; the translation between APIs happens in blackpie, streaming
   and tool calls included.
 - **Your subscriptions, shared.** Sign in to Claude Code, Codex (ChatGPT)
   or Copilot and that login shows up as a provider: every other agent can
@@ -57,9 +55,9 @@ line; agents connected to magpie lose it when it quits.
   Amazon Bedrock and its Mantle endpoint, DeepSeek, Kimi, GLM, MiniMax, StepFun, Qwen, Baidu Qianfan, Tencent Cloud Token Plan,
   Huawei Cloud MaaS, Volcengine Ark, Mistral, Groq, Nous Portal, xAI, OpenRouter, Together,
   Fireworks, SiliconFlow, NVIDIA NIM, ModelScope, AiHubMix, PipeLLM, 302.AI, Ollama, LM Studio…),
-  paste a key, done. Custom vendors need a name and a base URL. magpie never
+  paste a key, done. Custom vendors need a name and a base URL. blackpie never
   reads keys from your shell environment.
-- **Real model lists, nothing compiled in.** With a key in hand magpie asks
+- **Real model lists, nothing compiled in.** With a key in hand blackpie asks
   the vendor which models it serves and offers exactly those; the
   [models.dev](https://models.dev) catalog fills in names, reasoning efforts
   and the list for vendors that have none (a model the vendor's own entry
@@ -76,12 +74,12 @@ line; agents connected to magpie lose it when it quits.
   "Only models I pick" switch turns the list around: the models ticked
   when it is switched on stay, and a model added later, of any provider,
   stays out of that agent's picker and its config until it is ticked
-  (`magpie visible <agent> --only-picked`, back with `--show-new`). A
+  (`blackpie visible <agent> --only-picked`, back with `--show-new`). A
   model asked for by name still works either way.
 - **Profiles.** Snapshot every agent's settings under a name and switch all of
   them back in one move. The profile in use, the one applying would change
   nothing, is ticked, the tray panel's Profiles button shows its name, and
-  `magpie profiles` marks it ✓.
+  `blackpie profiles` marks it ✓.
 - **Real logos, no framework.** Plain HTML over the system webview; brand
   icons from [lobehub/icons](https://github.com/lobehub/lobe-icons).
 
@@ -89,70 +87,70 @@ line; agents connected to magpie lose it when it quits.
 
 | Agent        | File                              | Fields          |
 | ------------ | --------------------------------- | --------------- |
-| Claude Code  | `~/.claude/settings.json`         | provider, model, opus/sonnet/haiku/fable, auto mode, sign-in (through magpie) |
-| Claude Desktop | `Claude/` + `Claude-3p/configLibrary/` in `~/Library/Application Support` (`%LOCALAPPDATA%` on Windows, `~/.config` on Linux). A Desktop installed as an MSIX package on Windows keeps them in its package instead (`%LOCALAPPDATA%\Packages\Claude_<publisher>\LocalCache\Local`, or `AnthropicPBC.Claude_<publisher>` for the Store's package, its own data in `LocalCache\Roaming\Claude`). Desktop 2.31226 and later, packaged, reads the real `%LOCALAPPDATA%\Claude-3p` instead, so for a packaged Desktop magpie writes both ([`desktopdir`](../internal/desktopdir/desktopdir.go)) | provider (its third-party gateway mode: Code and Cowork on magpie, no Anthropic sign-in; restart Desktop), opus/sonnet/haiku/fable, subagent model and subagent effort (magpie's settings, applied by the gateway to subagent tool turns; no restart) |
+| Claude Code  | `~/.claude/settings.json`         | provider, model, opus/sonnet/haiku/fable, auto mode, sign-in (through blackpie) |
+| Claude Desktop | `Claude/` + `Claude-3p/configLibrary/` in `~/Library/Application Support` (`%LOCALAPPDATA%` on Windows, `~/.config` on Linux). A Desktop installed as an MSIX package on Windows keeps them in its package instead (`%LOCALAPPDATA%\Packages\Claude_<publisher>\LocalCache\Local`, or `AnthropicPBC.Claude_<publisher>` for the Store's package, its own data in `LocalCache\Roaming\Claude`). Desktop 2.31226 and later, packaged, reads the real `%LOCALAPPDATA%\Claude-3p` instead, so for a packaged Desktop blackpie writes both ([`desktopdir`](../internal/desktopdir/desktopdir.go)) | provider (its third-party gateway mode: Code and Cowork on blackpie, no Anthropic sign-in; restart Desktop), opus/sonnet/haiku/fable, subagent model and subagent effort (blackpie's settings, applied by the gateway to subagent tool turns; no restart) |
 | Codex        | `~/.codex/config.toml`            | provider, model, effort |
 | Gemini CLI   | `~/.gemini/settings.json`, `~/.gemini/.env` | auth, model |
 | OpenCode     | `~/.config/opencode/opencode.json(c)` (`$OPENCODE_CONFIG_DIR`) | model, small |
-| OpenChamber  | `~/.config/openchamber/preferences.json` (`$OPENCHAMBER_DATA_DIR`; magpie's provider in OpenCode's config) | model, small (its own defaults, over OpenCode's) |
+| OpenChamber  | `~/.config/openchamber/preferences.json` (`$OPENCHAMBER_DATA_DIR`; blackpie's provider in OpenCode's config) | model, small (its own defaults, over OpenCode's) |
 | MiMo Code    | `~/.config/mimocode/mimocode.json(c)` | model, small |
-| DevEco Code  | `~/.config/deveco/deveco.json(c)` (`$DEVECO_CONFIG_DIR`; its key is `magpie-deveco`, as parts of it send OpenCode's User-Agent) | model, small |
+| DevEco Code  | `~/.config/deveco/deveco.json(c)` (`$DEVECO_CONFIG_DIR`; its key is `blackpie-deveco`, as parts of it send OpenCode's User-Agent) | model, small |
 | Pi           | `~/.pi/agent/settings.json`       | model           |
 | StepCode     | `~/.stepcode/config.toml` (+ `models.json`; `$STEP_CODING_AGENT_DIR`, `$STEPCODE_CONFIG_DIR`) | model |
-| MothX        | `~/.mothx/settings.json` (`$MOTHX_DIR`; `%APPDATA%\mothx` on Windows) | model, thinking (`defaultProvider`/`defaultModel`/`defaultThinkingLevel`; magpie as the provider `magpie` beside the user's own, `openai-chat` with `thinkingFormat: "openai"`) |
-| PenguinHarness | `~/.penguin/data/default_project/.project_config.toml` (`$PENGUIN_HOME`, `$PENGUIN_PROJECT_ID`; the same on Windows) | model (`default_model`; magpie as `[providers.magpie]`, `openai-responses`, and its models as `[[models]]` entries of that provider) |
-| Aside        | `~/.aside/u/0/settings.json` (+ `models.json`; the first account, the only one magpie wires) | model, effort, fast, standard, deep, visual, image |
+| MothX        | `~/.mothx/settings.json` (`$MOTHX_DIR`; `%APPDATA%\mothx` on Windows) | model, thinking (`defaultProvider`/`defaultModel`/`defaultThinkingLevel`; blackpie as the provider `blackpie` beside the user's own, `openai-chat` with `thinkingFormat: "openai"`) |
+| PenguinHarness | `~/.penguin/data/default_project/.project_config.toml` (`$PENGUIN_HOME`, `$PENGUIN_PROJECT_ID`; the same on Windows) | model (`default_model`; blackpie as `[providers.blackpie]`, `openai-responses`, and its models as `[[models]]` entries of that provider) |
+| Aside        | `~/.aside/u/0/settings.json` (+ `models.json`; the first account, the only one blackpie wires) | model, effort, fast, standard, deep, visual, image |
 | OmO (omo-ai) | `~/.omo/agent/settings.json` (+ `models.json`; `$OMO_CODING_AGENT_DIR`, `$SENPI_CODING_AGENT_DIR`) | model |
-| Prime Agent  | `~/.prime/agent/settings.json` (+ `models.json`; `$PRIME_AGENT_CODING_AGENT_DIR`) | model, thinking (Pi's fields; its key `magpie-prime-agent` names it, since its requests carry no User-Agent; the global settings alone, `allowedModels` and `subagentDefaultModel` left as they are) |
+| Prime Agent  | `~/.prime/agent/settings.json` (+ `models.json`; `$PRIME_AGENT_CODING_AGENT_DIR`) | model, thinking (Pi's fields; its key `blackpie-prime-agent` names it, since its requests carry no User-Agent; the global settings alone, `allowedModels` and `subagentDefaultModel` left as they are) |
 | Goose        | `~/.config/goose/config.yaml`     | model           |
 | Cursor CLI   | `~/.cursor/cli-config.json`       | model           |
-| Zed          | `~/.config/zed/settings.json` (`$XDG_CONFIG_HOME` on Linux, `%APPDATA%\Zed` on Windows) | model (a `magpie` OpenAI-compatible provider; its catalog in Zed's picker) |
-| VS Code (Chat) | `~/Library/Application Support/Code/User/settings.json` + `chatLanguageModels.json` (`~/.config/Code/User` on Linux, `%APPDATA%\Code\User` on Windows) | model (`chat.defaultModel`; a `magpie` Custom Endpoint group, its catalog in Chat's model picker; VS Code 1.122+, no Copilot sign-in or key needed). Each profile's own pair under `User/profiles/<id>/` (listed in `globalStorage/storage.json`) gets the same, unless the profile uses the default's |
-| VS Code Insiders (Chat) | the same files under `Code - Insiders/User` in place of `Code/User` | as VS Code, a row of its own; its models send the token `magpie-vscode-insiders`, since its chat's User-Agent is VS Code's |
-| VSCodium (Chat) | the same files under `VSCodium/User` in place of `Code/User` | as VS Code, a row of its own; its models send the token `magpie-vscodium`, so Usage counts them as VSCodium; its Chat features must be turned on (`chat.disableAIFeatures=false`, and `defaultChatAgent` plus `trustedExtensionAuthAccess` for GitHub.copilot-chat in its product.json). With the Marketplace's GitHub Copilot Chat 0.48.1, which has no Custom Endpoint provider, the group is written for its OpenAI Compatible provider (`customoai`, the token sent as `x-api-key`), which lists models only while Copilot Chat is signed in to GitHub with a personal Copilot plan |
-| Zoo Code (VS Code) | VS Code's `Code/User/settings.json` (and each profile's): `zoo-code.autoImportSettingsPath` names `globalStorage/zoocodeorganization.zoo-code/settings/magpie-import.json` beside it | model (one provider profile `magpie`, OpenAI Compatible, imported by Zoo Code at start-up) |
-| Copilot (JetBrains) | `byok.json` in `~/.config/github-copilot` (`$XDG_CONFIG_HOME/github-copilot` when set, `%USERPROFILE%\AppData\Local\github-copilot` on Windows), the Copilot language server's own file, which Xcode's and Eclipse's Copilot read too | provider (a `magpie` custom endpoint provider beside the user's: every magpie model at the gateway's `/v1/chat/completions`, sent with `magpie-copilot-jetbrains`; a model hidden in Manage Models stays hidden through a sync; off removes magpie's three keys alone). Found by the `github-copilot-intellij` plugin in a JetBrains IDE or Android Studio. Listed after the IDE restarts, and only while Copilot is signed in to GitHub on a plan with Bring Your Own Key (Free, Pro, Pro+; Business and Enterprise when the organisation allows it); the model is picked in Copilot Chat |
-| JetBrains Air | `acp.json` in `~/Library/Application Support/JetBrains/Air` (`~/.config/JetBrains/Air` on Linux, `%APPDATA%\JetBrains\Air` on Windows) + `magpie-opencode.json` beside it | model (a `Magpie` ACP agent: OpenCode's `opencode acp` on magpie's provider alone, its models and routing groups in Air's model menu; needs OpenCode installed) |
+| Zed          | `~/.config/zed/settings.json` (`$XDG_CONFIG_HOME` on Linux, `%APPDATA%\Zed` on Windows) | model (a `blackpie` OpenAI-compatible provider; its catalog in Zed's picker) |
+| VS Code (Chat) | `~/Library/Application Support/Code/User/settings.json` + `chatLanguageModels.json` (`~/.config/Code/User` on Linux, `%APPDATA%\Code\User` on Windows) | model (`chat.defaultModel`; a `blackpie` Custom Endpoint group, its catalog in Chat's model picker; VS Code 1.122+, no Copilot sign-in or key needed). Each profile's own pair under `User/profiles/<id>/` (listed in `globalStorage/storage.json`) gets the same, unless the profile uses the default's |
+| VS Code Insiders (Chat) | the same files under `Code - Insiders/User` in place of `Code/User` | as VS Code, a row of its own; its models send the token `blackpie-vscode-insiders`, since its chat's User-Agent is VS Code's |
+| VSCodium (Chat) | the same files under `VSCodium/User` in place of `Code/User` | as VS Code, a row of its own; its models send the token `blackpie-vscodium`, so Usage counts them as VSCodium; its Chat features must be turned on (`chat.disableAIFeatures=false`, and `defaultChatAgent` plus `trustedExtensionAuthAccess` for GitHub.copilot-chat in its product.json). With the Marketplace's GitHub Copilot Chat 0.48.1, which has no Custom Endpoint provider, the group is written for its OpenAI Compatible provider (`customoai`, the token sent as `x-api-key`), which lists models only while Copilot Chat is signed in to GitHub with a personal Copilot plan |
+| Zoo Code (VS Code) | VS Code's `Code/User/settings.json` (and each profile's): `zoo-code.autoImportSettingsPath` names `globalStorage/zoocodeorganization.zoo-code/settings/blackpie-import.json` beside it | model (one provider profile `blackpie`, OpenAI Compatible, imported by Zoo Code at start-up) |
+| Copilot (JetBrains) | `byok.json` in `~/.config/github-copilot` (`$XDG_CONFIG_HOME/github-copilot` when set, `%USERPROFILE%\AppData\Local\github-copilot` on Windows), the Copilot language server's own file, which Xcode's and Eclipse's Copilot read too | provider (a `blackpie` custom endpoint provider beside the user's: every blackpie model at the gateway's `/v1/chat/completions`, sent with `blackpie-copilot-jetbrains`; a model hidden in Manage Models stays hidden through a sync; off removes blackpie's three keys alone). Found by the `github-copilot-intellij` plugin in a JetBrains IDE or Android Studio. Listed after the IDE restarts, and only while Copilot is signed in to GitHub on a plan with Bring Your Own Key (Free, Pro, Pro+; Business and Enterprise when the organisation allows it); the model is picked in Copilot Chat |
+| JetBrains Air | `acp.json` in `~/Library/Application Support/JetBrains/Air` (`~/.config/JetBrains/Air` on Linux, `%APPDATA%\JetBrains\Air` on Windows) + `blackpie-opencode.json` beside it | model (a `Blackpie` ACP agent: OpenCode's `opencode acp` on blackpie's provider alone, its models and routing groups in Air's model menu; needs OpenCode installed) |
 | Copilot CLI  | `~/.copilot/settings.json`        | model           |
 | Crush        | `~/.config/crush/crush.json`      | large, small    |
-| DeepSeek Harness (dsh) | `~/.dsh/profiles/*/cordis.patch.yml` (`$DSH_HOME`; a custom provider, Magpie, its key `MAGPIE_GATEWAY_KEY` in `~/.dsh/.env` and dsh's own key store `~/.dsh/.credentials.yaml`, which the desktop app reads; on one of magpie's models its `web-search-deepseek` row also goes to the gateway, which searches with the model or Settings › Web search, unless dsh has a `DEEPSEEK_API_KEY` or a row of your own), or `~/.dsh/config.yaml` before dsh 0.1.5 | model, effort |
-| Reasonix Studio (2.x, or a native Go `reasonix` 2.x / 1.39.x CLI) | `~/.reasonix/config.toml` + `.env` (`%APPDATA%/reasonix` on Windows; `$REASONIX_HOME`) | model (Executor), planner (Plan), effort (a dedicated `magpie` provider, shared by Studio and the native CLI) |
+| DeepSeek Harness (dsh) | `~/.dsh/profiles/*/cordis.patch.yml` (`$DSH_HOME`; a custom provider, Blackpie, its key `BLACKPIE_GATEWAY_KEY` in `~/.dsh/.env` and dsh's own key store `~/.dsh/.credentials.yaml`, which the desktop app reads; on one of blackpie's models its `web-search-deepseek` row also goes to the gateway, which searches with the model or Settings › Web search, unless dsh has a `DEEPSEEK_API_KEY` or a row of your own), or `~/.dsh/config.yaml` before dsh 0.1.5 | model, effort |
+| Reasonix Studio (2.x, or a native Go `reasonix` 2.x / 1.39.x CLI) | `~/.reasonix/config.toml` + `.env` (`%APPDATA%/reasonix` on Windows; `$REASONIX_HOME`) | model (Executor), planner (Plan), effort (a dedicated `blackpie` provider, shared by Studio and the native CLI) |
 | Command Code | `~/.commandcode/settings.json` (+ `providers.json`) | model |
-| fx           | `~/.fx/settings.json`             | model (a keyless `magpie` provider) |
+| fx           | `~/.fx/settings.json`             | model (a keyless `blackpie` provider) |
 | omp (oh-my-pi) | `~/.omp/agent/config.yml` (+ `models.yml`) | model |
 | Devin        | `~/.config/devin/config.json` (`%APPDATA%\devin\config.json` on Windows) | model |
 | Hermes Agent | `~/.hermes/config.yaml` (`%LOCALAPPDATA%\hermes` on Windows; `$HERMES_HOME`), and each profile's under `profiles/` | model |
 | Mister Morph | `~/.morph/config.yaml` (`$MISTER_MORPH_CONFIG`) | model, effort (`llm` on the gateway as `openai_response_compatible`, the Responses API; what it had comes back when you switch away) |
-| Kimi Code    | `~/.kimi/config.toml` (`$KIMI_SHARE_DIR`) | model (a `magpie` provider; magpie's models in Kimi's /model) |
-| Qwen Code    | `~/.qwen/settings.json` (`$QWEN_HOME`) | model (magpie's models as `modelProviders.openai` entries on a `MAGPIE_QWEN_API_KEY` env var; settings.model; `security.auth.selectedType` openai while wired) |
-| Muse Code    | `~/.config/muse/settings.json` (`$XDG_CONFIG_HOME`) | model (endpoint_transport to the gateway, auth none; magpie's models in Muse's list) |
-| Empryo       | `~/.empryo/config.json` | defaultModel (a `magpie` provider at the gateway in `providers`) |
-| Ante         | `~/.ante/catalog.json` and `settings.json` (`$ANTE_HOME`) | provider, model (a `magpie` provider on OpenAiCompatible, with no auth of magpie's: the gateway lets this machine in with any token and Ante counts a provider with none as authenticated; magpie's models in Ante's model picker, and Ante started on magpie, which is what its settings' `provider` decides) |
-| AstrBot      | `data/cmd_config.json` under `$ASTRBOT_ROOT`, else `~/.astrbot` (the desktop app's) | model (a `magpie` entry in `provider_sources` and magpie's models in `provider`, the user's own entries kept; the default chat model in `agent_runner.config.model.provider_id`, or `provider_settings.default_provider_id` on AstrBot before 4.28's agent runner; restart AstrBot after connecting; Docker installs aren't reached) |
-| QwenPaw      | each agent's `agent.json` in its workspace (`~/.qwenpaw/workspaces/<agent>`, the agents listed in `config.json`), under `$QWENPAW_WORKING_DIR`, else a legacy `~/.copaw`, else `~/.qwenpaw` | model (a `magpie` custom provider in `providers/custom/magpie.json` under QwenPaw's secret folder, `$QWENPAW_SECRET_DIR` or `~/.qwenpaw.secret`, OpenAI Chat at the gateway with magpie's models; the agent's `active_model` set to it, what was there put back on Disconnect; one row per agent, `qwenpaw` the default and `qwenpaw#<id>` the others; an agent on an ACP backend isn't listed; restart QwenPaw after the first connect), effort (the agent's `thinking_level`; magpie's models with reasoning levels are declared `thinking_param_style: "effort"` so QwenPaw applies it) |
-| OpenClaw     | `openclaw.json` in `~/.openclaw` (`$OPENCLAW_CONFIG_PATH`, `$OPENCLAW_STATE_DIR`, `~/.openclaw-<profile>` for `$OPENCLAW_PROFILE`, `~` as `$OPENCLAW_HOME`) | model (a `magpie` provider in `models.providers`, `openai-completions`, with magpie's models in it; `agents.defaults.model`'s primary set to it, what was there put back on Disconnect; `magpie/*` added to a `modelPolicy.allow` that would refuse it; the user's own keys in the provider and its models kept; a chat already on a model keeps it until `/model default`) |
-| jcode        | `config.toml` in `$JCODE_HOME`, else `~/.jcode` | model (a `[providers.magpie]` profile, `openai-compatible`, with magpie's models in it; `[provider] default_provider`/`default_model` set to it, what was there put back on Disconnect; the user's own keys in the profile, such as `headers` and a model's `reasoning_effort`, kept; restart open jcode sessions after connecting) |
-| MiniMax Code (mcode) | `~/.minimax/config.yaml` (`$MINIMAX_DATA_DIR`) | model (a `magpie` custom provider; magpie's models in its /model) |
-| Droid (Factory) | `~/.factory/settings.json` (`$FACTORY_HOME_OVERRIDE`) | model (magpie's models as BYOK `customModels`, in Droid's /model) |
-| Cline (CLI)  | `~/.cline/data/settings/providers.json` (`$CLINE_DIR`) | model, effort (magpie takes its openai-compatible provider) |
-| Qoder (CLI)  | `~/.qoder/settings.json` (`$QODER_CONFIG_DIR`) | model, effort (a `magpie` custom provider; needs a Qoder plan with BYOK) |
+| Kimi Code    | `~/.kimi/config.toml` (`$KIMI_SHARE_DIR`) | model (a `blackpie` provider; blackpie's models in Kimi's /model) |
+| Qwen Code    | `~/.qwen/settings.json` (`$QWEN_HOME`) | model (blackpie's models as `modelProviders.openai` entries on a `BLACKPIE_QWEN_API_KEY` env var; settings.model; `security.auth.selectedType` openai while wired) |
+| Muse Code    | `~/.config/muse/settings.json` (`$XDG_CONFIG_HOME`) | model (endpoint_transport to the gateway, auth none; blackpie's models in Muse's list) |
+| Empryo       | `~/.empryo/config.json` | defaultModel (a `blackpie` provider at the gateway in `providers`) |
+| Ante         | `~/.ante/catalog.json` and `settings.json` (`$ANTE_HOME`) | provider, model (a `blackpie` provider on OpenAiCompatible, with no auth of blackpie's: the gateway lets this machine in with any token and Ante counts a provider with none as authenticated; blackpie's models in Ante's model picker, and Ante started on blackpie, which is what its settings' `provider` decides) |
+| AstrBot      | `data/cmd_config.json` under `$ASTRBOT_ROOT`, else `~/.astrbot` (the desktop app's) | model (a `blackpie` entry in `provider_sources` and blackpie's models in `provider`, the user's own entries kept; the default chat model in `agent_runner.config.model.provider_id`, or `provider_settings.default_provider_id` on AstrBot before 4.28's agent runner; restart AstrBot after connecting; Docker installs aren't reached) |
+| QwenPaw      | each agent's `agent.json` in its workspace (`~/.qwenpaw/workspaces/<agent>`, the agents listed in `config.json`), under `$QWENPAW_WORKING_DIR`, else a legacy `~/.copaw`, else `~/.qwenpaw` | model (a `blackpie` custom provider in `providers/custom/blackpie.json` under QwenPaw's secret folder, `$QWENPAW_SECRET_DIR` or `~/.qwenpaw.secret`, OpenAI Chat at the gateway with blackpie's models; the agent's `active_model` set to it, what was there put back on Disconnect; one row per agent, `qwenpaw` the default and `qwenpaw#<id>` the others; an agent on an ACP backend isn't listed; restart QwenPaw after the first connect), effort (the agent's `thinking_level`; blackpie's models with reasoning levels are declared `thinking_param_style: "effort"` so QwenPaw applies it) |
+| OpenClaw     | `openclaw.json` in `~/.openclaw` (`$OPENCLAW_CONFIG_PATH`, `$OPENCLAW_STATE_DIR`, `~/.openclaw-<profile>` for `$OPENCLAW_PROFILE`, `~` as `$OPENCLAW_HOME`) | model (a `blackpie` provider in `models.providers`, `openai-completions`, with blackpie's models in it; `agents.defaults.model`'s primary set to it, what was there put back on Disconnect; `blackpie/*` added to a `modelPolicy.allow` that would refuse it; the user's own keys in the provider and its models kept; a chat already on a model keeps it until `/model default`) |
+| jcode        | `config.toml` in `$JCODE_HOME`, else `~/.jcode` | model (a `[providers.blackpie]` profile, `openai-compatible`, with blackpie's models in it; `[provider] default_provider`/`default_model` set to it, what was there put back on Disconnect; the user's own keys in the profile, such as `headers` and a model's `reasoning_effort`, kept; restart open jcode sessions after connecting) |
+| MiniMax Code (mcode) | `~/.minimax/config.yaml` (`$MINIMAX_DATA_DIR`) | model (a `blackpie` custom provider; blackpie's models in its /model) |
+| Droid (Factory) | `~/.factory/settings.json` (`$FACTORY_HOME_OVERRIDE`) | model (blackpie's models as BYOK `customModels`, in Droid's /model) |
+| Cline (CLI)  | `~/.cline/data/settings/providers.json` (`$CLINE_DIR`) | model, effort (blackpie takes its openai-compatible provider) |
+| Qoder (CLI)  | `~/.qoder/settings.json` (`$QODER_CONFIG_DIR`) | model, effort (a `blackpie` custom provider; needs a Qoder plan with BYOK) |
 | Qoder CN (CLI) | `~/.qoder-cn/settings.json` (`$QODERCN_CONFIG_DIR`) | model, effort (as Qoder; its own accounts, a Qoder CN plan with BYOK) |
 | Grok Build   | `~/.grok/config.toml` (`$GROK_HOME`) | model, effort |
-| Grok App     | `agent-home/config.toml` in its data folder (`$GROK_APP_HOME`, else `~/Library/Application Support/com.grokapp.grok-app`, `%APPDATA%\grokapp\grok-app\data`, `$XDG_DATA_HOME/grok-app`, or `~/.grok-app`) | model (a `[model.magpie]` custom provider under Accounts, with magpie's models and their effort levels in `app_models`; the route, `[models] default`, stays until the user presses Use on magpie there (one of the App's own routes picked in magpie is written as the route, and magpie's channel goes); a route an older magpie set to `magpie` is put back once; Disconnect drops the channel and puts the route back only if it is still `magpie`, else the one it was on before Connect if none is left; a model or default effort picked in the App kept; instructions, MCP and skills are the Library's Grok App row on agent-home; RTK has no hook for it or for Grok Build) |
-| ZCode        | `~/.zcode/v2/provider_config.json` and `config.json`, under the data folder moved in ZCode's settings (`dataBaseDir`); `~` is `$HOME` when set, on Windows too, as ZCode reads it before `%USERPROFILE%` | provider (magpie's models in ZCode's picker) |
-| WorkBuddy    | `~/.workbuddy/models.json` (`$WORKBUDDY_CONFIG_DIR`) | provider (magpie's models in WorkBuddy's picker) |
-| WorkBuddy AI | `~/.workbuddy-ai/models.json` (the international build) | provider (magpie's models in WorkBuddy AI's picker) |
-| CodeBuddy (CodeBuddy Code CLI, CodeBuddy IDE) | `~/.codebuddy/models.json` (`$CODEBUDDY_CONFIG_DIR` for the CLI), `settings.json` | model (magpie's models in its list; the CLI session's model; the IDE picks from the list) |
-| Raycast      | `~/.config/raycast/ai/providers.yaml` in the user's folder, on Mac and Windows | provider (a `magpie` entry in Raycast AI's Custom Providers, magpie's models in its model picker; Raycast Pro; the user's providers, `tools` and comments kept) |
-| Kiro Crew    | `~/.kiro/crew/config.json` (`$KIROCREW_HOME`; `config.local.json` over it is left alone) | provider, harness (`agent.acp_backend`, and `agent.member_acp_backend` for a harness that can dispatch: an agent connected to magpie, so its models are magpie's: the one Crew is set to is connected along with it when it isn't yet, and disconnected with it again; the user's value is put back on Disconnect) |
-| OpenPencil   | `openpencil/settings.json` in the config folder: `~/Library/Application Support` (macOS), `$XDG_CONFIG_HOME` or `~/.config` (Linux), `%APPDATA%` (Windows) | provider (a `magpie` entry in its `builtin_agents`, magpie's models in its chat's model picker; the user's entries and settings kept; refused while OpenPencil runs, as it writes the file back when it quits) |
-| NewMax       | `newmax.db` (SQLite, the row `app` of its `settings` table) in `$NEWMAX_USER_DATA_DIR`, else `~/.newmax` (every OS) | provider (a `magpie-gateway` entry in its `providers` and `providerOrder`, magpie's models in its model picker; the rest of the row kept byte for byte; refused while NewMax runs, as it writes its settings back whenever one changes) |
-| T3 Code      | `~/.t3/userdata/settings.json` (`$T3CODE_HOME/userdata`) | provider (a `magpie` provider instance on Claude Code, magpie's models as its custom models; a `magpie-codex` instance on Codex, whose `launchArgs` are Codex's own `-c` overrides to magpie and a `magpie-codex-models.json` catalog beside the settings. The harness is picked in T3's model picker) |
-| OpenHanako   | `~/.hanako/provider-catalog.json` + `agents/<id>/config.yaml` (`$HANA_HOME`; its local API while it runs) | model (the primary agent's; magpie's models as a provider) |
-| AtomCode     | `~/.atomcode/config.toml` (`$ATOMCODE_HOME`) | model, effort (a `magpie` provider account, one model table per catalog model as its own sign-in writes) |
-| Snow CLI     | `~/.snow/profiles/magpie.json` (`$SNOW_CONFIG_DIR`), made the active profile and copied to `config.json` | model (the user's other profiles' models too; Snow App takes the profile in with "Sync Snow CLI API config") |
-| Alma         | Alma's local API (`localhost:23001`, while Alma runs; alma-server's data in `$ALMA_DATA_DIR`, `$XDG_DATA_HOME/alma` or `~/.local/share/alma` on Linux) | model (Alma's default; magpie's models as a provider), and Image Generation's model when it is Auto: the one magpie draws with |
-| Lody | Its own confirmation dialog (`lody://provider/import`) | adds selected Claude, Codex, Pi, DSH, Kimi Code, Grok and Bub Providers on the local machine; no settings edited by magpie |
+| Grok App     | `agent-home/config.toml` in its data folder (`$GROK_APP_HOME`, else `~/Library/Application Support/com.grokapp.grok-app`, `%APPDATA%\grokapp\grok-app\data`, `$XDG_DATA_HOME/grok-app`, or `~/.grok-app`) | model (a `[model.blackpie]` custom provider under Accounts, with blackpie's models and their effort levels in `app_models`; the route, `[models] default`, stays until the user presses Use on blackpie there (one of the App's own routes picked in blackpie is written as the route, and blackpie's channel goes); a route an older blackpie set to `blackpie` is put back once; Disconnect drops the channel and puts the route back only if it is still `blackpie`, else the one it was on before Connect if none is left; a model or default effort picked in the App kept; instructions, MCP and skills are the Library's Grok App row on agent-home; RTK has no hook for it or for Grok Build) |
+| ZCode        | `~/.zcode/v2/provider_config.json` and `config.json`, under the data folder moved in ZCode's settings (`dataBaseDir`); `~` is `$HOME` when set, on Windows too, as ZCode reads it before `%USERPROFILE%` | provider (blackpie's models in ZCode's picker) |
+| WorkBuddy    | `~/.workbuddy/models.json` (`$WORKBUDDY_CONFIG_DIR`) | provider (blackpie's models in WorkBuddy's picker) |
+| WorkBuddy AI | `~/.workbuddy-ai/models.json` (the international build) | provider (blackpie's models in WorkBuddy AI's picker) |
+| CodeBuddy (CodeBuddy Code CLI, CodeBuddy IDE) | `~/.codebuddy/models.json` (`$CODEBUDDY_CONFIG_DIR` for the CLI), `settings.json` | model (blackpie's models in its list; the CLI session's model; the IDE picks from the list) |
+| Raycast      | `~/.config/raycast/ai/providers.yaml` in the user's folder, on Mac and Windows | provider (a `blackpie` entry in Raycast AI's Custom Providers, blackpie's models in its model picker; Raycast Pro; the user's providers, `tools` and comments kept) |
+| Kiro Crew    | `~/.kiro/crew/config.json` (`$KIROCREW_HOME`; `config.local.json` over it is left alone) | provider, harness (`agent.acp_backend`, and `agent.member_acp_backend` for a harness that can dispatch: an agent connected to blackpie, so its models are blackpie's: the one Crew is set to is connected along with it when it isn't yet, and disconnected with it again; the user's value is put back on Disconnect) |
+| OpenPencil   | `openpencil/settings.json` in the config folder: `~/Library/Application Support` (macOS), `$XDG_CONFIG_HOME` or `~/.config` (Linux), `%APPDATA%` (Windows) | provider (a `blackpie` entry in its `builtin_agents`, blackpie's models in its chat's model picker; the user's entries and settings kept; refused while OpenPencil runs, as it writes the file back when it quits) |
+| NewMax       | `newmax.db` (SQLite, the row `app` of its `settings` table) in `$NEWMAX_USER_DATA_DIR`, else `~/.newmax` (every OS) | provider (a `blackpie-gateway` entry in its `providers` and `providerOrder`, blackpie's models in its model picker; the rest of the row kept byte for byte; refused while NewMax runs, as it writes its settings back whenever one changes) |
+| T3 Code      | `~/.t3/userdata/settings.json` (`$T3CODE_HOME/userdata`) | provider (a `blackpie` provider instance on Claude Code, blackpie's models as its custom models; a `blackpie-codex` instance on Codex, whose `launchArgs` are Codex's own `-c` overrides to blackpie and a `blackpie-codex-models.json` catalog beside the settings. The harness is picked in T3's model picker) |
+| OpenHanako   | `~/.hanako/provider-catalog.json` + `agents/<id>/config.yaml` (`$HANA_HOME`; its local API while it runs) | model (the primary agent's; blackpie's models as a provider) |
+| AtomCode     | `~/.atomcode/config.toml` (`$ATOMCODE_HOME`) | model, effort (a `blackpie` provider account, one model table per catalog model as its own sign-in writes) |
+| Snow CLI     | `~/.snow/profiles/blackpie.json` (`$SNOW_CONFIG_DIR`), made the active profile and copied to `config.json` | model (the user's other profiles' models too; Snow App takes the profile in with "Sync Snow CLI API config") |
+| Alma         | Alma's local API (`localhost:23001`, while Alma runs; alma-server's data in `$ALMA_DATA_DIR`, `$XDG_DATA_HOME/alma` or `~/.local/share/alma` on Linux) | model (Alma's default; blackpie's models as a provider), and Image Generation's model when it is Auto: the one blackpie draws with |
+| Lody | Its own confirmation dialog (`lody://provider/import`) | adds selected Claude, Codex, Pi, DSH, Kimi Code, Grok and Bub Providers on the local machine; no settings edited by blackpie |
 
 Provider-scoped agents (OpenCode, MiMo Code, DevEco Code, Pi, OmO, StepCode, MothX, PenguinHarness, Aside, Goose, Crush, omp, Hermes Agent) take `provider/model`.
 Only agents that are installed or configured are shown.
@@ -161,17 +159,17 @@ Only agents that are installed or configured are shown.
 
 #### StepCode
 
-StepCode is configured via [`stepcode.go`](../internal/agent/stepcode.go). Magpie manages global `defaultProvider` and `defaultModel` in `~/.stepcode/config.toml` (or the parent of an absolute `STEP_CODING_AGENT_DIR`) and writes its catalog into `~/.stepcode/models.json` using Pi's provider format. Magpie only manages model selection; StepCode controls thinking levels itself. Project-local `.stepcode/config.toml` overlays take precedence over global settings. Restart StepCode or begin a new session after changing models. Detection is strictly directory-based (`~/.stepcode`), so having Smallstep's unrelated `step` certificate CLI on `PATH` is never mistaken for StepCode.
+StepCode is configured via [`stepcode.go`](../internal/agent/stepcode.go). Blackpie manages global `defaultProvider` and `defaultModel` in `~/.stepcode/config.toml` (or the parent of an absolute `STEP_CODING_AGENT_DIR`) and writes its catalog into `~/.stepcode/models.json` using Pi's provider format. Blackpie only manages model selection; StepCode controls thinking levels itself. Project-local `.stepcode/config.toml` overlays take precedence over global settings. Restart StepCode or begin a new session after changing models. Detection is strictly directory-based (`~/.stepcode`), so having Smallstep's unrelated `step` certificate CLI on `PATH` is never mistaken for StepCode.
 
-The optional real CLI verification test is run with `MAGPIE_TEST_STEPCODE_BIN=/path/to/step go test ./internal/agent -run '^TestStepCodeRealCLISandbox$' -count=1`. It runs StepCode in an isolated temporary sandbox with telemetry disabled and without live credentials.
+The optional real CLI verification test is run with `BLACKPIE_TEST_STEPCODE_BIN=/path/to/step go test ./internal/agent -run '^TestStepCodeRealCLISandbox$' -count=1`. It runs StepCode in an isolated temporary sandbox with telemetry disabled and without live credentials.
 
 #### MothX
 
-MothX (oschina/mothx, formerly vibecoding) is configured via [`mothx.go`](../internal/agent/mothx.go). Magpie writes its provider `magpie` into `providers` in MothX's global `settings.json` (`$MOTHX_DIR`, else `%APPDATA%\mothx` on Windows, else `~/.mothx`) and sets `defaultProvider`, `defaultModel` and `defaultThinkingLevel`. The provider uses `openai-chat` with `thinkingFormat: "openai"`, so a thinking level goes out as `reasoning_effort` for every model; without it MothX guesses Qwen's or DeepSeek's thinking fields from a model id. What the user adds to magpie's block (headers, a `thinkingFormat` of their own) stays. The key `magpie-mothx` names it, and so does its User-Agent (`Vibecoding Client/<version>`). A project's `.mothx/settings.json` overlays the global one and is left alone. MothX reads its settings at start-up, so restart open `mothx` sessions after a change. Disconnect puts `settings.json` back byte for byte when nothing else changed in it; when MothX or the user changed it meanwhile (its `/model` and `/statusline … global` write the whole file), Disconnect takes out only magpie's provider, its pick and a `providers` object it left empty.
+MothX (oschina/mothx, formerly vibecoding) is configured via [`mothx.go`](../internal/agent/mothx.go). Blackpie writes its provider `blackpie` into `providers` in MothX's global `settings.json` (`$MOTHX_DIR`, else `%APPDATA%\mothx` on Windows, else `~/.mothx`) and sets `defaultProvider`, `defaultModel` and `defaultThinkingLevel`. The provider uses `openai-chat` with `thinkingFormat: "openai"`, so a thinking level goes out as `reasoning_effort` for every model; without it MothX guesses Qwen's or DeepSeek's thinking fields from a model id. What the user adds to blackpie's block (headers, a `thinkingFormat` of their own) stays. The key `blackpie-mothx` names it, and so does its User-Agent (`Vibecoding Client/<version>`). A project's `.mothx/settings.json` overlays the global one and is left alone. MothX reads its settings at start-up, so restart open `mothx` sessions after a change. Disconnect puts `settings.json` back byte for byte when nothing else changed in it; when MothX or the user changed it meanwhile (its `/model` and `/statusline … global` write the whole file), Disconnect takes out only blackpie's provider, its pick and a `providers` object it left empty.
 
 #### PenguinHarness
 
-PenguinHarness (Prism-Shadow/penguin-harness, the `penguin` command, npm `@prismshadow/penguin-cli`) is configured via [`penguin.go`](../internal/agent/penguin.go). It keeps each Project's models in `<root>/<project>/.project_config.toml`, the root being `$PENGUIN_HOME`, else `~/.penguin/data` on every system, and the Project the CLI works in `$PENGUIN_PROJECT_ID`, else `default_project`. Magpie writes `[providers.magpie]` (`openai-responses`, so a thinking level goes out as `reasoning.effort`; the key `magpie-penguin` names it), one `[[models]]` entry per model of magpie's with its name, window, reply cap, whether it reads images and its price, and points `default_model` at one. The user's own models, the command policy and the rest stay. Penguin's server reads the file again when it changes, so no restart is needed; a sync with nothing new leaves the file alone. A file magpie made is private (0600), as Penguin keeps its own, and goes again on Disconnect; otherwise Disconnect takes out magpie's provider, its entries and a vision model among them, and puts back the user's own default. Its User-Agent is the OpenAI SDK's, so usage names it by its key. Installed with `curl -fsSL https://penguin.ooo/install.sh | sh` (`irm https://penguin.ooo/install.ps1 | iex` on Windows); an install.sh tarball updates with `penguin update --yes`, an npm one with npm.
+PenguinHarness (Prism-Shadow/penguin-harness, the `penguin` command, npm `@prismshadow/penguin-cli`) is configured via [`penguin.go`](../internal/agent/penguin.go). It keeps each Project's models in `<root>/<project>/.project_config.toml`, the root being `$PENGUIN_HOME`, else `~/.penguin/data` on every system, and the Project the CLI works in `$PENGUIN_PROJECT_ID`, else `default_project`. Blackpie writes `[providers.blackpie]` (`openai-responses`, so a thinking level goes out as `reasoning.effort`; the key `blackpie-penguin` names it), one `[[models]]` entry per model of blackpie's with its name, window, reply cap, whether it reads images and its price, and points `default_model` at one. The user's own models, the command policy and the rest stay. Penguin's server reads the file again when it changes, so no restart is needed; a sync with nothing new leaves the file alone. A file blackpie made is private (0600), as Penguin keeps its own, and goes again on Disconnect; otherwise Disconnect takes out blackpie's provider, its entries and a vision model among them, and puts back the user's own default. Its User-Agent is the OpenAI SDK's, so usage names it by its key. Installed with `curl -fsSL https://penguin.ooo/install.sh | sh` (`irm https://penguin.ooo/install.ps1 | iex` on Windows); an install.sh tarball updates with `penguin update --yes`, an npm one with npm.
 
 #### Reasonix Studio
 
@@ -181,35 +179,35 @@ do not count. Tested with
 [Studio 2.24.0](https://github.com/esengine/DeepSeek-Reasonix/releases/tag/studio-v2.24.0).
 
 Pick the Executor model in the app, or use
-`magpie reasonix magpie/deepseek/deepseek-chat` (`magpie reasonix
-magpie/group/code` for a routing group). Select Plan independently with
-`magpie reasonix planner magpie/deepseek/deepseek-chat`, or use `magpie reasonix
-planner off` to disable the separate planner. `magpie reasonix effort high` sets
-an advertised Executor reasoning level. `magpie reasonix default` restores the
-previous Executor selection; `magpie reasonix planner default` restores Plan.
-Magpie's provider and private `.env` key are removed when neither role needs
+`blackpie reasonix blackpie/deepseek/deepseek-chat` (`blackpie reasonix
+blackpie/group/code` for a routing group). Select Plan independently with
+`blackpie reasonix planner blackpie/deepseek/deepseek-chat`, or use `blackpie reasonix
+planner off` to disable the separate planner. `blackpie reasonix effort high` sets
+an advertised Executor reasoning level. `blackpie reasonix default` restores the
+previous Executor selection; `blackpie reasonix planner default` restores Plan.
+Blackpie's provider and private `.env` key are removed when neither role needs
 them. Restart Studio for new sessions; project/session overrides still take
 precedence. Other providers and credentials are preserved. A non-managed
-provider named `magpie` is a conflict, reported without overwriting it. Studio
+provider named `blackpie` is a conflict, reported without overwriting it. Studio
 and the native CLI share these files, so updating only Studio does not isolate
 their settings.
 
 The released-client stream/tool contract test is run with
-`MAGPIE_TEST_REASONIX_CLI=/path/to/reasonix go test ./internal/agent -run
+`BLACKPIE_TEST_REASONIX_CLI=/path/to/reasonix go test ./internal/agent -run
 '^TestReasonixStudioCLIIntegration$' -count=1`. It uses isolated settings and
 a local test upstream, with no vendor credentials.
 
 #### DeepSeek Harness: the DeepSeek row by hand
 
-Connecting dsh gives it magpie's own routes on dsh's pi-ai adapter
-(`magpie`, `magpie-responses`, `magpie-anthropic`). dsh's DeepSeek row
-(`llm-deepseek`, the `deepseek-official` route) is dsh's: magpie never
+Connecting dsh gives it blackpie's own routes on dsh's pi-ai adapter
+(`blackpie`, `blackpie-responses`, `blackpie-anthropic`). dsh's DeepSeek row
+(`llm-deepseek`, the `deepseek-official` route) is dsh's: blackpie never
 points it anywhere, and Disconnect leaves an entry of yours there alone.
 That row does more for DeepSeek's own models than pi-ai does: when dsh's
 prompt or tools change mid-session it adds the change to the history
 (`systemPromptUpdate: in-history`, `toolUpdate: addition-only`), so
 DeepSeek keeps its cache of what came before, and it uploads images
-through the Files API (#3298). To keep that and still go through magpie
+through the Files API (#3298). To keep that and still go through blackpie
 (usage, sessions, the accounts behind `deepseek/…`), point the row at
 the gateway yourself, in `~/.dsh/profiles/<profile>/cordis.patch.yml`
 (`desktop` for the app, `web` for `dsh web`, `headless`):
@@ -218,34 +216,34 @@ the gateway yourself, in `~/.dsh/profiles/<profile>/cordis.patch.yml`
 - id: llm-deepseek
   config:
     baseURL: http://127.0.0.1:3425
-    apiKeyEnv: MAGPIE_DS_KEY
+    apiKeyEnv: BLACKPIE_DS_KEY
     models:
       - id: deepseek/deepseek-flash
-        name: DeepSeek V4.1 Flash (magpie)
+        name: DeepSeek V4.1 Flash (blackpie)
         contextWindow: 1000000
         inputModalities: [text, image]
         systemPromptUpdate: in-history
         toolUpdate: addition-only
       - id: deepseek/deepseek-v4-pro
-        name: DeepSeek V4 Pro (magpie)
+        name: DeepSeek V4 Pro (blackpie)
         contextWindow: 1000000
 ```
 
 - `baseURL` is the gateway's root, with no `/anthropic`: llm-deepseek adds
   `/v1/messages` itself (`http://127.0.0.1:3425/v1` works too).
-- The model ids are magpie's (`magpie models`); dsh sends them as written and
-  magpie asks DeepSeek for its own name (`deepseek-flash`). A `models` list
+- The model ids are blackpie's (`blackpie models`); dsh sends them as written and
+  blackpie asks DeepSeek for its own name (`deepseek-flash`). A `models` list
   replaces llm-deepseek's defaults, which give the in-history updates to its
   own `deepseek-flash` entry only, so name them again on yours.
-- The key is the gateway's, not DeepSeek's: `magpie` on this computer, the
-  sharing key from another one. magpie sends DeepSeek your DeepSeek key from
+- The key is the gateway's, not DeepSeek's: `blackpie` on this computer, the
+  sharing key from another one. blackpie sends DeepSeek your DeepSeek key from
   the provider, as for any agent. Keep it under a name of your own
-  (`MAGPIE_DS_KEY`): `DEEPSEEK_API_KEY` is your DeepSeek key's, and magpie
-  takes `MAGPIE_GATEWAY_KEY` out on Disconnect. Export it, put it in
+  (`BLACKPIE_DS_KEY`): `DEEPSEEK_API_KEY` is your DeepSeek key's, and blackpie
+  takes `BLACKPIE_GATEWAY_KEY` out on Disconnect. Export it, put it in
   `~/.dsh/.env` (the CLI reads that), or enter it on the DeepSeek row in dsh's
   Models page (dsh's own key store, the one the desktop app reads).
-- Start sessions on the row's model in dsh. Picking a model for dsh in magpie
-  sets dsh's start on one of magpie's routes again.
+- Start sessions on the row's model in dsh. Picking a model for dsh in blackpie
+  sets dsh's start on one of blackpie's routes again.
 
 What goes through, tried with dsh 0.2.1-rc.2 (`dsh --profile headless`) and
 a DeepSeek API key: llm-deepseek's request reaches DeepSeek's Anthropic
@@ -254,100 +252,100 @@ message in the history, `tool_addition` blocks, the `anthropic-beta` header
 and its `dsh_session_log` and `dsh_plugin_packages` fields included. A system
 message added after two turns was followed and the turns before it were read
 from DeepSeek's cache. The session (`x-deepseek-harness-session-id`) and a
-compaction (`x-deepseek-harness-compact`) are recorded as on magpie's own
+compaction (`x-deepseek-harness-compact`) are recorded as on blackpie's own
 routes. Neither header, nor `x-deepseek-harness-user-id`, goes on to DeepSeek.
 
 What doesn't:
-- magpie has no Files API. llm-deepseek's upload to `/v1/files` is answered
+- blackpie has no Files API. llm-deepseek's upload to `/v1/files` is answered
   404, and it sends that request's images inline as base64 instead, every
   turn, up to `maxInlineRequestImageBytes` (20 MiB by default; past it dsh
   takes the oldest images out of the request), where Files would take
   128 MiB (`maxRequestFilesBytes`). Raise it in
   your entry for long sessions with many images, as in
   `maxInlineRequestImageBytes: 67108864`.
-- Keep the row on DeepSeek's own models. magpie passes llm-deepseek's fields
+- Keep the row on DeepSeek's own models. blackpie passes llm-deepseek's fields
   on as they are, `dsh_session_log` (dsh's log of the session) among them, so
   another provider's model on this row would be sent them too.
 
 #### VSCodium Chat
 
 VSCodium's Chat features are disabled by default. To use the Chat model
-picker with magpie, set `"chat.disableAIFeatures": false` in VSCodium's
+picker with blackpie, set `"chat.disableAIFeatures": false` in VSCodium's
 settings and add the `defaultChatAgent` and `trustedExtensionAuthAccess`
 entries required by [VSCodium's Copilot guide](https://github.com/VSCodium/vscodium/blob/master/docs/ext-github-copilot.md)
 to VSCodium's `product.json`. The guide also explains how to install a
 compatible GitHub Copilot Chat extension, since the Open VSX registry does
 not normally provide Microsoft's extension. Restart VSCodium, or run
-**Developer: Reload Window**, after changing these files. Magpie's models
-then appear under the `magpie` custom endpoint group.
+**Developer: Reload Window**, after changing these files. Blackpie's models
+then appear under the `blackpie` custom endpoint group.
 
 #### Zoo Code
 
 Zoo Code (the VS Code extension `ZooCodeOrganization.zoo-code`) keeps its
-provider profiles in VS Code's encrypted secret storage, which magpie can't
-write. Magpie uses Zoo Code's own `zoo-code.autoImportSettingsPath` setting
-instead: it writes a settings file, `magpie-import.json` in Zoo Code's
-`globalStorage/zoocodeorganization.zoo-code/settings` folder, with one OpenAI Compatible profile named `magpie` (the
-gateway's `/v1`, the key `magpie-zoo-code`, the model picked), and points the
+provider profiles in VS Code's encrypted secret storage, which blackpie can't
+write. Blackpie uses Zoo Code's own `zoo-code.autoImportSettingsPath` setting
+instead: it writes a settings file, `blackpie-import.json` in Zoo Code's
+`globalStorage/zoocodeorganization.zoo-code/settings` folder, with one OpenAI Compatible profile named `blackpie` (the
+gateway's `/v1`, the key `blackpie-zoo-code`, the model picked), and points the
 setting at it in VS Code's `settings.json` and each profile's. Zoo Code imports
 that file each time it starts, so run **Developer: Reload Window** after a
-change. While connected, every start switches Zoo Code back to the `magpie`
+change. While connected, every start switches Zoo Code back to the `blackpie`
 profile. Disconnect puts the setting back as it was and deletes the file, but
-the imported `magpie` profile stays in Zoo Code: pick another profile there, or
+the imported `blackpie` profile stays in Zoo Code: pick another profile there, or
 delete it in Zoo Code's settings. Only VS Code (Stable) is wired. Zoo Code for
 JetBrains starts its extension with an empty configuration, so the setting
 can't reach it there.
 
 #### Zed-compatible Agent paths
 
-Magpie can use a Zed-compatible fork or installation whose executable or
+Blackpie can use a Zed-compatible fork or installation whose executable or
 configuration directory is different from the upstream defaults. Set these
-variables before starting Magpie:
+variables before starting Blackpie:
 
 ```sh
-export MAGPIE_ZED_BIN=/Applications/ZedG.app/Contents/MacOS/zedg
-export MAGPIE_ZED_CONFIG_DIR="$HOME/.config/zed"
-export MAGPIE_ZED_PROCESS_NAMES=zedg,ZedG
-magpie serve
+export BLACKPIE_ZED_BIN=/Applications/ZedG.app/Contents/MacOS/zedg
+export BLACKPIE_ZED_CONFIG_DIR="$HOME/.config/zed"
+export BLACKPIE_ZED_PROCESS_NAMES=zedg,ZedG
+blackpie serve
 ```
 
-`MAGPIE_ZED_BIN` controls installation detection, `MAGPIE_ZED_CONFIG_DIR`
+`BLACKPIE_ZED_BIN` controls installation detection, `BLACKPIE_ZED_CONFIG_DIR`
 selects the directory containing `settings.json`, and
-`MAGPIE_ZED_PROCESS_NAMES` supplies comma-separated process names used for
+`BLACKPIE_ZED_PROCESS_NAMES` supplies comma-separated process names used for
 restart notices. The existing Zed configuration adapter is reused, so this is
 intended for forks that keep Zed's `settings.json` and Agent model schema, such
 as [ZedG](https://github.com/x6nux/zed-globalization). These variables affect
-the Magpie process in which they are set; put them in the service environment
-when running Magpie under systemd or Docker. They configure a Zed-compatible
-Agent on the same machine as Magpie; they do not discover or modify an Agent
+the Blackpie process in which they are set; put them in the service environment
+when running Blackpie under systemd or Docker. They configure a Zed-compatible
+Agent on the same machine as Blackpie; they do not discover or modify an Agent
 running on another host. On macOS, if the configured binary does not resolve to
-a `.app` bundle, Magpie falls back to the standard Zed application locations
+a `.app` bundle, Blackpie falls back to the standard Zed application locations
 when authorizing the gateway credential.
 
 ## Providers and the gateway
 
 Every model an agent can pick is spelled `provider/model` and served by
-magpie's gateway, so agents never hold vendor keys or vendor URLs. Add a
+blackpie's gateway, so agents never hold vendor keys or vendor URLs. Add a
 provider, and its models appear in every agent's picker:
 
 ```sh
-magpie presets                          # the vendors magpie knows, grouped: vendors, relays, local
-magpie provider add deepseek sk-…       # a preset needs only the key
-magpie provider add ollama              # local servers need none
-magpie provider add "My Relay" url=https://relay.example.com/v1 key=sk-… models=gpt-5.5,claude-sonnet-5
-magpie providers                        # host, key, exposed models, who uses what
-magpie provider deepseek                # one provider in detail
-magpie provider models deepseek         # re-fetch the vendor's list (add ids to choose which to expose)
-magpie provider models deepseek +deepseek-v4 -deepseek-chat   # expose one more, take one out; the rest stay
-magpie provider models deepseek a b c   # the whole list of models to expose, replacing it (all: the default)
-magpie provider refresh deepseek        # re-fetch it, and drop picks it no longer has (the TUI: m)
-magpie provider refresh-every relay 6h  # the gateway fetches its list every 6h (1d, 30m; off; at least 10m; a Remote magpie 10m unless set)
-magpie provider auto-include relay 'gpt-*' 're:claude-.*'  # a newly listed model these match is exposed (none clears)
-magpie provider test deepseek           # one tiny request per API, with latency
-magpie provider key deepseek sk-…       # replace the key
-magpie provider rm deepseek
-magpie models                           # the catalog agents see
-magpie claude deepseek/deepseek-chat    # use it
+blackpie presets                          # the vendors blackpie knows, grouped: vendors, relays, local
+blackpie provider add deepseek sk-…       # a preset needs only the key
+blackpie provider add ollama              # local servers need none
+blackpie provider add "My Relay" url=https://relay.example.com/v1 key=sk-… models=gpt-5.5,claude-sonnet-5
+blackpie providers                        # host, key, exposed models, who uses what
+blackpie provider deepseek                # one provider in detail
+blackpie provider models deepseek         # re-fetch the vendor's list (add ids to choose which to expose)
+blackpie provider models deepseek +deepseek-v4 -deepseek-chat   # expose one more, take one out; the rest stay
+blackpie provider models deepseek a b c   # the whole list of models to expose, replacing it (all: the default)
+blackpie provider refresh deepseek        # re-fetch it, and drop picks it no longer has (the TUI: m)
+blackpie provider refresh-every relay 6h  # the gateway fetches its list every 6h (1d, 30m; off; at least 10m; a Remote blackpie 10m unless set)
+blackpie provider auto-include relay 'gpt-*' 're:claude-.*'  # a newly listed model these match is exposed (none clears)
+blackpie provider test deepseek           # one tiny request per API, with latency
+blackpie provider key deepseek sk-…       # replace the key
+blackpie provider rm deepseek
+blackpie models                           # the catalog agents see
+blackpie claude deepseek/deepseek-chat    # use it
 ```
 
 Custom providers take `url=` (an OpenAI-compatible base), `anthropic=` (an
@@ -358,13 +356,13 @@ be overridden the same way.
 
 A model whose vendor answers that it is deprecated or retired (OpenCode
 Zen's 410 "Model exo-free has been deprecated.") leaves that provider's
-models in `magpie models`, `/v1/models` and every agent's list, even while
+models in `blackpie models`, `/v1/models` and every agent's list, even while
 the vendor's own list still names it. It comes back once a request for it
 as `provider/model` is answered, or after a week.
 
-`magpie provider set <id> header.<Name>=<value>` sends a header of your own
+`blackpie provider set <id> header.<Name>=<value>` sends a header of your own
 on every request to a key+URL provider (an empty value removes it; signed-in
-accounts ignore them). It replaces a header of the same name magpie would
+accounts ignore them). It replaces a header of the same name blackpie would
 send, except `anthropic-beta`, which is a list: your betas are added after
 the ones the agent asked for that request (Claude Code's, its 1M context's
 `context-1m-2025-08-07` for a `[1m]` model, fast mode's), each once. A beta
@@ -374,24 +372,24 @@ agent's; any other of yours is always sent. The beta of the agent's own
 sign-in (`oauth-2025-04-20`, which Claude Code signed in to claude.ai asks)
 never goes, as the sign-in never does; one you set yourself does.
 
-Requests go to a vendor with magpie's own User-Agent (`magpie/<version>`).
+Requests go to a vendor with blackpie's own User-Agent (`blackpie/<version>`).
 A coding plan that serves only the agents it names knows them by theirs:
-`magpie provider set <id> user-agent=agent` (the editor's "Send the
+`blackpie provider set <id> user-agent=agent` (the editor's "Send the
 agent's own User-Agent") sends a key+URL provider the User-Agent the agent
-sent magpie, as it sent it, on every API (chat, Anthropic, Responses,
+sent blackpie, as it sent it, on every API (chat, Anthropic, Responses,
 Gemini, count_tokens, embeddings, images, videos). A request the agent
-sent without one, and magpie's own (its classifier's, the image tool's),
-still go as magpie. A `header.User-Agent` you set wins over both.
-`user-agent=magpie` turns it off again; off is the default. A signed-in
-account, a plugin's and a vendor whose own client magpie goes as
-(OpenCode, Cline, Kilo, another magpie) keep the User-Agent their sign-in
+sent without one, and blackpie's own (its classifier's, the image tool's),
+still go as blackpie. A `header.User-Agent` you set wins over both.
+`user-agent=blackpie` turns it off again; off is the default. A signed-in
+account, a plugin's and a vendor whose own client blackpie goes as
+(OpenCode, Cline, Kilo, another blackpie) keep the User-Agent their sign-in
 sends, and don't take it.
 
-`magpie usage` (and `--csv`) takes `today`, `7d`, `30d` or `all`, each from a
+`blackpie usage` (and `--csv`) takes `today`, `7d`, `30d` or `all`, each from a
 local midnight, or a window ending now: `--last 24h` (any Go duration, `90m`)
 or `--days 1.5`; the CSV then holds that window's calls only (#2075).
 
-`magpie usage` also lists **upstream provider keys** to help check upstream bills.
+`blackpie usage` also lists **upstream provider keys** to help check upstream bills.
 Each request records the fingerprint and saved name of the key that actually
 served it, including image calls and account/key failover. The CSV adds
 `provider_key_id` and `provider_key_name`. JSON uses `providerKeyId` and `providerKeyName`, distinct from gateway caller
@@ -400,7 +398,7 @@ in usage records.
 Rotating the provider's first key does not move old usage to its replacement;
 deleted keys keep their historical identity. Older records appear as
 **key not recorded**, never inferred from today's configured key.
-These are upstream credentials, not keys clients use to call Magpie.
+These are upstream credentials, not keys clients use to call Blackpie.
 
 The CSV's `cache_write_tokens` is still every cache write; the two
 columns, `cache_write_5m_tokens` and `cache_write_1h_tokens`, split it by how
@@ -410,7 +408,7 @@ The app shows the split on a request's Cache and the usage tiles' tooltips.
 **Requests and failures** count requests, each once by how it ended: a
 request failed when the agent got an error. One that a later try answered
 (the next member of a group, another account) is not a failure; the Usage
-page, the Requests card, its rankings and group rows, and `magpie usage`
+page, the Requests card, its rankings and group rows, and `blackpie usage`
 count it as answered on a retry (`retried` in the JSON). On the Requests
 card each count is a button for its requests in the list below (the
 Failed and Retried filters, `failed=1` and `retried=1`). A try a vendor
@@ -426,13 +424,13 @@ vendor's reply said it ran at, empty when the reply doesn't say. The
 ChatGPT backend (Codex signed in with ChatGPT) says `auto` and `default`
 whether Fast ran or not, so from it those are left empty too. The JSON
 log keeps them as `tier_asked`, `tier_sent` and `tier_served`, and each
-try in `/v1/magpie/route` has `tier` and `tier_served`. The last column,
+try in `/v1/blackpie/route` has `tier` and `tier_served`. The last column,
 `upstream_stop`, is why the upstream said its reply ended, in its own
 words (`stop`, `tool_calls`, `end_turn`, a Responses reply's
 `completed`), empty when it said none. A request's row on the Requests
 page shows it as Upstream stop reason.
 
-**Output speed** (tok/s on the Usage and Routing pages, `magpie usage`) is
+**Output speed** (tok/s on the Usage and Routing pages, `blackpie usage`) is
 output tokens over the time after the first token, summed per request: the
 tokens of every timed request over the sum of their windows, so concurrent
 subagents never add up. A reply that reasoned counts only its answer, from its
@@ -482,7 +480,7 @@ a whole time: 1,000 tokens or more over a second or more. Under that the
 wait is too much of the time to tell anything, so an 11-token answer in
 2.75 s shows none, as an 815-token Claude Code reply does. Gateway rows and other agents' keep their own
 speed. A floor never mixes into a measured speed: the Speed trend and
-`magpie usage` count timed calls only.
+`blackpie usage` count timed calls only.
 
 A group's speed (a row of the Usage page's ranking, by model, provider or
 agent, its Output speed card, and the overview's lists) says how many
@@ -501,28 +499,28 @@ orders and bars a group by the figure it shows first (`usage.Totals`
 
 It lists **accounts** too: each Codex, Claude or other subscription account's
 tokens and cost, by the account that actually answered — the one that took
-over after a failover, the one `X-Magpie-Account` pinned. The account is named
+over after a failover, the one `X-Blackpie-Account` pinned. The account is named
 as the Routing view names it (its email or login, never a token); the CSV
-adds `provider_account` (JSON `providerAccount`), `magpie usage --csv
+adds `provider_account` (JSON `providerAccount`), `blackpie usage --csv
 --account <name>` keeps one account's calls, and the app's Usage page has an
 Accounts list and an Account filter on Requests. An older record names the
 account its call went out as when its host says so (`chatgpt.com as
 dee@example.com`); otherwise it appears as **account not recorded**, never
 inferred from today's sign-in. OTLP export never carries the account.
 
-One magpie can serve several computers (an office one, a personal one):
+One blackpie can serve several computers (an office one, a personal one):
 share it on the network (Gateway → Share on local network), and on each
-other computer add it as a **Remote magpie** — in the app's Add sheet, under
-its own heading, Another computer's magpie, after On this machine; on the
+other computer add it as a **Remote blackpie** — in the app's Add sheet, under
+its own heading, Another computer's blackpie, after On this machine; on the
 TUI's Providers page (`a`, then its address and key; `w` changes the address,
 `m` fetches its list again), or
-`magpie provider add remote-magpie sk-magpie-… url=http://192.168.1.20:3425 id=office`.
-Each computer's own magpie still wires its agents, while the providers,
+`blackpie provider add remote-blackpie sk-blackpie-… url=http://192.168.1.20:3425 id=office`.
+Each computer's own blackpie still wires its agents, while the providers,
 routing groups (`office/group/…`) and usage are the shared one's. A request
 goes on in the API the agent spoke — Anthropic Messages, Responses, Chat
-Completions, token counting — and a model the shared magpie's provider serves
+Completions, token counting — and a model the shared blackpie's provider serves
 on another API only is turned into that API once, never on both computers.
-Its list is the models the shared magpie's agents are shown, each named with
+Its list is the models the shared blackpie's agents are shown, each named with
 its provider there (`Claude Sonnet 5 · Relay A · office`) — the ids stay ids
 (`office/relay-a/claude-sonnet-5`), only these labels carry the names.
 Its image and video models are discovered automatically and served through
@@ -541,12 +539,12 @@ The remote must serve the requested API and model, and allow the supplied
 key to use them. Responses uses HTTP, including SSE, rather than WebSocket.
 An older remote without decision-model discovery still serves its existing
 APIs; update it and refresh the list to expose System One models here.
-Its quotas show too: the Usage page, the menu bar and `magpie quota` list the
-shared magpie's cards named with it (`Codex · office`, id `office/codex`), as
-that magpie last read them — only the computer holding the sign-ins asks the
-vendors, and it answers from what it has kept (`GET /v1/magpie/quotas/cards`).
+Its quotas show too: the Usage page, the menu bar and `blackpie quota` list the
+shared blackpie's cards named with it (`Codex · office`, id `office/codex`), as
+that blackpie last read them — only the computer holding the sign-ins asks the
+vendors, and it answers from what it has kept (`GET /v1/blackpie/quotas/cards`).
 A card's refresh here has it read that card once more
-(`POST /v1/magpie/quotas/refresh`, at most once in 30 seconds a card); until it
+(`POST /v1/blackpie/quotas/refresh`, at most once in 30 seconds a card); until it
 has read anything, the remote's one card says so. Their history is shown with
 its own. A Codex reset or a check-in is pressed on that computer, not here.
 
@@ -555,26 +553,26 @@ turn for the requested image model. If that provider does not list the model,
 or the turn cannot be identified, it uses Settings → Images → Image generation
 (including Automatic). Off disables this fallback, not a matching model on the
 turn's provider. An explicit `provider/model` keeps its destination; an upstream
-image error does not retry through the setting. Magpie Image MCP is not required.
+image error does not retry through the setting. Blackpie Image MCP is not required.
 
-The same model is an MCP server on the gateway at `/mcp/magpie/image`
+The same model is an MCP server on the gateway at `/mcp/blackpie/image`
 (Streamable HTTP; tools `generate_image`, `generate_video`,
 `generation_result`), for agents that aren't set up from the Library, such
-as magpie in Docker in gateway mode. Add `http://<host>:3425/mcp/magpie/image`
+as blackpie in Docker in gateway mode. Add `http://<host>:3425/mcp/blackpie/image`
 as an HTTP MCP server; from another computer send a gateway key as
 `Authorization: Bearer <key>`. An image comes back in the tool's answer and
 at a URL on the gateway kept for an hour (the same key reads it), a video at
 `/v1/videos/<id>/content`. With Image generation Off the tool says so.
 `generate_image` and `generate_video` take an optional `model`
-(provider/model, one of those the tool's schema lists, for `magpie tool`
+(provider/model, one of those the tool's schema lists, for `blackpie tool`
 `--model`). Left out, the one in Settings is used. One that isn't listed, or
 that a gateway key may not use, is refused with the models that may be used.
 
 WorkBuddy (China)'s daily check-in (签到) is pressed from the app's Usage card
-(*Check in now*), `magpie accounts checkin`, or `c` on the TUI's Usage page,
+(*Check in now*), `blackpie accounts checkin`, or `c` on the TUI's Usage page,
 which checks in every account signed in on this computer at once; its
-WorkBuddy lines say how today's went. A shared magpie's accounts are checked
-in on that magpie, from its own app, TUI or CLI.
+WorkBuddy lines say how today's went. A shared blackpie's accounts are checked
+in on that blackpie, from its own app, TUI or CLI.
 
 A vendor with two or more accounts lists each under its Daily check-in in
 **Settings → Usage**, with its own Off/On (#1902). An account turned off is
@@ -588,7 +586,7 @@ says its auto check-in is off. The choice is kept in `checkinOff` in
 A plugin whose `auth` hook has `checkin` checks its own accounts in the same
 way: once a day while its switch under **Settings → Usage → Plugins** is on,
 with the result on each account's Usage card. A check-in the vendor wants a
-captcha for is shown as such (check in in the vendor's app); magpie never
+captcha for is shown as such (check in in the vendor's app); blackpie never
 solves captchas. See [provider-plugins.md](subsystems/provider-plugins.md#a-plugins-daily-check-in).
 
 A plugin can also declare its own switches for its provider (`auth.options`).
@@ -607,7 +605,7 @@ upstream API keys. Turn on **Gateway → Share on local network**, then open
 sharing is on. Create a named key for each client and copy it from its row.
 To move from another gateway without touching its clients, enter the key they
 already send in **Your own key (optional)** (8–256 characters, no spaces, not
-starting with `sk-magpie-`, unlike any other key); left empty, magpie makes
+starting with `sk-blackpie-`, unlike any other key); left empty, blackpie makes
 one. The list shows only its last four characters, and it is counted,
 limited and restricted as any other key, from this computer too.
 Rename, disable, rotate or remove keys independently; rotation and removal
@@ -615,30 +613,30 @@ ask for confirmation. Rotation keeps the name, enabled state and usage
 history; other keys are unchanged. While sharing is on, **Gateway → Connect**
 offers loopback and shared addresses, plus enabled gateway keys, for all
 connection examples. With sharing off, Connect keeps the original **API key**
-field and local `magpie` token, without a gateway-key picker. Its arbitrary
-local option is **This computer**, distinct from the named **Magpie** key.
+field and local `blackpie` token, without a gateway-key picker. Its arbitrary
+local option is **This computer**, distinct from the named **Blackpie** key.
 
 For a headless gateway, use the CLI before exposing the port:
 
 ```sh
-magpie gateway-key add "Remote laptop" # prints the new credential once
-magpie gateway-key add Family --key -  # keeps a key clients already send, read from stdin
-magpie gateway-key list                # ids, names, enabled state and masked keys
-magpie gateway-key rotate <id>         # prints the replacement; identity stays the same
-magpie gateway-key remove <id>         # revokes remote access
-magpie gateway-key limit <id> week --tokens 2m --cost 5   # its own limit
-magpie gateway-key limit <id> list     # each limit, used, left and reset
-magpie gateway-key limit <id> 10d --tokens 5m   # every 10 days, from now
-magpie gateway-key limit <id> 5h --tokens 200k  # every 5 hours, from now
-magpie gateway-key limit <id> add week --cost 20   # one more limit; all must pass
-magpie gateway-key limit <id> remove 2 # take off the 2nd limit
-magpie gateway-key limit <id> reset    # count its usage from 0 again (reset 2: only the 2nd)
-magpie gateway-key limit <id> off      # no limit
-magpie gateway-key models <id> openai/gpt-5 anthropic/*   # only these models
-magpie gateway-key models <id> all     # every model
-magpie gateway-key accounts <id> codex/me@example.com   # only these accounts
-magpie gateway-key accounts <id> all    # every account
-magpie gateway-key quotas <id> on      # told the quotas of what it may use
+blackpie gateway-key add "Remote laptop" # prints the new credential once
+blackpie gateway-key add Family --key -  # keeps a key clients already send, read from stdin
+blackpie gateway-key list                # ids, names, enabled state and masked keys
+blackpie gateway-key rotate <id>         # prints the replacement; identity stays the same
+blackpie gateway-key remove <id>         # revokes remote access
+blackpie gateway-key limit <id> week --tokens 2m --cost 5   # its own limit
+blackpie gateway-key limit <id> list     # each limit, used, left and reset
+blackpie gateway-key limit <id> 10d --tokens 5m   # every 10 days, from now
+blackpie gateway-key limit <id> 5h --tokens 200k  # every 5 hours, from now
+blackpie gateway-key limit <id> add week --cost 20   # one more limit; all must pass
+blackpie gateway-key limit <id> remove 2 # take off the 2nd limit
+blackpie gateway-key limit <id> reset    # count its usage from 0 again (reset 2: only the 2nd)
+blackpie gateway-key limit <id> off      # no limit
+blackpie gateway-key models <id> openai/gpt-5 anthropic/*   # only these models
+blackpie gateway-key models <id> all     # every model
+blackpie gateway-key accounts <id> codex/me@example.com   # only these accounts
+blackpie gateway-key accounts <id> all    # every account
+blackpie gateway-key quotas <id> on      # told the quotas of what it may use
 ```
 
 Each gateway key can have its own **limit**: a token total, an estimated
@@ -651,17 +649,17 @@ ended, so a restart, a time-zone change or a daylight-saving shift doesn't
 move it. Changing only
 the caps or **Count cache reads too** keeps the cycle; changing N or the
 period, or turning the limit on, starts a new one then. Set it with **Limit** on
-the key's row (saved with Save) or `magpie gateway-key limit`; the row shows
+the key's row (saved with Save) or `blackpie gateway-key limit`; the row shows
 what the key has used, what is left and when it resets. A key can have up to
 five limits, each in a window of its own (#2227), such as $3 every 5 hours and
 $20 a week, as a subscription's two windows: **Add a limit** in the editor or
-`magpie gateway-key limit <id> add`. A request passes only while every one has
+`blackpie gateway-key limit <id> add`. A request passes only while every one has
 something left; its reservation is held in each window, and its 429 names the
 spent limit that resets last. Two limits can't share a window: a window's
 tokens and cost caps go in one limit. Setting a window without `add` changes
-the key's limit of that window, or its only one. `GET /v1/magpie/limit` gives
-each in `limits`, and in `limit` the one holding the key most, which a magpie
-from before #2227 reads; such a magpie also keeps only the first limit
+the key's limit of that window, or its only one. `GET /v1/blackpie/limit` gives
+each in `limits`, and in `limit` the one holding the key most, which a blackpie
+from before #2227 reads; such a blackpie also keeps only the first limit
 (`limit` in caller-keys.json, the rest under `moreLimits`). Tokens counted are a
 call's uncached input, output and cache writes, plus cache reads when **Count
 cache reads too** is on. Cost is an estimate at the Usage page's prices; a
@@ -673,19 +671,19 @@ counts are read from the usage log, so they survive a restart. A request in
 flight holds a reservation (its body's size in tokens plus the key's mean
 output per call), so requests sent at once overshoot by about one call; a
 streamed reply is settled when it ends with the usage its vendor reported.
-**Reset usage** in the key's limit editor (or `magpie gateway-key limit
+**Reset usage** in the key's limit editor (or `blackpie gateway-key limit
 <id> reset`) counts the key's tokens and cost from 0 together, from now: the
 editor's resets the limit it is open on, the CLI's every limit, or the nth
 with `reset <n>`. An
 N-day or N-hour key starts a new cycle then. A day, week or month key keeps
 its window's end (midnight, Monday, the 1st): only the calls before the
 reset stop counting, so it doesn't drift off the calendar. The reset is
-stored with the key (`since` in caller-keys.json, magpie's own: a value a
+stored with the key (`since` in caller-keys.json, blackpie's own: a value a
 client sends is ignored), so it survives a restart; the usage log itself is
 untouched. Keys saved before keep their JSON as it was.
-A key can read its own status with `GET /v1/magpie/limit`; it is told its
-own and no other key's, whatever the request names. A magpie that has this
-one as a Remote magpie provider shows each of its keys' limits on its
+A key can read its own status with `GET /v1/blackpie/limit`; it is told its
+own and no other key's, whatever the request names. A blackpie that has this
+one as a Remote blackpie provider shows each of its keys' limits on its
 Usage page this way (#1547). Requests from
 this computer that send no gateway key are not limited; a gateway key used
 from this computer is.
@@ -699,7 +697,7 @@ providers. Gateway → Gateway keys shows that address with a Copy button,
 so it can be handed out with the keys.
 
 A gateway key can also be held to some **models** (#882): pick them with the
-**All models** badge on the key's row, or run `magpie gateway-key models <id>
+**All models** badge on the key's row, or run `blackpie gateway-key models <id>
 openai/gpt-5 anthropic/*` (`all` takes the restriction off). A pattern is
 `<provider>/<model>` or `<provider>/*`, matched against the provider that
 serves the call, so a bare model name is resolved first, or a routing group,
@@ -715,7 +713,7 @@ A gateway key can also be held to some **accounts** (#905): the accounts
 and keys its requests may use, picked in the same menu right after their
 provider's models — an account by who is signed in, a key by its
 fingerprint — or with
-`magpie gateway-key accounts <id> codex/me@example.com openai/<key id>`
+`blackpie gateway-key accounts <id> codex/me@example.com openai/<key id>`
 (`all` takes the restriction off). The list holds a key to some accounts
 **of the providers it names**: a provider it names no account of, the key
 uses as its models allow. A key that lists accounts and **no model** may use
@@ -728,7 +726,7 @@ rotated, an account signed out, an account of an agent that keeps no
 logins renamed — is kept as it is, matching nothing, so the key is held
 closer, never wider. A routing group the key names is its members'
 through the accounts it may use only: naming a group is not naming its
-accounts, and magpie's own calls for the key — a web search, a picture
+accounts, and blackpie's own calls for the key — a web search, a picture
 described, a Codex title — are of the models the user picked, but their
 spend lands on an account, so the accounts hold them too. When every
 account or key behind a model is one the key may not use, the request is
@@ -739,7 +737,7 @@ key only the models an account or key it may use serves, the Routing
 view's left-out list marking what the key held out. A key with no
 accounts listed may use every account, as keys always did.
 
-While LAN sharing is enabled, or `MAGPIE_ADDR` puts the gateway on the
+While LAN sharing is enabled, or `BLACKPIE_ADDR` puts the gateway on the
 network (a host other than loopback or `localhost`: `0.0.0.0` in the Docker
 image, a server's address), remote requests require an enabled gateway key
 sent as Bearer, `x-api-key`, `x-goog-api-key` or `?key=`; one without gets
@@ -748,43 +746,43 @@ Docker's port publishing (the peer is the bridge, not the host's loopback)
 and a WSL distro under NAT. Loopback remains permissive: any token works,
 including a stale or disabled gateway key. Only a valid, enabled key is
 attributed to its named identity. Neither shared nor on the network, a
-remote request is refused (403). A `MAGPIE_ADDR` pinned to one interface's
+remote request is refused (403). A `BLACKPIE_ADDR` pinned to one interface's
 address asks a key even of this computer's agents calling that address;
 `0.0.0.0` with agents on `127.0.0.1` doesn't. The Claude subscription's
-own tool calls back to magpie are let in there by their run's one-time
+own tool calls back to blackpie are let in there by their run's one-time
 token, without a key (#1546).
-Sharing listens on every interface, unless `MAGPIE_ADDR` names a host of its
-own: `MAGPIE_ADDR=127.0.0.1:3425` behind Tailscale Serve, or one interface's
+Sharing listens on every interface, unless `BLACKPIE_ADDR` names a host of its
+own: `BLACKPIE_ADDR=127.0.0.1:3425` behind Tailscale Serve, or one interface's
 address, stays where it is while shared, and what reaches it from elsewhere
 still needs an enabled gateway key (#1112).
 
-**Codex on another computer** (#1281) can name the shared magpie its model
-provider, with a gateway key, and read magpie's models in Codex's own
+**Codex on another computer** (#1281) can name the shared blackpie its model
+provider, with a gateway key, and read blackpie's models in Codex's own
 catalog shape from `GET /v1/codex/models`. `/v1/models` is OpenAI's list,
 which Codex can't read, and `/backend-api/codex/models` is the ChatGPT
 backend's, for a Codex signed in to ChatGPT on the gateway's own computer;
 a gateway key gets a 401 there.
 
 ```toml
-model_provider = "magpie"
+model_provider = "blackpie"
 model = "provider/model"
 
-[model_providers.magpie]
-name = "magpie"
+[model_providers.blackpie]
+name = "blackpie"
 base_url = "http://192.168.1.20:3425/v1"
 model_catalog_url = "http://192.168.1.20:3425/v1/codex/models"
-env_key = "MAGPIE_API_KEY"   # the gateway key
+env_key = "BLACKPIE_API_KEY"   # the gateway key
 wire_api = "responses"
 supports_websockets = false
 ```
 
-The list is the models the shared magpie shows Codex (its Agents page
-picks), each as the `model_catalog_json` magpie writes for a Codex on its
+The list is the models the shared blackpie shows Codex (its Agents page
+picks), each as the `model_catalog_json` blackpie writes for a Codex on its
 own computer describes it, and only the models the key may use. Codex 0.161
 reads it by default; 0.160 needs `[features] api_key_model_discovery = true`.
 Codex reads at most 1 MiB of a catalog, and every entry carries Codex's
 prompt, so past about 125 models the list keeps the first that fit and the
-answer's `X-Magpie-Left-Out` header says how many it left out: pick fewer
+answer's `X-Blackpie-Left-Out` header says how many it left out: pick fewer
 for Codex, or hold the key to fewer.
 
 A request that reaches loopback through a proxy or tunnel on this computer
@@ -793,41 +791,41 @@ HTTP proxy, Caddy, nginx) is someone else's, and is answered as one from
 another machine (#1022): it carries a forwarding header (`Forwarded`,
 `X-Forwarded-For`, `X-Real-IP`, `Cf-Connecting-IP`, `True-Client-IP`,
 `Tailscale-User-Login`), which no agent sends. Without sharing it is refused;
-with sharing, or a `MAGPIE_ADDR` on the network, it needs an enabled gateway
+with sharing, or a `BLACKPIE_ADDR` on the network, it needs an enabled gateway
 key, as from the network. This
-covers every route: the model APIs, quotas, MCP sign-ins. To serve magpie
+covers every route: the model APIs, quotas, MCP sign-ins. To serve blackpie
 through a Cloudflare Tunnel, turn on **Gateway → Share on local network**,
 add a gateway key for each client, point the tunnel's service at
 `http://127.0.0.1:3425`, and give clients the tunnel's address with that key.
 A tunnel that forwards bare TCP (frp's `tcp`, `ssh -R`, socat) adds no header
 and can't be told from an agent here: point it at this computer's LAN
 address with sharing on, not at loopback. A proxy here that signs its
-clients in itself can be trusted with `MAGPIE_TRUST_PROXY=1`, which keeps
+clients in itself can be trusted with `BLACKPIE_TRUST_PROXY=1`, which keeps
 what it forwards local, as before.
 
 To let other computers in only from some addresses, list them as IPs and
 CIDR ranges in **Gateway → Settings → Allowed addresses**, or in
-`MAGPIE_ALLOW_IPS` (`203.0.113.7,10.0.0.0/8,2001:db8::/32`), which comes
+`BLACKPIE_ALLOW_IPS` (`203.0.113.7,10.0.0.0/8,2001:db8::/32`), which comes
 first. A request from any other address is refused 403, even with an
 enabled gateway key, and the refusal names the address it came from. This
 computer is always let in. The address is the connection's own, never a
 forwarding header, so behind a proxy or tunnel every client has the proxy's
-address: limit them at the proxy. A mistyped entry in `MAGPIE_ALLOW_IPS`
+address: limit them at the proxy. A mistyped entry in `BLACKPIE_ALLOW_IPS`
 lets nothing in rather than everything. When settings.json can't be read, or
 doesn't parse and has no good backup, the list read last stays in force; if
-none was read since magpie started, only this computer is let in until the
-file is repaired. `magpie web`'s page honours the same list.
+none was read since blackpie started, only this computer is let in until the
+file is repaired. `blackpie web`'s page honours the same list.
 
-**HTTPS.** A magpie reached over the internet (a server used as a relay)
+**HTTPS.** A blackpie reached over the internet (a server used as a relay)
 can serve HTTPS itself, with no proxy in front:
 
 ```sh
-magpie serve --tls-cert /etc/letsencrypt/live/relay.example.com/fullchain.pem \
+blackpie serve --tls-cert /etc/letsencrypt/live/relay.example.com/fullchain.pem \
              --tls-key  /etc/letsencrypt/live/relay.example.com/privkey.pem
 ```
 
-`MAGPIE_TLS_CERT` and `MAGPIE_TLS_KEY` do the same (for Docker), and `magpie
-web` and `magpie daemon install` take the same flags; the service keeps the
+`BLACKPIE_TLS_CERT` and `BLACKPIE_TLS_KEY` do the same (for Docker), and `blackpie
+web` and `blackpie daemon install` take the same flags; the service keeps the
 pair when it is installed again without them, and `--no-tls` takes it away.
 The files are PEM: the certificate with its chain after it, and its private
 key. One without the other, or files that don't load, refuse to start
@@ -835,10 +833,10 @@ rather than serve plain HTTP. The certificate is read again when either
 file changes, so a renewal (certbot, acme.sh) is served on the next
 connection without a restart; files that don't load then (a renewal half
 written) leave the one before in place, and the log says so. Other
-computers reach the gateway, and `magpie web`'s page, over `https://` only,
-and the network links magpie prints say `https://`; plain HTTP from them is
+computers reach the gateway, and `blackpie web`'s page, over `https://` only,
+and the network links blackpie prints say `https://`; plain HTTP from them is
 answered 400. This computer may still call `http://127.0.0.1` on the same
-port, as the agents, MCP servers and status checks magpie wires here do,
+port, as the agents, MCP servers and status checks blackpie wires here do,
 since no certificate for the server's name covers loopback. A container or
 a WSL distro calling through its NAT address is another computer, and uses
 `https://`. Gateway keys, sharing and allowed addresses work as over HTTP.
@@ -851,12 +849,12 @@ so its requests count as another computer's, as above.
 **Usage → Overview → Gateway keys** groups calls by the client's key, never
 the provider's credential. **Usage → Requests** offers the same filter;
 CSV includes `caller_key_id` and `caller_key_name`. Deleted keys keep their
-history. The usual local `magpie` token and older records stay unattributed.
+history. The usual local `blackpie` token and older records stay unattributed.
 Caller attribution includes chat, images, video creation and System One.
 Provider attribution stays independent; CSV puts `provider_key_*` before
 `caller_key_*`.
-An existing LAN key becomes **Magpie** without changing the credential.
-`lanKey` remains in settings for older Magpie versions. Disabling or removing
+An existing LAN key becomes **Blackpie** without changing the credential.
+`lanKey` remains in settings for older Blackpie versions. Disabling or removing
 the default key replaces that mirror with a random non-empty revoked value;
 rotation does not re-enable it. Turning sharing off and on again neither
 re-enables a disabled default key nor makes a removed one again; only
@@ -867,14 +865,14 @@ CLI key management, or the Settings and key-list pages from opening.
 If settings are read-only, changing the default key fails without changing
 it: make `settings.json` writable and retry so older versions cannot keep
 accepting its old credential. Independent named keys remain manageable.
-Gateway credentials stay in `~/.config/magpie/caller-keys.json` (XDG-aware,
+Gateway credentials stay in `~/.config/blackpie/caller-keys.json` (XDG-aware,
 mode `0600`), never in usage records or list responses.
 
 Baidu Qianfan's [Token Plans](https://cloud.baidu.com/doc/qianfan/s/Dmrabu8b6)
 are available as `baidu-qianfan`: a personal (个人版) and an enterprise (企业版)
 plan and pay as you go, each with its own Chat Completions, Responses and
 Anthropic Messages endpoints, and a key that works only on its own plan. Add
-it with `magpie provider add baidu-qianfan <api-key>` — the id it carried its
+it with `blackpie provider add baidu-qianfan <api-key>` — the id it carried its
 first day, `qianfan-token-plan`, is taken too. The plans serve no model list,
 so the preset carries their documented models; pay as you go serves its own
 at `/v2/models`.
@@ -891,11 +889,11 @@ with the same key, so a routing group can pick it as its classifier. The
 same model on the Qwen AI platform's pay as you go is `qwen-decision`
 (`maas.qianwenaiapi.com`), and on a Bailian workspace `bailian-decision`.
 Neither plan has an API for its credits: the console's subscription page
-shows them, so magpie shows no plan usage for these keys.
+shows them, so blackpie shows no plan usage for these keys.
 
 Volcengine Ark's System One API, in beta, is `volcengine-decision`: an Ark
 API key, asked at `https://ark.cn-beijing.volces.com/api/v1/systemone` with
-the `ark-beta-systemone-api: true` header magpie adds on Ark's host, and its
+the `ark-beta-systemone-api: true` header blackpie adds on Ark's host, and its
 one decision model `doubao-seed-2-1-lite-260915`. The Coding and Agent
 Plans' paths don't serve it, so it bills as pay as you go.
 
@@ -919,15 +917,15 @@ on the Agent Platform API (`aiplatform.googleapis.com`) in the project (billing
 has to be on there), then sign in with `gcloud auth application-default login`
 or have a service account's key file
 ([Google's guide](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start/gcp-auth)).
-[Where magpie looks for the credentials, and the kinds it reads](subsystems/providers-accounts.md#responsibilities-and-sources-of-truth).
+[Where blackpie looks for the credentials, and the kinds it reads](subsystems/providers-accounts.md#responsibilities-and-sources-of-truth).
 
 ```sh
-magpie provider add google-vertex project=my-project
-magpie provider set google-vertex location=us-central1        # global (the default), us, eu or a region
-magpie provider set google-vertex credentials=~/keys/vertex.json
-magpie provider set google-vertex impersonate=vertex@my-project.iam.gserviceaccount.com
-magpie provider set google-vertex impersonate=                # empty clears it
-magpie provider test google-vertex
+blackpie provider add google-vertex project=my-project
+blackpie provider set google-vertex location=us-central1        # global (the default), us, eu or a region
+blackpie provider set google-vertex credentials=~/keys/vertex.json
+blackpie provider set google-vertex impersonate=vertex@my-project.iam.gserviceaccount.com
+blackpie provider set google-vertex impersonate=                # empty clears it
+blackpie provider test google-vertex
 ```
 
 `project=` is the project's id. `location=` is `global` (the default, and what
@@ -944,7 +942,7 @@ its token is sent to. Adding, listing and showing it ask Google nothing; the
 credentials are read when a request is signed.
 
 Each location serves models of its own, and Vertex AI has no list to ask which,
-so magpie gives each location the models it answered with on 2026-10-06
+so blackpie gives each location the models it answered with on 2026-10-06
 (and `gemini-4-argon`, at `global` since 2026-10-13):
 
 | Location | Models |
@@ -957,15 +955,15 @@ A region that serves one more, as asia-northeast1 serves `gemini-3.5-flash`,
 has it typed in with the rest you want:
 
 ```sh
-magpie provider models google-vertex gemini-2.5-pro gemini-2.5-flash gemini-2.5-flash-lite gemini-3.5-flash
-magpie provider models google-vertex all     # back to the location's list
+blackpie provider models google-vertex gemini-2.5-pro gemini-2.5-flash gemini-2.5-flash-lite gemini-3.5-flash
+blackpie provider models google-vertex all     # back to the location's list
 ```
 
-`magpie provider set google-vertex location=…` keeps the models picked, so pick
+`blackpie provider set google-vertex location=…` keeps the models picked, so pick
 again after a move.
 
 A partner model is one whose id names its publisher before a slash, as
-`deepseek-ai/deepseek-v4.1-flash-maas` does. magpie asks it on Google's
+`deepseek-ai/deepseek-v4.1-flash-maas` does. blackpie asks it on Google's
 OpenAI-compatible chat completions in your project
 (`…/locations/<location>/endpoints/openapi/chat/completions`) with the same
 credentials, and asks a Gemini model on generateContent, with nothing to set.
@@ -975,13 +973,13 @@ such as `google/gemma-4-26b-a4b-it-maas`) is typed in under its full id, as
 any model is:
 
 ```sh
-magpie provider models google-vertex gemini-3.8-flash deepseek-ai/deepseek-v4.1-flash-maas google/gemma-4-26b-a4b-it-maas
+blackpie provider models google-vertex gemini-3.8-flash deepseek-ai/deepseek-v4.1-flash-maas google/gemma-4-26b-a4b-it-maas
 ```
 
 Turn each partner model on for the project in Model Garden first: until then
-Google refuses it. `magpie provider test google-vertex` tests Gemini, and a
+Google refuses it. `blackpie provider test google-vertex` tests Gemini, and a
 partner model is tested on its own (right-click it in the app, or
-`magpie provider test google-vertex <model>`).
+`blackpie provider test google-vertex <model>`).
 
 Anthropic's Claude is served too, with nothing more to set: a model whose id
 starts with `claude-` is asked on Anthropic's Messages API in your project
@@ -1000,7 +998,7 @@ and [Flex PayGo](https://docs.cloud.google.com/gemini-enterprise-agent-platform/
 are asked for with request headers. The editor's **Headers** offers both,
 `X-Vertex-AI-LLM-Request-Type` and `X-Vertex-AI-LLM-Shared-Request-Type`, to
 add; their values are the ones Google's pages give. From the CLI:
-`magpie provider set google-vertex header.<Name>=<value>`. [What was seen of
+`blackpie provider set google-vertex header.<Name>=<value>`. [What was seen of
 Priority PayGo](subsystems/providers-accounts.md#constraints-and-failure-behavior).
 
 When a request fails:
@@ -1011,7 +1009,7 @@ When a request fails:
   or set `credentials=`.
 - `GOOGLE_APPLICATION_CREDENTIALS names <file>, which isn't there`, or
   `GOOGLE_APPLICATION_CREDENTIALS is "…", not a full path` (`CLOUDSDK_CONFIG`
-  too): the variable names no file magpie can read, and gcloud's own isn't
+  too): the variable names no file blackpie can read, and gcloud's own isn't
   read in its place. Give the whole path (a `~/` at its start is the home),
   unset it, or set `credentials=`.
 - `the Google credentials in <file>: the sign-in was refused`, with the advice
@@ -1032,26 +1030,26 @@ When a request fails:
 
 ### Plugins
 
-A subscription magpie doesn't sign in to itself can come from an
+A subscription blackpie doesn't sign in to itself can come from an
 [OpenCode](https://opencode.ai) provider plugin or a
 [pi](https://github.com/earendil-works/pi) package: the npm packages OpenCode
 users install to sign in to a plan (their `auth` hook), and the pi packages
-that register a provider (`pi.registerProvider`), work in magpie as they do
-there. magpie runs them on [Bun](https://bun.sh), downloaded the first
+that register a provider (`pi.registerProvider`), work in blackpie as they do
+there. blackpie runs them on [Bun](https://bun.sh), downloaded the first
 time a plugin needs it, and the plugin signs in, lists the models and makes
-each request; magpie serves them to agents like any provider's.
+each request; blackpie serves them to agents like any provider's.
 
 ```sh
-magpie plugin add workbuddy              # a community plugin by its name (WorkBuddy, think-tags, Qoder)
-magpie plugin add opencode-gemini-auth   # an npm package, or a path to a plugin of your own
-magpie plugin add pi-antigravity         # a pi package, the same way
-magpie plugin                           # the plugins, what each signs in to, and whether you are
-magpie plugin login google-plugin       # its sign-in: the method, its questions, the browser or a key
-magpie plugin logout google-plugin
-magpie plugin off opencode-gemini-auth  # on brings it back; rm removes it; update updates them all
+blackpie plugin add workbuddy              # a community plugin by its name (WorkBuddy, think-tags, Qoder)
+blackpie plugin add opencode-gemini-auth   # an npm package, or a path to a plugin of your own
+blackpie plugin add pi-antigravity         # a pi package, the same way
+blackpie plugin                           # the plugins, what each signs in to, and whether you are
+blackpie plugin login google-plugin       # its sign-in: the method, its questions, the browser or a key
+blackpie plugin logout google-plugin
+blackpie plugin off opencode-gemini-auth  # on brings it back; rm removes it; update updates them all
 ```
 
-A provider id magpie already has (google, openai, anthropic) is
+A provider id blackpie already has (google, openai, anthropic) is
 `<id>-plugin`. In the app, Settings → Plugins adds and removes them, and
 the providers they sign in to are in Add provider → From plugins.
 
@@ -1060,10 +1058,10 @@ example a third-party plugin and your own copy of it. One of them serves
 that id: the one you picked, or else the one added last. Both plugins stay
 listed, and each row in Plugins › Installed says which one serves the
 provider. The other row has **Use for <provider>**, which switches the
-provider to it. `magpie plugin` prints the same thing, and
+provider to it. `blackpie plugin` prints the same thing, and
 
 ```sh
-magpie plugin use ~/dev/my-acme-auth acme   # this plugin serves acme from now on
+blackpie plugin use ~/dev/my-acme-auth acme   # this plugin serves acme from now on
 ```
 
 makes the pick. Each plugin can still be switched off or removed on its
@@ -1071,31 +1069,31 @@ own.
 
 A package is pi's when its `package.json` has a `pi` manifest, the
 `pi-package` keyword, or depends on `@earendil-works/pi-coding-agent`.
-magpie installs pi beside it and loads it with pi's own loader; the
-providers it registers are what magpie uses, and its commands, tools and
+blackpie installs pi beside it and loads it with pi's own loader; the
+providers it registers are what blackpie uses, and its commands, tools and
 renderers are left alone. Its sign-in runs as in pi: an OAuth login's
 questions and pages, and the dialogs and pickers it shows (`ctx.ui`, its
-terminal components too), are asked in magpie's sign-in; an API key works
+terminal components too), are asked in blackpie's sign-in; an API key works
 as well. pi's own files (its `auth.json` and what a package keeps) are in
-`pi/` under magpie's config directory, not your `~/.pi`, unless
+`pi/` under blackpie's config directory, not your `~/.pi`, unless
 `PI_CODING_AGENT_DIR` says otherwise. Requests reach the package as pi
 sends them, and its replies keep their thinking and tool calls.
 
 #### For plugin authors
 
-A plugin is an OpenCode plugin or a pi package; nothing magpie-specific is
-needed. For an OpenCode plugin magpie reads a few more fields, which
+A plugin is an OpenCode plugin or a pi package; nothing blackpie-specific is
+needed. For an OpenCode plugin blackpie reads a few more fields, which
 OpenCode ignores:
 
-- **The provider's icon**: `icon` on the `auth` hook, or `"magpie": {
+- **The provider's icon**: `icon` on the `auth` hook, or `"blackpie": {
   "icon": "…" }` in the plugin's `package.json` (for every provider it
   signs in to that names none). An `https://` URL of a picture on a public
-  host, which magpie fetches once and keeps, or a `data:image/…` URI;
+  host, which blackpie fetches once and keeps, or a `data:image/…` URI;
   PNG, JPEG, GIF, WebP, ICO or SVG, at most 1 MB. Anything else is ignored,
   and the icon the plugin market lists for the plugin is shown instead.
   The `package.json` icon is also the card's picture under Discover →
-  Unofficial, on GitHub for a repository tagged `magpie-plugin`.
-- **The plugin's name**: `"magpie": { "name": "…" }` in its `package.json`
+  Unofficial, on GitHub for a repository tagged `blackpie-plugin`.
+- **The plugin's name**: `"blackpie": { "name": "…" }` in its `package.json`
   names its row in Settings → Plugins, and its sidebar tab when its page
   gives no title, for a plugin the community's list doesn't name (that
   list's name wins). A package's npm name, which Bun keys it by, has to be
@@ -1105,10 +1103,10 @@ OpenCode ignores:
 - **An API key's field**: a `type: "api"` method's `label` titles the key's
   field, as OpenCode's dialog does (one that only says "API key" reads
   "<provider> API key"), and its `placeholder` is the hint inside the field
-  (and after the question in `magpie plugin login`). The method's `prompts`
+  (and after the question in `blackpie plugin login`). The method's `prompts`
   are asked first, as in OpenCode, and reach `authorize(inputs)`. A prompt of
-  `type: "password"` (magpie's own; OpenCode has `text` and `select`) is typed unseen:
-  a masked field in the app, no echo in `magpie plugin login` (#1982).
+  `type: "password"` (blackpie's own; OpenCode has `text` and `select`) is typed unseen:
+  a masked field in the app, no echo in `blackpie plugin login` (#1982).
 
 ```js
 export const LemonPlugin = async () => ({
@@ -1139,11 +1137,11 @@ event of a streamed reply and `onResponse(body, ctx)` a whole one, all in
 the agent's own API. A hook returns the changed object, or nothing to
 leave it; `onEvent` returns `null` to drop an event, and
 `ctx.reject(status, message)` turns a request away. Declare it with
-`"magpie": { "middleware": "./mw.js" }` in `package.json`, or add a single
+`"blackpie": { "middleware": "./mw.js" }` in `package.json`, or add a single
 `*.middleware.js` file:
 
 ```js
-// alias.middleware.js — magpie plugin add ./alias.middleware.js
+// alias.middleware.js — blackpie plugin add ./alias.middleware.js
 export const events = ["message_start"]
 export function onRequest(body, ctx) {
   ctx.state.asked = body.model
@@ -1175,16 +1173,16 @@ isn't serving, a request gets a 503 and nothing is sent.
 them with its **Options** button in Plugins › Installed, or
 
 ```sh
-magpie plugin options model-map '{"mapping": {"fast": "deepseek/deepseek-chat"}}'
-magpie plugin options model-map off   # clears them
+blackpie plugin options model-map '{"mapping": {"fast": "deepseek/deepseek-chat"}}'
+blackpie plugin options model-map off   # clears them
 ```
 
 The name can be a package's short name (`model-map` for
 `@magpie-community/middleware-model-map`). A package's
-`"magpie": { "options": {…} }` is the example the editor starts from.
+`"blackpie": { "options": {…} }` is the example the editor starts from.
 A key that a provider plugin declares as a switch for its provider (the
 editor's Plugin options, such as Cursor's `wire_trace`) goes where the
-plugin reads it, beside the switches the editor saves: `magpie plugin
+plugin reads it, beside the switches the editor saves: `blackpie plugin
 options cursor '{"wire_trace": true}'` turns it on, and `off` puts every
 switch back to the plugin's default.
 
@@ -1194,17 +1192,17 @@ with the same JSON: `param-override` (`param_override`), `model-map`
 (`model_mapping`), `system-prompt`, `word-guard` (sensitive words) and
 `think-tags` (strip `<think>…</think>`, or `thinking_to_content`), and
 `antigravity-cloak`, which keeps words Antigravity turns a system prompt
-away for out of what it sends Antigravity alone (magpie itself already
+away for out of what it sends Antigravity alone (blackpie itself already
 breaks up the lines it knows of: Codex's, Claude Code's, Hermes' earlier
-persona; `magpie provider set antigravity prompt=as-written` turns that
+persona; `blackpie provider set antigravity prompt=as-written` turns that
 off). A
 middleware's entry in the community `registry.json` has
 `"kind": "middleware"` and no `providers`.
 
 #### Agent plugins
 
-A plugin can add an agent magpie has no setup of its own for. Its
-`package.json` names the module (`"magpie": { "agent": "./agent.js" }`), or
+A plugin can add an agent blackpie has no setup of its own for. Its
+`package.json` names the module (`"blackpie": { "agent": "./agent.js" }`), or
 it is a single `*.agent.js` file:
 
 ```js
@@ -1212,7 +1210,7 @@ export const agent = {
   id: "aider", name: "Aider", bin: "aider",
   config: "~/.aider.conf.yml",   // json, yaml or env
   model: "model",                // the key of the model
-  prefix: "openai/",             // written before magpie's model id
+  prefix: "openai/",             // written before blackpie's model id
   ua: ["aider", "litellm"],
 }
 export function connect({ gateway, model, models }) {
@@ -1220,7 +1218,7 @@ export function connect({ gateway, model, models }) {
 }
 ```
 
-It is then on the Agents page like magpie's own: picking one of magpie's
+It is then on the Agents page like blackpie's own: picking one of blackpie's
 models writes the model and what `connect` returns, and its own model or
 Disconnect puts every key back as it was. It runs in moejs like middleware.
 `connect` gets `gateway` (`url`, `v1`, `key`), `model` and `models` (each
@@ -1238,7 +1236,7 @@ call costs. Each is left out when it isn't known (a routing group has no
   "pricing": { "prompt": "0.0000003", "completion": "0.0000012", "input_cache_read": "0.00000003" } }
 ```
 
-An id magpie's own agents use is refused. In the market an agent's entry has
+An id blackpie's own agents use is refused. In the market an agent's entry has
 `"kind": "agent"` (`@magpie-community/agent-<name>`). The full reference is
 on the site's Plugins page, under Agent plugins.
 
@@ -1257,10 +1255,10 @@ is counted at whatever the model's maker charges. Say what a provider
 actually charges, and the usage ledger and the session totals use that:
 
 ```sh
-magpie model price relay-a/gpt-5.5                        # what it is counted at, and where that came from
-magpie model price relay-a/gpt-5.5 0.12,0.60,0.01,0.15   # input,output,cache read,cache write
-magpie model price relay-a/gpt-5.5 --reset                # take your price off this model
-magpie model prices                                       # every model you priced
+blackpie model price relay-a/gpt-5.5                        # what it is counted at, and where that came from
+blackpie model price relay-a/gpt-5.5 0.12,0.60,0.01,0.15   # input,output,cache read,cache write
+blackpie model price relay-a/gpt-5.5 --reset                # take your price off this model
+blackpie model prices                                       # every model you priced
 ```
 
 The four numbers are USD per million tokens. All four are asked for, because
@@ -1274,16 +1272,16 @@ relay that sells `kimi-k3` as `moonshot-kimi-k3` answers as `kimi-k3`, so its
 calls are counted at `relay-a/kimi-k3`'s price. A model with a price of its
 own, `0` included, keeps it whatever its reply says.
 
-`magpie model price provider/model` says where a price came from, and for a
+`blackpie model price provider/model` says where a price came from, and for a
 model with none, the two commands that give it one.
 
 A call with no price at all is left out of a total's cost, never counted as
 free: the Usage page's sum says how many calls it couldn't price beside it
 ("≈$1.20+", then "3 calls unpriced"; Sessions, which prices by model, says how
-many models), and `magpie usage` and the terminal app's Usage page say the
-same after their totals. magpie doesn't guess a variant's price from a
+many models), and `blackpie usage` and the terminal app's Usage page say the
+same after their totals. blackpie doesn't guess a variant's price from a
 similar name (`-auto`, `-max`, `-fast` can each cost differently); give it
-one with `magpie model price`, or in the provider's editor under the model.
+one with `blackpie model price`, or in the provider's editor under the model.
 
 A **Kimi Code** membership's models are counted at the Kimi API model each
 one is, not at the $0 models.dev lists them at for the plan: `k3` and
@@ -1291,7 +1289,7 @@ one is, not at the $0 models.dev lists them at for the plan: `k3` and
 at `kimi-k3.1-pro-highspeed`, `kimi-for-coding-highspeed` at
 `kimi-k2.7-code-highspeed`. `kimi-for-coding` is K2.8 Preview, which the API
 doesn't sell, so it has no price until you give it one
-(`magpie model price kimi-code/kimi-for-coding …`).
+(`blackpie model price kimi-code/kimi-for-coding …`).
 
 A **fifth number** is a 1-hour cache write's price. Anthropic bills a cache
 write kept for 5 minutes at 1.25× input and one kept for an hour at 2× input,
@@ -1300,9 +1298,9 @@ and its usage says which were which (`cache_creation.ephemeral_5m_input_tokens`
 transcripts). The fourth number is the 5-minute price; the fifth, when not
 given, is 2× input for a Claude model — Anthropic's rule. Any other model has
 no 1-hour price unless you give one: a 1-hour write it reports is counted at
-the 5-minute price, and neither `magpie model price` nor the app's boxes show
+the 5-minute price, and neither `blackpie model price` nor the app's boxes show
 a 1-hour price for it. A call recorded
-before magpie kept the split counts all its writes at the 5-minute price, as
+before blackpie kept the split counts all its writes at the 5-minute price, as
 it did.
 
 A **long-context price** is what the whole request costs once its prompt is
@@ -1310,7 +1308,7 @@ over a size, as OpenAI bills gpt-6-astra, gpt-6.1-sol and gpt-6-luna over
 272K input (2× input and cache, 1.5× output):
 
 ```sh
-magpie model price openai/gpt-6-astra 10,50,1,12.5 --tier 272k 20,75,2,25
+blackpie model price openai/gpt-6-astra 10,50,1,12.5 --tier 272k 20,75,2,25
 ```
 
 The size counts the prompt the way OpenAI does: uncached input + cache reads
@@ -1334,7 +1332,7 @@ on the model in the provider's model editor (`"modelSameAs":
 {"workbuddy/kimi-k3-1": "kimi-k3"}` in settings.json) and its calls are
 costed at Kimi K3's list price, at the provider's price rate, never at
 another provider's tariff. A model with no Same as is never matched to
-another by its name. `magpie model price <provider/model>` says when a
+another by its name. `blackpie model price <provider/model>` says when a
 price came from it.
 `--reset` removes the first, and says so when a `<provider id>/*` price is
 still in force; reset that one by name to take it away too.
@@ -1356,15 +1354,15 @@ single provider-wide price.
 ### Counting two ids as one model
 
 A vendor can name one model two ways, as `deepseek-v4.1-flash` and
-`deepseek-flash`, and Usage, Sessions and `magpie usage` then show it as two
+`deepseek-flash`, and Usage, Sessions and `blackpie usage` then show it as two
 rows. Say they are one, and every place that counts usage by model counts
 them under the name you gave:
 
 ```sh
-magpie model alias deepseek-v4.1-flash deepseek-flash   # count it as deepseek-flash
-magpie model alias deepseek-v4.1-flash                  # what it is counted as
-magpie model alias deepseek-v4.1-flash --reset          # under its own id again
-magpie model aliases                                    # every alias you set
+blackpie model alias deepseek-v4.1-flash deepseek-flash   # count it as deepseek-flash
+blackpie model alias deepseek-v4.1-flash                  # what it is counted as
+blackpie model alias deepseek-v4.1-flash --reset          # under its own id again
+blackpie model aliases                                    # every alias you set
 ```
 
 It is kept in settings.json as `"usageAliases": {"deepseek-v4.1-flash":
@@ -1387,14 +1385,14 @@ own id.
 ### What a model takes
 
 A provider that serves a model models.dev does not list, or lists at the
-wrong size, has a window and a reply limit magpie cannot know. Say what they
+wrong size, has a window and a reply limit blackpie cannot know. Say what they
 are:
 
 ```sh
-magpie model context relay-a/gpt-5.5 262144    # the window a request may hold, or 1m
-magpie model output  relay-a/gpt-5.5 131072    # the most a reply may hold, or 128k
-magpie model context "relay-a/*" 200000        # every model of that provider
-magpie model output  relay-a/gpt-5.5 --reset   # take your limit off this model
+blackpie model context relay-a/gpt-5.5 262144    # the window a request may hold, or 1m
+blackpie model output  relay-a/gpt-5.5 131072    # the most a reply may hold, or 128k
+blackpie model context "relay-a/*" 200000        # every model of that provider
+blackpie model output  relay-a/gpt-5.5 --reset   # take your limit off this model
 ```
 
 The `*` is quoted because zsh treats a name it cannot expand as a command
@@ -1418,30 +1416,30 @@ told it. Only a model whose limit nobody knows goes at 16384. A reply that
 runs into it ends with `stop_reason: max_tokens`, which a Responses client
 reads as `incomplete_details.reason: "max_output_tokens"` (#1792).
 
-Saving a window or a reply limit writes that number into the model lists magpie
+Saving a window or a reply limit writes that number into the model lists blackpie
 keeps in the agents' own files — Pi's `contextWindow` and `maxTokens`, OpenCode's
 `limit`, and Crush's, droid's, Cline's, Qoder's and Zcode's — which an agent reads
 at start-up. A session already running therefore keeps the window it began with,
 while the gateway's own `/models` and every request from then on are right at
 once.
 
-#### All of a model at once: `magpie model spec`
+#### All of a model at once: `blackpie model spec`
 
-`magpie model spec` sets a model's window, reply limit, vision and reasoning
-levels in one command, and says where each value magpie goes by came from:
+`blackpie model spec` sets a model's window, reply limit, vision and reasoning
+levels in one command, and says where each value blackpie goes by came from:
 
 ```sh
-magpie model spec kenari/glm-5:free                          # what it has, and whether each is yours
-magpie model spec kenari/glm-5:free --context 128k --output 16k --vision on --reasoning low-high
-magpie model spec kenari/glm-5:free --reasoning low,medium,high   # a list instead of a range
-magpie model spec kenari/glm-5:free --reasoning off          # send it no reasoning field
-magpie model spec kenari/glm-5:free --vision auto            # take one value of yours off
-magpie model spec "kenari/*" --context 200000 --output 32k   # every model of the provider without its own
-magpie model spec kenari/glm-5:free --reset                  # take every value of yours off
-magpie model specs                                           # the models you gave a spec
+blackpie model spec kenari/glm-5:free                          # what it has, and whether each is yours
+blackpie model spec kenari/glm-5:free --context 128k --output 16k --vision on --reasoning low-high
+blackpie model spec kenari/glm-5:free --reasoning low,medium,high   # a list instead of a range
+blackpie model spec kenari/glm-5:free --reasoning off          # send it no reasoning field
+blackpie model spec kenari/glm-5:free --vision auto            # take one value of yours off
+blackpie model spec "kenari/*" --context 200000 --output 32k   # every model of the provider without its own
+blackpie model spec kenari/glm-5:free --reset                  # take every value of yours off
+blackpie model specs                                           # the models you gave a spec
 ```
 
-It writes the same stores `magpie model context`, `output`, `images` and
+It writes the same stores `blackpie model context`, `output`, `images` and
 `efforts` do — the window in providers.json, the rest in settings.json
 (`modelOutputs`, `modelImages`, `modelEfforts`, `modelReasonless`) — so the
 order above holds for each part, and a catalog refresh keeps them. A model
@@ -1449,16 +1447,16 @@ nothing knew the levels of can be given them (`--reasoning low-high`), and
 a request to it is sent at the nearest of those. One that has its own can
 only be narrowed to some of them, which narrows what agents are offered:
 the vendor is still asked at any level it has, as with
-`magpie model efforts`. A bad number, an
+`blackpie model efforts`. A bad number, an
 unknown flag, a level that isn't one, or a range that runs backwards is
 refused, and nothing of the command is written.
 
-What you set wins everywhere magpie reads a model: the app's badges and
+What you set wins everywhere blackpie reads a model: the app's badges and
 level chips, the gateway's `/v1/models` (`context_window`,
 `max_output_tokens`, `reasoning_levels`), the `max_tokens` a request is sent
 with, whether images reach it or are described
-first, which model magpie picks to describe images, and the model lists
-magpie writes into the agents.
+first, which model blackpie picks to describe images, and the model lists
+blackpie writes into the agents.
 
 ### The name a vendor knows a model by
 
@@ -1467,11 +1465,11 @@ with, a dated name, a `-latest` that is not what models.dev calls it. Say
 which name to ask for:
 
 ```sh
-magpie model wire relay-b/model-2                           # what the vendor is asked for
-magpie model wire relay-b/model-2 vendor-c/model-2-preview  # ask for it by this
-magpie model wire 'relay-b/*' 'vendor-c/*'                  # every model, * being the model
-magpie model wire relay-b/model-2 --reset                   # ask for it by its own name again
-magpie model wires                                          # every name your vendors are asked for models by
+blackpie model wire relay-b/model-2                           # what the vendor is asked for
+blackpie model wire relay-b/model-2 vendor-c/model-2-preview  # ask for it by this
+blackpie model wire 'relay-b/*' 'vendor-c/*'                  # every model, * being the model
+blackpie model wire relay-b/model-2 --reset                   # ask for it by its own name again
+blackpie model wires                                          # every name your vendors are asked for models by
 ```
 
 Quote the arguments with a `*` in them: zsh reads a bare `*` as a glob and
@@ -1490,16 +1488,16 @@ removal that took nothing away.
 
 Only the request that goes out carries that name, in the model field of a
 chat, Responses or Anthropic Messages request and of an Anthropic token
-count; image requests are left with the name magpie knows the model by.
+count; image requests are left with the name blackpie knows the model by.
 Gemini CLI and Antigravity sign-ins go on Code Assist, and there the model
-an effort picks is a variant of the model magpie knows — `gemini-3.7-flash`
+an effort picks is a variant of the model blackpie knows — `gemini-3.7-flash`
 at `high` is sent as `gemini-3.7-flash-high` — so a `*` in the name is that
 variant: `'antigravity/*' 'vendor-c/*'` asks for `vendor-c/gemini-3.7-flash-high`
 and `vendor-c/gemini-3.7-flash-low` each by its own, as it does everywhere
 else. A name with no `*` in it, or one given for `antigravity/gemini-3.7-flash`
 itself, is that one name at every level.
 
-Everything else keeps the name magpie knows the model by: the catalog agents
+Everything else keeps the name blackpie knows the model by: the catalog agents
 pick from, the routing groups' membership, `GET /models`, and what a call is
 recorded and priced as. What the vendor's own reply said answered is kept
 beside that, in the ledger's `served_model`, which is what it is for, and it
@@ -1509,21 +1507,21 @@ in force when the ledger is read, since a record keeps what the vendor
 answered and not the name the request went out under: naming a model after
 the call re-judges that call, which is then left reading as a swap. What a
 provider *supports* — whether it takes a temperature, which reasoning levels
-fit — is still asked about the model magpie knows, so a rename upstream does
-not change how magpie behaves towards the model.
+fit — is still asked about the model blackpie knows, so a rename upstream does
+not change how blackpie behaves towards the model.
 
 An upstream name is **one provider's**, not the model's: another provider
 serving the same id is asked for it under its own name, or this one. The
 model it is given for has to be one that provider serves — `<provider>/*`
-is the way to say one for every model — because a name for a model magpie
+is the way to say one for every model — because a name for a model blackpie
 would never ask the provider for is not a name of its own: the model is
-asked for by the name magpie knows it by, and nothing anywhere would say the
+asked for by the name blackpie knows it by, and nothing anywhere would say the
 name given for it is not the one in force. A relay that serves a model under
 an id of its own *and* lists it does get the name; what is refused is a
 model the provider's list does not have at all. The model test uses the name
 too, so a relay that only knows its own ids does not report a working model
 as broken. An image model is the exception that follows the rule above: it is
-tested by the name magpie knows it by, on the images API and on the chat it
+tested by the name blackpie knows it by, on the images API and on the chat it
 falls back to, because that is how a drawing is asked for.
 
 ### Routing groups
@@ -1532,18 +1530,18 @@ A routing group is several models, from one provider or many, that an agent
 picks as one: `group/<id>`. The gateway routes each request over every
 member's keys and accounts together. A model two of your providers serve
 under the same name becomes a group on its own; the Routing view in the app
-and `magpie group` make any other:
+and `blackpie group` make any other:
 
 ```sh
-magpie groups                           # yours, then those magpie found
-magpie group add "Opus anywhere" models=claude/claude-opus-5-5,copilot/claude-opus-5.5 routing=order stays=session
-magpie group opus-anywhere              # one group, its models in order
-magpie group set opus-anywhere models+=openrouter/anthropic/claude-opus-5.5 routing=usage
-magpie group set opus-anywhere models-=copilot/claude-opus-5.5
-magpie group set opus-anywhere routing=weight weight=claude/claude-opus-5-5=3,copilot/claude-opus-5.5=1
-magpie group copy opus-anywhere "Opus test"  # the same models, routing and rules, to change on its own
-magpie group rm opus-anywhere           # one magpie found is hidden; magpie group restore <id> brings it back
-magpie claude group/opus-anywhere       # use it
+blackpie groups                           # yours, then those blackpie found
+blackpie group add "Opus anywhere" models=claude/claude-opus-5-5,copilot/claude-opus-5.5 routing=order stays=session
+blackpie group opus-anywhere              # one group, its models in order
+blackpie group set opus-anywhere models+=openrouter/anthropic/claude-opus-5.5 routing=usage
+blackpie group set opus-anywhere models-=copilot/claude-opus-5.5
+blackpie group set opus-anywhere routing=weight weight=claude/claude-opus-5-5=3,copilot/claude-opus-5.5=1
+blackpie group copy opus-anywhere "Opus test"  # the same models, routing and rules, to change on its own
+blackpie group rm opus-anywhere           # one blackpie found is hidden; blackpie group restore <id> brings it back
+blackpie claude group/opus-anywhere       # use it
 ```
 
 `routing=` is `smart` (the default: of the subscriptions with quota to
@@ -1558,9 +1556,9 @@ weight is 1 to 1000, `weight=` alone clears them all, and a group in the
 group counts as one member, `weight=group/fast=2`). `fast` (speed first; also `fastest`, `speed`) sends each request to
 the member that answered fastest lately, by the time to its first token
 and how fast it wrote: compare the same model on several API channels and
-the quickest goes first. `magpie provider set <id> routing=fast` does the
+the quickest goes first. `blackpie provider set <id> routing=fast` does the
 same for one provider's keys. A key has no allowance to weigh, so it goes by its
-order or by what magpie sent it lately — except a sub2api key its owner gave
+order or by what blackpie sent it lately — except a sub2api key its owner gave
 a 5-hour, day or 7-day limit: with the provider's Balance URL set to the
 relay's `/v1/usage`, its card shows those windows and routing weighs it by
 them as it does a subscription, resting it till the window renews once the
@@ -1577,7 +1575,7 @@ its errors go to the agent).
 one provider serves it.
 
 `listed=no` (the group editor's **Model lists: The group alone**) keeps the
-models a group names, and those its patterns match, out of `magpie models`,
+models a group names, and those its patterns match, out of `blackpie models`,
 `/v1/models` and every agent's list, so a client offers the group alone.
 A signed-in subscription's own models (a ChatGPT, Claude, Copilot or plugin
 account's) stay in every agent's list: the group is added on top of them,
@@ -1599,8 +1597,8 @@ key) rests and the next is asked, and the Routing page's Requests list shows
 every try. It takes no patterns, rules, classifier, effort or fast mode.
 
 ```sh
-magpie group add Jevs models=typesafe/jev-latest,bailian-token-plan/decision-model-preview routing=order
-curl -s localhost:3425/v1/systemone -H 'Authorization: Bearer magpie' \
+blackpie group add Jevs models=typesafe/jev-latest,bailian-token-plan/decision-model-preview routing=order
+curl -s localhost:3425/v1/systemone -H 'Authorization: Bearer blackpie' \
   -d '{"model":"group/jevs","state":{"message":"fix the login bug"},"questions":{"intent":{"type":"choice","choices":["bug","feature"]}}}'
 ```
 
@@ -1631,7 +1629,7 @@ the offered configurations on this device across window restarts; new or changed
 configurations can be offered again. **Add provider → Import…** still includes ignored configurations.
 Discovery runs in the background, at most once a minute when opening or
 refreshing the page, and refreshes after an import. Configurations already in
-magpie, entries that cannot be imported, providers turned off in their source
+blackpie, entries that cannot be imported, providers turned off in their source
 app, and ID collisions that cannot join as another key are excluded from the
 hint. The latter two remain available through manual import. Counts refer to
 configurations in source apps, which may include the same provider
@@ -1640,27 +1638,27 @@ reach the automatic hint; ignored fingerprints are kept in local browser storage
 
 The app's Import from other apps dialog can copy providers from Claude Code's
 `settings.json` (`CLAUDE_CONFIG_DIR` when set) and Codex's `config.toml`
-(`CODEX_HOME` when set) into magpie. Codex imports custom
+(`CODEX_HOME` when set) into blackpie. Codex imports custom
 `[model_providers.*]` entries with an inline `experimental_bearer_token`,
 including fixed headers for custom providers in
 `[model_providers.*.http_headers]` and models from
 `[profiles.*]` or `model_catalog_json`. Review the entries before importing;
-subsequent changes to agent settings are not automatically copied to magpie.
-Entries that point back to magpie or only name an `env_key` are skipped.
+subsequent changes to agent settings are not automatically copied to blackpie.
+Entries that point back to blackpie or only name an `env_key` are skipped.
 
 The same dialog reads OpenCode's own sign-ins, `auth.json` in
 `$XDG_DATA_HOME/opencode` (`~/.local/share/opencode` when unset, on Windows
 too), where `opencode auth login` keeps them. An API key comes in on the
-magpie preset at the same address: OpenCode Go's key on OpenCode Go, Zen's
+blackpie preset at the same address: OpenCode Go's key on OpenCode Go, Zen's
 (`opencode`) on OpenCode Zen, and a vendor's (OpenAI, Anthropic, DeepSeek,
 OpenRouter and others) on its own. OpenCode keeps no address beside a key,
-so one of a provider magpie has no preset for is listed and skipped. Sign-ins
+so one of a provider blackpie has no preset for is listed and skipped. Sign-ins
 (Claude Pro/Max, Copilot, an enterprise server's token) are listed and
-skipped; add the subscription in magpie instead. OpenCode is read only when
+skipped; add the subscription in blackpie instead. OpenCode is read only when
 you open the dialog: the Providers page's automatic check leaves it out, as
-the file holds every sign-in OpenCode has. magpie never writes to it.
+the file holds every sign-in OpenCode has. blackpie never writes to it.
 
-### How magpie picks an account
+### How blackpie picks an account
 
 When a subscription has several accounts on (Claude Code's or Codex's
 saved accounts, say), or a routing group has several members, the gateway
@@ -1727,7 +1725,7 @@ each of these groups ordered by the share used.
   end) go by when their credits left run out after that: the one whose
   credits are lost first goes first, and one with none that run out
   after those whose do. A Claude account
-  magpie knows nothing of yet goes first once, to learn what it has left
+  blackpie knows nothing of yet goes first once, to learn what it has left
   from the answer; any other unknown account goes after those known,
   and is still tried when they fail, ahead of any at 90% or more.
   An account with a month beside its week (Factory) goes by its month:
@@ -1752,7 +1750,7 @@ each of these groups ordered by the share used.
   conversation goes to the account the fewest other conversations of the
   last 30 minutes are on.
 - **Least used first**: the lowest share used first; then the account
-  magpie sent the fewest tokens lately (half of them stop counting after an
+  blackpie sent the fewest tokens lately (half of them stop counting after an
   hour). An account not known counts as unused.
 - **Weekly pace**: the account with the highest pace first. Pace is the
   share of the week left divided by the hours until the week renews (at
@@ -1760,11 +1758,11 @@ each of these groups ordered by the share used.
   windows that count the model (Opus's own and the general one), the lower
   pace counts. An account with no week goes by its 5 hours. Accounts whose
   pace is within a tenth of the highest in their band count as alike, and
-  among them the one magpie sent the fewest tokens lately goes first. A
+  among them the one blackpie sent the fewest tokens lately goes first. A
   Claude account not known goes first once, as in Smart; another unknown
   account counts as a fresh week.
 - **Speed first**: the account, key or group member that answered this
-  model fastest lately first. magpie keeps, in memory, how long each one's
+  model fastest lately first. blackpie keeps, in memory, how long each one's
   streamed answers took to their first token and how many tokens a second
   they wrote after it, newer answers counting more (a 20-minute
   half-life), and ranks them by the time a 200-token reply would take.
@@ -1796,10 +1794,10 @@ routed by one of them. Turned off, the pickers offer Smart alone, and a
 provider or group still set to one of them is tried in its listed order.
 
 Your own routing groups are the built-in plugin `groups` (Routing groups in
-Plugins › Built-in), which stays on while you have one. The groups magpie
+Plugins › Built-in), which stays on while you have one. The groups blackpie
 finds for a model two providers serve don't need it. Turned off, the gateway
 doesn't list or serve a group of your own, and the Routing page has no New
-group button; `magpie groups` still lists them.
+group button; `blackpie groups` still lists them.
 
 **Make first** sets the accounts' order. How much that order counts
 depends on the routing:
@@ -1810,7 +1808,7 @@ depends on the routing:
 | In turn | Where the rotation goes next. |
 | Smart | Only between accounts whose windows all renew in the same hours, or whose shares used are equal. |
 | Least used first | Only between accounts with the same share used and the same tokens sent lately. |
-| Weekly pace | Only between accounts in the same pace band that magpie sent the same tokens lately, in practice none since magpie started. |
+| Weekly pace | Only between accounts in the same pace band that blackpie sent the same tokens lately, in practice none since blackpie started. |
 | Speed first | Only between those within a tenth of each other's speed, and among those not measured lately. |
 | Cheapest first | Only between those that cost the same now, and among those with no known price. |
 
@@ -1824,10 +1822,10 @@ rests the account until it is back, and the same request goes to the next
 candidate at once, as long as none of the reply has been sent. How long it
 rests comes from the first of these that is known: the reset time in the
 refusal (Claude Code's `usage limit reached|<time>`, ChatGPT's
-`resets_at`), the reset of a window magpie last read as used up (98%, 100%
+`resets_at`), the reset of a window blackpie last read as used up (98%, 100%
 In order), the vendor's `Retry-After` or rate-limit reset header (an hour
 at most), else 15 minutes. A key's provider can rest longer of its own:
-`magpie provider quota-rest <id> 6h`, or `until 08:00` for an allowance
+`blackpie provider quota-rest <id> 6h`, or `until 08:00` for an allowance
 that comes back at a time of day (`until 00:00+08:00` on the vendor's
 clock). Its own rest stands over a `Retry-After` that asked for more than
 the hour. It is never longer than 8 days. The account's
@@ -1840,10 +1838,10 @@ the account for as long as the vendor asks (an hour at most), or a
 minute, doubled each time it comes back right after its rest, up to 30
 minutes. Out of credit rests half an hour. Any other failure rests a minute, longer each time it fails
 again, up to 10 minutes; a subscription that fails with a window used up
-rests until that window renews. `magpie provider rest-cap <id> 4h` moves
+rests until that window renews. `blackpie provider rest-cap <id> 4h` moves
 both of those caps, 30 and 10 minutes, for one provider's keys and
 accounts, from 1 minute (every rest a minute) up to 8 days; `default` gives
-them back. `magpie provider rest-cap <id> off` is for a relay or an account
+them back. `blackpie provider rest-cap <id> off` is for a relay or an account
 pool whose unknown errors come now and then: a key or account of it that
 fails without saying why (a 5xx, a dropped connection) doesn't rest at all,
 and the next request asks it again. A refused key (401, 403), a model it
@@ -1863,17 +1861,17 @@ API. Codex and Chat clients get a 400 saying the model refused the request,
 which they don't ask again for. Any other 400 is never asked again.
 
 **Through the gateway, or on its own.** Everything above is the gateway's,
-for requests sent through magpie. Claude Code or Codex used on its own
+for requests sent through blackpie. Claude Code or Codex used on its own
 talks to the vendor with the account it is signed in to, and routing
-never sees it. For that, magpie looks at the account the agent is signed
+never sees it. For that, blackpie looks at the account the agent is signed
 in to a minute after it starts and every 5 minutes after: once it has used
-98% of a window (100% In order), or reached its usage cap, magpie signs
+98% of a window (100% In order), or reached its usage cap, blackpie signs
 the agent in to the next ticked account, in their order, whose allowance
-is known and under that share. A saved Claude account magpie knows
+is known and under that share. A saved Claude account blackpie knows
 nothing of yet (see below) is not moved to. When every other account is
-past that share too, magpie moves the agent to the one with the most room
+past that share too, blackpie moves the agent to the one with the most room
 left, if it has more than a point more than the account it is on; else the
-agent stays. `magpie accounts switch claude next` (or `codex next`) does
+agent stays. `blackpie accounts switch claude next` (or `codex next`) does
 the same by hand: the next account after the one the agent is on, in
 their order and wrapping round, that has room, or the one with the most
 room left when none has. It takes accounts that aren't ticked too, as
@@ -1886,38 +1884,38 @@ it. *Keep … signed in to* turns this off: the agent stays on the first
 account, or on the account you picked, whatever it has left. It changes nothing in the gateway's routing.
 
 Removing the account Codex or Claude Code is signed in to (its *Remove*,
-or `magpie accounts forget <codex|claude> <email|name>`) signs the agent
+or `blackpie accounts forget <codex|claude> <email|name>`) signs the agent
 in to another of its accounts first, as that one's *Use* would, then
 forgets this one; if that switch fails, nothing is removed. Codex's only
 account is signed out instead, as `codex logout` does. Claude Code is
 never signed out: when the account is the only one it can be signed in
-to, magpie keeps it and
+to, blackpie keeps it and
 says so. Add another account first, or sign out in Claude Code itself,
 then remove it.
 
-With more than one Codex account on, magpie also sets `openai_base_url`
+With more than one Codex account on, blackpie also sets `openai_base_url`
 in Codex's config.toml, so a request the signed-in account has no
 allowance for goes on to the others through the gateway. *Only switch
-Codex's sign-in* under Providers › Codex (or `magpie accounts switch-only
-codex on`) leaves that out: magpie only moves Codex's own sign-in
+Codex's sign-in* under Providers › Codex (or `blackpie accounts switch-only
+codex on`) leaves that out: blackpie only moves Codex's own sign-in
 (`auth.json`) as above, and Codex's requests go straight to OpenAI, never
-through magpie (#1907). An `openai_base_url` you wrote yourself stays. The
+through blackpie (#1907). An `openai_base_url` you wrote yourself stays. The
 Codex app and a running `codex app-server` read the sign-in when they
 start, so one already open stays on its account until it is opened again;
-a new `codex` session takes the new one. Connected to magpie, Codex's
+a new `codex` session takes the new one. Connected to blackpie, Codex's
 requests go through it as before.
 
-*Only switch Claude Code's sign-in* under Providers › Claude (or `magpie
+*Only switch Claude Code's sign-in* under Providers › Claude (or `blackpie
 accounts switch-only claude on`) keeps the Claude accounts to Claude
-Code alone, with one account too: magpie still moves Claude Code's own
+Code alone, with one account too: blackpie still moves Claude Code's own
 sign-in as above, and serves no request on them. They leave the model
 list, and a request that names them, from any agent, a group, a
-fallback or a Claude Code connected to magpie, is refused as kept to
+fallback or a Claude Code connected to blackpie, is refused as kept to
 Claude Code, so no turn runs through Claude Code's SDK mode, which
 spends more of the allowance than Claude Code used on its own (myduso on
 Discord). Their usage is still read and shown.
 
-**Switch accounts only.** To use magpie only to switch Claude Code (or
+**Switch accounts only.** To use blackpie only to switch Claude Code (or
 Codex) between your accounts, leave it not connected on Agents and sign
 your accounts in under Providers › Claude Code. Its row on Agents then
 shows the account it is signed in to; click it, and the *Switch accounts
@@ -1930,7 +1928,7 @@ it from any app, open Claude Code's (or Codex's) row and click its
 *account* line.
 
 **How often an allowance is read.** Routing uses what was read last and
-never waits for a reading, except the first one after magpie starts (3
+never waits for a reading, except the first one after blackpie starts (3
 seconds at most). A reading over a minute old is read again in the
 background as a request is routed, and an account that fails for its
 quota is read again at once; if a reading was already under way as it
@@ -1938,21 +1936,21 @@ failed, the account is read again as soon as that reading is back. A
 reading the Usage page made counts as one, its age from when it was made.
 Codex and most other subscriptions read every
 account from the vendor this way. A Codex account is also known from each
-reply ChatGPT sends magpie for it, which says what the account has used:
+reply ChatGPT sends blackpie for it, which says what the account has used:
 an account near its usage cap is held from the next turn on (#1295). A
 usage cap is set on the account's row for each of its windows, and a
 window can have one of its own, set from its meter: a five-hour window at
 50% and a weekly one at 40%, or no cap on one window. The account is held
 while any window is past its own. A
-usage cap is still a stop on what magpie has read, not a guarantee: a turn
+usage cap is still a stop on what blackpie has read, not a guarantee: a turn
 already under way can take an account past it, so a 99% cap doesn't
-promise 1% is left. Claude is different: magpie never asks
+promise 1% is left. Claude is different: blackpie never asks
 Anthropic itself. It reads only the account Claude Code is signed in to,
 by running Claude Code's `/usage`:
 
-- once after magpie starts;
+- once after blackpie starts;
 - when you open or refresh the Usage page (in the app or the TUI), or run
-  `magpie quota` or `magpie accounts`, at most every 30 seconds;
+  `blackpie quota` or `blackpie accounts`, at most every 30 seconds;
 - otherwise again after 5 to 15 minutes (drawn at random each time), and
   only if Claude Code was used since.
 
@@ -1965,27 +1963,27 @@ whose reset has passed counts as empty again.
 ### Signed-in agents as providers
 
 An agent you have signed in to is a subscription with models behind it, so
-magpie offers it as a provider too. Claude Code (an OAuth login in the macOS
+blackpie offers it as a provider too. Claude Code (an OAuth login in the macOS
 Keychain or `~/.claude/.credentials.json`), Codex (a ChatGPT login in
 `~/.codex/auth.json`), Copilot (a GitHub login in
 `~/.config/github-copilot/apps.json`), Devin (`devin auth login`, kept in
-`~/.local/share/devin/credentials.toml`) and Qoder (signed in from magpie with
-its OAuth device flow, kept in magpie's own config; Qoder CN is its own
+`~/.local/share/devin/credentials.toml`) and Qoder (signed in from blackpie with
+its OAuth device flow, kept in blackpie's own config; Qoder CN is its own
 subscription beside it, for accounts on qoder.cn made with an Alibaba Cloud
-account or a phone number, which can't sign in on qoder.com) appear in `magpie providers` and in
+account or a phone number, which can't sign in on qoder.com) appear in `blackpie providers` and in
 the Providers tab as *signed in as …*, with their models spelled
 `claude/claude-sonnet-5`, `codex/gpt-5.5`, `copilot/claude-sonnet-4.5` or
-`devin/swe-2-max` in every other agent's picker. magpie reads the agent's own credentials each
+`devin/swe-2-max` in every other agent's picker. blackpie reads the agent's own credentials each
 time, refreshes tokens the way the agent does — writing a rotated token
 back where the agent will find it — and stores nothing but your model
 picks; sign out of the agent and the provider is gone. The model list is
-the vendor's own too: magpie asks Anthropic's, Copilot's or Codex's API with
+the vendor's own too: blackpie asks Anthropic's, Copilot's or Codex's API with
 that same sign-in, so a model added upstream appears on the next refresh.
-The ChatGPT backend only streams and rejects a few parameters, so magpie
+The ChatGPT backend only streams and rejects a few parameters, so blackpie
 translates non-streaming requests and drops what it would refuse.
 Claude subscriptions are different: Anthropic classifies another agent's
 system prompt as third-party traffic even when the OAuth request otherwise
-looks like Claude Code. magpie therefore drives the genuine local `claude`
+looks like Claude Code. blackpie therefore drives the genuine local `claude`
 binary for every Claude subscription generation. The caller's tools are
 bridged into that live turn over MCP, and tool results resume the same Claude
 Code process; Pi, OpenCode and every other agent use this path automatically.
@@ -1998,76 +1996,76 @@ devin CLI uses, and a Cursor subscription to the agent API cursor-agent
 uses, each with the CLI's sign-in and the caller's tools passed through
 (Cursor's model calls them as MCP tools; none of Cursor's own tools run).
 Google sign-ins — Gemini CLI's and Antigravity's — talk to Google's Code
-Assist API directly: magpie reads Gemini CLI's own login from `~/.gemini` or
+Assist API directly: blackpie reads Gemini CLI's own login from `~/.gemini` or
 signs one in itself, and refreshes the token in memory. Google no longer
 serves Gemini CLI's sign-in to individual accounts, only to Gemini Code
 Assist Standard and Enterprise, which need a Google Cloud project named
-(`magpie accounts project gemini <email> <project-id>`, or
+(`blackpie accounts project gemini <email> <project-id>`, or
 `GOOGLE_CLOUD_PROJECT` in `~/.gemini/.env`). Google may suspend an
-Antigravity account it sees used outside Antigravity, so magpie asks before
+Antigravity account it sees used outside Antigravity, so blackpie asks before
 adding one; use an account you can afford to lose.
 
 Accounts signed in elsewhere can be imported from their files instead of
 signed in again: *Import accounts from a file…* under a subscription's
-accounts, or `magpie accounts import <codex|claude|antigravity|factory>
+accounts, or `blackpie accounts import <codex|claude|antigravity|factory>
 <file>... [--yes]`. For ChatGPT that takes Codex's `auth.json`, codexbar's
 `~/.codexbar/config.json` (every ChatGPT account it switches between) and
 the exports of Cockpit Tools, CLIProxyAPI, Sub2API and claude-swap (Claude), as many files as
 you like. Each ChatGPT sign-in is refreshed before it is added, which
-checks it and makes magpie its only holder: the tool the file came from
+checks it and makes blackpie its only holder: the tool the file came from
 (Codex on another computer, codexbar, Cockpit Tools, CLIProxyAPI) is
 signed out of that account and has to sign in again. A backup carries no
 sign-in, so this is also how accounts move to a new computer: import the
 file from the old one there. The files are only read. An account
-magpie has already is left as it is, two Team seats of one email stay two
+blackpie has already is left as it is, two Team seats of one email stay two
 accounts, and an entry with only an access token (a ChatGPT web session)
 is refused, since it would stop working within days with nothing to renew
 it. For Claude it takes Claude Code's `.credentials.json`, CLIProxyAPI's
 auth files and claude-swap's export (`cswap --export <file>`, format 1;
 an encrypted one is decrypted first, and an API-key account is added as a
-key instead). A Claude sign-in is kept as the file has it, magpie asking
+key instead). A Claude sign-in is kept as the file has it, blackpie asking
 Anthropic nothing, with its organization, and a cswap alias becomes the
-account's name in magpie when it has none and the name picks no other
+account's name in blackpie when it has none and the name picks no other
 account. Claude Code renews it the first time it runs on it, and the
 file's copy stops working then: remove the account from cswap (`cswap
 --remove-account`) rather than switch to it there again.
 
 ### Connecting anything else
 
-The gateway listens on `127.0.0.1:3425` (`MAGPIE_ADDR` changes it) and starts
-with the app; `magpie serve` runs it alone. For reverse-proxied or container
-deployments, set `MAGPIE_PUBLIC_URL=https://magpie.example.com` to the base
+The gateway listens on `127.0.0.1:3425` (`BLACKPIE_ADDR` changes it) and starts
+with the app; `blackpie serve` runs it alone. For reverse-proxied or container
+deployments, set `BLACKPIE_PUBLIC_URL=https://blackpie.example.com` to the base
 URL shown in the console and CLI, including connection examples. While
-other machines are let in (Share on local network, or a `MAGPIE_ADDR` on
+other machines are let in (Share on local network, or a `BLACKPIE_ADDR` on
 the network), the Gateway page's Connect starts at it until you pick
 another address there, Settings › About lists it beside the local URL, and
-`magpie web` shows it as the gateway's address: on the Gateway page, in
+`blackpie web` shows it as the gateway's address: on the Gateway page, in
 About's Gateway URL and at the sidebar's foot. Local agent configs still
 use the local gateway address.
 
-Building an app or agent that should use magpie, or get a row on the
+Building an app or agent that should use blackpie, or get a row on the
 Agents page: see [Integrating your app or agent](integrating.md).
 
 External clients behind a reverse proxy need an enabled gateway key
 (Gateway → Gateway keys): with Gateway → Share on local network on, or a
-`MAGPIE_ADDR` on the network, magpie asks for one; otherwise it refuses
+`BLACKPIE_ADDR` on the network, blackpie asks for one; otherwise it refuses
 them, unless the proxy authenticates its clients itself
-(`MAGPIE_TRUST_PROXY=1`, below). A public URL with no port of
-its own — a reverse proxy's `https://magpie.example.com` — is the address
-`magpie web` prints for its own page too. One location is enough: the
+(`BLACKPIE_TRUST_PROXY=1`, below). A public URL with no port of
+its own — a reverse proxy's `https://blackpie.example.com` — is the address
+`blackpie web` prints for its own page too. One location is enough: the
 page's port (`127.0.0.1:3430`) answers the gateway's client routes as well
 (`/v1/…`, `/v1beta/…`, `/mcp/…`, `/backend-api/codex/…` and the same
 routes without `/v1`), handing them to the gateway, so a proxy that sends
-everything to the page's port serves the page at `https://magpie.example.com/`
-and the agents at `https://magpie.example.com/v1`. On the page's port every
+everything to the page's port serves the page at `https://blackpie.example.com/`
+and the agents at `https://blackpie.example.com/v1`. On the page's port every
 one of those routes is answered as a request from another machine, from
 loopback too: only while Gateway → Share on local
-network is on (or `MAGPIE_ADDR` is on the network), and with an enabled
+network is on (or `BLACKPIE_ADDR` is on the network), and with an enabled
 gateway key, after the allow list. A forward to that port that adds no
 forwarding header (frp's `tcp`, `ssh -R`, socat, an nginx `proxy_pass`
-without `X-Forwarded-For`) reaches it from loopback, so magpie can't tell
+without `X-Forwarded-For`) reaches it from loopback, so blackpie can't tell
 it from an agent on this computer and never answers it as one;
-`MAGPIE_TRUST_PROXY=1` doesn't change that. The page's sign-in cookie is
+`BLACKPIE_TRUST_PROXY=1` doesn't change that. The page's sign-in cookie is
 no gateway key, and the page and its `/api` still need the page's key.
 Agents on this computer call the gateway's own port (`127.0.0.1:3425`),
 which needs no key from loopback. Ollama's `/api/*` and Claude Desktop's
@@ -2079,7 +2077,7 @@ forwarding header needs a gateway key as one from the network does (see
 a forwarding header looks like an agent here: put the page's port, not
 the gateway's, behind a forward that adds none. A proxy that authenticates
 its clients itself can be trusted on the gateway's port with
-`MAGPIE_TRUST_PROXY=1`.
+`BLACKPIE_TRUST_PROXY=1`.
 
 It exposes:
 
@@ -2094,18 +2092,18 @@ It exposes:
 | `/v1/models`, `/v1beta/models` | the catalog            |
 | `/v1/codex/models`       | the catalog as Codex's `model_catalog_url` reads it ([Codex on another computer](#providers-and-the-gateway)) |
 | `/api/version`, `/api/tags`, `/api/show` | the catalog as an Ollama server lists it, for a client that takes a custom endpoint only as Ollama (below) |
-| `/mcp/magpie/hub` | MCP (Streamable HTTP): every MCP server in the Library, as one server, for any app, while *Library → MCP → MCP router* is on |
-| `/mcp/magpie/hub/{agent}` | MCP (Streamable HTTP): the Library's MCP servers ticked for that agent, as one server, while *Library → MCP → MCP router* is on |
+| `/mcp/blackpie/hub` | MCP (Streamable HTTP): every MCP server in the Library, as one server, for any app, while *Library → MCP → MCP router* is on |
+| `/mcp/blackpie/hub/{agent}` | MCP (Streamable HTTP): the Library's MCP servers ticked for that agent, as one server, while *Library → MCP → MCP router* is on |
 
 With that switch on, each agent that takes an MCP server over HTTP is
-given one entry, `magpie`, in place of the Library's servers, and magpie
+given one entry, `blackpie`, in place of the Library's servers, and blackpie
 runs those servers itself, once for every agent: a command is started on
 its first call and ended after 10 minutes with none. Each tool is named
 `<server>__<tool>`, and a tool turned off in the Library isn't listed. An
 agent that reaches no server over HTTP (Claude Desktop), or has an entry
-called `magpie` of its own, keeps each server's own entry, and the page
+called `blackpie` of its own, keeps each server's own entry, and the page
 says so. An agent in WSL or on another computer is given the address it
-reaches magpie at, with its key. Turning the switch off gives every agent
+reaches blackpie at, with its key. Turning the switch off gives every agent
 each server's own entry again. It is guarded as the gateway is: a local
 request, or one with a gateway key, and no other web page
 ([MCP router](subsystems/mcp-router.md)).
@@ -2116,7 +2114,7 @@ Each `/v1/models` entry includes `reasoning` and `supported_reasoning_levels`
 clients of the Catwalk schema (Crush and kin) read (#2576). A routing group is marked `reasoning` when any
 member thinks; `supported_reasoning_levels` lists the levels the members
 that think have in common. A member known not to think doesn't take them
-away (#2127), nor does one whose levels nothing knows (#597). A member magpie
+away (#2127), nor does one whose levels nothing knows (#597). A member blackpie
 knows does not think is sent no reasoning ask when the group routes to it,
 so the effort the group is asked for reaches the members that take it and
 doesn't turn a vendor away as a 400; a member nothing speaks for is sent
@@ -2132,22 +2130,22 @@ from `/api/tags`, each one's tools, vision, thinking and window from
 `/api/show`, and chats on `/v1/chat/completions`. Ollama's own chat
 (`/api/chat`, `/api/generate`, so `ollama run`) isn't served. Copilot sends
 no key, so this works on this computer only; behind a reverse proxy with a
-single public URL, `/api` goes to `magpie web`'s page (which answers the
+single public URL, `/api` goes to `blackpie web`'s page (which answers the
 gateway's `/v1` routes but not its `/api` ones), so give the gateway's own
 port.
 
 Requests pass straight through when the vendor speaks the agent's API and
 are translated otherwise, streaming, tool calls and reasoning included. The
-key is `magpie` (any value works; the gateway only listens on loopback), and
+key is `blackpie` (any value works; the gateway only listens on loopback), and
 models are named `provider/model`.
 
 - A routing group is asked by its id (`group/<id>`) or its name.
 - A bare model id (`glm-5.3`) works too. When several providers serve it,
-  it goes to the routing group magpie found for it, which asks them in the
+  it goes to the routing group blackpie found for it, which asks them in the
   order of the Providers page and falls over to the next. With found
   groups off, it goes to the first of them in that order alone.
 - Speech to text (`/v1/audio/transcriptions`, `/v1/audio/translations`)
-  takes OpenAI's multipart form, its `model` a magpie id such as
+  takes OpenAI's multipart form, its `model` a blackpie id such as
   `openai/whisper-1`, `groq/whisper-large-v3` or a custom provider's own
   (a vLLM `qwen3-asr`). The form goes to that provider's OpenAI-style base
   as it was sent, the audio byte for byte; only the model is set to the
@@ -2155,27 +2153,27 @@ models are named `provider/model`.
   The answer comes back in the vendor's own format (`json`, `text`, `srt`,
   `vtt`). A provider with no OpenAI-style API is refused; one that has no
   such endpoint answers its own 404. Text to speech is not served.
-- Every reply names who answered in `X-Magpie-Provider` (the provider)
-  and `X-Magpie-Model` (`provider/model`), and so does the usage log.
+- Every reply names who answered in `X-Blackpie-Provider` (the provider)
+  and `X-Blackpie-Model` (`provider/model`), and so does the usage log.
 
 Anything with a base-URL setting can use it:
 
 | Tool speaks | Base URL                   | Environment                                   |
 | ----------- | -------------------------- | --------------------------------------------- |
-| OpenAI      | `http://127.0.0.1:3425/v1` | `OPENAI_BASE_URL`, `OPENAI_API_KEY=magpie`      |
-| Anthropic   | `http://127.0.0.1:3425`    | `ANTHROPIC_BASE_URL`, `ANTHROPIC_API_KEY=magpie` |
-| Gemini      | `http://127.0.0.1:3425`    | `GOOGLE_GEMINI_BASE_URL`, `GEMINI_API_KEY=magpie` |
+| OpenAI      | `http://127.0.0.1:3425/v1` | `OPENAI_BASE_URL`, `OPENAI_API_KEY=blackpie`      |
+| Anthropic   | `http://127.0.0.1:3425`    | `ANTHROPIC_BASE_URL`, `ANTHROPIC_API_KEY=blackpie` |
+| Gemini      | `http://127.0.0.1:3425`    | `GOOGLE_GEMINI_BASE_URL`, `GEMINI_API_KEY=blackpie` |
 
-An optional `X-Magpie-Account: <account>` header (the account's email
+An optional `X-Blackpie-Account: <account>` header (the account's email
 or login, or its id on the Routing page) pins a request to one account of a
 subscription with several: only it is tried, and an unknown account, one
 whose plan lacks the model, or one resting is an error rather than another
 account's reply. The header is not sent on to the vendor.
 
 A status bar can show where a turn went before its first token arrives:
-send `X-Magpie-Session: <id>` with the requests (an agent's own session
+send `X-Blackpie-Session: <id>` with the requests (an agent's own session
 header, such as Pi's or Claude Code's, works too) and read
-`GET /v1/magpie/route?session=<id>`. It answers the session's latest
+`GET /v1/blackpie/route?session=<id>`. It answers the session's latest
 request as routing has it so far — `asked` (the model the agent named),
 `group`, `rule` (the group's rule that matched, and `rule.pick`, the
 effort its decision model picked), `model` and `effort` (the member being
@@ -2186,54 +2184,54 @@ tried now, as `provider/model`, and the reasoning it was sent at), and
 decided, before the vendor is asked. `after=<seq>&wait=<seconds>` (up to 60)
 holds the answer until the route changes past the `seq` of the last one,
 so a UI can follow a turn with one request at a time. Only the session
-named is told; like `/v1/magpie/quotas`, it answers this machine, and
+named is told; like `/v1/blackpie/quotas`, it answers this machine, and
 another only with the key of a gateway shared on the local network. A key
 held to a budget, to some models or to some accounts is told the routes of
 its own requests alone: another key's session answers `route: null`.
 
-To show the one in use without a session, `GET /v1/magpie/quotas` (and
-`magpie quota --json`, the same list) has `lastServedAt` on each
+To show the one in use without a session, `GET /v1/blackpie/quotas` (and
+`blackpie quota --json`, the same list) has `lastServedAt` on each
 subscription account, plan and key that answered a request through the
 gateway in the last 30 days, and `last: true` on the latest. It is kept
 in `served.json` beside `providers.json`, so a restart keeps it.
 
 Each subscription window there also has the Usage page's whole-window
 estimate (#2333): `holds` (`tokens`, `cost` at API list prices, `priced`)
-reckoned from magpie's own calls through the account since the window
+reckoned from blackpie's own calls through the account since the window
 began, over the share used. Where it can't be told honestly, `holdsWhy`
 says why instead: `low` (under 5% used), `clock` (no reset clock), `log`
-(the window began before magpie's log), `none` (nothing routed in it) or
+(the window began before blackpie's log), `none` (nothing routed in it) or
 `credits` (a call in it may have been paid from credits). A window with
 neither is one no whole is told for: a pool, a family, money, or a card
 with a balance or read on another computer.
 
-`GET /v1/magpie/quotas?kept=1` answers the same list from what magpie last
+`GET /v1/blackpie/quotas?kept=1` answers the same list from what blackpie last
 read, asking no vendor and never waiting for a read, for something that asks
-often. `magpie statusline` is built on it for Claude Code's status line
+often. `blackpie statusline` is built on it for Claude Code's status line
 (#1997): Claude Code runs it on every message with the session's JSON on
 stdin, and it prints one line, the model the session's latest turn went to
-(from `/v1/magpie/route`), then each subscription and plan with its windows'
+(from `/v1/blackpie/route`), then each subscription and plan with its windows'
 use, `*` on the one that answered last:
 `→ claude/claude-opus-5-5 | claude a@example.com* 5h 62% 7d 41% | claude B 5h 8% 7d 30%`.
 The accounts that answered through the gateway in the last 30 days are
-shown, every one when none has; `magpie statusline claude` (a provider, or
+shown, every one when none has; `blackpie statusline claude` (a provider, or
 an account's email, login or name) keeps only those. It works however Claude
 Code signs in to the gateway, unlike the `anthropic-ratelimit-*` headers,
-which Claude Code reads only while signed in to claude.ai. magpie doesn't
+which Claude Code reads only while signed in to claude.ai. blackpie doesn't
 write it into Claude Code's settings, where another status line may be;
 add it to `~/.claude/settings.json` yourself:
-`"statusLine": {"type": "command", "command": "magpie statusline"}`. With
+`"statusLine": {"type": "command", "command": "blackpie statusline"}`. With
 the gateway not running it prints an empty line.
 
-`magpie heap [<file>]` is for a report of magpie holding too much memory: a
+`blackpie heap [<file>]` is for a report of blackpie holding too much memory: a
 macOS `sample` of the app shows Go's frames as `???`. It asks the running
-magpie that serves the gateway (the app, the menu bar, `magpie serve` or
-`magpie web`) for `GET /v1/magpie/heap`, a Go heap profile taken after a
+blackpie that serves the gateway (the app, the menu bar, `blackpie serve` or
+`blackpie web`) for `GET /v1/blackpie/heap`, a Go heap profile taken after a
 collection (`runtime/pprof`'s `heap`, gzipped protobuf, which
 `go tool pprof` reads), and writes it to `<file>`, else
-`magpie-heap-<date>-<time>.pb.gz` in the working folder, never over a file
+`blackpie-heap-<date>-<time>.pb.gz` in the working folder, never over a file
 there. It prints the file and the runtime's numbers the gateway sends in
-`X-Magpie-Heap-Stats`: the process, `HeapAlloc` (and what is live after the
+`X-Blackpie-Heap-Stats`: the process, `HeapAlloc` (and what is live after the
 collection), `HeapInuse`, `HeapSys`, `StackSys`, `Sys` (all Go took from
 the system; a footprint far above it is outside Go, such as the webview),
 `NumGC` and the goroutine count. The route answers only a program on this
@@ -2241,88 +2239,88 @@ computer calling it as `localhost` or a loopback address: another machine,
 a proxy's or tunnel's client, any request with a browser's marks (an
 Origin, listed or not, `null`, `Sec-Fetch-*`, a `Mozilla/` user agent) and
 any other `Host` are refused 403, with a gateway key too. With
-`MAGPIE_ADDR` on an address that isn't loopback, the call isn't from
+`BLACKPIE_ADDR` on an address that isn't loopback, the call isn't from
 loopback, so it is refused as well.
 
-`magpie cpu [<file>] [--seconds N]` is for a report of magpie using too
+`blackpie cpu [<file>] [--seconds N]` is for a report of blackpie using too
 much CPU (@LeiCheng42 on X, while Codex ran). It asks the same running
-magpie for `GET /v1/magpie/cpu?seconds=N`, a Go CPU profile recorded for
+blackpie for `GET /v1/blackpie/cpu?seconds=N`, a Go CPU profile recorded for
 30 seconds, or N from 5 to 120 (`runtime/pprof`'s CPU profile, gzipped
-protobuf, which `go tool pprof` reads). While it records, use magpie as
+protobuf, which `go tool pprof` reads). While it records, use blackpie as
 you do when it is busy, such as running Codex: the gateway goes on serving
 every other call, and the profile is of that. It writes the profile to
-`<file>`, else `magpie-cpu-<date>-<time>.pb.gz` in the working folder,
+`<file>`, else `blackpie-cpu-<date>-<time>.pb.gz` in the working folder,
 and refuses a file that is there before it records, not after. It prints
-the file and the numbers the gateway sends in `X-Magpie-CPU-Stats`: the
+the file and the numbers the gateway sends in `X-Blackpie-CPU-Stats`: the
 process, the CPU time it used over the seconds recorded (user and system,
 as the system counts it, with the share of one core) and since it started,
 its cores and `GOMAXPROCS`, and the goroutine count. Go records one CPU
-profile at a time, so a second `magpie cpu` while one records is refused
+profile at a time, so a second `blackpie cpu` while one records is refused
 409; one whose caller hangs up stops recording. The route answers the same
-callers as `/v1/magpie/heap`, and refuses the same ones 403.
+callers as `/v1/blackpie/heap`, and refuses the same ones 403.
 
-`magpie goroutines [<file>]` is for a report of magpie stuck at something
+`blackpie goroutines [<file>]` is for a report of blackpie stuck at something
 while it goes on running, such as an app that kept an old partner list for
 days (#3362): killing it to look would end what was stuck. It asks the same
-running magpie for `GET /v1/magpie/goroutines`, every goroutine's stack as
+running blackpie for `GET /v1/blackpie/goroutines`, every goroutine's stack as
 text (`runtime/pprof`'s `goroutine` profile at debug 2, the form a crash
 prints): each goroutine's state and how long it has waited
 (`[select, 4320 minutes]`), its frames with source lines, and who started
 it. Arguments are printed as numbers, never what they point at, so it holds
 no keys or messages. Nothing is stopped. It writes the dump to `<file>`,
-else `magpie-goroutines-<date>-<time>.txt` in the working folder, never
+else `blackpie-goroutines-<date>-<time>.txt` in the working folder, never
 over a file there, and prints the file and the process the gateway names in
-`X-Magpie-Goroutine-Stats` (its id, program, version, uptime and goroutine
-count). The route answers the same callers as `/v1/magpie/heap`, and
+`X-Blackpie-Goroutine-Stats` (its id, program, version, uptime and goroutine
+count). The route answers the same callers as `/v1/blackpie/heap`, and
 refuses the same ones 403. It answers ahead of everything else a request
 passes through first (the allow list, which reads settings.json under its
 lock, and the catalog and file holds), so it still answers when those, or
 `/v1/models` and agents' requests behind them, are stuck, and the dump
 names who holds them.
 
-The app doesn't put `magpie` on a terminal's PATH unless Settings →
+The app doesn't put `blackpie` on a terminal's PATH unless Settings →
 Command line is used to put it there; until then, run the app's own
 program, which takes every command. On macOS:
-`/Applications/magpie.app/Contents/MacOS/magpie goroutines`. On Windows,
+`/Applications/blackpie.app/Contents/MacOS/blackpie goroutines`. On Windows,
 in PowerShell, the app as it last started (it records its path for
-`start magpie`):
-`& (Get-ItemPropertyValue 'HKCU:\Software\Microsoft\Windows\CurrentVersion\App Paths\magpie.exe' '(default)') goroutines | Out-Host`.
+`start blackpie`):
+`& (Get-ItemPropertyValue 'HKCU:\Software\Microsoft\Windows\CurrentVersion\App Paths\blackpie.exe' '(default)') goroutines | Out-Host`.
 `| Out-Host` has PowerShell wait for the app's program, which is built
 without a console of its own, and print what it says. The same goes for
-`magpie heap` and `magpie cpu`. A portable copy (a `.portable` file or
+`blackpie heap` and `blackpie cpu`. A portable copy (a `.portable` file or
 a `data` folder beside it) records no path, and a copy moved since its
 last start leaves the old one: run the program where it is, such as
-`& "$HOME\Downloads\magpie-windows-amd64.exe" goroutines | Out-Host`.
+`& "$HOME\Downloads\blackpie-windows-amd64.exe" goroutines | Out-Host`.
 
-`magpie log [--path] [-n N] [-f]` says where magpie's logs are. The app
+`blackpie log [--path] [-n N] [-f]` says where blackpie's logs are. The app
 (its window, the menu bar or tray icon and the panel, opened from the
 Finder, the Dock, the Start menu or a terminal) writes what it logs to
-`app.log` as well as to stderr: `~/Library/Logs/magpie/app.log` on macOS,
-`%LOCALAPPDATA%\magpie\logs\app.log` on Windows,
-`$XDG_STATE_HOME/magpie/app.log` (`~/.local/state/magpie/app.log`) on Linux
-and the BSDs, and `logs/app.log` in a portable magpie's data folder. A
+`app.log` as well as to stderr: `~/Library/Logs/blackpie/app.log` on macOS,
+`%LOCALAPPDATA%\blackpie\logs\app.log` on Windows,
+`$XDG_STATE_HOME/blackpie/app.log` (`~/.local/state/blackpie/app.log`) on Linux
+and the BSDs, and `logs/app.log` in a portable blackpie's data folder. A
 panic's trace goes there too. At 5 MiB it becomes `app.old.log`, over the
 one before, so two files are kept at most. The file is readable by your
 user only, and what looks like a key or token is masked in it, though
-nothing magpie logs is meant to carry one. Settings › About › Log has its
-path and an Open that shows its folder. `magpie log` prints its path, the
-older file when there is one, the service's log when `magpie daemon` is
-installed and the log of a gateway `magpie tui` left running; `--path`
+nothing blackpie logs is meant to carry one. Settings › About › Log has its
+path and an Open that shows its folder. `blackpie log` prints its path, the
+older file when there is one, the service's log when `blackpie daemon` is
+installed and the log of a gateway `blackpie tui` left running; `--path`
 prints the app's alone, `-n N` its last N lines and `-f` follows it,
-across a rotation, until Ctrl+C. `magpie serve`, `magpie web` and the TUI
+across a rotation, until Ctrl+C. `blackpie serve`, `blackpie web` and the TUI
 write no `app.log`: their log is the terminal's, or the service's.
 
 A gateway key held to a budget, to some models or to some accounts is told
-none of this magpie's accounts (#1981): `/v1/magpie/quotas`,
-`/v1/magpie/quotas/history`, `/v1/magpie/quotas/cards`,
-`POST /v1/magpie/quotas/refresh` and `/v1/magpie/concurrency` answer it
+none of this blackpie's accounts (#1981): `/v1/blackpie/quotas`,
+`/v1/blackpie/quotas/history`, `/v1/blackpie/quotas/cards`,
+`POST /v1/blackpie/quotas/refresh` and `/v1/blackpie/concurrency` answer it
 403 with `"code": "gateway_key_held"`, from this machine or another. It
-reads its own limit from `GET /v1/magpie/limit`. Another magpie that uses
+reads its own limit from `GET /v1/blackpie/limit`. Another blackpie that uses
 such a key shows only that key's own card.
 
 Its owner can let such a key be told the quotas of what it may use
 (#2216): the **Quotas** badge on the key's row (on hover; it reads
-*Quotas shown* while on), or `magpie gateway-key quotas <id> on` (`off`
+*Quotas shown* while on), or `blackpie gateway-key quotas <id> on` (`off`
 again, or no argument to see which). The four quota routes then tell it
 the cards of the providers whose every model it may use — a key held to
 some of a provider's models is told nothing of that provider, since the
@@ -2330,29 +2328,29 @@ models it may not use spend the same quota — and of those only the
 accounts and keys it may use, account names and balances included. A
 card it isn't told is refused a refresh (403 `gateway_key_held`), and a
 refresh that names none reads again only the cards it is told. A key
-told none of the cards is answered `/v1/magpie/quotas/cards` 403
-`gateway_key_held` as before, so another magpie shows its own card, not
-that nothing was read. `/v1/magpie/concurrency` and `/v1/magpie/usage`
+told none of the cards is answered `/v1/blackpie/quotas/cards` 403
+`gateway_key_held` as before, so another blackpie shows its own card, not
+that nothing was read. `/v1/blackpie/concurrency` and `/v1/blackpie/usage`
 still refuse it.
 
 An app of your own can read the Usage page's numbers too.
-`GET /v1/magpie/usage?period=<today|week|month|all>` is the page's summary,
+`GET /v1/blackpie/usage?period=<today|week|month|all>` is the page's summary,
 the same JSON as the window's `/api/usage` (`path` is left out for another
 machine), with every session in `sessions` where the window's lists the
-top 100 by tokens; `sessionCount` is how many there are. `GET /v1/magpie/usage/requests` is its requests a page at a time
+top 100 by tokens; `sessionCount` is how many there are. `GET /v1/blackpie/usage/requests` is its requests a page at a time
 (`offset`, `limit` up to 500), with the same filters as the Requests log:
 `period`, `day`, `agent`, `provider`, `model`, `account`, `callerKey`,
 `purpose`, `failed`, `retried`, `q`, `via`, `computer`. `callerKey=none`
 keeps the calls no gateway key made, and `by.callerKey` splits the page's
 calls by key, `none` among them (#2521). What was said in a call is not
-in either. Like `/v1/magpie/quotas`, they answer this machine, and another
+in either. Like `/v1/blackpie/quotas`, they answer this machine, and another
 only with a gateway key. A key held to a budget, to some models or to some
-accounts is told its own calls alone: `/v1/magpie/usage` refuses it with a
-403, and `/v1/magpie/usage/requests` keeps only its rows, filter lists and
+accounts is told its own calls alone: `/v1/blackpie/usage` refuses it with a
+403, and `/v1/blackpie/usage/requests` keeps only its rows, filter lists and
 share of the split by key.
 
 What is in flight now, for a status bar such as SketchyBar (#2132):
-`GET /v1/magpie/concurrency` answers `requests`, every agent request the
+`GET /v1/blackpie/concurrency` answers `requests`, every agent request the
 gateway is working on, whether or not any limit is set (those waiting for a
 slot among them); `waiting`, how many of those wait for a slot under a
 provider's or account's limit; and `tools`, Claude Code turns run through a
@@ -2366,16 +2364,16 @@ waiting in a key's or account's queue, `rpm` waiting for room in the
 minute, `upstream` out at the vendor (sent, or its reply streaming). No
 prompt, reply or key is in it. The read asks no vendor and isn't counted
 itself, so it can be polled every second. It answers as
-`/v1/magpie/quotas` does: this machine, another only with a gateway key,
+`/v1/blackpie/quotas` does: this machine, another only with a gateway key,
 and never a held key.
 
-An app that calls its vendor itself, not through magpie, can report those
-calls so the Usage page counts them: `POST /v1/magpie/usage/requests` with
+An app that calls its vendor itself, not through blackpie, can report those
+calls so the Usage page counts them: `POST /v1/blackpie/usage/requests` with
 `Content-Type: application/json`. The body is one record or an array of up
 to 5000 (32 MiB at most), shaped like a `usage.jsonl` line:
 
 ```sh
-curl -s http://127.0.0.1:3425/v1/magpie/usage/requests \
+curl -s http://127.0.0.1:3425/v1/blackpie/usage/requests \
   -H 'Content-Type: application/json' \
   -d '[{"t":"2026-10-13T08:00:00Z","agent":"my-app","provider":"anthropic",
         "model":"claude-sonnet-4-6","in":1200,"out":340,"cache_read":9000,
@@ -2396,7 +2394,7 @@ curl -s http://127.0.0.1:3425/v1/magpie/usage/requests \
   it to nine tenths, times 10/8 (at most `ms` × 10/8). A reply whose
   content came in under a quarter of its window was held and let go in a
   burst, and tells no speed. Leave out what you don't know.
-- **Pricing:** a record without `cost` is priced at magpie's prices for
+- **Pricing:** a record without `cost` is priced at blackpie's prices for
   its provider and model.
 - **Past times:** `t` is taken as given, however far back, so a history
   can be backfilled; it may not be before 2000-01-01T00:00:00Z or more
@@ -2425,21 +2423,21 @@ conversation did.
 Records written before these fields came have neither. Codex's sub-agents are told
 apart by `kind` only.
 
-`magpie quota refresh <provider> [<account>]` reads that card again, as its
+`blackpie quota refresh <provider> [<account>]` reads that card again, as its
 refresh button on the Usage page does, and prints it alone; the other
 vendors aren't asked. Name the account by its login or its alias, or write
 `<provider>/<account>`. A second refresh of the same card within 30 seconds
 asks nobody and prints what was read, saying so on stderr, so a status line
-can run it in a loop. `--json` prints the card as `magpie quota --json` does,
+can run it in a loop. `--json` prints the card as `blackpie quota --json` does,
 with `readAt` (when it was read) and `error` (why it couldn't be).
 
-`magpie quota wait <provider|account>` blocks until that subscription (any
-of its accounts magpie has on) or that one account has allowance again — no
+`blackpie quota wait <provider|account>` blocks until that subscription (any
+of its accounts blackpie has on) or that one account has allowance again — no
 window that stops it used up — then exits 0, so a long task stopped by its
 limit can go on unattended:
 
 ```sh
-until codex exec "…"; do magpie quota wait codex || break; done
+until codex exec "…"; do blackpie quota wait codex || break; done
 ```
 
 It reads the vendors itself, whether or not the gateway runs, and again
@@ -2452,33 +2450,33 @@ unknown name exits 2 and Ctrl+C 130.
 
 A ChatGPT account that holds credits keeps answering once a usage window is
 used up: the vendor spends the credits, so a task goes on. That is the
-default. `magpie quota credits <account> off` (or *Use credits* on the
-account's Usage card) turns it off for that account: once magpie's latest
+default. `blackpie quota credits <account> off` (or *Use credits* on the
+account's Usage card) turns it off for that account: once blackpie's latest
 reading of its windows, refreshed about every minute, shows one used up,
 the gateway holds it as used up till the window renews, and requests go to
 the other accounts, groups and fallbacks; with none left, the request gets a
 429 saying why, unless the account spends its resets by itself and its week
-is used up, when a reset is spent first. `magpie quota credits <account>
+is used up, when a reset is spent first. `blackpie quota credits <account>
 last` (or *Only after everything else* under *Use credits*) keeps the
 credits but spends them last: once a window is used up, the account is
 tried after every other account, key and fallback that isn't on its
 credits, so the order goes subscription, then API key, then the credits.
-`magpie quota credits` lists the accounts set not to spend them and those
-that spend them last, `magpie quota credits <account>` says one's.
+`blackpie quota credits` lists the accounts set not to spend them and those
+that spend them last, `blackpie quota credits <account>` says one's.
 It changes the gateway's routing only, never the account Codex is signed in
-to. The credits an account holds show beside its windows in `magpie quota`,
-`magpie accounts`, the Usage page and the menu bar panel.
+to. The credits an account holds show beside its windows in `blackpie quota`,
+`blackpie accounts`, the Usage page and the menu bar panel.
 
 An account can have a name of your own, for telling apart seats the vendor
 names alike (a team's GLM seats under masked emails): click the account's
-name in its provider's editor, or `magpie accounts alias <agent> <email>
-<name>` (`--clear` takes it off). The name is magpie's, kept in
+name in its provider's editor, or `blackpie accounts alias <agent> <email>
+<name>` (`--clear` takes it off). The name is blackpie's, kept in
 providers.json; the vendor's or plugin's sign-in is never written to. It
-shows on the account's Usage card, in the menu bar, in `magpie accounts`,
-`magpie quota` and `GET /v1/magpie/quotas` (`alias`). The name picks the
-account wherever its email does: `magpie accounts switch claude Work`,
+shows on the account's Usage card, in the menu bar, in `blackpie accounts`,
+`blackpie quota` and `GET /v1/blackpie/quotas` (`alias`). The name picks the
+account wherever its email does: `blackpie accounts switch claude Work`,
 `forget`, `alias`, `provider pool <id> --accounts` and `provider
-account-cap`. magpie refuses a name two accounts have, or one that is
+account-cap`. blackpie refuses a name two accounts have, or one that is
 another account's email, rather than pick one by guess; `next` after
 `switch` is always the next account (see above). A GLM Coding Plan
 seat added both as a key and as a signed-in ZCode account is shown once, on
@@ -2495,7 +2493,7 @@ same *Arrange* hides a subscription from the panel's tab (*Hide*, *Show*
 puts it back), and the tab's foot says how many are hidden. Hiding is the
 panel's only: routing, caps, the Usage page and the menu bar's own cells
 still have it, and a menu bar cell for it still opens its card. Both are
-kept in magpie's settings (`usageOrder`, `panelUsageHidden`). Which
+kept in blackpie's settings (`usageOrder`, `panelUsageHidden`). Which
 allowances the menu bar itself shows beside its icon is picked in Settings.
 The same list has *Tokens and cost today* and *Tokens and cost, last 7
 days*: every agent's requests as the Usage page's Requests tab sums them,
@@ -2507,42 +2505,42 @@ cached. Clicked, one opens the Requests tab at that period.
 The *Gateway* tab in the app has this as copy buttons and ready-made
 snippets (shell, curl, Python, Node) for each API, the list of model ids,
 and a Requests row that opens *Usage* › *Requests*, where each call shows with
-what it sent and got back; `MAGPIE_DEBUG=1` logs every call to the terminal.
+what it sent and got back; `BLACKPIE_DEBUG=1` logs every call to the terminal.
 
 **Claude Code** gets `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN` and the
 model variables in the `env` block of `settings.json`; picking a native
 model (`opus`, `sonnet`…) removes them and restores whatever was there.
 A key in `ANTHROPIC_AUTH_TOKEN` signs Claude Code out of claude.ai while it
-runs through magpie: claude.ai's plan limits in `/usage`, its connectors,
+runs through blackpie: claude.ai's plan limits in `/usage`, its connectors,
 voice and `/teleport` are off. Set its sign-in to claude.ai to keep that
-login: magpie writes the token empty, Claude Code sends magpie its claude.ai
-sign-in, and magpie never passes it on (nor its `oauth-2025-04-20` beta). A
-provider that refuses magpie's own key is then reported to Claude Code as
+login: blackpie writes the token empty, Claude Code sends blackpie its claude.ai
+sign-in, and blackpie never passes it on (nor its `oauth-2025-04-20` beta). A
+provider that refuses blackpie's own key is then reported to Claude Code as
 a 502, not as its sign-in refused, so Claude Code doesn't log out. Remote
 Control and ultrareview stay off: Claude Code has them only on Anthropic's
 own address. The choice is offered where the gateway takes any key, so not
-from a WSL distro under NAT while magpie is shared on the network.
+from a WSL distro under NAT while blackpie is shared on the network.
 
-**Codex** gets a `[model_providers.magpie]` table, `model_catalog_json`
-pointing at `~/.codex/magpie-models.json` (written from the catalog, so the
+**Codex** gets a `[model_providers.blackpie]` table, `model_catalog_json`
+pointing at `~/.codex/blackpie-models.json` (written from the catalog, so the
 models show in Codex's own list) and a valid `model`/`effort`; picking a
 native model or disconnecting removes `model_provider` and the catalog. The
-`[model_providers.magpie]` table stays, so a thread started on magpie can
+`[model_providers.blackpie]` table stays, so a thread started on blackpie can
 still be opened. Codex won't load its config at all when `model_provider =
-"magpie"` has no table ("Model provider `magpie` not found"). If another
-tool leaves that state behind, magpie writes the table back the next time
+"blackpie"` has no table ("Model provider `blackpie` not found"). If another
+tool leaves that state behind, blackpie writes the table back the next time
 it syncs. Signed in to ChatGPT (the sign-in field's default), Codex keeps
-its own provider and sign-in, and magpie's models join its list through
-`openai_base_url`. magpie becomes Codex's provider then only while the
+its own provider and sign-in, and blackpie's models join its list through
+`openai_base_url`. blackpie becomes Codex's provider then only while the
 Codex app holds the account: OpenAI no longer allows it and it has no
 credits left, except a workspace account still within its overage. The
-app sends nothing for a held account, so magpie steps in, and it steps
+app sends nothing for a held account, so blackpie steps in, and it steps
 back once the account has room again. A window at 100% with credits left
 doesn't count: Codex stays signed in and keeps sending on those. Your
 ChatGPT sign-in is never touched.
 Codex reads its model list at start-up, so restart it after a switch.
 
-**OpenCode, Pi, Crush** get a `magpie` provider entry and `magpie/provider/model`.
+**OpenCode, Pi, Crush** get a `blackpie` provider entry and `blackpie/provider/model`.
 
 **Gemini CLI** switches `auth` between API key, Google account and Vertex;
 the API key goes to `~/.gemini/.env`. Picking a catalog model points
@@ -2551,22 +2549,22 @@ the API key goes to `~/.gemini/.env`. Picking a catalog model points
 `settings.json`; a native model puts the previous auth back.
 
 **Antigravity CLI** (`agy`) takes the gateway, its key and the model only
-from how it is started. Picking a catalog model (`magpie agy <model>`)
-puts a function named `agy` in a marked block (`# >>> magpie agy >>>`) of
+from how it is started. Picking a catalog model (`blackpie agy <model>`)
+puts a function named `agy` in a marked block (`# >>> blackpie agy >>>`) of
 your shell profiles: `.zshrc`, the bash profile a terminal reads, and
 `config.fish` (the PowerShell profiles on Windows). In a new terminal,
-plain `agy` then runs `magpie agy run`, which starts the real agy with the
-gateway, the key and `--model` (yours wins when you give one); off magpie
+plain `agy` then runs `blackpie agy run`, which starts the real agy with the
+gateway, the key and `--model` (yours wins when you give one); off blackpie
 it starts agy untouched. A terminal open already takes the command the
-Launch row copies. Stepping out (`magpie agy default`) takes the block out
-again. `magpie agy env` prints what `agy run` adds.
+Launch row copies. Stepping out (`blackpie agy default`) takes the block out
+again. `blackpie agy env` prints what `agy run` adds.
 
 agy installed in a WSL distro is listed as Antigravity CLI · WSL
 <distro>, found by `~/.gemini/antigravity-cli` or the `agy` command there.
 A catalog model puts the same marked `agy` function in the distro's
 `~/.bashrc`, `~/.zshrc` and `~/.config/fish/config.fish` (each one that is
 there, plus the one for your login shell in the distro's `/etc/passwd`).
-There is no magpie inside the distro, so this function reads the model
+There is no blackpie inside the distro, so this function reads the model
 from `settings.json` itself. It names the gateway at the address the
 distro reaches it on: Windows' address under NAT, which a sync rewrites
 when WSL comes back on another one.
@@ -2576,17 +2574,17 @@ when WSL comes back on another one.
 A vendor or relay can hand its users a ready-made provider as a link:
 
 ```
-magpie://import?preset=deepseek&key=sk-…
-magpie://import?name=Acme%20Relay&chat=https://api.acme.example/v1&anthropic=https://api.acme.example&key=sk-…&models=gpt-5.5,claude-sonnet-5
+blackpie://import?preset=deepseek&key=sk-…
+blackpie://import?name=Acme%20Relay&chat=https://api.acme.example/v1&anthropic=https://api.acme.example&key=sk-…&models=gpt-5.5,claude-sonnet-5
 ```
 
-Opening one brings up magpie with what the link would add: the name, the
+Opening one brings up blackpie with what the link would add: the name, the
 hosts your prompts and key would go to, the models. Nothing is saved until
-you press *Add*. `magpie import <link>` does the same in a terminal.
+you press *Add*. `blackpie import <link>` does the same in a terminal.
 
 | Parameter   | Meaning                                                            |
 | ----------- | ------------------------------------------------------------------ |
-| `preset`    | a preset id (`magpie presets`); its endpoints are used. Not `google-vertex`, which is asked at your own Google Cloud project |
+| `preset`    | a preset id (`blackpie presets`); its endpoints are used. Not `google-vertex`, which is asked at your own Google Cloud project |
 | `region`    | with a preset that has regions, which one                          |
 | `name`      | the provider's name; required without a preset                     |
 | `id`        | its id; derived from the name when absent                          |
@@ -2598,24 +2596,24 @@ you press *Add*. `magpie import <link>` does the same in a terminal.
 | `models`    | model ids to expose, comma separated                               |
 | `catalog`   | models.dev provider id, for model names and reasoning levels       |
 | `website`, `keys` | the vendor's site and its API-key page (https)               |
-| `icon`      | an https picture of the vendor's own (PNG, JPEG, GIF, WebP, ICO, SVG, at most 1 MB). magpie downloads it once, after you confirm the import, into its icons folder; without one it falls back to the catalog's logo or a plain mark |
+| `icon`      | an https picture of the vendor's own (PNG, JPEG, GIF, WebP, ICO, SVG, at most 1 MB). blackpie downloads it once, after you confirm the import, into its icons folder; without one it falls back to the catalog's logo or a plain mark |
 
 Base URLs must be https (plain http only to this machine or the local
 network). Web pages and GitHub don't link custom schemes reliably, so link
-to `https://usemagpie.ai/import#<same parameters>` instead: it opens
-magpie, and offers the download when it is not installed. The parameters
+to `https://useblackpie.ai/import#<same parameters>` instead: it opens
+blackpie, and offers the download when it is not installed. The parameters
 stay in the fragment, which browsers never send to a server. The full guide,
 with a link builder: <https://usemagpie.ai/docs/import>.
 
 ## Install
 
 Download the app for macOS, Windows or Linux from
-[usemagpie.ai](https://usemagpie.ai), or install it from a terminal (on
+[useblackpie.ai](https://useblackpie.ai), or install it from a terminal (on
 Linux, the desktop app when GTK 3 and WebKitGTK 4.1 are installed, the
 terminal build otherwise):
 
 ```sh
-curl -fsSL https://usemagpie.ai/install.sh | sh
+curl -fsSL https://useblackpie.ai/install.sh | sh
 ```
 
 On Linux the installer asks nothing. A computer with a desktop (a
@@ -2627,42 +2625,42 @@ libwebkit2gtk-4.1-0` on Debian and Ubuntu, `sudo dnf install
 webkit2gtk4.1` on Fedora, `sudo pacman -S --needed webkit2gtk-4.1` on
 Arch, `sudo zypper install libwebkit2gtk-4_1-0` on openSUSE); run it again
 afterwards for the app. `--gui` installs the app at once, before its
-libraries; `--tui` (or `MAGPIE_CLI=1`) installs the terminal build on a
+libraries; `--tui` (or `BLACKPIE_CLI=1`) installs the terminal build on a
 desktop too. The libraries are looked up with `ldconfig -p`, in `/sbin`
 as well, since a Debian user's `PATH` doesn't have it, and in the usual
 library folders where there is no cache. On musl (Alpine) it is always the
 terminal build.
 
 Behind a firewall, or without access to GitHub, both the installer and
-`magpie update` take `--proxy <url>` (http, https, socks5, socks5h; or
-`MAGPIE_PROXY`, and `HTTPS_PROXY` / `ALL_PROXY` as usual) and
+`blackpie update` take `--proxy <url>` (http, https, socks5, socks5h; or
+`BLACKPIE_PROXY`, and `HTTPS_PROXY` / `ALL_PROXY` as usual) and
 `--mirror <prefix>`, a GitHub download mirror of your choosing put before
-the release's github.com URL (or `MAGPIE_MIRROR`; `magpie update mirror
+the release's github.com URL (or `BLACKPIE_MIRROR`; `blackpie update mirror
 <prefix>|off` keeps one for every update, the app's too):
 
 ```sh
-curl -fsSL https://usemagpie.ai/install.sh | sh -s -- --proxy http://127.0.0.1:7890
-magpie update --mirror https://mirror.example/
+curl -fsSL https://useblackpie.ai/install.sh | sh -s -- --proxy http://127.0.0.1:7890
+blackpie update --mirror https://mirror.example/
 ```
 
 No mirror is used unless you give one, and the SHA-256 every download is
-checked against still comes from usemagpie.ai, never from the mirror.
+checked against still comes from useblackpie.ai, never from the mirror.
 
 Mac releases are signed and notarised; the Windows and Linux builds are not
 signed yet (Windows SmartScreen may ask before the first run). Every build
 keeps itself current: the app
 downloads a new version in the background and installs it when you restart
-(*Restart to Update* in the menu) or quit; `magpie update` does the same from
+(*Restart to Update* in the menu) or quit; `blackpie update` does the same from
 a terminal. Every release is on
-[yetone/magpie-releases](https://github.com/yetone/magpie-releases/releases).
+[hmjz100/blackpie-releases](https://github.com/hmjz100/blackpie-releases/releases).
 
 ### Update channel
 
-magpie takes every version as it comes out unless you choose Stable, in
-*Settings → About → Update channel* or with `magpie update channel stable`
-(`magpie update channel every` goes back; `magpie update channel` prints
+blackpie takes every version as it comes out unless you choose Stable, in
+*Settings → About → Update channel* or with `blackpie update channel stable`
+(`blackpie update channel every` goes back; `blackpie update channel` prints
 the one in use). It is saved as `"updateChannel": "stable"` in
-settings.json, and the app and `magpie update` both follow it.
+settings.json, and the app and `blackpie update` both follow it.
 
 Stable is one version a week. Each Monday at 00:00 UTC it becomes the
 newest release that had been out for three days by then (Friday 00:00
@@ -2672,7 +2670,7 @@ When Stable moves past several versions, What's new lists the notes of
 every version since yours as one list.
 
 The update feed works this out from the release list
-(`https://usemagpie.ai/api/latest?channel=stable`); nothing is promoted
+(`https://useblackpie.ai/api/latest?channel=stable`); nothing is promoted
 by hand. A release is urgent when its notes have a line that starts with
 `**Urgent release:**` and says why, for example:
 
@@ -2680,7 +2678,7 @@ by hand. A release is urgent when its notes have a line that starts with
 **Urgent release:** the gateway sent requests without a key to a page on another site.
 ```
 
-magpie-releases' release run writes it from an `Urgent: <why>` trailer on
+blackpie-releases' release run writes it from an `Urgent: <why>` trailer on
 any commit since the version before. It can also be added to a published
 release with `gh release edit` while the release is among the newest 100
 (about a day of releases); the feed's ledger reads them every quarter
@@ -2689,14 +2687,14 @@ hour. A release is never marked prerelease for this.
 From source:
 
 ```sh
-go install github.com/yetone/magpie@latest
+go install github.com/hmjz100/blackpie@latest
 ```
 
 or build locally:
 
 ```sh
-make build            # ./magpie with the desktop app (needs cgo + the platform webview)
-make app              # macOS: magpie.app, a menu bar app with no Dock icon
+make build            # ./blackpie with the desktop app (needs cgo + the platform webview)
+make app              # macOS: blackpie.app, a menu bar app with no Dock icon
 make cli              # terminal-only build, no cgo, cross-compiles anywhere
 make release          # dist/: native app build + cli builds for every platform
 make release-windows  # dist/: the Windows app, amd64 and arm64 (cross-compiles)
@@ -2709,69 +2707,69 @@ Windows uses the WebView2 runtime that ships with the OS.
 
 Termux uses the Android terminal build: the installer puts it in
 `$PREFIX/bin`, and `make build` selects it automatically. With plain
-`go build` or `go install`, pass `-tags nogui`; use `magpie web` or
-`magpie tui` for the interface. `magpie autostart on` requires Termux:Boot.
+`go build` or `go install`, pass `-tags nogui`; use `blackpie web` or
+`blackpie tui` for the interface. `blackpie autostart on` requires Termux:Boot.
 
 ### As a background service
 
-`magpie daemon install` runs `magpie serve` as a service of your own, with
+`blackpie daemon install` runs `blackpie serve` as a service of your own, with
 no window and no desktop session: a server, or a machine you reach over
 SSH. The system starts it at login (and at boot, see below) and starts it
 again when it stops with a failure.
 
 ```sh
-magpie daemon install    # write the service and start it; again, to take a new PATH or proxy
-magpie daemon status     # running or not, its pid, file and logs, whether the gateway answers
-magpie daemon restart    # after updating magpie
-magpie daemon stop|start
-magpie daemon uninstall  # stop it and remove the file
-magpie daemon web on     # the service serves the browser page too; off stops it, no word shows it
+blackpie daemon install    # write the service and start it; again, to take a new PATH or proxy
+blackpie daemon status     # running or not, its pid, file and logs, whether the gateway answers
+blackpie daemon restart    # after updating blackpie
+blackpie daemon stop|start
+blackpie daemon uninstall  # stop it and remove the file
+blackpie daemon web on     # the service serves the browser page too; off stops it, no word shows it
 ```
 
 The service serves only the gateway unless asked for the page:
-`magpie daemon install --web` (or `magpie daemon web on` once installed)
-runs `magpie serve --web`, which serves the gateway and `magpie web`'s
+`blackpie daemon install --web` (or `blackpie daemon web on` once installed)
+runs `blackpie serve --web`, which serves the gateway and `blackpie web`'s
 page from one process, so the page shows the service's own gateway,
 providers and accounts. It listens on `127.0.0.1:3430`, which answers the
 gateway's `/v1` routes too (see [Connecting anything else](#connecting-anything-else)), so one
 reverse-proxy location serves both; `--lan` puts it on
 `0.0.0.0:3430` and `--addr host:port` anywhere, with the same warning as
-`magpie web --lan`: anyone with the link can change your settings. Its key
-is made once and kept in the service file (as `MAGPIE_WEB_KEY`, readable by
+`blackpie web --lan`: anyone with the link can change your settings. Its key
+is made once and kept in the service file (as `BLACKPIE_WEB_KEY`, readable by
 you alone), so the link stays the same across restarts and reinstalls;
 `daemon web off` drops it, and the next `on` makes a new one.
-`magpie daemon status` prints the link. `--no-web` installs without it.
+`blackpie daemon status` prints the link. `--no-web` installs without it.
 
-`magpie web` beside a running service doesn't take the gateway's port:
+`blackpie web` beside a running service doesn't take the gateway's port:
 when the service serves the page it prints that page's link and exits, and
-otherwise its own page uses the service's gateway and says so. A magpie
+otherwise its own page uses the service's gateway and says so. A blackpie
 holding the port but slow to answer (a busy server, or one still starting)
 is waited for, not raced: the new one serves the gateway only once the
 port is free.
 
-- **Linux:** a systemd user unit, `~/.config/systemd/user/magpie.service`
+- **Linux:** a systemd user unit, `~/.config/systemd/user/blackpie.service`
   (`$XDG_CONFIG_HOME/systemd/user` when set), run with `systemctl --user`,
-  no root. Its log: `journalctl --user -u magpie -f`. systemd starts a
+  no root. Its log: `journalctl --user -u blackpie -f`. systemd starts a
   user's units at their first login and stops them at their last, so for
   the gateway to run from boot with no one logged in, run
-  `sudo loginctl enable-linger $USER` once; `magpie daemon status` says so
+  `sudo loginctl enable-linger $USER` once; `blackpie daemon status` says so
   when it isn't on. From `su` or `sudo -u`, `systemctl --user` can't reach
   your session: log in as the user, or set
   `XDG_RUNTIME_DIR=/run/user/$(id -u)`. On WSL, turn systemd on first
   (`[boot] systemd=true` in `/etc/wsl.conf`). A system without systemd is
-  told so; run `magpie serve` under the manager it has.
-- **macOS:** a launch agent, `~/Library/LaunchAgents/com.yetone.magpie.serve.plist`,
+  told so; run `blackpie serve` under the manager it has.
+- **macOS:** a launch agent, `~/Library/LaunchAgents/com.hmjz100.blackpie.serve.plist`,
   loaded with `launchctl bootstrap gui/$UID`. Its log:
-  `~/Library/Logs/magpie/serve.log`, beside the app's own `app.log`
-  (`magpie log`).
-- **Windows:** not a service; `magpie autostart on` opens magpie, which
-  serves the gateway, when you log in. Inside WSL, `magpie daemon` works as
+  `~/Library/Logs/blackpie/serve.log`, beside the app's own `app.log`
+  (`blackpie log`).
+- **Windows:** not a service; `blackpie autostart on` opens blackpie, which
+  serves the gateway, when you log in. Inside WSL, `blackpie daemon` works as
   on Linux.
 
-The service gets the environment `magpie daemon install` ran in: `PATH`
-(where it finds the agents' CLIs and bun), the proxy variables, `MAGPIE_*`
-settings such as `MAGPIE_ADDR` (and the `--tls-cert`/`--tls-key` pair, as
-`MAGPIE_TLS_CERT` and `MAGPIE_TLS_KEY`), the XDG folders and the agents' own folder
+The service gets the environment `blackpie daemon install` ran in: `PATH`
+(where it finds the agents' CLIs and bun), the proxy variables, `BLACKPIE_*`
+settings such as `BLACKPIE_ADDR` (and the `--tls-cert`/`--tls-key` pair, as
+`BLACKPIE_TLS_CERT` and `BLACKPIE_TLS_KEY`), the XDG folders and the agents' own folder
 variables (`CODEX_HOME`, `CLAUDE_CONFIG_DIR`…). To that `PATH` it adds
 what a terminal of yours has and the shell may not: nvm's default Node
 (not its newest), the other version managers' and npm's folders, and your
@@ -2779,9 +2777,9 @@ login shell's own `PATH`, so plugins and the MCP servers they start find
 `node` with nvm loaded lazily or over SSH. When no `node` is found even
 then, the install says so. The file is readable by you
 alone, since a proxy's address can hold a password. Run the install again
-after changing any of them. It runs magpie by the name it has on `PATH`
+after changing any of them. It runs blackpie by the name it has on `PATH`
 when that is the same file (Homebrew's link stays right across updates),
-and refuses a `go run` build. It is refused while `magpie autostart` is on:
+and refuses a `go run` build. It is refused while `blackpie autostart` is on:
 the app opened at login serves the gateway too, and the two would take
 turns failing on the port. The app opened by hand while the service runs
 uses the service's gateway.
@@ -2791,44 +2789,44 @@ uses the service's gateway.
 `docker build` makes a server image: the terminal-only binary on Debian 12
 slim, with bash and curl, so a vendor's `curl … | bash` installer runs and
 the CLI it installs (Cursor's, Devin's, Grok Build) finds the glibc it links,
-as the plugins' Bun does, and a terminal opens in the container (`docker exec -it magpie bash`, or a
-NAS panel's terminal; `magpie` is on its PATH), run as nonroot,
-with everything it keeps in a volume at `/config`: magpie's own files
-(`/config/magpie`), the sign-ins kept where their agent keeps them (HOME is
+as the plugins' Bun does, and a terminal opens in the container (`docker exec -it blackpie bash`, or a
+NAS panel's terminal; `blackpie` is on its PATH), run as nonroot,
+with everything it keeps in a volume at `/config`: blackpie's own files
+(`/config/blackpie`), the sign-ins kept where their agent keeps them (HOME is
 `/config/home`, so `~/.codex`, `~/.claude`… are in it) and the cache with the
 Bun plugins run on (`/config/cache`, downloaded once). A volume made by an
-older image keeps working: magpie adds these folders to it on start, and only
+older image keeps working: blackpie adds these folders to it on start, and only
 sign-ins made with that older image, which lived outside the volume, have to
 be made again.
 
 ```sh
-docker build -t magpie .
-docker run -d --name magpie -p 127.0.0.1:3425:3425 -p 127.0.0.1:3430:3430 -v magpie-config:/config magpie
+docker build -t blackpie .
+docker run -d --name blackpie -p 127.0.0.1:3425:3425 -p 127.0.0.1:3430:3430 -v blackpie-config:/config blackpie
 ```
 
 3425 is the gateway for agents. Inside the container it takes any key; a
 request from outside it, the host's own included, must carry an enabled
 gateway key as its API key, and one without gets 401. Make one in the
 browser UI (Gateway → Gateway keys) or with
-`docker exec magpie magpie gateway-key add "Docker client"`. Sharing
+`docker exec blackpie blackpie gateway-key add "Docker client"`. Sharing
 (Gateway → Share on local network) isn't needed for this; turning it on
-also creates a key named **Magpie**. The ports above are published on the
+also creates a key named **Blackpie**. The ports above are published on the
 host's loopback; Docker's `-p 3425:3425` puts the gateway on every interface
 of the host, for other machines to reach. Upgrading from an earlier image:
-an agent outside the container that sends `magpie`, or another key that
+an agent outside the container that sends `blackpie`, or another key that
 isn't an enabled gateway key, now gets 401 ("the API key sent is not an
-enabled magpie gateway key"); give it a gateway key.
+enabled blackpie gateway key"); give it a gateway key.
 Inside the container
-magpie only sees the container's own address (Docker's 172.17.x), so set
-`-e MAGPIE_PUBLIC_URL=http://<the host's or NAS's address>:3425` (the port
+blackpie only sees the container's own address (Docker's 172.17.x), so set
+`-e BLACKPIE_PUBLIC_URL=http://<the host's or NAS's address>:3425` (the port
 published on the host) for the address it shows and prints to be the one
 other machines use; behind a reverse proxy, set it to that external base URL
 and follow the [authentication requirements above](#connecting-anything-else),
-especially when the proxy reaches magpie over loopback.
+especially when the proxy reaches blackpie over loopback.
 
-For the browser UI run the image with `magpie web --addr 0.0.0.0:3430 --no-open`
+For the browser UI run the image with `blackpie web --addr 0.0.0.0:3430 --no-open`
 in place of the default `serve`, and open
-`http://localhost:3430/?k=<key from docker logs magpie>` (set `MAGPIE_WEB_KEY`
+`http://localhost:3430/?k=<key from docker logs blackpie>` (set `BLACKPIE_WEB_KEY`
 to keep one key across restarts; a browser then stays signed in for 400
 days). A browser keeps cookies per host, not per port, so another service on
 the same address can take the sign-in away: by clearing its site data, or by
@@ -2839,20 +2837,20 @@ subscriptions and import sign-ins from a file. The vendor sends a sign-in's
 browser back to `localhost` (ChatGPT to `http://localhost:1455/auth/callback?code=…`),
 which is your own machine, not the container, so that page won't load: copy
 its whole address from the address bar and paste it into the sign-in's
-*Callback URL* field. `docker exec -it magpie /magpie accounts add codex`
+*Callback URL* field. `docker exec -it blackpie /blackpie accounts add codex`
 does the same in a terminal: open the link it prints, then paste the address
 the browser ended on. Keys, sign-ins and plugins live in the volume, so a
 restart, or a new container on the same volume, keeps them.
 
-The image has a `HEALTHCHECK`: `magpie healthcheck` exits 0 while the gateway
-answers on `MAGPIE_ADDR`, under `serve` and `web` alike, so `docker ps` shows
+The image has a `HEALTHCHECK`: `blackpie healthcheck` exits 0 while the gateway
+answers on `BLACKPIE_ADDR`, under `serve` and `web` alike, so `docker ps` shows
 the container as healthy (Compose: `depends_on: condition: service_healthy`)
 with no curl in the image. Bind-mounting a folder at `/config` in place of a
 named volume works too; it has to be writable by uid 65532.
 
 #### NAS with agents on other machines
 
-Magpie can run on a headless NAS as a shared gateway even when the agents that
+Blackpie can run on a headless NAS as a shared gateway even when the agents that
 use it (Claude Code, Codex, OpenCode, and so on) run on other computers. The
 container does not discover agent installations on the NAS host or on remote
 machines: configure those agents to use the NAS address and an enabled gateway
@@ -2866,9 +2864,9 @@ Settings leaves out what is written into this machine's agents (provider in
 model names) and the desktop's alerts and tray. Codex's and Claude Code's own
 settings (Codex subagents, long conversations, Codex thread titles and the
 rest) are on the Agents page, in the agent's opened row, so a gateway has
-none of them. `magpie web` is in it by itself when it finds
+none of them. `blackpie web` is in it by itself when it finds
 no agents on its machine, as in the container, and with
-`magpie web --gateway`. *Settings › General › Gateway mode* picks Automatic,
+`blackpie web --gateway`. *Settings › General › Gateway mode* picks Automatic,
 On or Off for this machine (it wins over both); Off brings every page back.
 The app's own window is never in gateway mode.
 
@@ -2876,24 +2874,24 @@ For a bind-mounted configuration directory, the directory must be writable by
 the non-root container user (uid 65532):
 
 ```sh
-sudo chown -R 65532:65532 /volume1/docker/magpie/config
+sudo chown -R 65532:65532 /volume1/docker/blackpie/config
 ```
 
 An example Docker Compose project is:
 
 ```yaml
 services:
-  magpie:
-    image: ghcr.io/yetone/magpie:latest
+  blackpie:
+    image: ghcr.io/hmjz100/blackpie:latest
     restart: unless-stopped
     ports:
       # 127.0.0.1: the host alone; every caller outside the container needs a gateway key.
       - "127.0.0.1:3425:3425"
       - "127.0.0.1:3430:3430"
     environment:
-      MAGPIE_ADDR: 0.0.0.0:3425
-      MAGPIE_PUBLIC_URL: http://<nas-address>:3425
-      MAGPIE_WEB_KEY: <random-key>
+      BLACKPIE_ADDR: 0.0.0.0:3425
+      BLACKPIE_PUBLIC_URL: http://<nas-address>:3425
+      BLACKPIE_WEB_KEY: <random-key>
     volumes:
       - ./config:/config
     command: [web, --addr, 0.0.0.0:3430, --no-open]
@@ -2905,7 +2903,7 @@ To let remote agents reach it, change the gateway mapping to `3425:3425` (or
 bind it only to the NAS interface or VPN address) and recreate the
 container. For Internet access, prefer a
 VPN such as Tailscale or WireGuard; a reverse proxy or tunnel forwarding to
-Magpie over loopback needs a gateway key from its clients, as the network does.
+Blackpie over loopback needs a gateway key from its clients, as the network does.
 
 ### Developing
 
@@ -2917,74 +2915,74 @@ builds with `-tags dev` and opens the app with the UI served straight from
 `internal/gui/assets`: save `app.css`, `app.js` or `index.html` and the window
 reloads itself. With `fswatch` installed (`brew install fswatch`), a change to a
 Go file rebuilds and relaunches the app too. The dev build uses its own gateway
-port (`DEV_ADDR`, default 127.0.0.1:3426), so a magpie you already run keeps
+port (`DEV_ADDR`, default 127.0.0.1:3426), so a blackpie you already run keeps
 serving your agents. Point it at a scratch home to keep your real agent
 configs out of it:
 
 ```sh
-HOME=/tmp/magpie-home XDG_CONFIG_HOME=/tmp/magpie-home/.config make dev
+HOME=/tmp/blackpie-home XDG_CONFIG_HOME=/tmp/blackpie-home/.config make dev
 ```
 
-`MAGPIE_THEME=light|dark` forces the palette and `MAGPIE_DEBUG=1` prints what the
+`BLACKPIE_THEME=light|dark` forces the palette and `BLACKPIE_DEBUG=1` prints what the
 gateway translates.
 
 ## Use
 
 ```sh
-magpie                          # open the app: a window plus the menu bar icon
-magpie tray                     # menu bar icon only (use this in your login items)
-magpie tui                      # the same thing, in the terminal; serves the gateway while open when no other magpie does
-magpie web                      # the app's window in a browser (WSL, a server over SSH); --lan, --addr, --no-open, --gateway, --tls-cert/--tls-key
-                                # (a new key each run; MAGPIE_WEB_KEY keeps one, for a page run as a service)
-                                # (behind a reverse proxy, MAGPIE_WEB_URL=https://<the page there> prints the link through it)
-magpie serve                    # the gateway alone, no window; --web[=host:port] serves the page too, from the same process
+blackpie                          # open the app: a window plus the menu bar icon
+blackpie tray                     # menu bar icon only (use this in your login items)
+blackpie tui                      # the same thing, in the terminal; serves the gateway while open when no other blackpie does
+blackpie web                      # the app's window in a browser (WSL, a server over SSH); --lan, --addr, --no-open, --gateway, --tls-cert/--tls-key
+                                # (a new key each run; BLACKPIE_WEB_KEY keeps one, for a page run as a service)
+                                # (behind a reverse proxy, BLACKPIE_WEB_URL=https://<the page there> prints the link through it)
+blackpie serve                    # the gateway alone, no window; --web[=host:port] serves the page too, from the same process
                                 # --tls-cert <file> --tls-key <file>: https:// for other computers (see HTTPS under sharing)
-magpie daemon install           # run magpie serve as a service (systemd, launchd); --web, --lan, --addr serve the page too; --tls-cert/--tls-key, --no-tls
-magpie ls                       # list every agent and its current settings
-magpie claude opus              # set a model (agent names accept prefixes: cc, oc, gem …)
-magpie codex gpt-5.6-sol
-magpie codex effort high        # other fields
-magpie codex effort             # one field, as it is now
-magpie codex xhigh              # bare effort levels are recognised too
-magpie codex deepseek/deepseek-chat   # any catalog model, through the gateway
-magpie claude moonshot/kimi-k2.5
-magpie claude haiku deepseek/deepseek-v4-flash   # one tier on its own model
-magpie claude haiku ""          # back to the main model
-magpie gemini auth api-key
-magpie opencode anthropic/claude-sonnet-5
-magpie oc small anthropic/claude-haiku-4-5
-magpie mimo anthropic/claude-sonnet-5
+blackpie daemon install           # run blackpie serve as a service (systemd, launchd); --web, --lan, --addr serve the page too; --tls-cert/--tls-key, --no-tls
+blackpie ls                       # list every agent and its current settings
+blackpie claude opus              # set a model (agent names accept prefixes: cc, oc, gem …)
+blackpie codex gpt-5.6-sol
+blackpie codex effort high        # other fields
+blackpie codex effort             # one field, as it is now
+blackpie codex xhigh              # bare effort levels are recognised too
+blackpie codex deepseek/deepseek-chat   # any catalog model, through the gateway
+blackpie claude moonshot/kimi-k2.5
+blackpie claude haiku deepseek/deepseek-v4-flash   # one tier on its own model
+blackpie claude haiku ""          # back to the main model
+blackpie gemini auth api-key
+blackpie opencode anthropic/claude-sonnet-5
+blackpie oc small anthropic/claude-haiku-4-5
+blackpie mimo anthropic/claude-sonnet-5
 
-magpie save work                # snapshot everything as a profile
-magpie use work                 # switch back
-magpie profiles
-magpie rm work
+blackpie save work                # snapshot everything as a profile
+blackpie use work                 # switch back
+blackpie profiles
+blackpie rm work
 
-magpie sync                     # refresh the models.dev catalog and every live model list
+blackpie sync                     # refresh the models.dev catalog and every live model list
 
-magpie quota                    # what is left of every subscription, plan and key balance
-magpie quota refresh codex      # read Codex's cards again now (once per 30s)
-magpie quota wait codex         # block until a Codex account has allowance again
-magpie quota credits me@example.com off   # hold a ChatGPT account at its limit instead of spending credits
-magpie quota credits me@example.com last  # spend its credits only after every other account, key and fallback
+blackpie quota                    # what is left of every subscription, plan and key balance
+blackpie quota refresh codex      # read Codex's cards again now (once per 30s)
+blackpie quota wait codex         # block until a Codex account has allowance again
+blackpie quota credits me@example.com off   # hold a ChatGPT account at its limit instead of spending credits
+blackpie quota credits me@example.com last  # spend its credits only after every other account, key and fallback
 
-magpie tools                    # the tools magpie's MCP servers give agents, with their parameters
-magpie tools generate_image     # one tool in full
-magpie tool generate_image "a magpie on a branch, watercolour" --size 1536x1024 -o hero.png
-magpie tool generate_image --n 2 --quality high --background transparent "an app icon"   # hero.png, then numbered
-magpie tool analyze_image ./shot.png --prompt "what does the error say?"
-magpie tool web_search "go 1.27 release notes"
+blackpie tools                    # the tools blackpie's MCP servers give agents, with their parameters
+blackpie tools generate_image     # one tool in full
+blackpie tool generate_image "a blackpie on a branch, watercolour" --size 1536x1024 -o hero.png
+blackpie tool generate_image --n 2 --quality high --background transparent "an app icon"   # hero.png, then numbered
+blackpie tool analyze_image ./shot.png --prompt "what does the error say?"
+blackpie tool web_search "go 1.27 release notes"
 ```
 
-`magpie tool` calls a tool through the running magpie's own MCP servers
+`blackpie tool` calls a tool through the running blackpie's own MCP servers
 (image generation, image recognition, web search and plugins' tools), as an
 agent's MCP call does, so it has the same tools and parameters, models from
 Settings, and the same usage counting. A parameter is `--<param> <value>`; the
 words left over are the tool's one required text. An unknown or missing
 parameter is refused before anything is called. An image or video it makes is
 saved at `-o` (a file or a folder) or in the current folder, never over a file
-that is there; `--json` prints the raw answer. It needs magpie running (the
-app, `magpie serve` or the service); `MAGPIE_GATEWAY=<url>` points it at
+that is there; `--json` prints the raw answer. It needs blackpie running (the
+app, `blackpie serve` or the service); `BLACKPIE_GATEWAY=<url>` points it at
 another.
 
 In the app, click any value to open a filtered list; type to search or to
@@ -3002,23 +3000,23 @@ again to return to the whole period. Changing the period clears the selection.
 On macOS, *Settings → Preferences → Session terminal* chooses which installed
 app opens a session from the terminal button in *Usage → Sessions*. The list
 contains apps registered to open `.command` files, with the current system
-default listed once. With no saved choice, magpie follows that default, or
+default listed once. With no saved choice, blackpie follows that default, or
 Terminal when the default is not a terminal. The *Resume* button still copies
 the command.
 
 Rex (superlogical.com/rex) is listed too when its `rex` program is found,
 on `PATH` or inside a `Rex*.app` in `/Applications` or `~/Applications`
 (only a native program counts, so the Perl tool also called `rex` is not
-taken). Rex claims no `.command` files, so magpie opens it through its CLI,
-in a Rex session of its own labelled `magpie`. Outside Rex, `rex run` with no
+taken). Rex claims no `.command` files, so blackpie opens it through its CLI,
+in a Rex session of its own labelled `blackpie`. Outside Rex, `rex run` with no
 `-s` adds a tab only when Rex has exactly one session: with none or several it
 exits 3 (not found or ambiguous), and the CLI can't tell which session the app
-shows. So magpie finds its session with `rex ls --json` and runs
+shows. So blackpie finds its session with `rex ls --json` and runs
 `rex run -s <its ID> --label=<session or agent> -- /bin/sh -c '<command>; exec $SHELL -l'`,
 then names the new tab with `rex window rename`. With no such session (or one
-that ended since the list) it runs `rex new magpie --window=<session or agent> -- …`,
+that ended since the list) it runs `rex new blackpie --window=<session or agent> -- …`,
 whose first tab is so named. A tab added from outside shows only in the
-app's sidebar, so magpie then brings Rex forward and asks the app to go to
+app's sidebar, so blackpie then brings Rex forward and asks the app to go to
 it: it takes the client of kind `app` from `rex client list --json` (the one
 attached to its session, else the last app connected) and runs
 `rex -C <client> do session.select session_id=<session> window_id=<tab>`.
@@ -3047,11 +3045,11 @@ until you start a new one.
 ### Moving to another machine
 
 ```sh
-magpie backup                   # writes magpie.magpie-backup, asks for a passphrase twice
-magpie backup --no-keys ~/b.magpie-backup   # the same with no API keys in it
-magpie restore magpie.magpie-backup         # on the other machine
-magpie restore --no-agents b.magpie-backup  # providers, settings, profiles; agents left as they are
-magpie restore --no-library b.magpie-backup # the library here left as it is
+blackpie backup                   # writes blackpie.blackpie-backup, asks for a passphrase twice
+blackpie backup --no-keys ~/b.blackpie-backup   # the same with no API keys in it
+blackpie restore blackpie.blackpie-backup         # on the other machine
+blackpie restore --no-agents b.blackpie-backup  # providers, settings, profiles; agents left as they are
+blackpie restore --no-library b.blackpie-backup # the library here left as it is
 ```
 
 A backup holds your providers (with their keys, unless `--no-keys`), the
@@ -3098,7 +3096,7 @@ the gateway runs. Choose one of these:
 - **GitHub**: an existing repository, using a fine-grained token
   with Contents read and write permission. The repository must be private:
   sync refuses a public one, whose history would give anyone every sealed version.
-  The address can include a folder, such as `github://owner/repo/magpie-sync`.
+  The address can include a folder, such as `github://owner/repo/blackpie-sync`.
   Each update is a commit to that branch, so the repository also provides a
   history of the encrypted backup.
 
@@ -3115,12 +3113,12 @@ Settings → Sync lists those fields under **Kept on this computer**, and
 **Follow the others** takes the synced value again.
 
 ```sh
-magpie webdav on https://dav.jianguoyun.com/dav/ user=me@example.com
-magpie s3 on s3://my-bucket/magpie endpoint=https://<account>.r2.cloudflarestorage.com access-key-id=…
-magpie s3 on s3://backups endpoint=http://nas.local:9000 path-style=yes access-key-id=…
-magpie s3                       # where it syncs to and how the last sync went; magpie s3 now, off
-magpie github on github://owner/private-backups/settings branch=main
-magpie github                   # where it syncs to and how the last sync went; magpie github now, off
+blackpie webdav on https://dav.jianguoyun.com/dav/ user=me@example.com
+blackpie s3 on s3://my-bucket/blackpie endpoint=https://<account>.r2.cloudflarestorage.com access-key-id=…
+blackpie s3 on s3://backups endpoint=http://nas.local:9000 path-style=yes access-key-id=…
+blackpie s3                       # where it syncs to and how the last sync went; blackpie s3 now, off
+blackpie github on github://owner/private-backups/settings branch=main
+blackpie github                   # where it syncs to and how the last sync went; blackpie github now, off
 ```
 
 For S3:
@@ -3132,9 +3130,9 @@ For S3:
 - The secret is asked for and saved like the WebDAV password. It is used only
   with the endpoint and access key it was given for.
 - The bucket must already exist.
-- The access key needs to read and write `<prefix>/magpie/`. On AWS it also
+- The access key needs to read and write `<prefix>/blackpie/`. On AWS it also
   needs to list the bucket.
-- A server without conditional writes is supported. There magpie checks the
+- A server without conditional writes is supported. There blackpie checks the
   object's ETag just before each write. Two computers that write in the
   same moment can both pass that check (Aliyun OSS, #1776), and the later
   write is the one kept. The other computer notices at its next sync, a
@@ -3155,7 +3153,7 @@ For GitHub:
 - Give a fine-grained token access to this repository with Contents read and
   write permission. It is asked for by the CLI, never accepted in a command
   line, and is saved separately from the library's GitHub token.
-- Folder is optional. Files go in `<folder>/magpie/`; every changed backup
+- Folder is optional. Files go in `<folder>/blackpie/`; every changed backup
   creates a commit. Unchanged setup creates no backup commit.
 - Use the same encryption passphrase on every computer. It must differ from
   the GitHub token. The token and sync connection settings stay on each computer.
@@ -3174,22 +3172,22 @@ No restart is needed for saved settings. The export is the built-in plugin
 `otel` (Observability in Plugins › Built-in), which stays on while settings
 or the environment say to export.
 
-For `magpie serve`, environment variables override the saved preferences:
+For `blackpie serve`, environment variables override the saved preferences:
 
 ```sh
-MAGPIE_OTEL_ENABLED=true MAGPIE_OTEL_ENDPOINT=http://localhost:4318 magpie serve
+BLACKPIE_OTEL_ENABLED=true BLACKPIE_OTEL_ENDPOINT=http://localhost:4318 blackpie serve
 ```
 
-- `MAGPIE_OTEL_ENABLED`: `true` or `false`; an endpoint alone does not enable export.
-- `MAGPIE_OTEL_ENDPOINT`: an HTTP(S) base URL; `/v1/traces` and `/v1/metrics` are appended.
-- `MAGPIE_OTEL_HEADERS`: comma-separated `name=value` pairs, for example
+- `BLACKPIE_OTEL_ENABLED`: `true` or `false`; an endpoint alone does not enable export.
+- `BLACKPIE_OTEL_ENDPOINT`: an HTTP(S) base URL; `/v1/traces` and `/v1/metrics` are appended.
+- `BLACKPIE_OTEL_HEADERS`: comma-separated `name=value` pairs, for example
   `Authorization=Bearer%20token`. Percent-encode spaces and commas in values.
-- `MAGPIE_OTEL_METRICS`: `true` or `false`, off by default.
-- `MAGPIE_OTEL_SESSIONS`: `true` or `false`, off by default; trace supported local
+- `BLACKPIE_OTEL_METRICS`: `true` or `false`, off by default.
+- `BLACKPIE_OTEL_SESSIONS`: `true` or `false`, off by default; trace supported local
   agent interactions from newly recorded session events.
-- `MAGPIE_OTEL_BODIES`: `true` or `false`, off by default; sends each call's
+- `BLACKPIE_OTEL_BODIES`: `true` or `false`, off by default; sends each call's
   request and reply as the trace's Langfuse input and output.
-- `MAGPIE_OTEL_BODIES_WHOLE`: `true` or `false`, off by default; with bodies on,
+- `BLACKPIE_OTEL_BODIES_WHOLE`: `true` or `false`, off by default; with bodies on,
   keeps them entire rather than cut at 256 KB. A long reply is written to a
   temporary file; a body too large for the collector is still refused.
 
@@ -3197,7 +3195,7 @@ For Langfuse, pick **Collector › Langfuse**, then the host (Cloud EU
 `https://cloud.langfuse.com`, Cloud US `https://us.cloud.langfuse.com`, or
 **Self-hosted** with your own address, which also takes another Langfuse
 Cloud region such as `https://jp.cloud.langfuse.com`) and the project's public
-and secret keys (Langfuse › Settings › API Keys). magpie saves them as the
+and secret keys (Langfuse › Settings › API Keys). blackpie saves them as the
 endpoint `<host>/api/public/otel` and the header
 `Authorization: Basic <base64(public-key:secret-key)>`, kept with the other
 OTLP headers (left out of a backup without keys). Nothing is saved until both
@@ -3207,9 +3205,9 @@ metrics off, since Langfuse takes traces only, and turns export on. A Langfuse
 endpoint set up by hand opens in this view with its keys filled in, and
 changing a key or the host keeps every other header and the metrics and
 export choices as they were. Switching from another collector leaves that
-collector's headers behind. For `magpie serve`, the same values go in the
-environment: `MAGPIE_OTEL_ENDPOINT=https://cloud.langfuse.com/api/public/otel`
-and `MAGPIE_OTEL_HEADERS=Authorization=Basic%20<base64(public-key:secret-key)>,x-langfuse-ingestion-version=4`.
+collector's headers behind. For `blackpie serve`, the same values go in the
+environment: `BLACKPIE_OTEL_ENDPOINT=https://cloud.langfuse.com/api/public/otel`
+and `BLACKPIE_OTEL_HEADERS=Authorization=Basic%20<base64(public-key:secret-key)>,x-langfuse-ingestion-version=4`.
 
 Traces include agent, provider, model, token counts (including cache and
 reasoning), HTTP status, timing, and route ID. Attempts with the same route ID
@@ -3224,7 +3222,7 @@ Tool execution inside the caller is outside the gateway's trace.
 
 Model-call spans also send estimated USD input, output and total costs to
 Langfuse via `langfuse.observation.cost_details`, using the same effective
-prices as Magpie's usage ledger (custom prices first, then catalog prices).
+prices as Blackpie's usage ledger (custom prices first, then catalog prices).
 Input cost includes cache reads and writes; reasoning tokens are already
 included in output cost. Explicit zero prices are exported too. Unknown
 prices are omitted so Langfuse can use its own model pricing. Parent and tool
@@ -3246,7 +3244,7 @@ scan; other unresolved concurrent requests retain gateway traces without waiting
 Polling reuses headers by path, size and mtime.
 Other adapters still use recent observations (five minutes).
 Only loopback requests without a gateway key can be deduplicated. The native
-client session ID takes precedence over a Magpie routing override; unknown
+client session ID takes precedence over a Blackpie routing override; unknown
 sessions retain gateway traces, including WSL mirrored and Docker Desktop
 clients whose sessions are not visible locally. Requests without a session ID
 fall back to recent observations for that agent.
@@ -3266,7 +3264,7 @@ includes Codex calls with an explicit kind (subagent, review, memgen, title or
 compact): even if a child has a readable rollout, these can appear twice. Only
 its unclassified calls use local-session deduplication; a rollout alone does not
 prove every auxiliary request was recorded. Keyed and non-loopback clients
-always retain gateway traces. Magpie reads new events from local session stores
+always retain gateway traces. Blackpie reads new events from local session stores
 every two seconds; it does not upload
 completed history when enabled. Restarting or changing the destination starts
 an observation window. Span IDs remain stable across repeated records.
@@ -3308,7 +3306,7 @@ Gemini snapshot reads cap at 32 MiB; Gemini retains the current prompt plus
 Completed observations are deduplicated with bounded metadata. Claude's final
 response and Gemini's final token records may take one extra poll to settle.
 
-Inferred timings carry `magpie.timing.source=inferred`. Tool arguments/results
+Inferred timings carry `blackpie.timing.source=inferred`. Tool arguments/results
 and user input/output follow **Include request and response bodies**, masking
 secrets and respecting the whole-body preference. Session directory/title
 metadata, credentials and account names are not exported.
@@ -3318,11 +3316,11 @@ clients to avoid duplicate token usage. Unsupported clients and remote
 forwarded requests retain gateway tracing; the local usage ledger is unchanged.
 This mode shows agent activity rather than gateway retries or provider-routing
 details. It reads this computer's local sessions, including calls made without
-Magpie as the proxy.
+Blackpie as the proxy.
 
 Metrics group duration and input/output token histograms by agent, provider,
 model, operation and error status. Prompt/reply text is exported only when
-**Include request and response bodies** is enabled (`MAGPIE_OTEL_BODIES=true`);
+**Include request and response bodies** is enabled (`BLACKPIE_OTEL_BODIES=true`);
 secrets are masked and each body is limited to 256 KiB unless **Include the
 whole bodies** is enabled. Conversation IDs are exported only with
 conversation tracing; provider account names/keys are never exported.
@@ -3340,10 +3338,10 @@ are retried up to two times, with retry delays capped at 60 seconds; other
 errors and partial rejection are logged
 without the collector's response body. Each HTTP attempt times out after
 three seconds. Graceful gateway shutdown allows at most three seconds to
-drain; `magpie serve` currently exits on SIGTERM without draining, so its last
+drain; `blackpie serve` currently exits on SIGTERM without draining, so its last
 batch may be lost. This is best-effort export; local usage records remain
 available if it fails.
-Requests follow magpie's proxy setting, with loopback collectors going direct.
+Requests follow blackpie's proxy setting, with loopback collectors going direct.
 Queued records are discarded if export is disabled or the destination or
 credentials change before sending. Redirects are not followed.
 Backups without keys omit OTLP headers; restoring one preserves this machine's
@@ -3364,14 +3362,14 @@ unless `BUN_CONFIG_REGISTRY` or `NPM_CONFIG_REGISTRY` names a registry
 already. The switch never sends anything through a proxy such as
 gh-proxy.
 
-Mirror fallback is off by default. Set `MAGPIE_MIRRORS=on` to use it. When
+Mirror fallback is off by default. Set `BLACKPIE_MIRRORS=on` to use it. When
 it is on, the official source is tried first; a mirror is only tried after
 a network error, HTTP 429, HTTP 5xx, or GitHub's rate-limit 403. The
 defaults are `registry.npmmirror.com` for npm and `gh-proxy.com` for
-GitHub. `MAGPIE_NPM_REGISTRY` and `MAGPIE_GITHUB_MIRROR` replace them.
+GitHub. `BLACKPIE_NPM_REGISTRY` and `BLACKPIE_GITHUB_MIRROR` replace them.
 
 Only two downloads are checked against a checksum that does not come from
-the mirror: Magpie's own update assets (their SHA-256 comes from the
+the mirror: Blackpie's own update assets (their SHA-256 comes from the
 unmirrored update feed) and Bun's zip. Bun's default version carries its
 SHA-256s in the code, so it can be downloaded through a mirror even when
 Bun's official `SHASUMS256.txt` is unreachable; a newer Bun still needs
@@ -3388,17 +3386,17 @@ API key, or URL userinfo/query token, never use a mirror; they go to the
 official source alone.
 
 ```sh
-MAGPIE_MIRRORS=on \
-MAGPIE_NPM_REGISTRY=https://registry.example.com \
-MAGPIE_GITHUB_MIRROR=https://gh.example magpie serve
+BLACKPIE_MIRRORS=on \
+BLACKPIE_NPM_REGISTRY=https://registry.example.com \
+BLACKPIE_GITHUB_MIRROR=https://gh.example blackpie serve
 ```
 
 ## Files
 
-magpie's folder, `~/.config/magpie`, is kept flat on purpose: backups,
-sync, Docker volume mounts and older magpies all find each file by its
+blackpie's folder, `~/.config/blackpie`, is kept flat on purpose: backups,
+sync, Docker volume mounts and older blackpies all find each file by its
 name there (#2028). Below, each file says what it is for. A `.lock`
-beside a file is held while it is written, across magpies; a `.bak` is
+beside a file is held while it is written, across blackpies; a `.bak` is
 the copy made before a write.
 
 What you set:
@@ -3415,7 +3413,7 @@ What you set:
 
 Accounts and sign-ins:
 
-- `logins.json` — the subscription accounts signed in through magpie
+- `logins.json` — the subscription accounts signed in through blackpie
   (0600)
 - `plugin-auth.json` — the plugins' sign-ins (0600)
 - `mcp-signins.json` — sign-ins to MCP servers (0600)
@@ -3424,10 +3422,10 @@ Accounts and sign-ins:
 - `redact.key` — the key behind the placeholders privacy masking puts in
   place of what it hides
 
-What magpie set on your agents:
+What blackpie set on your agents:
 
-- `stash.json` — values magpie replaced, restored on switch-back
-- `applied.json` — what magpie last set on each agent, and when
+- `stash.json` — values blackpie replaced, restored on switch-back
+- `applied.json` — what blackpie last set on each agent, and when
 - `migrations.json` — which subscriptions moved to their plugin
   ([Built-in subscriptions that a plugin serves](../AGENTS.md))
 
@@ -3461,10 +3459,10 @@ Kept for the window:
 - `install-id`, `stats-sent` — the [user count](#counting-users)'s
   random id and the last day it went
 
-In `~/.cache/magpie`:
+In `~/.cache/blackpie`:
 
-- `bun/<version>/magpie-bun` — the Bun plugins run on, named
-  so that a proxy app's PROCESS-NAME rule can match it (`magpie-bun.exe` on
+- `bun/<version>/blackpie-bun` — the Bun plugins run on, named
+  so that a proxy app's PROCESS-NAME rule can match it (`blackpie-bun.exe` on
   Windows)
 - `models.json` — models.dev catalog (OpenCode's cache at
   `~/.cache/opencode/models.json` is used when present)
@@ -3476,17 +3474,17 @@ In `~/.cache/magpie`:
 
 ## Counting users
 
-Once a day, a running magpie (the app, or `magpie serve`) sends one event to
+Once a day, a running blackpie (the app, or `blackpie serve`) sends one event to
 PostHog so we know how many people use it: a random id made up on your
-computer (`~/.config/magpie/install-id`, made the first time the event is
-sent), magpie's version, and your system and architecture. The day it last
-went is in `~/.config/magpie/stats-sent`, so a day is sent once; the
+computer (`~/.config/blackpie/install-id`, made the first time the event is
+sent), blackpie's version, and your system and architecture. The day it last
+went is in `~/.config/blackpie/stats-sent`, so a day is sent once; the
 event is tried at start and then every hour.
 
-With it goes what magpie is used with, so we know which agents, providers
-and models to look after first, by magpie's own ids only:
+With it goes what blackpie is used with, so we know which agents, providers
+and models to look after first, by blackpie's own ids only:
 
-- the agents connected to magpie (`claude`, `codex`); an omp profile is
+- the agents connected to blackpie (`claude`, `codex`); an omp profile is
   only `omp`;
 - the providers that are on: a preset's id (`deepseek`), a subscription's
   (`codex`, `copilot`), a community plugin's (`plugin:kiro`); a provider you
@@ -3500,32 +3498,32 @@ and models to look after first, by magpie's own ids only:
 - for each partner (a sponsor listed first in the add sheet), by its id, how
   many times a day the add sheet showed it, its row was opened, its key
   page was opened and a provider was added from it (at most 20 of each,
-  5 adds), kept in `~/.cache/magpie/partner-counts.json` for at most 14
-  days and sent the day after as `magpie partner` events.
+  5 adds), kept in `~/.cache/blackpie/partner-counts.json` for at most 14
+  days and sent the day after as `blackpie partner` events.
 
 No names, base URLs, accounts, keys, prompts or usage go. Turn that part off
 in Settings → Privacy → Share the agents, providers and models I use; the
 day's event then has the id, version and system only. Turn it all off in
 Settings → Privacy → Count me as a user, or with `DO_NOT_TRACK=1` or
-`MAGPIE_NO_STATS=1`. Builds from source never send it. The code is
+`BLACKPIE_NO_STATS=1`. Builds from source never send it. The code is
 [internal/stats](../internal/stats/stats.go). Deleting `install-id` makes a
 new one at the next send. The [Privacy page](https://usemagpie.ai/docs/privacy)
-shows a whole batch and everything else magpie sends by itself.
+shows a whole batch and everything else blackpie sends by itself.
 
-Partners are also counted where usemagpie.ai sees them, whatever these
+Partners are also counted where useblackpie.ai sees them, whatever these
 settings say, as any website sees its visits. The partner list
 (`/api/partners`) gives each partner's website and key page as a
-`https://usemagpie.ai/go/<id>/site|keys[/<region>]` link, which sends a
-`magpie partner go` event (the partner, which link, the region, and the
+`https://useblackpie.ai/go/<id>/site|keys[/<region>]` link, which sends a
+`blackpie partner go` event (the partner, which link, the region, and the
 country Cloudflare gives) before sending the browser on; and one in ten
-fetches of the list sends a `magpie partners fetch` event with weight 10
+fetches of the list sends a `blackpie partners fetch` event with weight 10
 and the country, while a partner is listed. Each event has an id of its
 own: no install id, address or account goes with it. The code is
 [site/worker.js](../site/worker.js).
 
 A plugin's, an import link's and the library's icons sit on hosts their
-authors picked. magpie fetches each through
-`https://usemagpie.ai/api/icon?url=<https URL>`, so the host sees
+authors picked. blackpie fetches each through
+`https://useblackpie.ai/api/icon?url=<https URL>`, so the host sees
 Cloudflare's address and never the user's. The worker sends only
 `Accept: image/*` and its own User-Agent, passes on a PNG, JPEG, GIF, WebP,
 ICO or SVG of at most 1 MB and refuses anything else, and counts and keeps
@@ -3535,8 +3533,7 @@ and `icon` in [site/worker.js](../site/worker.js).
 ## Community
 
 Questions, setups worth sharing, ideas, bugs: come talk to us and other
-magpie users on [Discord](https://discord.gg/vGSnD3ZKQF). Issues and pull
-requests are welcome here too.
+blackpie users. Issues and pull requests are welcome here too.
 
 ## License
 

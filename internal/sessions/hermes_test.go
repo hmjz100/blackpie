@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 	_ "modernc.org/sqlite"
 )
 
@@ -168,7 +168,7 @@ func TestHermesUsageFallbackAndLiveRefresh(t *testing.T) {
 
 	// Repeated discovery must see SQLite WAL changes to aggregate usage and
 	// the title even when the main database file's mtime has not moved, without
-	// resetting Magpie's cache.
+	// resetting Blackpie's cache.
 	oldInfo, err := os.Stat(path)
 	if err != nil {
 		t.Fatal(err)

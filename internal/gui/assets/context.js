@@ -23,7 +23,7 @@
   };
   const partName = (k) => t(PART_NAMES[k] || k);
   // the Codexes here before 0.163 or of no known version (app.js too)
-  const codexHeld = window.codexHeld = (held) => t("{who}: the share needs Codex 0.163 or later; until it's updated magpie writes only async_compaction = true, at 65%", { who: held.map((r) => t({ app: "Codex app", ide: "Codex editor extension", wsl: "Codex in WSL" }[r.kind] || "Codex CLI") + (r.version ? " " + r.version : "")).join(", ") });
+  const codexHeld = window.codexHeld = (held) => t("{who}: the share needs Codex 0.163 or later; until it's updated blackpie writes only async_compaction = true, at 65%", { who: held.map((r) => t({ app: "Codex app", ide: "Codex editor extension", wsl: "Codex in WSL" }[r.kind] || "Codex CLI") + (r.version ? " " + r.version : "")).join(", ") });
 
   const fmtK = (n) => {
     n = Math.max(0, Math.round(n || 0));
@@ -57,7 +57,7 @@
   };
 
   // what an item of the prompt is called: a file's path or a tool's name
-  // as it is; magpie's own names for the rest in the reader's language
+  // as it is; blackpie's own names for the rest in the reader's language
   const ITEM_NAMES = {
     prompt: "Agent prompt", harness: "Harness messages", billing: "Billing header",
     environment: "Environment notes", context: "Context", skills: "Skills",
@@ -220,7 +220,7 @@
   // reader's pick: a bar of the parts side by side (the default), or a
   // block for each part listing its largest items
   let ctxLook = "bar";
-  try { if (localStorage.getItem("magpie.ctxLook") === "blocks") ctxLook = "blocks"; } catch {}
+  try { if (localStorage.getItem("blackpie.ctxLook") === "blocks") ctxLook = "blocks"; } catch {}
 
   // compacted says a prompt is a compaction of the one before it, as
   // context.go's compacted tells it, to the token (Go's prev*6/10 is whole)
@@ -256,7 +256,7 @@
   // beside the title, so the request list under it has the room
   // (0xBCD18E on X: it took most of the height, three rows were left)
   let ctxShut = false;
-  try { ctxShut = localStorage.getItem("magpie.ctxShut") === "1"; } catch {}
+  try { ctxShut = localStorage.getItem("blackpie.ctxShut") === "1"; } catch {}
   // opts.open: this request was opened to see its context window (the
   // Usage page's Context tab), so it shows unfolded, it alone: the next
   // request drawn in the card takes the reader's choice again
@@ -447,7 +447,7 @@
     const setLook = (k) => {
       if (viz.dataset.look === k) return;
       ctxLook = k;
-      try { localStorage.setItem("magpie.ctxLook", k); } catch {}
+      try { localStorage.setItem("blackpie.ctxLook", k); } catch {}
       tipOf = "";
       tip.hidden = true;
       viz.dataset.look = k;
@@ -741,7 +741,7 @@
           tipOf = "";
           tip.hidden = true;
           e.currentTarget.setAttribute("aria-expanded", String(!ctxShut));
-          try { localStorage.setItem("magpie.ctxShut", ctxShut ? "1" : "0"); } catch {}
+          try { localStorage.setItem("blackpie.ctxShut", ctxShut ? "1" : "0"); } catch {}
           opts.onFold?.(ctxShut);
         };
         title = fold;
@@ -941,7 +941,7 @@
 
   // A part of the card clicked opens what the request sent there, read
   // from the request's body: an item alone (a tool, a file, a turn), or
-  // the part's items, each opened to its text. magpie keeps the last few
+  // the part's items, each opened to its text. blackpie keeps the last few
   // requests' bodies, masked, in memory only, so an older one's text is
   // gone. A long text comes a stretch at a time, so a prompt of megabytes
   // doesn't hold the window up.
@@ -954,7 +954,7 @@
 
   const CTX_RANGES = [["1", "Today"], ["7", "7 days"], ["30", "30 days"]];
   let ctxDays = "7";
-  try { const d = localStorage.getItem("magpie.ctxDays"); if (CTX_RANGES.some(([id]) => id === d)) ctxDays = d; } catch {}
+  try { const d = localStorage.getItem("blackpie.ctxDays"); if (CTX_RANGES.some(([id]) => id === d)) ctxDays = d; } catch {}
   let ctxData = null, ctxJSON = "", ctxRead = 0, ctxOpen = "", ctxAgent = "all";
   // the days the pane shows "Reading…" for: a second read before the history
   // answers (the page opened, then the first state's refresh) leaves it be,
@@ -1336,7 +1336,7 @@
     if (set.locked) note.textContent = t("{name} is set and comes first", { name: set.locked });
     else if (own) note.textContent = t("{model} compacts at its own {value}, which comes first", { model: own.model, value: fmtK(own.value) });
     else if (set.source == "long") note.textContent = t("Long conversations, shared by Codex, Claude Code and Grok Build");
-    else if (set.ours) note.textContent = t("Set by magpie");
+    else if (set.ours) note.textContent = t("Set by blackpie");
     else if (set.value && a.compact && +set.value > a.compact.window && a.compact.window) note.textContent = t("You set {value}; the model's {window} comes first", { value: show(set.value), window: fmtK(a.compact.window) });
     else if (set.value) note.textContent = t("You set {value}", { value: show(set.value) });
     else note.textContent = t("The agent's default");
@@ -1485,7 +1485,7 @@
     // theirs, so no row of its own stands empty above the pane
     $("#ctxRange")?.replaceChildren(segs(CTX_RANGES.map(([id, n]) => [id, t(n)]), ctxDays, (id) => {
       ctxDays = id;
-      try { localStorage.setItem("magpie.ctxDays", id); } catch {}
+      try { localStorage.setItem("blackpie.ctxDays", id); } catch {}
       loadContext();
     }));
     pane.replaceChildren();
@@ -1498,12 +1498,12 @@
       return;
     }
     const seen = el("div", "row-head ctx-sess-head");
-    seen.append(el("span", "label", t("Through magpie")), el("span", "grow"));
+    seen.append(el("span", "label", t("Through blackpie")), el("span", "grow"));
     pane.append(seen);
-    pane.append(el("p", "usage-note", t("What each agent's prompts hold, as magpie's gateway read them: the score and tags are worked out from the requests of the range.")));
+    pane.append(el("p", "usage-note", t("What each agent's prompts hold, as blackpie's gateway read them: the score and tags are worked out from the requests of the range.")));
     if (!ctxData.agents.length) {
       const empty = el("div", "ctx-none");
-      empty.append(el("b", "", t("No prompts read yet")), el("span", "", t("Requests your agents send through magpie show here.")));
+      empty.append(el("b", "", t("No prompts read yet")), el("span", "", t("Requests your agents send through blackpie show here.")));
       pane.append(empty);
       return;
     }

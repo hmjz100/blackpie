@@ -4,20 +4,20 @@ const { chromium, webkit } = require("playwright");
 const { fixture } = require("./fixtures/caller-keys.cjs");
 const { openPart } = require("./reader.cjs");
 
-// Jevik_AI on X deleted magpie's folders by hand, and Codex kept pointing
-// at a gateway that was gone. Settings › About › Uninstall magpie asks
+// Jevik_AI on X deleted blackpie's folders by hand, and Codex kept pointing
+// at a gateway that was gone. Settings › About › Uninstall blackpie asks
 // first, disconnects every agent and removes the service (POST
-// /api/uninstall), and only then has magpie quit and its files deleted
+// /api/uninstall), and only then has blackpie quit and its files deleted
 // (POST /api/uninstall/finish). A failure is said and nothing more is
-// removed; the Codex app still on the old settings is said before magpie
-// quits. magpie web never offers it.
+// removed; the Codex app still on the old settings is said before blackpie
+// quits. blackpie web never offers it.
 const LANGS = ["en", "zh", "zh-TW", "ja", "de"];
 const words = {
-  en: { row: "Uninstall magpie", title: "Uninstall magpie?", go: "Uninstall", cancel: "Cancel", again: "Try again", quit: "Quit magpie" },
-  zh: { row: "卸载 magpie", title: "卸载 magpie？", go: "卸载", cancel: "取消" },
-  "zh-TW": { row: "解除安裝 magpie", title: "解除安裝 magpie？", go: "解除安裝", cancel: "取消" },
-  ja: { row: "magpie をアンインストール", title: "magpie をアンインストールしますか？", go: "アンインストール", cancel: "キャンセル" },
-  de: { row: "magpie deinstallieren", title: "magpie deinstallieren?", go: "Deinstallieren", cancel: "Abbrechen" },
+  en: { row: "Uninstall blackpie", title: "Uninstall blackpie?", go: "Uninstall", cancel: "Cancel", again: "Try again", quit: "Quit blackpie" },
+  zh: { row: "卸载 blackpie", title: "卸载 blackpie？", go: "卸载", cancel: "取消" },
+  "zh-TW": { row: "解除安裝 blackpie", title: "解除安裝 blackpie？", go: "解除安裝", cancel: "取消" },
+  ja: { row: "blackpie をアンインストール", title: "blackpie をアンインストールしますか？", go: "アンインストール", cancel: "キャンセル" },
+  de: { row: "blackpie deinstallieren", title: "blackpie deinstallieren?", go: "Deinstallieren", cancel: "Abbrechen" },
 };
 
 async function setup(t, engine, lang, width, { web = false, reply = { failed: false, says: [] } } = {}) {
@@ -35,7 +35,7 @@ async function setup(t, engine, lang, width, { web = false, reply = { failed: fa
     if (p === "/api/uninstall/finish") return route.fulfill({ status: 204 });
     return route.fulfill({ json: { agents: [], system: [], data: [], ...reply } });
   });
-  await page.goto("http://magpie.test/?view=gateway");
+  await page.goto("http://blackpie.test/?view=gateway");
   await page.locator("#prefs").click();
   await openPart(page, "about");
   await page.locator("#about .row").first().waitFor();
@@ -48,7 +48,7 @@ const scrolled = (page) => page.evaluate(() => document.querySelector("#view-set
 for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium", "webkit"])) {
   for (const lang of LANGS) {
     for (const width of [1100, 420]) {
-      test(`${engine} ${lang} ${width}: Uninstall magpie asks, then disconnects and quits`, async (t) => {
+      test(`${engine} ${lang} ${width}: Uninstall blackpie asks, then disconnects and quits`, async (t) => {
         const { page, errors, posts } = await setup(t, engine, lang, width);
         const w = words[lang];
         const row = page.locator("#uninstallRow");
@@ -91,19 +91,19 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
     assert.deepEqual(errors, []);
   });
 
-  test(`${engine}: the Codex app on its old settings is said before magpie quits`, async (t) => {
+  test(`${engine}: the Codex app on its old settings is said before blackpie quits`, async (t) => {
     const { page, errors, posts } = await setup(t, engine, "en", 1100, { reply: { failed: false, codexApp: true, says: [] } });
     await page.locator("#uninstallRow button").click();
     await dialog(page).getByRole("button", { name: "Uninstall", exact: true }).click();
-    await dialog(page).getByRole("button", { name: "Quit magpie", exact: true }).waitFor();
+    await dialog(page).getByRole("button", { name: "Quit blackpie", exact: true }).waitFor();
     assert.deepEqual(posts, ["/api/uninstall"]);
-    await dialog(page).getByRole("button", { name: "Quit magpie", exact: true }).click();
+    await dialog(page).getByRole("button", { name: "Quit blackpie", exact: true }).click();
     await waitFor(() => posts.length === 2);
     assert.deepEqual(posts, ["/api/uninstall", "/api/uninstall/finish"]);
     assert.deepEqual(errors, []);
   });
 
-  test(`${engine}: magpie web never offers it`, async (t) => {
+  test(`${engine}: blackpie web never offers it`, async (t) => {
     const { page, errors } = await setup(t, engine, "en", 1100, { web: true });
     assert.equal(await page.locator("#uninstallRow").count(), 0);
     assert.doesNotMatch(await page.locator("#about").textContent(), /Uninstall/);

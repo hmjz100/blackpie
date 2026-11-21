@@ -6,10 +6,10 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/yetone/magpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/proc"
 )
 
-// notice tells a window user, who sees no terminal, why magpie stopped:
+// notice tells a window user, who sees no terminal, why blackpie stopped:
 // with the system's dialog where there is one, else only on stderr.
 func notice(title, body string) {
 	quote := strings.NewReplacer(`\`, `\`, `"`, `\"`).Replace

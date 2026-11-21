@@ -1,12 +1,12 @@
 package gateway
 
-// A reply says which of magpie's providers and models answered it (#822):
+// A reply says which of blackpie's providers and models answered it (#822):
 // the body's model is the vendor's own name for it (glm-5.3-flash), which
 // names neither the provider nor the group's member, so an agent that
 // counts usage by it puts every provider's glm-5.3-flash in one bucket.
 //
-// Every reply carries X-Magpie-Provider (the provider's id) and
-// X-Magpie-Model (magpie's provider/model id of the member that answered).
+// Every reply carries X-Blackpie-Provider (the provider's id) and
+// X-Blackpie-Model (blackpie's provider/model id of the member that answered).
 // The body's model is the one the agent asked for whenever the request
 // went out under another name — a group's member, an alias, a fallback,
 // a provider/model id, a name the user gave the model upstream — since
@@ -14,9 +14,9 @@ package gateway
 // (issennknight on Discord: deepseek-v4.1-flash served as
 // deepseek-v4.1-flash-1017). A request that went out under the name it
 // asked for keeps the vendor's text, a dated name included. Settings'
-// MemberModel, or a request's X-Magpie-Response-Model: member, has the
-// body's model say magpie's id instead, except for the agents that read
-// it themselves (vendorNamed); X-Magpie-Response-Model: vendor keeps the
+// MemberModel, or a request's X-Blackpie-Response-Model: member, has the
+// body's model say blackpie's id instead, except for the agents that read
+// it themselves (vendorNamed); X-Blackpie-Response-Model: vendor keeps the
 // vendor's text. The vendor's own name is still in the usage log
 // (Record.Served) and on the Routing page: the request's capture is
 // inside this writer.
@@ -30,14 +30,14 @@ import (
 	"sync"
 
 	"github.com/tidwall/gjson"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 const (
-	providerHeader      = "X-Magpie-Provider"
-	modelHeader         = "X-Magpie-Model"
-	responseModelHeader = "X-Magpie-Response-Model" // a request's: member, or vendor
+	providerHeader      = "X-Blackpie-Provider"
+	modelHeader         = "X-Blackpie-Model"
+	responseModelHeader = "X-Blackpie-Response-Model" // a request's: member, or vendor
 )
 
 // vendorNamed are the agents whose replies never name the member: they
@@ -68,7 +68,7 @@ func noteMember(w http.ResponseWriter, r *http.Request, p provider.Provider, mod
 
 // replyNaming is what the reply to r has its body's model say: the
 // member's id (namesMember), the vendor's own text (asked for with
-// X-Magpie-Response-Model: vendor), or else the model the agent asked
+// X-Blackpie-Response-Model: vendor), or else the model the agent asked
 // for, when the request went out under another name.
 type replyNaming int
 

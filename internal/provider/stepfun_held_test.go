@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/filememo"
 )
 
 // TestStepFunSignedInReadOnce: a provider list asked each StepFun

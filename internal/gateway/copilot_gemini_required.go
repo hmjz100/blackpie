@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/tidwall/gjson"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // Copilot's Gemini turns a request away 400 "invalid request body" for a

@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // readBack is r as the ledger reads it back: from a chunk as written, priced
@@ -25,7 +25,7 @@ func readBack(t *testing.T, r Record) []Row {
 	return []Row{raw.row(0), b.block(raw).row(0), b.block(made().pack()).row(0)}
 }
 
-// A call whose vendor counted no cache (a plugin's magpie_cache_unknown:
+// A call whose vendor counted no cache (a plugin's blackpie_cache_unknown:
 // Kiro tells only credits) is read back from the ledger as one, so its
 // CacheRead of 0 is never read as a miss (#3464). A vendor that counted a
 // miss stays one, and a Kiro call kept before its plugin said so is read

@@ -7,7 +7,7 @@ package gateway
 // Extra Usage. The subprocess keeps Claude Code's real Agent/CLI identity.
 //
 // Caller tools are exposed as an MCP server. A tools/call blocks in the hidden
-// stdio helper while magpie returns the tool_use to the caller. The caller's next
+// stdio helper while blackpie returns the tool_use to the caller. The caller's next
 // HTTP request supplies tool_result blocks, which unblock the same Claude Code
 // turn. This is the protocol-neutral equivalent of pi-claude-bridge's parked
 // Agent SDK query (https://github.com/elidickinson/pi-claude-bridge, MIT).
@@ -39,7 +39,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"hash"
 	"io"
 	"io/fs"
@@ -60,15 +60,15 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/claudecode"
-	"github.com/yetone/magpie/internal/claudetui"
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/netproxy"
-	"github.com/yetone/magpie/internal/proc"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/wslrun"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/claudecode"
+	"github.com/hmjz100/blackpie/internal/claudetui"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/netproxy"
+	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/wslrun"
 )
 
 type subscriptionBridge struct {
@@ -139,14 +139,14 @@ type subscriptionRun struct {
 	outputs []*os.File
 	reading sync.WaitGroup
 	// exited is closed once Claude Code has exited and its output is read,
-	// exit then how it ended (Wait's error); killed says magpie ended it
+	// exit then how it ended (Wait's error); killed says blackpie ended it
 	// (abort) while it ran
 	exited chan struct{}
 	exit   error
 	killed bool
 	tmp    string
 	// room frees the process's place in claudeRoom once it has exited,
-	// roomLeft telling it magpie ended it (abort)
+	// roomLeft telling it blackpie ended it (abort)
 	room     func(left bool)
 	roomLeft bool
 	// schema says the client asked for an answer fitting a JSON schema,
@@ -218,7 +218,7 @@ type subscriptionRun struct {
 	// found none (#1638).
 	behindKey  string
 	behindTurn string
-	// endWhy is why magpie ended it, as the log of a turn that finds it
+	// endWhy is why blackpie ended it, as the log of a turn that finds it
 	// gone says (abortFor); results are the calls whose results it was
 	// last handed (continueWith)
 	endWhy  string
@@ -255,7 +255,7 @@ type subscriptionRun struct {
 	// helper hands each one over. Set and read under mu.
 	onCall func(id, name string, args json.RawMessage)
 
-	// search answers magpie's web search tool, searchName, which the
+	// search answers blackpie's web search tool, searchName, which the
 	// client never sees
 	search     func(ctx context.Context, query string) (string, []Hit, error)
 	searchName string
@@ -287,7 +287,7 @@ type subscriptionRun struct {
 	parkedAt time.Time
 
 	// started is when it was started, and active when its turn under way
-	// began (r.mu), for `magpie claude-code runs` (claudeRunList)
+	// began (r.mu), for `blackpie claude-code runs` (claudeRunList)
 	started time.Time
 	active  time.Time
 	// ends is when its timer lets it go (endIn), under r.mu
@@ -328,7 +328,7 @@ type shownCall struct {
 }
 
 // waitTool collects a tool result that took longer than an agent's patience.
-const waitTool = "magpie_wait"
+const waitTool = "blackpie_wait"
 
 type mcpToolResult struct {
 	Content []map[string]any `json:"content"`
@@ -360,12 +360,12 @@ func claudeProjectName(path string) string {
 
 // sweepBridgeProjects removes the projects that runs from before
 // --no-session-persistence left in Claude Code's folder: only those named
-// after a magpie-claude- folder in the temp directory, which no one but the
+// after a blackpie-claude- folder in the temp directory, which no one but the
 // bridge works in.
 func sweepBridgeProjects(claudeDir, tempDir string) {
 	var prefixes []string
 	for _, d := range []string{tempDir, evalSymlinks(tempDir)} {
-		prefix := claudeProjectName(filepath.Join(d, "magpie-claude-"))
+		prefix := claudeProjectName(filepath.Join(d, "blackpie-claude-"))
 		if !slices.Contains(prefixes, prefix) {
 			prefixes = append(prefixes, prefix)
 		}
@@ -384,7 +384,7 @@ func sweepBridgeProjects(claudeDir, tempDir string) {
 }
 
 // sweepBridgeTemps removes the folders runs a gateway no longer running
-// left in the temp directory: a run's own magpie-claude-<n> (its tools.json,
+// left in the temp directory: a run's own blackpie-claude-<n> (its tools.json,
 // its work folder when it has no shared one) is removed when it ends, but a
 // gateway quit for an update, or killed, ends none of its runs (#958).
 // Another gateway on the same account (a dev build) makes them in the same
@@ -394,7 +394,7 @@ func sweepBridgeProjects(claudeDir, tempDir string) {
 func sweepBridgeTemps(tempDir string) {
 	entries, _ := os.ReadDir(tempDir)
 	for _, e := range entries {
-		rest, ok := strings.CutPrefix(e.Name(), "magpie-claude-")
+		rest, ok := strings.CutPrefix(e.Name(), "blackpie-claude-")
 		if !ok || !e.IsDir() || rest == "" || strings.Trim(rest, "0123456789") != "" {
 			continue
 		}
@@ -556,7 +556,7 @@ func randomToken() string {
 	return hex.EncodeToString(b[:])
 }
 
-// claudeCLI is the Claude Code magpie runs: this machine's, or, on Windows
+// claudeCLI is the Claude Code blackpie runs: this machine's, or, on Windows
 // without one, the one installed in a running WSL distro, run there with
 // its own login and quota (wslrun).
 type claudeCLI struct {
@@ -564,7 +564,7 @@ type claudeCLI struct {
 	wsl  *wslrun.Tool
 }
 
-// claudeBinary is this machine's Claude Code, or the one magpie downloaded
+// claudeBinary is this machine's Claude Code, or the one blackpie downloaded
 // for it (claudecode.Find), else one in WSL.
 func claudeBinary() (claudeCLI, error) {
 	if p := claudecode.Find(); p != "" {
@@ -583,10 +583,10 @@ func (c claudeCLI) command(ctx context.Context, args ...string) *exec.Cmd {
 	return proc.CommandContext(ctx, c.path, args...)
 }
 
-// claudeEuid is the user magpie runs as; a var for tests.
+// claudeEuid is the user blackpie runs as; a var for tests.
 var claudeEuid = os.Geteuid
 
-// root is whether this Claude Code runs as root: magpie itself as root
+// root is whether this Claude Code runs as root: blackpie itself as root
 // (a server's or a container's), or a WSL distro's default user root.
 func (c claudeCLI) root() bool {
 	if c.wsl != nil {
@@ -600,7 +600,7 @@ func (c claudeCLI) root() bool {
 // used with root/sudo privileges") unless IS_SANDBOX is "1" or
 // CLAUDE_CODE_BUBBLEWRAP is set: its setup checks exactly that (2.1.296).
 // The run has no tool of Claude Code's own that touches the machine, only
-// magpie's MCP ones, answered by the client, and Anthropic's web search,
+// blackpie's MCP ones, answered by the client, and Anthropic's web search,
 // so skipping the permission prompts as root does nothing more than as
 // anyone else. Run as anyone else, env is kept as it is.
 func (c claudeCLI) asRoot(env []string) []string {
@@ -623,7 +623,7 @@ func (c claudeCLI) asRoot(env []string) []string {
 	return append(out, "IS_SANDBOX=1")
 }
 
-// claudeEnvVars are the variables magpie sets for a Claude Code run, which
+// claudeEnvVars are the variables blackpie sets for a Claude Code run, which
 // one in WSL is handed (wslrun's Env).
 var claudeEnvVars = []string{"ENABLE_CLAUDEAI_MCP_SERVERS", "DISABLE_AUTO_COMPACT", "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
 	"DISABLE_TELEMETRY", "DO_NOT_TRACK", "DISABLE_ERROR_REPORTING", "DISABLE_AUTOUPDATER", "ANTHROPIC_BETAS"}
@@ -657,7 +657,7 @@ func (c claudeCLI) proxied(ctx context.Context, env []string) ([]string, error) 
 	return netproxy.EnvForBunWith(claudeProxy(ctx), env, c.wsl == nil || c.wsl.Host == "")
 }
 
-// file is where this Claude Code reads a file of magpie's at path: one in
+// file is where this Claude Code reads a file of blackpie's at path: one in
 // WSL under the distro's mount of the drive.
 func (c claudeCLI) file(path string) string {
 	if c.wsl != nil {
@@ -698,7 +698,7 @@ func (c claudeCLI) tuiWSLUnread(configDir string) string {
 	return ""
 }
 
-// exe is magpie's own executable, as this Claude Code starts it.
+// exe is blackpie's own executable, as this Claude Code starts it.
 func (c claudeCLI) exe() (string, error) {
 	if c.wsl != nil {
 		return c.wsl.Exe()
@@ -720,7 +720,7 @@ func callbackBaseURL() string {
 
 // claudeMCPPath is where the Claude subscription bridge's MCP helper hands
 // a tool call back: the path, then the run's callback token.
-const claudeMCPPath = "/_magpie/claude-mcp/"
+const claudeMCPPath = "/_blackpie/claude-mcp/"
 
 // from, when set, is the conversation's session a run let go past idleMost
 // saved (unshelve): Claude Code goes on with it, told only the messages
@@ -779,7 +779,7 @@ func (b *subscriptionBridge) startRun(ctx context.Context, req *Request, model, 
 			sweepBridgeTemps(os.TempDir())
 		}()
 	})
-	tmp, err := os.MkdirTemp("", "magpie-claude-")
+	tmp, err := os.MkdirTemp("", "blackpie-claude-")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -804,7 +804,7 @@ func (b *subscriptionBridge) startRun(ctx context.Context, req *Request, model, 
 		return nil, nil, err
 	}
 	mcpConfig, _ := json.Marshal(map[string]any{"mcpServers": map[string]any{
-		"magpie": map[string]any{"command": exe, "args": []string{"claude-mcp-helper", callbackPath, toolsPath}},
+		"blackpie": map[string]any{"command": exe, "args": []string{"claude-mcp-helper", callbackPath, toolsPath}},
 	}})
 	args := claudeCLIArgs(model, string(mcpConfig), req.Effort, req.WebSearch)
 	if req.ThinkOff {
@@ -819,7 +819,7 @@ func (b *subscriptionBridge) startRun(ctx context.Context, req *Request, model, 
 	}
 	// in the caller's own folder when it says which it is and it is one
 	// here (clientWorkDir): Claude Code tells the model the folder it runs
-	// in as its working directory, and a model told magpie's folder wrote
+	// in as its working directory, and a model told blackpie's folder wrote
 	// the caller's files there, through tools that run in the caller's
 	work := ""
 	if binary.wsl == nil {
@@ -861,7 +861,7 @@ func (b *subscriptionBridge) startRun(ctx context.Context, req *Request, model, 
 		sessions = claudeSessions(configDir, work)
 		args = slices.DeleteFunc(args, func(a string) bool { return a == "--no-session-persistence" })
 		// a caller's folder keeps its own sessions beside the runs': only
-		// magpie's own folder is swept, a run's session removed by its id
+		// blackpie's own folder is swept, a run's session removed by its id
 		if !client {
 			b.sweepSessions(sessions)
 		}
@@ -942,7 +942,7 @@ func (b *subscriptionBridge) startRun(ctx context.Context, req *Request, model, 
 		env = append(env, "ANTHROPIC_BETAS="+req.SafeguardBeta)
 	}
 	if tui && (!client || configDir != "") {
-		// a folder of magpie's, or an account folder of magpie's whose
+		// a folder of blackpie's, or an account folder of blackpie's whose
 		// Claude Code no one else runs: asked whether to trust it, the
 		// shim says yes; in the user's own account a caller's folder is
 		// theirs to answer for, and the run is -p
@@ -1066,7 +1066,7 @@ func (b *subscriptionBridge) startRun(ctx context.Context, req *Request, model, 
 }
 
 // claudeTUIHelper, when set, is run as the interactive mode's helper in
-// place of magpie's executable: a test's stand-in.
+// place of blackpie's executable: a test's stand-in.
 var claudeTUIHelper string
 
 // controlWait is how long Claude Code may take to answer a control
@@ -1092,7 +1092,7 @@ type tuiNoStart struct{ err error }
 func (e *tuiNoStart) Error() string { return e.err.Error() }
 func (e *tuiNoStart) Unwrap() error { return e.err }
 
-// claudeTUIRuns is false where magpie's executable has no shim to run:
+// claudeTUIRuns is false where blackpie's executable has no shim to run:
 // the gateway's tests, whose fake Claude Codes are -p ones.
 var claudeTUIRuns = true
 
@@ -1186,7 +1186,7 @@ type ClaudeMode struct {
 	Why    string    `json:"why,omitempty"`
 	Broken time.Time `json:"broken,omitzero"` // since when, for "broken"
 	WSL    bool      `json:"wsl,omitempty"`   // Claude Code in WSL
-	// how the last run since magpie started went (noteClaudeRun)
+	// how the last run since blackpie started went (noteClaudeRun)
 	Last *ClaudeLastRun `json:"last,omitempty"`
 	// Only: the user has model requests never be -p (ClaudeTUIOnly)
 	Only bool `json:"only,omitempty"`
@@ -1201,7 +1201,7 @@ type ClaudeLastRun struct {
 	At  time.Time `json:"at"`
 }
 
-// claudeLast is the last run's, since magpie started
+// claudeLast is the last run's, since blackpie started
 var claudeLast struct {
 	sync.Mutex
 	run ClaudeLastRun
@@ -1283,8 +1283,8 @@ func (r *subscriptionRun) setSafeguards(req *Request) error {
 // tuiCommand is the interactive mode's helper (claudetui) running this
 // Claude Code with the -p arguments args; tuiEnv adds to its environment.
 func (c claudeCLI) tuiCommand(ctx context.Context, args ...string) (*exec.Cmd, error) {
-	// the helper runs here, on Windows for Claude Code in WSL too: magpie
-	// itself, not exe, which is magpie as the distro starts it (/mnt/c/…)
+	// the helper runs here, on Windows for Claude Code in WSL too: blackpie
+	// itself, not exe, which is blackpie as the distro starts it (/mnt/c/…)
 	helper, err := os.Executable()
 	if err != nil {
 		return nil, err
@@ -1337,7 +1337,7 @@ func claudeNotTUIWhy(req *Request, binary claudeCLI, prompt []map[string]any, co
 // claudeOnlyErr is the error a request gets that would be -p, where the
 // user has model requests never be (ClaudeTUIOnly).
 func claudeOnlyErr(why string) error {
-	return fmt.Errorf("this request would run as claude -p (%s), and magpie is set to use only Claude Code's interactive mode; set Claude Code's interactive mode in Settings to On to let it run as -p", why)
+	return fmt.Errorf("this request would run as claude -p (%s), and blackpie is set to use only Claude Code's interactive mode; set Claude Code's interactive mode in Settings to On to let it run as -p", why)
 }
 
 // tuiBroken is whether the interactive mode failed to start on this
@@ -1360,7 +1360,7 @@ func (r *subscriptionRun) cliControlWithin(ctx context.Context, request map[stri
 	ch := make(chan controlReply, 1)
 	// one that ended says how, and the last it wrote to stderr: "Claude
 	// Code ended" alone left the user nothing to act on
-	what := fmt.Sprintf("answered magpie's %v request", request["subtype"])
+	what := fmt.Sprintf("answered blackpie's %v request", request["subtype"])
 	r.mu.Lock()
 	if r.closed {
 		r.mu.Unlock()
@@ -1862,7 +1862,7 @@ func (b *subscriptionBridge) keepIdle(r *subscriptionRun, key, conv string) bool
 	// request exclude each other through gone()). Left there, the same
 	// run under two keys was the oldest again after each pass below, which
 	// let go of one key only, so the loop never ended and drop grew with
-	// b.mu held (X, Sma1lboy: magpie at 158 GB after two days).
+	// b.mu held (X, Sma1lboy: blackpie at 158 GB after two days).
 	if r.idleKey != "" && r.idleKey != key && b.idle[r.idleKey] == r {
 		delete(b.idle, r.idleKey)
 	}
@@ -1911,7 +1911,7 @@ const shelfMost = 64
 // have asked it, a prefix it has cached; a run started anew is told the
 // whole conversation in one message, and writes all of it to the cache
 // again (X, AncientTwo: a Claude subscription's limits went much faster
-// through magpie than in Claude Code — with more than idleMost
+// through blackpie than in Claude Code — with more than idleMost
 // conversations going, each turn of each wrote its whole conversation).
 type savedSession struct {
 	session  string
@@ -2704,14 +2704,14 @@ func claudeSettingsKnown() bool {
 //     itself would;
 //   - an hour when the request's marks name it: its client picked it;
 //   - the pick of the user of the computer the request's Claude Code runs
-//     on (pickedTTL: this one's, or what the magpie it came through
+//     on (pickedTTL: this one's, or what the blackpie it came through
 //     named), and with none picked this computer's or an hour, as Claude
 //     Code keeps it on a subscription. Claude Code marks five minutes with
 //     no ttl, picked or as its default off a subscription, so its marks
 //     can't say which (linkaww: a 5m pick, relayed side calls an hour's;
 //     nothing picked, every relayed write five minutes');
 //   - else what the marks ask for, five minutes for a mark with no ttl (a
-//     remote magpie's relay was given the hour of its own setting, never
+//     remote blackpie's relay was given the hour of its own setting, never
 //     the Mac's, Linka);
 //   - else, for a request with no marks, this computer's pick or an hour
 //     (claudeRunTTL).
@@ -2767,7 +2767,7 @@ func cleanClaudeEnvTTL(env []string, ttl string) []string {
 		// the cache from there on
 		"CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS=1",
 		// the cache kept as the user picked (claudeRunTTL), stated so that
-		// the marks magpie puts in the first message (renderClaudePrompt,
+		// the marks blackpie puts in the first message (renderClaudePrompt,
 		// Request.cacheTTL) are the same: Anthropic refuses a 1h mark after
 		// a 5m one
 		"CLAUDE_CODE_PROMPT_CACHE_TTL="+ttl)
@@ -2788,7 +2788,7 @@ var claudeQuietVars = []string{"CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC", "DISA
 // Nothing is forced: an account Anthropic hasn't given threads goes whole,
 // as its own claude does. Updates and error reports stay off, which the
 // flags don't need. The quiet variables stay as the user set them, in
-// magpie's environment or in their Claude Code's settings.json env (the run
+// blackpie's environment or in their Claude Code's settings.json env (the run
 // reads no settings of the user's: --setting-sources ""), since they are the
 // user's telemetry choice for Claude Code.
 //
@@ -3006,19 +3006,19 @@ func (r *subscriptionRun) readOutput(rd io.Reader) {
 	}
 	// toolStart says whether a tool_use block, index of this message, is a
 	// call of the client's, to be handed over as name: Claude Code's own
-	// calls (WebSearch, magpie's web search, a schema's StructuredOutput)
+	// calls (WebSearch, blackpie's web search, a schema's StructuredOutput)
 	// are its own to answer
 	toolStart := func(index int, name string) (string, bool) {
 		if r.schema && name == "StructuredOutput" {
 			own[index] = true
 			return "", false
 		}
-		name, ok := strings.CutPrefix(name, "mcp__magpie__")
+		name, ok := strings.CutPrefix(name, "mcp__blackpie__")
 		r.mu.Lock()
 		name = declaredName(r.names, name)
 		search := r.search != nil && name == r.searchName
 		r.mu.Unlock()
-		// magpie answers its own web search, as Claude Code does
+		// blackpie answers its own web search, as Claude Code does
 		// its WebSearch
 		if !ok || search {
 			own[index] = true
@@ -3080,7 +3080,7 @@ func (r *subscriptionRun) readOutput(rd io.Reader) {
 					return
 				}
 				begin("msg_"+strings.ReplaceAll(newUUID(), "-", ""), r.model, cliUsage{})
-				name, _ = toolStart(0, "mcp__magpie__"+name)
+				name, _ = toolStart(0, "mcp__blackpie__"+name)
 				told[id] = true
 				if written[id] {
 					delete(written, id)
@@ -3192,7 +3192,7 @@ func (r *subscriptionRun) readOutput(rd io.Reader) {
 			_ = json.Unmarshal(envelope.Message, &whole)
 			var ids []string
 			for _, c := range whole.Content {
-				if c.Type == "tool_use" && strings.HasPrefix(c.Name, "mcp__magpie__") && c.ID != "" {
+				if c.Type == "tool_use" && strings.HasPrefix(c.Name, "mcp__blackpie__") && c.ID != "" {
 					ids = append(ids, c.ID)
 				}
 			}
@@ -3776,7 +3776,7 @@ func cacheMark1h() map[string]string {
 	return map[string]string{"type": "ephemeral", "ttl": "1h"}
 }
 
-// runMark is the prompt-cache mark on what magpie gives a run: kept as
+// runMark is the prompt-cache mark on what blackpie gives a run: kept as
 // long as Claude Code's own (Request.cacheTTL, given to the run by
 // cleanClaudeEnvTTL), since Anthropic refuses a 1h mark after a 5m one.
 func (r *Request) runMark() map[string]string {
@@ -3868,12 +3868,12 @@ func historyEnd(msgs []Message) int {
 // "Bash is disabled for this session, in subagents as well as here.",
 // which the model takes for a fact and gives up (#958).
 func bridgeName(name string) string {
-	return "mcp__magpie__" + bridgeToolName(name)
+	return "mcp__blackpie__" + bridgeToolName(name)
 }
 
 // bridgeToolName is the name the MCP helper offers a tool of the caller's
 // under. Claude Code takes an MCP tool's name as [A-Za-z0-9_-] only, with
-// mcp__magpie__ before it in at most 64: it made "spawn.agent" its
+// mcp__blackpie__ before it in at most 64: it made "spawn.agent" its
 // spawn_agent, which the client never offered (#2649). A name it would
 // change, or one ending as a changed name ends, is told apart by a hash of
 // it, the same in every run, so a resumed session and a conversation's
@@ -4625,7 +4625,7 @@ func (b *subscriptionBridge) mcpCall(w http.ResponseWriter, r *http.Request) {
 	run := b.runs[token]
 	b.mu.Unlock()
 	if run == nil {
-		// a run of the magpie this one took the gateway over from, its
+		// a run of the blackpie this one took the gateway over from, its
 		// turn under way when the gateway changed hands (handover.go)
 		if forwardCallback(w, r) {
 			return
@@ -4827,10 +4827,10 @@ func (r *subscriptionRun) launch() error {
 // tell writes line to Claude Code's input. Wait closes that input as
 // Claude Code exits, and a write after it failed "write |1: file already
 // closed", which said nothing of why: one Claude Code no longer reads says
-// how it ended, or that magpie ended it, and the last it wrote to stderr —
+// how it ended, or that blackpie ended it, and the last it wrote to stderr —
 // the cause comes last, after any warnings before it.
 func (r *subscriptionRun) tell(line []byte) error {
-	// one magpie ended is not written to: until Wait has reaped it, its
+	// one blackpie ended is not written to: until Wait has reaped it, its
 	// input still takes a write, which no one will read
 	r.mu.Lock()
 	killed := r.killed
@@ -4856,7 +4856,7 @@ func (r *subscriptionRun) tell(line []byte) error {
 	return r.whyEnded()
 }
 
-// whyEnded says how the run's Claude Code ended, or that magpie ended it,
+// whyEnded says how the run's Claude Code ended, or that blackpie ended it,
 // and the last it wrote to stderr.
 func (r *subscriptionRun) whyEnded() error {
 	return r.endedBefore("read its input")
@@ -4869,7 +4869,7 @@ func (r *subscriptionRun) endedBefore(what string) error {
 	defer r.mu.Unlock()
 	why := "exited before it " + what
 	if r.killed {
-		why = "was ended by magpie before it " + what
+		why = "was ended by blackpie before it " + what
 	} else if r.exit != nil {
 		why += " (" + r.exit.Error() + ")"
 	}
@@ -5031,7 +5031,7 @@ func (b *subscriptionBridge) abortAll() {
 		runs = append(runs, run)
 	}
 	b.mu.Unlock()
-	// each asked at once, then waited for: a Claude Code magpie exits
+	// each asked at once, then waited for: a Claude Code blackpie exits
 	// under is not left to be killed by no one
 	stops := make([]<-chan struct{}, 0, len(runs))
 	for _, run := range runs {
@@ -5067,7 +5067,7 @@ func keepLost(m map[string]lostRun, key string, l lostRun, most int) {
 }
 
 // whyLost is why the run ended, for the log of its conversation's next
-// turn: the reason magpie gave (abortFor), or how its Claude Code exited.
+// turn: the reason blackpie gave (abortFor), or how its Claude Code exited.
 func (r *subscriptionRun) whyLost() string {
 	r.mu.Lock()
 	why, killed, exit := r.endWhy, r.killed, r.exit
@@ -5076,7 +5076,7 @@ func (r *subscriptionRun) whyLost() string {
 	case why != "":
 		return why
 	case killed:
-		return "magpie ended it"
+		return "blackpie ended it"
 	case exit != nil:
 		return "its Claude Code exited (" + exit.Error() + ")"
 	}
@@ -5332,7 +5332,7 @@ func (s *Server) serveClaudeSubscription(w http.ResponseWriter, r *http.Request,
 // anthropic-ratelimit-unified-* headers, which a Claude Code signed in to
 // claude.ai reads into its status line's rate_limits (claude-hud's 5-hour
 // and weekly figures, #1257). Its run tells them in its rate_limit_event,
-// not as headers, so they are said again from what magpie keeps.
+// not as headers, so they are said again from what blackpie keeps.
 func limitHeaders(w http.ResponseWriter, owner string) {
 	user, own := ownerAccount(owner)
 	if user == "" || own && provider.ClaudeCodeMovedOff(user) {
@@ -5372,7 +5372,7 @@ func (s *Server) serveSubscription(w http.ResponseWriter, r *http.Request, from 
 	if name == "Claude Code" && wantsClientCache(r, from) {
 		req, err = parseAnthropicRequest(body, true)
 	} else if name == "Claude Code" && classifierClientCache(from, body) {
-		// the classifier never asked for its marks through magpie's
+		// the classifier never asked for its marks through blackpie's
 		// header: a set the bridge can't keep (a TTL order Anthropic
 		// would refuse) goes the default way, as before, not refused
 		if req, err = parseAnthropicRequest(body, true); err != nil {
@@ -5411,7 +5411,7 @@ func (s *Server) serveSubscription(w http.ResponseWriter, r *http.Request, from 
 			}
 		}
 	}
-	// its model searches the web with magpie's tool, which magpie answers
+	// its model searches the web with blackpie's tool, which blackpie answers
 	var search Tool
 	if req.WebSearch && !searching(r.Context()) {
 		if canSearch() {
@@ -5723,7 +5723,7 @@ func relay(w http.ResponseWriter, r *http.Request, from provider.Protocol, name 
 // bridgeTools are the caller's tools as the MCP helper offers them, less
 // those tool_choice rules out.
 // Each schema is folded to an object root (objectSchema), as a Messages
-// request magpie builds is: Claude Code leaves out an MCP tool whose
+// request blackpie builds is: Claude Code leaves out an MCP tool whose
 // inputSchema has a oneOf, anyOf or allOf at its root, which Anthropic's
 // API refuses, so Codex desktop's browser tool mcp__cua_repl__js, a oneOf
 // of objects, never reached the model (Lee931018 on X).

@@ -3,10 +3,10 @@ package gateway
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"regexp"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // An agent that loads its tools when it needs them (pi's and T3 Code's

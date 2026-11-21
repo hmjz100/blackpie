@@ -16,7 +16,7 @@ type RowGroup struct {
 	ID string `json:"id"`
 	Totals
 	// Rows is how many rows its filter lists: the calls turned away and
-	// magpie's own probes are among them, in no sum (Calls)
+	// blackpie's own probes are among them, in no sum (Calls)
 	Rows int `json:"rows"`
 	// Agents, Providers and Models are those its calls were of, so a header
 	// can say what else the group spans

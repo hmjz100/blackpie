@@ -26,7 +26,7 @@ var browserTracking struct {
 	err   error
 }
 
-const browserJobPrefix = `Local\magpie-data-browser-`
+const browserJobPrefix = `Local\blackpie-data-browser-`
 
 var browserKernel = windows.NewLazySystemDLL("kernel32.dll")
 var openBrowserJob = browserKernel.NewProc("OpenJobObjectW")

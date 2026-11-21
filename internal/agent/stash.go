@@ -9,22 +9,22 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/filelock"
-	"github.com/yetone/magpie/internal/filememo"
-	"github.com/yetone/magpie/internal/lastgood"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/filelock"
+	"github.com/hmjz100/blackpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/lastgood"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
-// The stash remembers what an agent's config said before magpie pointed it
+// The stash remembers what an agent's config said before blackpie pointed it
 // at the gateway, so switching back restores it instead of guessing.
 //
 // stash.json holds every agent's originals, so a change to it is read,
-// changed and written under stashMu, held across magpies too, and written
+// changed and written under stashMu, held across blackpies too, and written
 // whole (edit.WriteAtomic): two changes at once, or one cut short, never
 // leave it half there, which the next change read as no stash and wrote
 // back over every agent's. A file that doesn't parse (edited by hand, or
-// half written by an older magpie) is copied aside before it is written
+// half written by an older blackpie) is copied aside before it is written
 // over, so what it held can still be got back.
 var stashMu = filelock.Mutex{Path: func() string { return stashPath() + ".lock" }}
 

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // copyTree copies a testdata folder to to.
@@ -46,7 +46,7 @@ func panelPlugins(t *testing.T) (on, off, first, second string) {
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(h, ".config"))
 	t.Setenv("XDG_CACHE_HOME", filepath.Join(h, ".cache"))
 	t.Setenv("XDG_DATA_HOME", filepath.Join(h, ".local", "share"))
-	t.Setenv("MAGPIE_BUN", "")
+	t.Setenv("BLACKPIE_BUN", "")
 	t.Setenv("PATH", "")
 	on, off = filepath.Join(h, "src", "notes"), filepath.Join(h, "src", "notes-off")
 	first, second = filepath.Join(h, "src", "usage-a"), filepath.Join(h, "src", "usage-b")
@@ -54,7 +54,7 @@ func panelPlugins(t *testing.T) (on, off, first, second string) {
 	copyTree(t, "testdata/panel-plugin", off)
 	for i, dir := range []string{first, second} {
 		copyTree(t, "testdata/page-plugin", dir)
-		pkg := `{"name":"usage-` + string(rune('a'+i)) + `","version":"0.1.0","magpie":{"page":{"title":"Usage ` + string(rune('A'+i)) + `","file":"page/index.html","replaces":"usage"},"permissions":["usage:summary"]}}`
+		pkg := `{"name":"usage-` + string(rune('a'+i)) + `","version":"0.1.0","blackpie":{"page":{"title":"Usage ` + string(rune('A'+i)) + `","file":"page/index.html","replaces":"usage"},"permissions":["usage:summary"]}}`
 		if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(pkg), 0o644); err != nil {
 			t.Fatal(err)
 		}
@@ -84,9 +84,9 @@ func TestPluginPanelsServedShutIn(t *testing.T) {
 		t.Fatalf("panels: %s %v", w.Body, err)
 	}
 	want := []struct{ slot, title, key string }{
-		{"provider", "Notes", "plugin-magpie-provider-notes-0"},
-		{"usage", "Top models today", "plugin-magpie-provider-notes-1"},
-		{"settings", "Provider notes", "plugin-magpie-provider-notes-2"},
+		{"provider", "Notes", "plugin-blackpie-provider-notes-0"},
+		{"usage", "Top models today", "plugin-blackpie-provider-notes-1"},
+		{"settings", "Provider notes", "plugin-blackpie-provider-notes-2"},
 	}
 	toks := map[string]bool{}
 	for i, p := range panels {

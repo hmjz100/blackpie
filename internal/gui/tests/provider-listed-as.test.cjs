@@ -1,6 +1,6 @@
 // A relay's model can be listed by an id of the user's (zeewell on X:
 // deepseek-v4.1-flash-1017 as deepseek-v4.1-flash), in the provider
-// editor's Names & levels beside Same as: magpie lists, routes and counts
+// editor's Names & levels beside Same as: blackpie lists, routes and counts
 // it by that id, and the relay is still asked for its own. It is staged
 // and made with the editor's Save, as the rest of Names & levels is;
 // Restore default and an emptied box list it by its own id again. A
@@ -11,7 +11,7 @@ const path = require("node:path");
 const { test } = require("node:test");
 const { chromium, webkit } = require("playwright");
 
-const assets = process.env.MAGPIE_TEST_ASSETS || path.resolve(__dirname, "../assets");
+const assets = process.env.BLACKPIE_TEST_ASSETS || path.resolve(__dirname, "../assets");
 const levels = ["none", "low", "medium", "high"];
 
 function serve(lang, posts) {
@@ -48,13 +48,13 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
     test(`${engine} ${lang}: the id a model is listed by is staged and made with the provider's Save`, async (t) => {
       const browser = await (engine === "webkit" ? webkit.launch() : chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL || "chromium" }));
       t.after(() => browser.close());
-      const page = await (await browser.newContext({ viewport: { width: Number(process.env.MAGPIE_TEST_WIDTH || 900), height: 720 }, reducedMotion: "reduce" })).newPage();
+      const page = await (await browser.newContext({ viewport: { width: Number(process.env.BLACKPIE_TEST_WIDTH || 900), height: 720 }, reducedMotion: "reduce" })).newPage();
       page.setDefaultTimeout(5000);
       page.setDefaultNavigationTimeout(60000);
       const errors = [], posts = [];
       page.on("pageerror", (e) => errors.push(e.message));
       await page.route("**/*", serve(lang, posts));
-      await page.goto("http://magpie.test/?view=providers");
+      await page.goto("http://blackpie.test/?view=providers");
       await page.waitForFunction(() => typeof I18N === "object");
       const L = Object.fromEntries(await page.evaluate(([lang, keys]) => keys.map((k) => [k, lang === "en" ? k : I18N[lang][k]]), [lang, keys]));
       for (const k of keys) assert(L[k], `${lang} has ${k}`);
@@ -98,7 +98,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       await page.waitForFunction(() => !document.querySelector(".mnames"));
       assert.deepEqual(posts[1].body.modelPrefs.m1, { id: "local-account-model" });
       const missing = await page.evaluate(() => ["Listed as",
-        "The id magpie lists {id} by at this provider: agents, routing groups, the groups magpie finds, gateway keys and Usage all use it, and the provider is still asked for {own}. Empty: its own id",
+        "The id blackpie lists {id} by at this provider: agents, routing groups, the groups blackpie finds, gateway keys and Usage all use it, and the provider is still asked for {own}. Empty: its own id",
         "Its own name, every reasoning level it has, whether it sees images, the API it is asked on, the model it is the same as, its own id, and its list price",
       ].flatMap((k) => ["zh", "zh-TW", "ja", "de"].filter((l) => !I18N[l][k]).map((l) => `${l}: ${k}`)));
       assert.deepEqual(missing, [], "every string has every language");

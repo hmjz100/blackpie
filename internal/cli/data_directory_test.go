@@ -16,7 +16,7 @@ func TestNeedsData(t *testing.T) {
 }
 
 // What an agent runs for its whole session takes no lease, which would keep
-// a move waiting on it; whatever serves or writes magpie's data does.
+// a move waiting on it; whatever serves or writes blackpie's data does.
 func TestLeaseFree(t *testing.T) {
 	for _, args := range [][]string{{"mcp", "image"}, {"claude-mcp-helper"}, {"statusline"}, {"tool", "image"}, {"healthcheck"}} {
 		if !leaseFree(args) {
@@ -37,7 +37,7 @@ func TestWindowEntry(t *testing.T) {
 		}
 		return
 	}
-	for _, args := range [][]string{nil, {"app"}, {"gui", "settings"}, {"tray"}, {"magpie://open"}, {"-Embedding"}} {
+	for _, args := range [][]string{nil, {"app"}, {"gui", "settings"}, {"tray"}, {"blackpie://open"}, {"-Embedding"}} {
 		if !windowEntry(args) {
 			t.Errorf("window start fails silently: %v", args)
 		}

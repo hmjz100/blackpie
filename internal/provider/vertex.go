@@ -35,7 +35,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io/fs"
 	"net/http"
 	"net/url"
@@ -48,7 +48,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/yetone/magpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/appdir"
 )
 
 // VertexPreset is the preset's id.

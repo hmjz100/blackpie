@@ -7,23 +7,23 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/yetone/magpie/internal/agent"
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/autostart"
-	"github.com/yetone/magpie/internal/daemon"
-	"github.com/yetone/magpie/internal/datamove"
-	"github.com/yetone/magpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/autostart"
+	"github.com/hmjz100/blackpie/internal/daemon"
+	"github.com/hmjz100/blackpie/internal/datamove"
+	"github.com/hmjz100/blackpie/internal/proc"
 )
 
 // On Linux with no desktop session (a WSL distro, a server over SSH)
-// nothing opens magpie at login, so once magpie tui quit, the agents it had
+// nothing opens blackpie at login, so once blackpie tui quit, the agents it had
 // connected asked a gateway that was gone: Codex in WSL "连接会失败，没自动
-// 启动magpie的网关" (zaidu259434 on X, with magpie installed in WSL and
-// pointed at Windows' magpie as a remote one). As it quits having served
+// 启动blackpie的网关" (zaidu259434 on X, with blackpie installed in WSL and
+// pointed at Windows' blackpie as a remote one). As it quits having served
 // the gateway with an agent connected, the terminal hands the gateway on:
-// to magpie's service (magpie daemon), installed now where systemd runs it
+// to blackpie's service (blackpie daemon), installed now where systemd runs it
 // and the user never removed it, which starts it with the system or the
-// user's login from then on; else to a `magpie serve` of its own, in the
+// user's login from then on; else to a `blackpie serve` of its own, in the
 // background until the system stops.
 
 // keeper is what keepGateway asks and does; a var for the tests.
@@ -58,20 +58,20 @@ func keepGateway(connected bool) string {
 	if k.goos != "linux" || !connected || k.autostartOn() {
 		return gatewayGoneNote()
 	}
-	// a data move waits for every magpie to exit, and one started now
+	// a data move waits for every blackpie to exit, and one started now
 	// would be refused at the closed folder
 	if k.moving() {
-		return gatewayGoneNote() + " (magpie is moving its data directory)"
+		return gatewayGoneNote() + " (blackpie is moving its data directory)"
 	}
 	st, err := k.status()
 	switch {
 	case err == nil && st.Installed:
 		if err := k.start(); err == nil {
-			return "magpie: the gateway goes on in magpie's service (magpie daemon status)"
+			return "blackpie: the gateway goes on in blackpie's service (blackpie daemon status)"
 		}
 	case err == nil && !k.removed():
 		if err := k.install(); err == nil {
-			msg := "magpie: the gateway goes on in magpie's service, which now starts with this system or your login, so agents connected to magpie reach it with magpie tui closed; magpie daemon uninstall removes it"
+			msg := "blackpie: the gateway goes on in blackpie's service, which now starts with this system or your login, so agents connected to blackpie reach it with blackpie tui closed; blackpie daemon uninstall removes it"
 			if l := k.linger(); l != "" {
 				msg += " (" + l + ")"
 			}
@@ -80,23 +80,23 @@ func keepGateway(connected bool) string {
 	}
 	pid, log, err := k.background()
 	if err != nil {
-		return gatewayGoneNote() + " (couldn't start magpie serve in the background: " + err.Error() + ")"
+		return gatewayGoneNote() + " (couldn't start blackpie serve in the background: " + err.Error() + ")"
 	}
-	msg := fmt.Sprintf("magpie: the gateway goes on in the background (magpie serve, pid %d, log %s) until this system stops", pid, log)
+	msg := fmt.Sprintf("blackpie: the gateway goes on in the background (blackpie serve, pid %d, log %s) until this system stops", pid, log)
 	if wslHere() {
-		msg += "; for it to start with WSL, turn systemd on with [boot] systemd=true in /etc/wsl.conf and run magpie daemon install"
+		msg += "; for it to start with WSL, turn systemd on with [boot] systemd=true in /etc/wsl.conf and run blackpie daemon install"
 	} else {
-		msg += "; magpie daemon install starts it with the system"
+		msg += "; blackpie daemon install starts it with the system"
 	}
 	return msg
 }
 
-// BackgroundLog is the log of a magpie serve that magpie tui left
+// BackgroundLog is the log of a blackpie serve that blackpie tui left
 // running as it quit (serveInBackground).
 func BackgroundLog() string { return filepath.Join(appdir.Cache(), "serve.log") }
 
-// serveInBackground starts `magpie serve` on its own, outliving this
-// process and its terminal, its output in a log in magpie's cache.
+// serveInBackground starts `blackpie serve` on its own, outliving this
+// process and its terminal, its output in a log in blackpie's cache.
 func serveInBackground() (int, string, error) {
 	exe, err := os.Executable()
 	if err != nil {
@@ -122,7 +122,7 @@ func serveInBackground() (int, string, error) {
 	return pid, log, nil
 }
 
-// dataMoving is whether a data move is under way for this magpie.
+// dataMoving is whether a data move is under way for this blackpie.
 func dataMoving() bool {
 	exe, err := os.Executable()
 	if err != nil {
@@ -138,7 +138,7 @@ func wslHere() bool {
 	return strings.Contains(strings.ToLower(string(b)), "microsoft")
 }
 
-// connected says one of agents is connected to magpie.
+// connected says one of agents is connected to blackpie.
 func connected(agents []*agent.Agent) bool {
 	for _, a := range agents {
 		if a.Routed != nil && a.Routed() {

@@ -57,7 +57,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       let asked = 0;
       page.on("request", (q) => { if (q.url().includes("/api/gateway/trace")) asked++; });
       await page.route("**/*", serve());
-      await page.goto(`http://magpie.test/?view=${how.view}`);
+      await page.goto(`http://blackpie.test/?view=${how.view}`);
       // the 3 s retry would have asked twice more by now
       await page.waitForTimeout(7500);
       assert.equal(asked, 1, `the trace was asked ${asked} times out of sight`);

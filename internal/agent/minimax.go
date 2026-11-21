@@ -5,19 +5,19 @@ package agent
 // $MINIMAX_DATA_DIR or ~/.minimax. The model sessions start on is
 // defaultModel, "<provider>/<model>" split at the first slash, where a
 // provider the user added (Add 3rd-party provider…, mcode provider add) is
-// "custom_provider:<key>", an entry of custom_provider. magpie adds itself
-// there as custom_provider.magpie — the gateway, spoken to as Anthropic
+// "custom_provider:<key>", an entry of custom_provider. blackpie adds itself
+// there as custom_provider.blackpie — the gateway, spoken to as Anthropic
 // messages, with the catalog as its models — so the catalog joins MiniMax
 // Code's /model. A model there is keyed by its id's flat spelling,
 // "bb-codex~gpt-6.1-sol" (provider.FlatID), which the gateway takes back to
 // "bb-codex/gpt-6.1-sol": a SubAgent's model must be "<provider>/<model>"
-// with one slash in the whole (#1387), so a model through magpie is
-// "custom_provider:magpie/bb-codex~gpt-6.1-sol". A key written before
+// with one slash in the whole (#1387), so a model through blackpie is
+// "custom_provider:blackpie/bb-codex~gpt-6.1-sol". A key written before
 // that, with the slashes, has its keys moved to the flat one and stays
 // beside it switched off, for the sessions that started on it, and the
 // settings that named it name the flat one (mcodeRefs). The default the
-// user had is stashed and put back when magpie steps out. MiniMax Code
-// rewrites the file itself (its /model, its provider commands), so magpie's
+// user had is stashed and put back when blackpie steps out. MiniMax Code
+// rewrites the file itself (its /model, its provider commands), so blackpie's
 // entry is edited in place: a key the user or MiniMax Code put on it, or on
 // one of its models, stays.
 
@@ -26,24 +26,24 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/provider"
 	"gopkg.in/yaml.v3"
 )
 
-// mcodeProvider is magpie's provider id in MiniMax Code, and mcodeEntry its
+// mcodeProvider is blackpie's provider id in MiniMax Code, and mcodeEntry its
 // entry in config.yaml.
 const (
-	mcodeProvider = "custom_provider:" + magpieID
-	mcodeEntry    = "custom_provider." + magpieID
+	mcodeProvider = "custom_provider:" + blackpieID
+	mcodeEntry    = "custom_provider." + blackpieID
 )
 
 // mcodeRefs are the settings in config.yaml that name a model as
 // "<provider>/<model>": the default, the light one and memory's two.
 var mcodeRefs = []string{"defaultModel", "defaultLightModel", "memory.captureModel", "memory.consolidationModel"}
 
-// mcodeKey is the key magpie's model id is written under in its entry: its
+// mcodeKey is the key blackpie's model id is written under in its entry: its
 // flat spelling where the gateway takes that back to it (flat, from
 // provider.Flattened), else the id.
 func mcodeKey(flat map[string]string, id string) string {
@@ -53,7 +53,7 @@ func mcodeKey(flat map[string]string, id string) string {
 	return id
 }
 
-// mcodeID is the catalog id of a key in magpie's entry: one with a slash
+// mcodeID is the catalog id of a key in blackpie's entry: one with a slash
 // was written so before #1387; a flat one no model has now is read with
 // its first tilde as the slash after the provider's id, which has none.
 func mcodeID(key string) string {
@@ -66,10 +66,10 @@ func mcodeID(key string) string {
 	return strings.Replace(key, provider.FlatSep, "/", 1)
 }
 
-// mcodeUA is the User-Agent magpie's entry sends: MiniMax Code 0.5's own was
+// mcodeUA is the User-Agent blackpie's entry sends: MiniMax Code 0.5's own was
 // the Anthropic SDK's ("L/JS 0.91.1"), or node's for its token counts.
 // 0.6.8 sends "MiniMaxCode" on a custom provider that sets none, which names
-// it too (#1605: a provider pointed at magpie by hand).
+// it too (#1605: a provider pointed at blackpie by hand).
 const mcodeUA = "minimax-code"
 
 // MiniMaxDir is the folder MiniMax Code keeps its config.yaml in.
@@ -93,7 +93,7 @@ func miniMaxAt(at place, dir string) *Agent {
 	path := filepath.Join(dir, "config.yaml")
 	key := "minimax-code:" + path + ":"
 	get := func(k string) string { v, _ := edit.GetYAML(path, k); return v }
-	onMagpie := func() bool { return strings.HasPrefix(get("defaultModel"), mcodeProvider+"/") }
+	onBlackpie := func() bool { return strings.HasPrefix(get("defaultModel"), mcodeProvider+"/") }
 	// setDefault sets defaultModel and its variant, taking out each that is ""
 	setDefault := func(model, variant string) error {
 		var del []string
@@ -128,14 +128,14 @@ func miniMaxAt(at place, dir string) *Agent {
 			return ""
 		},
 		Check: func() string {
-			if !onMagpie() {
+			if !onBlackpie() {
 				return ""
 			}
 			if _, ok := edit.GetYAMLText(path, mcodeEntry); !ok {
-				return "MiniMax Code's " + mcodeEntry + " (config.yaml) is gone, so it no longer reaches magpie"
+				return "MiniMax Code's " + mcodeEntry + " (config.yaml) is gone, so it no longer reaches blackpie"
 			}
 			if get(mcodeEntry+".enabled") == "false" {
-				return "MiniMax Code's " + mcodeEntry + " (config.yaml) is turned off, so it no longer reaches magpie"
+				return "MiniMax Code's " + mcodeEntry + " (config.yaml) is turned off, so it no longer reaches blackpie"
 			}
 			return wiringOff("MiniMax Code", path, func(k string) (string, bool) { return edit.GetYAML(path, mcodeEntry+".options."+k) },
 				"baseURL", at.gw(), "apiKey", at.gwKey())
@@ -145,13 +145,13 @@ func miniMaxAt(at place, dir string) *Agent {
 			Get: func() string {
 				v := get("defaultModel")
 				if ref, ok := strings.CutPrefix(v, mcodeProvider+"/"); ok {
-					return magpieID + "/" + mcodeID(ref)
+					return blackpieID + "/" + mcodeID(ref)
 				}
 				return v
 			},
 			Set: func(v string) error {
-				if ref, ok := strings.CutPrefix(v, magpieID+"/"); ok && isMagpie(ref) {
-					if !onMagpie() {
+				if ref, ok := strings.CutPrefix(v, blackpieID+"/"); ok && isBlackpie(ref) {
+					if !onBlackpie() {
 						stash(map[string]string{
 							key + "defaultModel":        get("defaultModel"),
 							key + "defaultModelVariant": get("defaultModelVariant"),
@@ -160,12 +160,12 @@ func miniMaxAt(at place, dir string) *Agent {
 					if err := writeMiniMaxEntry(path); err != nil {
 						return err
 					}
-					// a variant is the last model's ("thinking"), none of magpie's
+					// a variant is the last model's ("thinking"), none of blackpie's
 					return setDefault(mcodeProvider+"/"+mcodeKey(provider.Flattened(), ref), "")
 				}
 				// the variant goes with the model it was picked for
 				variant := ""
-				if onMagpie() {
+				if onBlackpie() {
 					was, wasVariant := unstash(key+"defaultModel"), unstash(key+"defaultModelVariant")
 					if v == "" {
 						v = was // back to the default the user had
@@ -182,22 +182,22 @@ func miniMaxAt(at place, dir string) *Agent {
 				if err := edit.DelYAML(path, mcodeEntry); err != nil {
 					return err
 				}
-				// nor an empty custom_provider left where magpie's was the one
+				// nor an empty custom_provider left where blackpie's was the one
 				if t, ok := edit.GetYAMLText(path, "custom_provider"); ok && strings.TrimSpace(t) == "{}" {
 					return edit.DelYAML(path, "custom_provider")
 				}
 				return nil
 			},
 			Options: func(cur map[string]string) []Option {
-				return withVia(miniMaxOwnOptions(path, cur["model"]), "minimax-code", magpieID+"/")
+				return withVia(miniMaxOwnOptions(path, cur["model"]), "minimax-code", blackpieID+"/")
 			},
 		}},
 	}, path)
 }
 
-// writeMiniMaxEntryAt puts magpie's entry in MiniMax Code's config.yaml,
+// writeMiniMaxEntryAt puts blackpie's entry in MiniMax Code's config.yaml,
 // for a MiniMax Code reaching the gateway at gw, as the catalog is now, over
-// the one there: what magpie sets is set, a model gone from the catalog
+// the one there: what blackpie sets is set, a model gone from the catalog
 // goes, and every other key — the user's, MiniMax Code's — stays with its
 // comments. The file is written only when this changes it.
 func writeMiniMaxEntryAt(path, gw string) error {
@@ -209,7 +209,7 @@ func writeMiniMaxEntryAt(path, gw string) error {
 			entry = doc.Content[0]
 		}
 	}
-	yamlSet(entry, "name", magpieID)
+	yamlSet(entry, "name", blackpieID)
 	yamlSet(entry, "kind", "custom")
 	yamlSet(entry, "enabled", true)
 	// the gateway takes every model as Anthropic messages, as Claude Code
@@ -434,7 +434,7 @@ func miniMaxOwnOptions(path, cur string) []Option {
 	}
 	add("", c.Provider)
 	add("custom_provider:", c.CustomProvider)
-	if cur != "" && !seen[cur] && !strings.HasPrefix(cur, magpieID+"/") {
+	if cur != "" && !seen[cur] && !strings.HasPrefix(cur, blackpieID+"/") {
 		p, m, _ := strings.Cut(cur, "/")
 		out = append([]Option{{Value: cur, Icon: miniMaxIcon(p, m)}}, out...)
 	}

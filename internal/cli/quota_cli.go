@@ -10,24 +10,24 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
-const quotaUsage = `usage: magpie quota [<provider>…] [--json]
-       magpie quota reset [<codex account>] [--card <n>] [--yes]
-       magpie quota auto-reset [<codex account>] [week|expiring] [on|off]
-       magpie quota auto-reset lead [<minutes or hours, like 30m or 3h>|default]
-       magpie quota credits [<codex account>] [on|last|off]
-       magpie quota alert [<percent>|off] [--balance <amount>|off]
-       magpie quota wait <provider|account> [--timeout <duration>] [--quiet]
-       magpie quota history [<provider|account>…] [--days <n>] [--json]
-       magpie quota refresh <provider> [<account>] [--json]
-  what is left of every subscription, plan and key magpie has: each window's use and
+const quotaUsage = `usage: blackpie quota [<provider>…] [--json]
+       blackpie quota reset [<codex account>] [--card <n>] [--yes]
+       blackpie quota auto-reset [<codex account>] [week|expiring] [on|off]
+       blackpie quota auto-reset lead [<minutes or hours, like 30m or 3h>|default]
+       blackpie quota credits [<codex account>] [on|last|off]
+       blackpie quota alert [<percent>|off] [--balance <amount>|off]
+       blackpie quota wait <provider|account> [--timeout <duration>] [--quiet]
+       blackpie quota history [<provider|account>…] [--days <n>] [--json]
+       blackpie quota refresh <provider> [<account>] [--json]
+  what is left of every subscription, plan and key blackpie has: each window's use and
   when it starts again, and each key's balance, asked of the vendors now (or less than
   a minute ago). --json is for scripts and agents, each entry with lastServedAt, when it
   last answered through the gateway, and last: true on the latest; the gateway answers the same at
-  GET http://127.0.0.1:3425/v1/magpie/quotas (on the port in the Gateway page's Gateway address), and to another machine only while magpie is
+  GET http://127.0.0.1:3425/v1/blackpie/quotas (on the port in the Gateway page's Gateway address), and to another machine only while blackpie is
   shared on the local network, with its key as the API key (Authorization: Bearer or x-api-key)
   A Codex account that holds rate-limit resets says how many; quota reset spends one,
   starting the account's current windows again (the one Codex is signed in to unless
@@ -48,7 +48,7 @@ const quotaUsage = `usage: magpie quota [<provider>…] [--json]
   instead, for every account, from 15m to 24h; default puts back the half hour, and
   alone it says what is set. Earlier loses what the windows have left then.
   quota credits off keeps a Codex account from spending its credits: once one of
-  its windows is used up, by magpie's latest reading (refreshed about every
+  its windows is used up, by blackpie's latest reading (refreshed about every
   minute), routing holds it as used up until that window renews and the request
   goes to the other accounts, groups and fallbacks, or is refused with why (with
   auto-reset on, its week used up and no one else left, it spends a reset first).
@@ -58,34 +58,34 @@ const quotaUsage = `usage: magpie quota [<provider>…] [--json]
   tried after every other account, key and fallback that isn't on its credits, so a
   subscription, then an API key, then the credits. Alone it says which accounts don't
   spend theirs and which spend them last.
-  quota alert 80 has the magpie app notify when any window of a subscription or plan
+  quota alert 80 has the blackpie app notify when any window of a subscription or plan
   reaches 80% used, once each time the window runs (not windows set aside, such as
   on-demand spending); --balance 5 when a balance falls to 5 or under, in its own
   currency or credits, once until topped up past it. off turns either off, and alone
   it says what is set. Both are off until set.
-  quota wait codex returns once any Codex account magpie has on has allowance again
+  quota wait codex returns once any Codex account blackpie has on has allowance again
   (a window that stops it no longer used up), and an account's email or login, or
   <provider>/<account>, waits for that one alone: it reads the vendors itself, gateway
   running or not, again shortly after the soonest reset (every 1 to 10 minutes), and
   says on stderr what it waits for. For a script to go on with work it stopped:
-  until codex exec …; do magpie quota wait codex || break; done. Exit 0 once there
+  until codex exec …; do blackpie quota wait codex || break; done. Exit 0 once there
   is allowance, 1 when --timeout (30m, 6h) passes first, 2 for a name it doesn't
   know, 130 on Ctrl+C.
-  quota history is what magpie has read of each subscription's and plan's windows
+  quota history is what blackpie has read of each subscription's and plan's windows
   over time, kept 45 days (UTC times, a reading only when it changed, each window's
   runs apart by when they reset): the latest readings of each window, or with --json
-  every one since --days days ago, as GET /v1/magpie/quotas/history?days=&provider=&user=
+  every one since --days days ago, as GET /v1/blackpie/quotas/history?days=&provider=&user=
   answers. A provider, an account's email or login, or <provider>/<account> narrows it.
   A reading is kept at the time it was read: a Claude account's, which Claude Code
   tells only as it answers or runs /usage, isn't written again each time it is shown.
   quota refresh reads one card again, as its refresh button on the Usage page does:
   the provider's, or of the one account named (<provider>/<account> works too), and
   shows only it, --json with each card's readAt and error. A saved Claude account is
-  read by running Claude Code's /usage in its own folder, which plain magpie quota
+  read by running Claude Code's /usage in its own folder, which plain blackpie quota
   never does. A card read less than 30 seconds ago isn't asked again: what was read
   then is shown.`
 
-// quotaCmd: magpie quota [<provider>…] [--json]
+// quotaCmd: blackpie quota [<provider>…] [--json]
 func quotaCmd(args []string) error {
 	if len(args) > 1 && args[1] == "reset" {
 		return quotaResetCmd(args[2:])
@@ -121,7 +121,7 @@ func quotaCmd(args []string) error {
 			only = append(only, strings.ToLower(a))
 		}
 	}
-	// magpie quota is the user asking: read even when allowances are read
+	// blackpie quota is the user asking: read even when allowances are read
 	// only when asked (#1518)
 	ctx, cancel := context.WithTimeout(provider.Asked(context.Background()), 15*time.Second)
 	defer cancel()
@@ -152,7 +152,7 @@ func quotaCmd(args []string) error {
 	return nil
 }
 
-// printQuotas is magpie quota's table: a line for each card.
+// printQuotas is blackpie quota's table: a line for each card.
 func printQuotas(qs []provider.Quota) {
 	width := 0
 	for _, q := range qs {
@@ -180,7 +180,7 @@ func printQuotas(qs []provider.Quota) {
 		line += quotaReadingCell(q.AsOf, q.ReadAt, q.Windows)
 		fmt.Println(line)
 	}
-	fmt.Println(faint.Render("  % is how much of a window is used · ↻ when it starts again · --json for scripts, or GET /v1/magpie/quotas on the gateway"))
+	fmt.Println(faint.Render("  % is how much of a window is used · ↻ when it starts again · --json for scripts, or GET /v1/blackpie/quotas on the gateway"))
 }
 
 // balanceCell is what an account holds in a line: "1.2K credits left",
@@ -209,7 +209,7 @@ func resetsCell(r *provider.ResetCredits, agent, user string) string {
 	return cell
 }
 
-// quotaResetCmd: magpie quota reset [<codex account>] [--card <n>] [--yes]
+// quotaResetCmd: blackpie quota reset [<codex account>] [--card <n>] [--yes]
 // — spends one of the account's rate-limit resets, once the user has said
 // so: the one that runs out first, or the nth to run out.
 func quotaResetCmd(args []string) error {
@@ -233,7 +233,7 @@ func quotaResetCmd(args []string) error {
 			return nil
 		default:
 			if strings.HasPrefix(a, "-") {
-				return fmt.Errorf("magpie quota reset doesn't know %s", a)
+				return fmt.Errorf("blackpie quota reset doesn't know %s", a)
 			}
 			if user != "" {
 				return fmt.Errorf("one account at a time: %s or %s", user, a)
@@ -320,7 +320,7 @@ func ordinal(n int) string {
 	return strconv.Itoa(n) + suffix
 }
 
-// quotaAutoResetCmd: magpie quota auto-reset [<codex account>] [week|expiring]
+// quotaAutoResetCmd: blackpie quota auto-reset [<codex account>] [week|expiring]
 // [on|off] — whether the account spends a reset by itself once its week is
 // used up, before one expires, or both (#2078).
 func quotaAutoResetCmd(args []string) error {
@@ -345,12 +345,12 @@ func quotaAutoResetCmd(args []string) error {
 		}
 	}
 	if when != "" && !set {
-		return fmt.Errorf("say on or off: magpie quota auto-reset <account> %s on", when)
+		return fmt.Errorf("say on or off: blackpie quota auto-reset <account> %s on", when)
 	}
 	if !set && user == "" {
 		on := settings.Load().CodexAutoReset
 		if len(on) == 0 {
-			fmt.Println(muted.Render("no Codex account uses a reset by itself ·"), "magpie quota auto-reset <account> on")
+			fmt.Println(muted.Render("no Codex account uses a reset by itself ·"), "blackpie quota auto-reset <account> on")
 			return nil
 		}
 		for _, u := range on {
@@ -388,13 +388,13 @@ func quotaAutoResetCmd(args []string) error {
 	return nil
 }
 
-// quotaResetLeadCmd: magpie quota auto-reset lead [<duration>|default] —
+// quotaResetLeadCmd: blackpie quota auto-reset lead [<duration>|default] —
 // how long before a reset about to expire unused it is spent, for every
 // account with expiring on (the owner, 10-30).
 func quotaResetLeadCmd(args []string) error {
 	switch {
 	case len(args) > 1:
-		return fmt.Errorf("one lead at a time, like: magpie quota auto-reset lead 2h")
+		return fmt.Errorf("one lead at a time, like: blackpie quota auto-reset lead 2h")
 	case len(args) == 0:
 		s := settings.Load()
 		say := "used " + leadWords(s.ResetLead()) + " before it expires"
@@ -459,13 +459,13 @@ func autoResetSay(user string) string {
 	return "uses its resets only when told to"
 }
 
-// printResetsUsed lists the resets of user's magpie spent, newest first,
+// printResetsUsed lists the resets of user's blackpie spent, newest first,
 // and why: so a reset gone from the account can be told apart from one it
 // ran out of or the user spent elsewhere.
 func printResetsUsed(user string) {
 	used := provider.ResetsUsed(user)
 	if len(used) == 0 {
-		fmt.Println(muted.Render("magpie hasn't used any of its resets in the last 90 days"))
+		fmt.Println(muted.Render("blackpie hasn't used any of its resets in the last 90 days"))
 		return
 	}
 	for _, u := range used {
@@ -473,7 +473,7 @@ func printResetsUsed(user string) {
 	}
 }
 
-// resetUsedWhy says why magpie used a reset, as ResetUse.Why has it.
+// resetUsedWhy says why blackpie used a reset, as ResetUse.Why has it.
 func resetUsedWhy(why string) string {
 	switch why {
 	case provider.ResetUsedWeek:
@@ -484,7 +484,7 @@ func resetUsedWhy(why string) string {
 	return "used by hand"
 }
 
-// quotaCreditsCmd: magpie quota credits [<codex account>] [on|last|off]
+// quotaCreditsCmd: blackpie quota credits [<codex account>] [on|last|off]
 // — whether the account spends its credits once its allowance is used
 // up, and with last only after everything else.
 func quotaCreditsCmd(args []string) error {
@@ -507,11 +507,11 @@ func quotaCreditsCmd(args []string) error {
 		s := settings.Load()
 		off, last := s.CodexNoCredits, s.CodexCreditsLast
 		if len(off) == 0 && len(last) == 0 {
-			fmt.Println(muted.Render("every Codex account spends its credits once its allowance is used up ·"), "magpie quota credits <account> last|off")
+			fmt.Println(muted.Render("every Codex account spends its credits once its allowance is used up ·"), "blackpie quota credits <account> last|off")
 			return nil
 		}
 		for _, u := range off {
-			fmt.Println(muted.Render("○"), u, muted.Render("doesn't spend its credits: held once magpie reads a window used up"))
+			fmt.Println(muted.Render("○"), u, muted.Render("doesn't spend its credits: held once blackpie reads a window used up"))
 		}
 		for _, u := range last {
 			if provider.CodexCreditsLast(u) {
@@ -531,7 +531,7 @@ func quotaCreditsCmd(args []string) error {
 		case provider.CreditsLast:
 			fmt.Println(user, "spends its credits once its allowance is used up, only after every other account, key and fallback")
 		default:
-			fmt.Println(user, "doesn't spend its credits: once magpie reads a window used up it is held till it renews")
+			fmt.Println(user, "doesn't spend its credits: once blackpie reads a window used up it is held till it renews")
 		}
 		return nil
 	}
@@ -544,7 +544,7 @@ func quotaCreditsCmd(args []string) error {
 	case provider.CreditsLast:
 		fmt.Println(green.Render("✓"), user+":", "spends its credits once its allowance is used up, but only after every other account, key and fallback that isn't on its credits")
 	default:
-		fmt.Println(green.Render("✓"), user+":", "no longer spends its credits: once magpie reads a window used up, requests go to the other accounts till it renews")
+		fmt.Println(green.Render("✓"), user+":", "no longer spends its credits: once blackpie reads a window used up, requests go to the other accounts till it renews")
 	}
 	return nil
 }
@@ -567,7 +567,7 @@ func codexAccountNamed(user string) (string, error) {
 	return user, nil
 }
 
-// quotaAlertCmd: magpie quota alert [<percent>|off] [--balance <amount>|off]
+// quotaAlertCmd: blackpie quota alert [<percent>|off] [--balance <amount>|off]
 // — the usage alerts Settings sets (#368), the notifications the app shows.
 func quotaAlertCmd(args []string) error {
 	s := settings.Load()
@@ -626,7 +626,7 @@ func quotaAlertCmd(args []string) error {
 		fmt.Println("; no balance alert")
 	}
 	if s.UsageAlert > 0 || s.BalanceAlert > 0 {
-		fmt.Println(muted.Render("  the notifications come from the magpie app, while it runs"))
+		fmt.Println(muted.Render("  the notifications come from the blackpie app, while it runs"))
 	}
 	return nil
 }
@@ -656,7 +656,7 @@ func quotaMatches(q provider.Quota, only []string) bool {
 		if strings.EqualFold(q.Provider, o) || strings.EqualFold(q.Name, o) || strings.EqualFold(q.Kind, o) || (q.Alias != "" && strings.EqualFold(q.Alias, o)) {
 			return true
 		}
-		// a remote magpie's card: by the remote ("office", or its name)
+		// a remote blackpie's card: by the remote ("office", or its name)
 		// or by the provider there ("codex" is office/codex too)
 		if rid, there, ok := strings.Cut(q.Provider, "/"); ok && q.From != "" &&
 			(strings.EqualFold(rid, o) || strings.EqualFold(q.From, o) || strings.EqualFold(there, o)) {
@@ -684,7 +684,7 @@ func withUntold(qs []provider.Quota, only []string) ([]provider.Quota, error) {
 	return qs, nil
 }
 
-// quotaHistoryCmd: magpie quota history [<provider|account>…] [--days <n>] [--json]
+// quotaHistoryCmd: blackpie quota history [<provider|account>…] [--days <n>] [--json]
 func quotaHistoryCmd(args []string) error {
 	asJSON, days := false, ""
 	var only []string
@@ -716,7 +716,7 @@ func quotaHistoryCmd(args []string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	all := provider.QuotaHistories(provider.QuotaHistorySince(days, now), "", "")
-	// and each remote magpie's, as it keeps them (office/codex)
+	// and each remote blackpie's, as it keeps them (office/codex)
 	all = append(all, provider.RemoteQuotaHistories(ctx, days)...)
 	for _, h := range all {
 		rid, there, _ := strings.Cut(h.Provider, "/")
@@ -735,7 +735,7 @@ func quotaHistoryCmd(args []string) error {
 		if len(only) > 0 {
 			return fmt.Errorf("no readings kept of %s", strings.Join(only, ", "))
 		}
-		fmt.Println(muted.Render("nothing kept yet ·"), "a subscription's or plan's windows are kept here as magpie reads them")
+		fmt.Println(muted.Render("nothing kept yet ·"), "a subscription's or plan's windows are kept here as blackpie reads them")
 		return nil
 	}
 	for _, h := range hs {
@@ -748,7 +748,7 @@ func quotaHistoryCmd(args []string) error {
 			fmt.Println("  " + l.Name + "  " + quotaPointsCell(l.Points, 8))
 		}
 	}
-	fmt.Println(faint.Render("  % is how much was left · ↻ a new run of the window · --json for every reading, or GET /v1/magpie/quotas/history on the gateway"))
+	fmt.Println(faint.Render("  % is how much was left · ↻ a new run of the window · --json for every reading, or GET /v1/blackpie/quotas/history on the gateway"))
 	return nil
 }
 

@@ -10,14 +10,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/agentenv"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/agentenv"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
-// magpie quota --json tells when each key last answered through the gateway
+// blackpie quota --json tells when each key last answered through the gateway
 // — a process of its own, which wrote it down — and marks the latest last,
-// as GET /v1/magpie/quotas does (#570).
+// as GET /v1/blackpie/quotas does (#570).
 func TestQuotaJSONLastServedAt(t *testing.T) {
 	groupsHome(t)
 	for _, k := range agentenv.Vars {

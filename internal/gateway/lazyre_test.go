@@ -3,7 +3,7 @@ package gateway
 import (
 	"testing"
 
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 )
 
 // TestAllCompile compiles every pattern this package compiles on first

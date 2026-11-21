@@ -109,7 +109,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         const errors = [];
         page.on("pageerror", (e) => errors.push(e.message));
         await page.route("**/*", serve());
-        await page.goto("http://magpie.test/?view=routing");
+        await page.goto("http://blackpie.test/?view=routing");
         await page.locator(".rt-ctx .ctx-segbar .ctx-seg").first().waitFor();
         await page.waitForTimeout(800);
 

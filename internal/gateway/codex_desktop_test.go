@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // codexDeskReset forgets the backend's list for the Codex app, before the
@@ -48,7 +48,7 @@ func codexDeskAsked(t *testing.T) {
 // The list the Codex app reads from a file beside the ChatGPT sign-in
 // (laddieyao on Discord): the backend's entries as it sent them, its
 // base_instructions untouched, asked for with Codex's own sign-in, and
-// magpie's models after them. Not known until the backend has answered,
+// blackpie's models after them. Not known until the backend has answered,
 // and a failed ask after that keeps the last list it gave: unknown, never
 // an empty list.
 func TestCodexDesktopCatalog(t *testing.T) {
@@ -103,7 +103,7 @@ func TestCodexDesktopCatalog(t *testing.T) {
 		t.Fatalf("the backend's entry: %v", m)
 	}
 	if slugs["relay/claude-opus-5.5"] == nil {
-		t.Fatalf("magpie's models missing: %s", b)
+		t.Fatalf("blackpie's models missing: %s", b)
 	}
 
 	// an ask that fails keeps the list the backend gave last

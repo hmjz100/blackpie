@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// StopMCP ends every MCP server magpie started, the hub's and the run
+// StopMCP ends every MCP server blackpie started, the hub's and the run
 // sessions', and waits up to timeout for each one's process tree to be
 // gone. An error means one may still hold files: a data move gives up.
 func StopMCP(timeout time.Duration) error {

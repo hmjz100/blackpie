@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/sessions"
+	"github.com/hmjz100/blackpie/internal/sessions"
 )
 
 // The Sessions tab asks for its list and stats every 15 s, and over a long
@@ -40,7 +40,7 @@ func TestSessionsSentOnceWhileTheSame(t *testing.T) {
 	get := func(path, had string) *httptest.ResponseRecorder {
 		r := httptest.NewRequest("GET", path, nil)
 		if had != "" {
-			r.Header.Set("X-Magpie-Had", had)
+			r.Header.Set("X-Blackpie-Had", had)
 		}
 		w := httptest.NewRecorder()
 		mux.ServeHTTP(w, r)
@@ -51,16 +51,16 @@ func TestSessionsSentOnceWhileTheSame(t *testing.T) {
 	}
 	for _, path := range []string{"/api/sessions", "/api/sessions/stats?days=0"} {
 		first := get(path, "")
-		tag := first.Header().Get("X-Magpie-Tag")
-		if tag == "" || first.Body.Len() == 0 || first.Header().Get("X-Magpie-Same") != "" {
-			t.Fatalf("%s: the first answer has tag %q and %d bytes, same %q", path, tag, first.Body.Len(), first.Header().Get("X-Magpie-Same"))
+		tag := first.Header().Get("X-Blackpie-Tag")
+		if tag == "" || first.Body.Len() == 0 || first.Header().Get("X-Blackpie-Same") != "" {
+			t.Fatalf("%s: the first answer has tag %q and %d bytes, same %q", path, tag, first.Body.Len(), first.Header().Get("X-Blackpie-Same"))
 		}
 		again := get(path, tag)
-		if again.Header().Get("X-Magpie-Same") != "1" || again.Body.Len() != 0 || again.Header().Get("X-Magpie-Tag") != tag {
-			t.Errorf("%s: asked with the answer's own tag, got same %q, %d bytes, tag %q", path, again.Header().Get("X-Magpie-Same"), again.Body.Len(), again.Header().Get("X-Magpie-Tag"))
+		if again.Header().Get("X-Blackpie-Same") != "1" || again.Body.Len() != 0 || again.Header().Get("X-Blackpie-Tag") != tag {
+			t.Errorf("%s: asked with the answer's own tag, got same %q, %d bytes, tag %q", path, again.Header().Get("X-Blackpie-Same"), again.Body.Len(), again.Header().Get("X-Blackpie-Tag"))
 		}
-		if other := get(path, "0123"); other.Header().Get("X-Magpie-Same") != "" || other.Body.String() != first.Body.String() {
-			t.Errorf("%s: asked with another tag, got same %q and %d bytes, want the whole answer", path, other.Header().Get("X-Magpie-Same"), other.Body.Len())
+		if other := get(path, "0123"); other.Header().Get("X-Blackpie-Same") != "" || other.Body.String() != first.Body.String() {
+			t.Errorf("%s: asked with another tag, got same %q and %d bytes, want the whole answer", path, other.Header().Get("X-Blackpie-Same"), other.Body.Len())
 		}
 	}
 
@@ -69,15 +69,15 @@ func TestSessionsSentOnceWhileTheSame(t *testing.T) {
 	bodies := map[string]string{}
 	for _, path := range []string{"/api/sessions", "/api/sessions/stats?days=0"} {
 		w := get(path, "")
-		tags[path], bodies[path] = w.Header().Get("X-Magpie-Tag"), w.Body.String()
+		tags[path], bodies[path] = w.Header().Get("X-Blackpie-Tag"), w.Body.String()
 	}
 	write("00000002-1111-2222-3333-444444444444", "2026-09-21T10:00:00.000Z")
 	sessions.Reset()
 	forgetStats()
 	for path, had := range tags {
 		w := get(path, had)
-		if w.Header().Get("X-Magpie-Same") != "" || w.Body.Len() == 0 || w.Header().Get("X-Magpie-Tag") == had {
-			t.Errorf("%s: after a new session, asked with the old tag, got same %q, %d bytes, tag %q", path, w.Header().Get("X-Magpie-Same"), w.Body.Len(), w.Header().Get("X-Magpie-Tag"))
+		if w.Header().Get("X-Blackpie-Same") != "" || w.Body.Len() == 0 || w.Header().Get("X-Blackpie-Tag") == had {
+			t.Errorf("%s: after a new session, asked with the old tag, got same %q, %d bytes, tag %q", path, w.Header().Get("X-Blackpie-Same"), w.Body.Len(), w.Header().Get("X-Blackpie-Tag"))
 		}
 		whole := get(path, "")
 		if path != "/api/sessions" {
@@ -87,8 +87,8 @@ func TestSessionsSentOnceWhileTheSame(t *testing.T) {
 			continue
 		}
 		// the list sends the new session's row, and the old one as a run
-		if w.Header().Get("X-Magpie-Delta") != "sessions" {
-			t.Fatalf("the list after a new session: delta %q, want sessions", w.Header().Get("X-Magpie-Delta"))
+		if w.Header().Get("X-Blackpie-Delta") != "sessions" {
+			t.Fatalf("the list after a new session: delta %q, want sessions", w.Header().Get("X-Blackpie-Delta"))
 		}
 		var delta, old, want struct {
 			Sessions []json.RawMessage `json:"sessions"`

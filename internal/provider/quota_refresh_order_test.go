@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/agentenv"
+	"github.com/hmjz100/blackpie/internal/agentenv"
 )
 
 func isolateRefreshes(t *testing.T) {

@@ -27,7 +27,7 @@ function server(market) {
     if (url.pathname === "/api/plugins") return json(state);
     if (url.pathname === "/api/plugins/listings") { await market(); return json({ listings }); }
     if (url.pathname.startsWith("/api/")) return json({});
-    if (!/^\/[\w./-]*$/.test(url.pathname) || url.host !== "magpie.test") return route.fulfill({ status: 404, body: "" });
+    if (!/^\/[\w./-]*$/.test(url.pathname) || url.host !== "blackpie.test") return route.fulfill({ status: 404, body: "" });
     const file = path.join(assets, url.pathname === "/" ? "index.html" : url.pathname);
     const contentType = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png" }[path.extname(file)];
     try { await route.fulfill({ body: await fs.readFile(file), contentType }); } catch { await route.fulfill({ status: 404, body: "" }); }
@@ -46,7 +46,7 @@ async function open(browser, reduced, market) {
       .observe(document, { childList: true, subtree: true });
   });
   await page.route("**/*", server(market));
-  await page.goto("http://magpie.test/?view=plugins");
+  await page.goto("http://blackpie.test/?view=plugins");
   return { page, errors };
 }
 

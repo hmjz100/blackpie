@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/agentenv"
+	"github.com/hmjz100/blackpie/internal/agentenv"
 )
 
 // The signature is the one Tencent Cloud's signing doc (api/213/30654)

@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-// The Codex app greys its Send for every model, magpie's included, while
-// the ChatGPT account it is on is out (MasterYi on Discord), till magpie is
+// The Codex app greys its Send for every model, blackpie's included, while
+// the ChatGPT account it is on is out (MasterYi on Discord), till blackpie is
 // its provider and its app-server restarted (codex_app_server.go). What
 // follows tells the account is out as soon as a reply says so, not at the
 // next look five minutes on.
@@ -34,7 +34,7 @@ var codexRecheck struct {
 // codexReadNow reads whether Codex's account is out, and signs Codex in
 // to the next account with room when it is, as KeepOnAnAccountWithRoom's
 // look does: the Codex app greys its Send once its account is out, so no
-// request comes to tell magpie again, and that look could be five minutes
+// request comes to tell blackpie again, and that look could be five minutes
 // off (danzi002 on Discord restarted the app each time instead). A var
 // for tests.
 var codexReadNow = func(user string) {

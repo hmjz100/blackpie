@@ -29,7 +29,7 @@ const BREAK = `
   };
 })();
 // a plugin that keeps each setting its code is given
-magpie.plugin("fixture", (ctx) => {
+blackpie.plugin("fixture", (ctx) => {
   window.__given = [ctx.config.n];
   ctx.onConfig((c) => window.__given.push(c.n));
 });
@@ -46,7 +46,7 @@ function serve(lang, config) {
     if (url.pathname === "/api/groups") return json({ groups: [] });
     if (url.pathname === "/api/caller-keys") return json({ keys: [] });
     if (url.pathname.startsWith("/api/")) return json({});
-    if (url.host !== "magpie.test") return route.fulfill({ status: 404, body: "" });
+    if (url.host !== "blackpie.test") return route.fulfill({ status: 404, body: "" });
     const file = path.join(assets, url.pathname === "/" ? "index.html" : url.pathname);
     const contentType = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml" }[path.extname(file)];
     let body;
@@ -72,7 +72,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         page.on("console", (m) => { if (m.type() === "error") logged.push(m.text()); });
         await page.addInitScript(() => { window.__break = true; });
         await page.route("**/*", serve(lang, {}));
-        await page.goto("http://magpie.test/?view=gateway");
+        await page.goto("http://blackpie.test/?view=gateway");
         const card = page.locator("#view-gateway .slot-error");
         await card.waitFor();
         assert.equal(await card.getAttribute("role"), "alert", where);
@@ -122,7 +122,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
     await page.route("**/*", serve(lang, { fixture: { n: 10 } }));
-    await page.goto("http://magpie.test/?view=gateway");
+    await page.goto("http://blackpie.test/?view=gateway");
     await page.locator("#gwRequests").waitFor();
     // from boot.js, as the plugin set itself up
     assert.deepEqual(await page.evaluate(() => window.__given), [10]);

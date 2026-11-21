@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"cmp"
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/yetone/magpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/appdir"
 )
 
 // WorkBuddy (Tencent's desktop agent) keeps its sessions much as Claude

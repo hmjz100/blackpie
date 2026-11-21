@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/yetone/magpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/appdir"
 )
 
 func validMode(mode string) bool { return mode == appdir.ModeInstalled || mode == appdir.ModePortable }

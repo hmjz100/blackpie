@@ -4,12 +4,12 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io"
 	"net/http"
 	"strings"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // notAnAPIReply turns a 2xx reply that can't be a model API's answer into

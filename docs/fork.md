@@ -1,6 +1,6 @@
 # This fork
 
-`lingqiqi5211/moepie` builds on [yetone/magpie](https://github.com/yetone/magpie)
+`hmjz100/blackpie` builds on [hmjz100/blackpie](https://github.com/hmjz100/blackpie)
 and removes what this fork does not use. Upstream moves fast, so the two
 branches have different jobs:
 
@@ -61,20 +61,20 @@ the conflict resolution described, so the next pick stays a one-line decision.
 
 ## Application name and compatibility
 
-The application and its build outputs are **moepie**: `make build`, `make cli`
-and `make install` produce `moepie`, the Mac bundle is `moepie.app`, and release
-assets use `moepie-` (desktop) or `moepie-cli-` (terminal). The updater selects
-those same names and unpacks `moepie.app`. The Mac bundle identifier is
-`io.github.lingqiqi5211.moepie`; the `magpie://` import scheme stays compatible.
+The application and its build outputs are **blackpie**: `make build`, `make cli`
+and `make install` produce `blackpie`, the Mac bundle is `blackpie.app`, and release
+assets use `blackpie-` (desktop) or `blackpie-cli-` (terminal). The updater selects
+those same names and unpacks `blackpie.app`. The Mac bundle identifier is
+`io.github.hmjz100.blackpie`; the `blackpie://` import scheme stays compatible.
 
 This is not a data or protocol migration. The Go module/imports, data folders,
-`MAGPIE_` variables, ports, internal identifiers and CLI compatibility commands
-keep their upstream names. Linux's GTK program name also stays `magpie`, since
-WebKit uses it for its data folder. Windows still writes `magpie.com` as the
-console companion: existing `magpie` commands wait for it, and it records the
-actual `moepie-windows-*.exe` target rather than assuming an executable name.
-Process and built-in MCP detection accept both `moepie` and older binary names;
-carried MCP libraries keep their compatible `magpie` command marker. Existing
+`BLACKPIE_` variables, ports, internal identifiers and CLI compatibility commands
+keep their upstream names. Linux's GTK program name also stays `blackpie`, since
+WebKit uses it for its data folder. Windows still writes `blackpie.com` as the
+console companion: existing `blackpie` commands wait for it, and it records the
+actual `blackpie-windows-*.exe` target rather than assuming an executable name.
+Process and built-in MCP detection accept both `blackpie` and older binary names;
+carried MCP libraries keep their compatible `blackpie` command marker. Existing
 shortcuts are not forcibly migrated or recreated after user deletion.
 Copyright and third-party notices remain in the builds.
 
@@ -153,8 +153,8 @@ attached to them. Release metadata and `SHA256SUMS` are fetched only from the
 original URL, never through a source mirror. History scans up to 15 pages of
 100 releases before sorting by version or choosing Stable; explicit 50/100
 release history is not clipped to the default 40-note display limit.
-`MAGPIE_UPDATE_FEED` overrides update metadata;
-`MAGPIE_NOTES_FEED` separately overrides release notes for tests and local runs.
+`BLACKPIE_UPDATE_FEED` overrides update metadata;
+`BLACKPIE_NOTES_FEED` separately overrides release notes for tests and local runs.
 
 ## Checks before a pick lands
 

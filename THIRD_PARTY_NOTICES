@@ -1,9 +1,9 @@
-magpie third-party notices
+blackpie third-party notices
 ==========================
 
-magpie is built with moejs (https://github.com/MoeForge/moejs,
+blackpie is built with moejs (https://github.com/MoeForge/moejs,
 Apache License 2.0), a JavaScript engine that runs gateway plugins. moejs
-compiles the material below into every magpie binary, and its notices,
+compiles the material below into every blackpie binary, and its notices,
 sections 1 to 4 of moejs's THIRD_PARTY_NOTICES at v0.1.0-alpha.11,
 follow verbatim.
 
@@ -391,7 +391,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ========================================================================
-magpie's own data from other projects
+blackpie's own data from other projects
 ========================================================================
 
 ------------------------------------------------------------------------

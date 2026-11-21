@@ -80,7 +80,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       page.on("pageerror", (e) => errors.push(e.message));
       await page.route("**/*", serve(lang, feed));
       t.after(async () => { feed.next?.([]); await browser.close(); });
-      await page.goto("http://magpie.test/?view=routing");
+      await page.goto("http://blackpie.test/?view=routing");
       const rows = page.locator(".rt-req");
       await rows.nth(fixtures.length - 1).waitFor();
       const check = async () => {
@@ -232,9 +232,9 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       page.setDefaultTimeout(5000);
       const feed = {}, errors = [];
       page.on("pageerror", (e) => errors.push(e.message));
-      await page.addInitScript((v) => { try { localStorage.setItem("magpie.routingMetrics", v); } catch {} }, typeof kept === "string" ? kept : JSON.stringify(kept));
+      await page.addInitScript((v) => { try { localStorage.setItem("blackpie.routingMetrics", v); } catch {} }, typeof kept === "string" ? kept : JSON.stringify(kept));
       await page.route("**/*", serve("en", feed));
-      await page.goto("http://magpie.test/?view=routing");
+      await page.goto("http://blackpie.test/?view=routing");
       const row = page.locator(".rt-req").first();
       await page.locator(".rt-req").nth(fixtures.length - 1).waitFor();
       const has = await row.locator(".rt-metric").evaluateAll((es) => es.map((e) => ["duration", "ttft", "speed"].find((c) => e.classList.contains(c))));

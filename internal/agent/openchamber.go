@@ -13,10 +13,10 @@ package agent
 // Each new session is sent the model it picks, in this order: the project's
 // defaultModel (settings.json projects[]), the profile's defaultModel, the
 // agent's own, and only then OpenCode's model — so a defaultModel of its own
-// wins over the one magpie sets for OpenCode. Its small model (titles, commit
+// wins over the one blackpie sets for OpenCode. Its small model (titles, commit
 // messages) is smallModelOverride once smallModelUseDefault is false, else
 // OpenCode's small_model. A model is "provider/model" as OpenCode names it,
-// so one of magpie's needs magpie's provider in the OpenCode config.
+// so one of blackpie's needs blackpie's provider in the OpenCode config.
 
 import (
 	"encoding/json"
@@ -29,8 +29,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/edit"
 )
 
 // openChamberDir is where OpenChamber keeps its settings.
@@ -151,12 +151,12 @@ func (s ocStore) projectModels() map[string]string {
 	return out
 }
 
-// openChamberOnMagpie says whether OpenChamber sends one of magpie's
-// models: OpenCode's config must keep magpie's provider for it.
-func openChamberOnMagpie() bool {
+// openChamberOnBlackpie says whether OpenChamber sends one of blackpie's
+// models: OpenCode's config must keep blackpie's provider for it.
+func openChamberOnBlackpie() bool {
 	home, _ := os.UserHomeDir()
 	s := ocStore{openChamberDir(home)}
-	return usesMagpie(s.model(), s.small())
+	return usesBlackpie(s.model(), s.small())
 }
 
 func openChamber(home, cfg string) *Agent {
@@ -164,21 +164,21 @@ func openChamber(home, cfg string) *Agent {
 	oc := opencode(home, cfg)
 	ocPath := oc.Path
 	auth := filepath.Join(home, ".local", "share", "opencode", "auth.json")
-	provider := openCodeKept(ocPath, func() any { return magpieProviderJSONFor("opencode", "opencode") })
+	provider := openCodeKept(ocPath, func() any { return blackpieProviderJSONFor("opencode", "opencode") })
 	opts := func(key string) func(map[string]string) []Option {
 		return func(cur map[string]string) []Option {
-			return withVia(ownOptions(auth, cur[key]), "opencode", magpieID+"/")
+			return withVia(ownOptions(auth, cur[key]), "opencode", blackpieID+"/")
 		}
 	}
-	// stepped off magpie: its provider goes too, when nothing else in the
+	// stepped off blackpie: its provider goes too, when nothing else in the
 	// OpenCode config names one of its models
 	tidy := func() error {
 		m, _ := edit.GetJSON(ocPath, "model")
 		sm, _ := edit.GetJSON(ocPath, "small_model")
-		if usesMagpie(m, sm, s.model(), s.small()) {
+		if usesBlackpie(m, sm, s.model(), s.small()) {
 			return nil
 		}
-		return edit.DelJSON(ocPath, "provider."+magpieID)
+		return edit.DelJSON(ocPath, "provider."+blackpieID)
 	}
 	return &Agent{
 		ID: "openchamber", Name: "OpenChamber", Icon: "openchamber", Aliases: []string{"chamber"}, Spelled: openCodeSpelled(ocPath, gatewayV1),
@@ -186,10 +186,10 @@ func openChamber(home, cfg string) *Agent {
 		Bin: "openchamber", Dir: s.dir, Path: s.prefs(),
 		Notice: func() string {
 			var notes []string
-			if usesMagpie(s.model()) {
+			if usesBlackpie(s.model()) {
 				ps := s.projectModels()
 				for _, name := range slices.Sorted(maps.Keys(ps)) {
-					if m := ps[name]; !usesMagpie(m) {
+					if m := ps[name]; !usesBlackpie(m) {
 						notes = append(notes, noticeOpenchamber1.say("project", name, "model", m))
 					}
 				}
@@ -200,18 +200,18 @@ func openChamber(home, cfg string) *Agent {
 			return strings.Join(notes, " ")
 		},
 		Check: func() string {
-			if !usesMagpie(s.model(), s.small()) {
+			if !usesBlackpie(s.model(), s.small()) {
 				return ""
 			}
-			return wiringOff("OpenChamber", ocPath, func(k string) (string, bool) { return edit.GetJSON(ocPath, "provider."+magpieID+".options."+k) },
+			return wiringOff("OpenChamber", ocPath, func(k string) (string, bool) { return edit.GetJSON(ocPath, "provider."+blackpieID+".options."+k) },
 				"baseURL", gatewayV1(), "apiKey", hereKey())
 		},
 		ListOnly: true,
 		Sync: func() error {
-			if _, ok := edit.GetJSON(ocPath, "provider."+magpieID); !ok && usesMagpie(s.model(), s.small()) {
-				return edit.SetJSON(ocPath, edit.KV{Path: "provider." + magpieID, Value: provider()})
+			if _, ok := edit.GetJSON(ocPath, "provider."+blackpieID); !ok && usesBlackpie(s.model(), s.small()) {
+				return edit.SetJSON(ocPath, edit.KV{Path: "provider." + blackpieID, Value: provider()})
 			}
-			return syncJSONInOrder(ocPath, "provider."+magpieID, provider)
+			return syncJSONInOrder(ocPath, "provider."+blackpieID, provider)
 		},
 		Fields: []Field{
 			{Key: "model", Label: "model", Get: s.model, Options: opts("model"), Set: func(v string) error {

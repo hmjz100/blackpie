@@ -4,18 +4,18 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // takesOriginalDetail is whether p's Responses API takes an input_image's
 // detail "original", Codex's for a screenshot: OpenAI's own API (a ChatGPT
 // account's Codex backend, Azure OpenAI), DeepSeek's own, whose Codex
-// setup asks for it, and a remote magpie, which decides for its own
+// setup asks for it, and a remote blackpie, which decides for its own
 // upstream. A relay's Responses API may not: OpenCode Go answers 400
 // "invalid image detail" for DeepSeek V4.1 Flash, which it serves through
 // another vendor (qiu_eth).
 func takesOriginalDetail(p provider.Provider) bool {
-	if p.IsAzure() || p.IsRemoteMagpie() {
+	if p.IsAzure() || p.IsRemoteBlackpie() {
 		return true
 	}
 	switch provider.HostOf(p.Base(provider.Responses)) {

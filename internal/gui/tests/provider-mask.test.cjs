@@ -40,12 +40,12 @@ const KEYS = ["Hide accounts", "Accounts hidden", "Mask the accounts on this pag
 for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium", "webkit"])) {
   for (const lang of ["en", "zh", "zh-TW", "ja", "de"]) {
     for (const width of [1000, 420]) {
-      // stored: what an earlier version left in magpie.maskEmails
+      // stored: what an earlier version left in blackpie.maskEmails
       const open = async (t, stored) => {
         const browser = await (engine === "webkit" ? webkit.launch() : chromium.launch({ channel: "chromium" }));
         t.after(() => browser.close());
         const context = await browser.newContext({ viewport: { width, height: 800 }, reducedMotion: "reduce" });
-        await context.addInitScript((v) => { try { if (!sessionStorage.getItem("seeded")) { if (v !== null) localStorage.setItem("magpie.maskEmails", v); sessionStorage.setItem("seeded", "1"); } } catch {} }, stored);
+        await context.addInitScript((v) => { try { if (!sessionStorage.getItem("seeded")) { if (v !== null) localStorage.setItem("blackpie.maskEmails", v); sessionStorage.setItem("seeded", "1"); } } catch {} }, stored);
         const page = await context.newPage();
         page.setDefaultTimeout(5000);
         page.setDefaultNavigationTimeout(60000);
@@ -59,7 +59,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
 
       test(`${engine} ${lang} ${width}: Providers' Hide accounts is its own`, async (t) => {
         const page = await open(t, null);
-        await page.goto("http://magpie.test/?view=routing");
+        await page.goto("http://blackpie.test/?view=routing");
         await page.locator("#rtMask").waitFor();
         await page.evaluate((m) => { const d = document.createElement("div"); d.id = "sample"; d.textContent = "Codex as " + m; document.querySelector("#view-routing").append(d); }, MAIL);
 
@@ -90,7 +90,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         assert.ok(!(await provText(page)).includes(MAIL));
         assert.equal(await pv.getAttribute("aria-pressed"), "true");
         assert.equal(await pv.locator("[data-t]").textContent(), await page.evaluate((k) => t(k), KEYS[1]));
-        assert.equal(await page.evaluate(() => localStorage.getItem("magpie.maskProviders")), "1");
+        assert.equal(await page.evaluate(() => localStorage.getItem("blackpie.maskProviders")), "1");
 
         // Routing's turned off: Routing back, Providers still hidden
         await page.evaluate(() => show("routing"));
@@ -106,7 +106,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await listed(page);
         await page.waitForFunction(() => document.querySelector("#view-providers .pii"));
         assert.equal(await page.locator("#pvMask").getAttribute("aria-pressed"), "true");
-        assert.equal(await page.evaluate(() => localStorage.getItem("magpie.maskEmails")), "0");
+        assert.equal(await page.evaluate(() => localStorage.getItem("blackpie.maskEmails")), "0");
 
         assert.equal(await page.locator("select").count(), 0, "no native select");
         assert.equal(await pv.evaluate((b) => getComputedStyle(b).borderLeftWidth), "0px");
@@ -122,14 +122,14 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       for (const stored of ["1", "0"]) {
         test(`${engine} ${lang} ${width}: Hide accounts ${stored === "1" ? "on" : "off"} before the update stays so on Providers`, async (t) => {
           const page = await open(t, stored);
-          await page.goto("http://magpie.test/?view=providers");
+          await page.goto("http://blackpie.test/?view=providers");
           await listed(page);
           await page.locator("#pvMask").waitFor();
           if (stored === "1") await page.waitForFunction(() => document.querySelector("#view-providers .pii"));
           assert.equal(await page.locator("#view-providers .pii").count() > 0, stored === "1");
           assert.equal((await provText(page)).includes(MAIL), stored === "0");
           assert.equal(await page.locator("#pvMask").getAttribute("aria-pressed"), String(stored === "1"));
-          assert.equal(await page.evaluate(() => localStorage.getItem("magpie.maskProviders")), stored);
+          assert.equal(await page.evaluate(() => localStorage.getItem("blackpie.maskProviders")), stored);
           await page.evaluate(() => hideAccounts.follow(true));
           assert.equal(await page.locator("#pvMask").getAttribute("aria-pressed"), String(stored === "1"), "a default never turns the user's choice");
           assert.deepEqual(page.errors, []);

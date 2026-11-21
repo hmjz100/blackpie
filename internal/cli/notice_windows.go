@@ -8,7 +8,7 @@ import (
 
 var procMessageBox = windows.NewLazySystemDLL("user32.dll").NewProc("MessageBoxW")
 
-// notice tells a window user, who sees no terminal, why magpie stopped.
+// notice tells a window user, who sees no terminal, why blackpie stopped.
 func notice(title, body string) {
 	const iconError, foreground, topmost = 0x10, 0x10000, 0x40000
 	procMessageBox.Call(0,

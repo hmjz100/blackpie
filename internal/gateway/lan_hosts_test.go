@@ -10,8 +10,8 @@ import (
 // card is reached there as well as at its private one: both are offered,
 // in the interfaces' order. Loopback, link-local and IPv6 are not.
 func TestLANHostsKeepAPublicAddress(t *testing.T) {
-	t.Setenv("MAGPIE_PUBLIC_URL", "")
-	t.Setenv("MAGPIE_ADDR", "")
+	t.Setenv("BLACKPIE_PUBLIC_URL", "")
+	t.Setenv("BLACKPIE_ADDR", "")
 	was := hostIPs
 	t.Cleanup(func() { hostIPs = was })
 	hostIPs = func() []net.IP {
@@ -43,8 +43,8 @@ func TestLANHostsKeepAPublicAddress(t *testing.T) {
 // 192.168.110.x other devices reach (coeo91 on Discord). A home network's
 // address comes before Tailscale's carrier-grade NAT one.
 func TestLANHostsLeaveOutAProxysTUN(t *testing.T) {
-	t.Setenv("MAGPIE_PUBLIC_URL", "")
-	t.Setenv("MAGPIE_ADDR", "")
+	t.Setenv("BLACKPIE_PUBLIC_URL", "")
+	t.Setenv("BLACKPIE_ADDR", "")
 	was := hostIPs
 	t.Cleanup(func() { hostIPs = was })
 	hostIPs = func() []net.IP {

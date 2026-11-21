@@ -84,7 +84,7 @@ func dropDerived() int {
 // dropEffortPeriods lets go of every period's kept CodexModelEffort answer
 // but one being built: each thread's consumption by model, ~7 MB of a real
 // history's idle heap after one visit to the Sessions page. The next ask
-// restores the final answer from moepie-effort-v1.json when its inputs
+// restores the final answer from blackpie-effort-v1.json when its inputs
 // still match, or builds it again. The effort before the last few days
 // (effortOlds, ~2 MB more) goes too when no build is under way.
 func dropEffortPeriods() int {

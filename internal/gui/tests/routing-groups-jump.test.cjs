@@ -16,7 +16,7 @@ const path = require("node:path");
 const { test } = require("node:test");
 const { chromium, webkit } = require("playwright");
 
-const assets = path.resolve(process.env.MAGPIE_ROUTING_ASSETS || path.join(__dirname, "../assets"));
+const assets = path.resolve(process.env.BLACKPIE_ROUTING_ASSETS || path.join(__dirname, "../assets"));
 const models = [
   { id: "a/m", name: "m", providerName: "A", icon: "generic" },
   { id: "b/m", name: "m", providerName: "B", icon: "generic" },
@@ -82,7 +82,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         const errors = [];
         page.on("pageerror", (e) => errors.push(e.message));
         await page.route("**/*", serve(lang, web));
-        await page.goto("http://magpie.test/?view=routing");
+        await page.goto("http://blackpie.test/?view=routing");
         await page.locator(".rt-reqs > *").first().waitFor({ state: "attached" });
         await page.locator(".rt-group", { hasText: "Model M" }).waitFor({ state: "attached" });
 
@@ -94,7 +94,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         assert.deepEqual((await tabs.allTextContents()).map((s) => s.trim()), [w.view, w.groups]);
         // the head's jump went with the tabs, and its New group with the groups' own
         assert.equal(await page.locator("#rtGoGroups, #rtNewGroup").count(), 0, "no jump or New group in the head");
-        await page.evaluate(() => localStorage.removeItem("magpie.routingTab"));
+        await page.evaluate(() => localStorage.removeItem("blackpie.routingTab"));
 
         // the live view first: the requests on it, the groups off screen
         const side = await page.evaluate(() => document.body.classList.contains("side-nav"));
@@ -162,7 +162,7 @@ test("chromium en: a jump to a group picks the Routing groups' tab", async (t) =
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.route("**/*", serve("en", true));
-  await page.goto("http://magpie.test/?view=routing");
+  await page.goto("http://blackpie.test/?view=routing");
   await page.locator(".rt-reqs > *").first().waitFor({ state: "attached" });
   await page.locator(".rt-group", { hasText: "Model M" }).waitFor({ state: "attached" });
   const tabs = page.locator("#view-routing > .row-head #rtTabs > .opt");
@@ -175,7 +175,7 @@ test("chromium en: a jump to a group picks the Routing groups' tab", async (t) =
   assert.equal(await page.locator("#rtPaneGroups").isVisible(), true, "the groups' pane");
   assert.equal(await page.locator("#rtPaneView").isVisible(), false, "the view's pane went");
   assert.equal(await tabs.nth(1).getAttribute("aria-pressed"), "true", "their tab shows as picked");
-  assert.equal(await page.evaluate(() => localStorage.getItem("magpie.routingTab")), "groups", "and the pick is kept");
+  assert.equal(await page.evaluate(() => localStorage.getItem("blackpie.routingTab")), "groups", "and the pick is kept");
   assert.deepEqual(await page.locator(".rt-gedit .fbrow .n").allTextContents(), ["mA"], "the new group has its model");
   assert.deepEqual(errors, []);
 });
@@ -190,9 +190,9 @@ test("chromium en: the sidebar lists the Routing page's two parts under Routing"
   page.setDefaultNavigationTimeout(60000);
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.addInitScript(() => { try { localStorage.setItem("magpie.navLayout", "side"); } catch {} });
+  await page.addInitScript(() => { try { localStorage.setItem("blackpie.navLayout", "side"); } catch {} });
   await page.route("**/*", serve("en", true));
-  await page.goto("http://magpie.test/?view=routing");
+  await page.goto("http://blackpie.test/?view=routing");
   await page.locator(".rt-reqs > *").first().waitFor({ state: "attached" });
   await page.locator(".rt-group", { hasText: "Model M" }).waitFor({ state: "attached" });
   assert.equal(await page.evaluate(() => document.body.classList.contains("side-nav")), true, "the sidebar's layout");

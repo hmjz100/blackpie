@@ -1,6 +1,6 @@
 // Run with Node's test runner and Playwright on the module path; see README.md.
 // The Gateway page's Settings › Browser access (jiakun_zhao on X: the
-// page managed through a Cloudflare tunnel took `magpie web` kept running in
+// page managed through a Cloudflare tunnel took `blackpie web` kept running in
 // a terminal beside the app). Off, This computer or Local network, posted to
 // /api/web-page; once on, the link (its key shown as "…", copied whole), a
 // New key, the port with Apply, and why it isn't served when a port is
@@ -24,7 +24,7 @@ function server(lang, web, posts, gets) {
   const say = () => {
     if (!wp.mode) return { mode: "", port: wp.port, serving: false };
     const s = { ...wp, link: `http://127.0.0.1:${wp.port}/?k=${wp.key}` };
-    if (wp.port === 3500) Object.assign(s, { serving: false, error: "port 3500 can't be taken (address already in use): magpie tries again every few seconds" });
+    if (wp.port === 3500) Object.assign(s, { serving: false, error: "port 3500 can't be taken (address already in use): blackpie tries again every few seconds" });
     else s.serving = true;
     if (wp.mode === "lan") s.network = [`http://192.168.1.20:${wp.port}/?k=${wp.key}`];
     return s;
@@ -46,7 +46,7 @@ function server(lang, web, posts, gets) {
       return json(say());
     }
     if (url.pathname === "/api/providers") return json({ providers: [], gateway: { running: true, mine: true, url: "http://127.0.0.1:3425", calls: [], groups: [] } });
-    if (url.pathname === "/api/settings") return json({ lang, theme: "light", gateway: "http://127.0.0.1:3425", lan: false, lanURLs: [], version: "0.1.900", dir: "/config/magpie", fx: { rate: 7.2, at: new Date().toISOString(), stale: false } });
+    if (url.pathname === "/api/settings") return json({ lang, theme: "light", gateway: "http://127.0.0.1:3425", lan: false, lanURLs: [], version: "0.1.900", dir: "/config/blackpie", fx: { rate: 7.2, at: new Date().toISOString(), stale: false } });
     if (url.pathname === "/api/plugins") return json({ plugins: [] });
     if (url.pathname === "/api/usage/quotas") return json([]);
     if (url.pathname === "/api/groups") return json({ groups: [], models: [] });
@@ -95,8 +95,8 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         assert.equal((await head.textContent()).trim(), await tr("Browser access"));
         if (lang !== "en") assert.notEqual(await tr("Browser access"), "Browser access", "translated");
         const first = list.locator(".row.pref").first();
-        assert.equal((await first.locator(".name").textContent()).trim(), await tr("Open magpie in a browser"));
-        assert.equal((await first.locator(".sub").textContent()).trim(), await tr("The app serves this window’s page with a key in its link, as magpie web does, while it runs. For a tunnel such as Cloudflare Tunnel, point it at http://127.0.0.1:{port}", { port: 3430 }));
+        assert.equal((await first.locator(".name").textContent()).trim(), await tr("Open blackpie in a browser"));
+        assert.equal((await first.locator(".sub").textContent()).trim(), await tr("The app serves this window’s page with a key in its link, as blackpie web does, while it runs. For a tunnel such as Cloudflare Tunnel, point it at http://127.0.0.1:{port}", { port: 3430 }));
         assert.equal(await list.locator(".row.pref").count(), 1, "off: one row");
 
         const local = first.getByRole("button", { name: await tr("This computer") });
@@ -124,7 +124,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await reach(page, field);
         await field.fill("3500");
         await list.getByRole("button", { name: await tr("Apply") }).click();
-        const why = await tr("Port {p} is taken by another program, magpie web perhaps: magpie tries again every few seconds", { p: 3500 });
+        const why = await tr("Port {p} is taken by another program, blackpie web perhaps: blackpie tries again every few seconds", { p: 3500 });
         await list.locator(".web-page-link-row .sub.err").filter({ hasText: why }).waitFor();
         assert.deepEqual(posts.at(-1), { port: 3500 });
 

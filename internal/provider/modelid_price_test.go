@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Listed IDs name vendor models directly. Reusing another vendor model's
@@ -76,7 +76,7 @@ func TestListPriceVendorLookupsDoNotResolveListedIDsAgain(t *testing.T) {
 		p    Provider
 		want map[string]catalog.Price
 	}{
-		{Provider{ID: "remote", Preset: RemoteMagpiePreset, Chat: "https://remote.example.invalid/v1"}, map[string]catalog.Price{"grok-4.7": {Input: 70, Output: 90}, "grok-4.8": {Input: 20, Output: 60}}},
+		{Provider{ID: "remote", Preset: RemoteBlackpiePreset, Chat: "https://remote.example.invalid/v1"}, map[string]catalog.Price{"grok-4.7": {Input: 70, Output: 90}, "grok-4.8": {Input: 20, Output: 60}}},
 		{Provider{ID: "cline", Chat: "https://api.cline.bot/v1"}, map[string]catalog.Price{"grok-4.7": {Input: 7, Output: 9}, "grok-4.8": {}}},
 		{Provider{ID: "kilo", Chat: "https://api.kilo.ai/v1"}, map[string]catalog.Price{"grok-4.7": {Input: 7, Output: 9}, "grok-4.8": {}}},
 		{Provider{ID: "grok", Account: &Account{Agent: "grok"}}, map[string]catalog.Price{"grok-4.7": {Input: 4, Output: 12}}},

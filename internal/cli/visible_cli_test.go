@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/agent"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // The visibility is kept under the agent's id lowered, because VisibleTo
@@ -37,7 +37,7 @@ func TestVisibleKeyLowered(t *testing.T) {
 	}
 }
 
-// magpie models and magpie visible take a WSL agent by its id, in the
+// blackpie models and blackpie visible take a WSL agent by its id, in the
 // distro's own case or any other: before, both lowered what was typed and
 // then matched it exactly against ids that keep the distro's case (#271).
 func TestWSLAgentByIDInModelsAndVisible(t *testing.T) {

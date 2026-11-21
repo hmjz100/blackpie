@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io"
 	"net/http"
 	"slices"
@@ -15,10 +15,10 @@ import (
 	"time"
 
 	"github.com/tidwall/gjson"
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/probelog"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/probelog"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // A plugin's provider (see internal/plugin) is a subscription like the
@@ -33,7 +33,7 @@ const pluginBase = "plugin://"
 
 // ConversationHeader carries the conversation a request belongs to, to a
 // plugin's chat.headers hook as its session; it goes no further.
-const ConversationHeader = "X-Magpie-Conversation"
+const ConversationHeader = "X-Blackpie-Conversation"
 
 // WorkDirHeader and WorkGitHeader tell a plugin's fetch where the agent
 // that asked works, as the agent says it in its request: the folder,
@@ -42,18 +42,18 @@ const ConversationHeader = "X-Magpie-Conversation"
 // known. The plugin host takes them off whatever the plugin sends on
 // (host.js), so they reach no vendor as headers.
 const (
-	WorkDirHeader = "X-Magpie-Work-Dir"
-	WorkGitHeader = "X-Magpie-Work-Git"
+	WorkDirHeader = "X-Blackpie-Work-Dir"
+	WorkGitHeader = "X-Blackpie-Work-Git"
 )
 
-// FallbackHeader, "1", tells a plugin's fetch that magpie needn't have the
+// FallbackHeader, "1", tells a plugin's fetch that blackpie needn't have the
 // answer waited for: a request its vendor queues (Qoder's free models)
 // comes back at once with the queue's 503 and Retry-After instead of being
 // waited out for minutes. Without it the plugin waits. A model's test
 // sends it, so a queued model's test says it is queued instead of running
 // out of time. The plugin host takes it off whatever the plugin sends on
 // (host.js), as it does the two above.
-const FallbackHeader = "X-Magpie-Fallback"
+const FallbackHeader = "X-Blackpie-Fallback"
 
 // warmPlugin starts p's plugin host and runs its account's loader, which
 // may renew the sign-in, under ctx and through the account's proxy: what
@@ -70,7 +70,7 @@ func (p Provider) warmPlugin(ctx context.Context) {
 	_, _ = plugin.LoaderOptions(p.Via(ctx), id, p.Account.pluginKey)
 }
 
-// PluginID is the id magpie gives the provider OpenCode calls id: the same,
+// PluginID is the id blackpie gives the provider OpenCode calls id: the same,
 // unless a preset or a built-in subscription has it (google, openai,
 // anthropic), or a provider of the user's own made before the plugin was
 // installed (zenmux, #867), or "auto" or "group", which start the ids of
@@ -80,7 +80,7 @@ func PluginID(id string) string {
 	if PluginServes(id) {
 		return id
 	}
-	if slices.Contains(accountIDs, id) || Preset(id) != nil || id == "magpie" || id == autoID || id == strings.TrimSuffix(GroupPrefix, "/") || customIDs()[id] {
+	if slices.Contains(accountIDs, id) || Preset(id) != nil || id == "blackpie" || id == autoID || id == strings.TrimSuffix(GroupPrefix, "/") || customIDs()[id] {
 		return id + "-plugin"
 	}
 	return id
@@ -123,7 +123,7 @@ func PluginForTest(id, pluginID string) Provider {
 }
 
 // PluginProvider is the id OpenCode knows the plugin's provider p is by
-// (grok, kiro), whatever magpie names it; "" for one no plugin gives.
+// (grok, kiro), whatever blackpie names it; "" for one no plugin gives.
 func (p Provider) PluginProvider() string {
 	if !p.IsPlugin() {
 		return ""
@@ -148,7 +148,7 @@ func (p Provider) PluginOpenAICompatible(model string) bool {
 	return ok && firstOf(m.NPM, pp.NPM) == "@ai-sdk/openai-compatible"
 }
 
-// PluginOf is the plugin provider magpie's provider id is, when it is one.
+// PluginOf is the plugin provider blackpie's provider id is, when it is one.
 func PluginOf(id string) (plugin.Provider, bool) {
 	for _, pp := range heldPlugins() {
 		if PluginID(pp.ID) == id {
@@ -228,7 +228,7 @@ var npmBase = map[string]string{
 }
 
 // pluginModel is the model of pp's list by the id id, which is the
-// plugin's own or one the user lists it by at magpie's provider of pp
+// plugin's own or one the user lists it by at blackpie's provider of pp
 // (SetModelID): what the plugin says of its model (its API, tiers, price)
 // holds under either.
 func pluginModel(pp plugin.Provider, id string) (plugin.Model, bool) {
@@ -651,7 +651,7 @@ func pluginFetch(pp plugin.Provider, account string, req *http.Request) (*http.R
 		url = base + "/models/" + api + ":streamGenerateContent?alt=sse"
 	case strings.HasPrefix(rest, "/v1/"):
 		// chat, responses and Anthropic's messages: the AI SDK's base
-		// ends where magpie's /v1 does
+		// ends where blackpie's /v1 does
 		url = base + strings.TrimPrefix(rest, "/v1")
 	case strings.HasPrefix(rest, "https://") || strings.HasPrefix(rest, "http://"):
 		// a URL of the vendor's own outside the base (Provider.Origin's),
@@ -712,7 +712,7 @@ func pluginRequestBase(pp plugin.Provider, m plugin.Model, loader string) string
 // the mark, as a built-in whose sign-in renewed took it off whatever the
 // request then met. Without it a 401 marks the account and a success
 // clears the mark.
-const SignInHeader = "X-Magpie-Sign-In"
+const SignInHeader = "X-Blackpie-Sign-In"
 
 // ModelUnserved are how a vendor says the model isn't one it serves this
 // key, or this way — words another provider, or key, may not answer with
@@ -872,7 +872,7 @@ func firstOf(ss ...string) string {
 // plugin's), the client the account asks for this request when it asks
 // for one (ZCode's Start Plan: zcodeStartClient), and client otherwise.
 //
-// A request sent for magpie's own test (probelog.With) is written into the
+// A request sent for blackpie's own test (probelog.With) is written into the
 // request log here, whichever way it goes: a plugin's fetch and a client
 // of the account's own pass no transport that would.
 func (p Provider) Do(client *http.Client, req *http.Request) (*http.Response, error) {

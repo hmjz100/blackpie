@@ -4,13 +4,13 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // An order dragged on the Agents page reaches every agent, not only Codex
-// (#1052): Claude Code's /model picker (viaMagpie, which writePicker turns
-// into settings.json's modelPicker) and the model files magpie writes for
-// the others (magpieModels) list the models in it, and one agent's order
+// (#1052): Claude Code's /model picker (viaBlackpie, which writePicker turns
+// into settings.json's modelPicker) and the model files blackpie writes for
+// the others (blackpieModels) list the models in it, and one agent's order
 // leaves another's alone.
 func TestModelOrderReachesEveryAgent(t *testing.T) {
 	syncHome(t)
@@ -18,13 +18,13 @@ func TestModelOrderReachesEveryAgent(t *testing.T) {
 		t.Fatal(err)
 	}
 	refs := func(agent string) (out []string) {
-		for _, o := range viaMagpie(agent, "") {
+		for _, o := range viaBlackpie(agent, "") {
 			out = append(out, o.Ref)
 		}
 		return out
 	}
 	ids := func(agent string) (out []string) {
-		for _, m := range magpieModels(agent) {
+		for _, m := range blackpieModels(agent) {
 			out = append(out, m.ID)
 		}
 		return out

@@ -8,12 +8,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/proc"
 )
 
 // A child that lives until its input closes, as Bun's host.js does.
 func init() {
-	if os.Getenv("MAGPIE_TEST_STDIN_CHILD") == "1" {
+	if os.Getenv("BLACKPIE_TEST_STDIN_CHILD") == "1" {
 		_, _ = io.Copy(io.Discard, os.Stdin)
 		os.Exit(0)
 	}
@@ -26,7 +26,7 @@ func startStdinHost(t *testing.T) *host {
 		t.Fatal(err)
 	}
 	cmd := proc.Command(exe, "-test.run=^$")
-	cmd.Env = append(os.Environ(), "MAGPIE_TEST_STDIN_CHILD=1")
+	cmd.Env = append(os.Environ(), "BLACKPIE_TEST_STDIN_CHILD=1")
 	in, err := cmd.StdinPipe()
 	if err != nil {
 		t.Fatal(err)

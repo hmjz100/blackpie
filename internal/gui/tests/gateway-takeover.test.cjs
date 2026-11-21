@@ -1,10 +1,10 @@
 // Run with Node's test runner and Playwright on the module path; see README.md.
 // The Gateway card's button (leslie_luo on Discord: the page said an older
-// magpie served the gateway, with no way to quit it). With an older magpie
-// on the port it reads "Quit magpie {v} and take over" and asks the backend
+// blackpie served the gateway, with no way to quit it). With an older blackpie
+// on the port it reads "Quit blackpie {v} and take over" and asks the backend
 // to; once this one serves, it is "Restart gateway" and restarts it. A
-// magpie of this version serving it gets no button. What stood in the way
-// (a program that isn't magpie on the port) is said under it, naming the
+// blackpie of this version serving it gets no button. What stood in the way
+// (a program that isn't blackpie on the port) is said under it, naming the
 // process, and the page's Settings it points to unfold. No click scrolls
 // the page, nothing has a left border, in English and Chinese.
 const assert = require("node:assert/strict");
@@ -50,21 +50,21 @@ function fixture(lang, world, theme = "light") {
 
 const words = {
   en: {
-    quit: "Quit magpie 0.1.550 and take over", restart: "Restart gateway", running: "running",
-    notMagpie: /Port 3999 is held by \/usr\/bin\/python3 \(pid 4242\), which isn't magpie/,
-    container: /Port 3999 is forwarded by \/Applications\/OrbStack\.app\/.*OrbStack Helper \(pid 873\) to a container or a VM: the magpie 0\.1\.552 .*docker stop <name>.*another port under Settings below/,
+    quit: "Quit blackpie 0.1.550 and take over", restart: "Restart gateway", running: "running",
+    notBlackpie: /Port 3999 is held by \/usr\/bin\/python3 \(pid 4242\), which isn't blackpie/,
+    container: /Port 3999 is forwarded by \/Applications\/OrbStack\.app\/.*OrbStack Helper \(pid 873\) to a container or a VM: the blackpie 0\.1\.552 .*docker stop <name>.*another port under Settings below/,
   },
   zh: {
-    quit: "关闭 magpie 0.1.550 并接管网关", restart: "重启网关", running: "运行中",
-    notMagpie: /端口 3999 被 \/usr\/bin\/python3（pid 4242）占用，它不是 magpie/,
-    container: /端口 3999 由 \/Applications\/OrbStack\.app\/.*OrbStack Helper（pid 873）转发到一个容器或虚拟机：在那里应答的 magpie 0\.1\.552 .*docker stop <名称>.*换到其他端口/,
+    quit: "关闭 blackpie 0.1.550 并接管网关", restart: "重启网关", running: "运行中",
+    notBlackpie: /端口 3999 被 \/usr\/bin\/python3（pid 4242）占用，它不是 blackpie/,
+    container: /端口 3999 由 \/Applications\/OrbStack\.app\/.*OrbStack Helper（pid 873）转发到一个容器或虚拟机：在那里应答的 blackpie 0\.1\.552 .*docker stop <名称>.*换到其他端口/,
   },
 };
 
 for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium", "webkit"])) {
   for (const lang of ["en", "zh"]) {
     const w = words[lang];
-    test(`${engine} ${lang}: the gateway card quits an older magpie, or restarts the gateway`, async (t) => {
+    test(`${engine} ${lang}: the gateway card quits an older blackpie, or restarts the gateway`, async (t) => {
       assert(["chromium", "webkit"].includes(engine), "BROWSER must be chromium or webkit");
       const browser = await (engine === "webkit" ? webkit.launch() : chromium.launch());
       t.after(() => browser.close());
@@ -76,7 +76,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         page.setDefaultNavigationTimeout(60000);
         page.on("pageerror", (e) => errors.push(e.message));
         await page.route("**/*", fixture(lang, world, theme));
-        await page.goto("http://magpie.test/?view=gateway");
+        await page.goto("http://blackpie.test/?view=gateway");
         await page.locator("#gateway .state").waitFor();
         return { context, page };
       };
@@ -85,11 +85,11 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       // a border all round, as a button's: no stripe down its left side
       const noLeftAccent = (loc) => loc.evaluate((e) => { const s = getComputedStyle(e); return s.borderLeftWidth === s.borderRightWidth && s.borderLeftColor === s.borderRightColor; });
 
-      // a program that isn't magpie holds the port: said, by its path and pid
+      // a program that isn't blackpie holds the port: said, by its path and pid
       {
         const world = {
           posts: [], gateway: { mine: false, version: "0.1.550", older: true },
-          answer: () => ({ ok: false, reason: "not-magpie", port: "3999", pid: 4242, path: "/usr/bin/python3", version: "0.1.550" }),
+          answer: () => ({ ok: false, reason: "not-blackpie", port: "3999", pid: 4242, path: "/usr/bin/python3", version: "0.1.550" }),
         };
         const { context, page } = await open(world);
         const fix = page.locator("#gateway .gw-fix");
@@ -106,17 +106,17 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await fix.click();
         await page.locator("#gateway .sub.err").waitFor();
         assert.deepEqual(world.posts, ["/api/gateway/take-over"]);
-        assert.match(await page.locator("#gateway .sub.err").textContent(), w.notMagpie);
+        assert.match(await page.locator("#gateway .sub.err").textContent(), w.notBlackpie);
         assert.equal(await page.locator("#gwSettings").isVisible(), true, "Settings below unfolded");
         assert.equal(await page.locator("#foldGwSettings").getAttribute("aria-expanded"), "true");
-        assert.equal(await page.evaluate(() => localStorage.getItem("magpie.gwSettingsFolded")), "1");
+        assert.equal(await page.evaluate(() => localStorage.getItem("blackpie.gwSettingsFolded")), "1");
         assert(await noLeftBorder(page.locator("#gateway .sub.err")), "the error has a left border");
         assert.equal(await scrolls(page), before, "the click scrolled the page");
         assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "the page scrolls sideways");
         await context.close();
       }
 
-      // a magpie in a container (leslie_luo's OrbStack): said as a container's
+      // a blackpie in a container (leslie_luo's OrbStack): said as a container's
       // to stop, in dark mode, where the button is bordered to read as one
       {
         const world = {
@@ -141,7 +141,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await context.close();
       }
 
-      // an older magpie is quit and this one serves; the button restarts it then
+      // an older blackpie is quit and this one serves; the button restarts it then
       {
         const world = { posts: [], gateway: { mine: false, version: "0.1.550", older: true } };
         world.answer = (p) => {
@@ -163,7 +163,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await context.close();
       }
 
-      // another magpie of this version: not this page's to quit
+      // another blackpie of this version: not this page's to quit
       {
         const world = { posts: [], gateway: { mine: false, version: "0.1.630" }, answer: () => ({ ok: true }) };
         const { context, page } = await open(world);

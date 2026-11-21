@@ -8,7 +8,7 @@
 .rt-mode { grid-column: 1 / -1; margin: 0; font-size: 12.5px; color: var(--fg-2); line-height: 1.45; }
 .rt-stage { position: absolute; display: grid; grid-template-columns: 124px 124px minmax(0, 1fr); column-gap: 56px; align-items: center; padding: 22px 2px; }
 .rt-stage { transform-origin: 0 0; min-width: min-content; }
-/* taller than its window (client.js tallness): the agents and magpie at
+/* taller than its window (client.js tallness): the agents and blackpie at
    its top, beside the first accounts, not out of sight at its middle */
 .rt-stage.tall:not(.max560) > :is(.rt-srcs, .rt-hub) { align-self: start; }
 /* the stage's window: as tall as the view has room for (client.js
@@ -71,7 +71,7 @@
 .rt-accts li { position: relative; display: grid; grid-template-columns: 10px minmax(0, 1fr) fit-content(60%); align-items: center; column-gap: 10px; row-gap: 6px; padding: 9px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; font-size: 13px; transition: opacity .3s, border-color .3s, transform .5s cubic-bezier(.2, .8, .2, 1); }
 .rt-accts li { margin-left: calc(var(--depth, 0) * 18px); }
 /* a key off screen is not laid out or painted (#3164): with hundreds of
-   keys open, WebKit painted every row again on each frame a magpie flew.
+   keys open, WebKit painted every row again on each frame a blackpie flew.
    One not drawn yet is as tall as a key drawn is (--rt-row, client.js's
    layout). A row a 429 hit keeps its tag up over its top edge, which this
    would cut, so it is drawn whole */
@@ -336,7 +336,7 @@
 .rt-time-parts li::before { display: none; }
 .rt-time-parts .v { margin-left: auto; white-space: nowrap; color: var(--fg-2); font-variant-numeric: tabular-nums; }
 :is(.rt-time, .rt-timing, .rt-time-fine) .other { --rt-time: var(--muted); }
-:is(.rt-time, .rt-timing, .rt-time-fine) .magpie { --rt-time: var(--accent); }
+:is(.rt-time, .rt-timing, .rt-time-fine) .blackpie { --rt-time: var(--accent); }
 :is(.rt-time, .rt-timing, .rt-time-fine) .net { --rt-time: var(--amber); }
 :is(.rt-time, .rt-timing, .rt-time-fine) .vendor { --rt-time: var(--fg-2); }
 .rt-off { padding: 18px 4px; text-align: center; color: var(--muted); font-size: 13px; }
@@ -357,7 +357,7 @@
 .rt-accts:where(.max460) li.rt-fold { grid-template-columns: 10px minmax(0, 1fr) auto; }
 .rt-accts:where(.max460) li.rt-fold em { grid-row: 2; text-align: left; }
 .rt-accts:where(.max460) li.rt-fold .chev { grid-column: 3; grid-row: 1; }
-/* narrow (the tray panel, or the stage zoomed in): magpie and the agent
+/* narrow (the tray panel, or the stage zoomed in): blackpie and the agent
    side by side, the accounts under them, on a lane down their left */
 .rt-stage:where(.max560) { grid-template-columns: 1fr 1fr; column-gap: 28px; row-gap: 26px; padding: 16px 0; }
 :where(.rt-stage.max560) .rt-accts { grid-column: 1 / -1; padding-left: 22px; }

@@ -1,5 +1,5 @@
 // The Gateway page's Settings (the gateway plugin's): its port, model ids
-// without the provider, the addresses other computers may reach magpie
+// without the provider, the addresses other computers may reach blackpie
 // from, the web pages that may call it and Browser access, moved here from
 // Settings › Network and sharing; Share on local network is the card's
 // choice above them. Run after app.js, whose helpers it shares (el, segs,
@@ -17,7 +17,7 @@ async function loadGatewaySettings() {
   prefs = s;
   if (JSON.stringify(s) === gwSettingsSeen && $("#portList").childElementCount) return;
   renderGatewaySettings();
-  // the card's addresses too: whether magpie runs in a container is only
+  // the card's addresses too: whether blackpie runs in a container is only
   // in the settings (lanShown)
   if (providers && !$("#view-gateway").classList.contains("loading")) renderGatewayLan();
 }
@@ -34,9 +34,9 @@ function renderGatewaySettings() {
 
 // renderPort: the gateway's address on this computer (Magic_zero on Discord:
 // 3425 taken by another program, or one easier to tell apart). Only its
-// port, 1024 up, is typed here; magpie moves its gateway there and every
+// port, 1024 up, is typed here; blackpie moves its gateway there and every
 // agent it connected with it, or says why it can't (another program has
-// it). MAGPIE_ADDR, a whole host:port, comes first and the field shows it,
+// it). BLACKPIE_ADDR, a whole host:port, comes first and the field shows it,
 // off (Chicring on Discord: the row was titled a port while it showed one).
 let portDraft = { value: null, err: "" };
 // portSays is the gateway's word on a port it couldn't take, in the page's
@@ -44,7 +44,7 @@ let portDraft = { value: null, err: "" };
 function portSays(m) {
   let x;
   if ((x = /^port (\d+) is in use by another program/.exec(m))) return t("Port {p} is in use by another program: pick another one", { p: x[1] });
-  if ((x = /^another magpie serves the gateway at (\S+):/.exec(m))) return t("Another magpie serves the gateway at {url}: set its port there, or quit it first", { url: x[1] });
+  if ((x = /^another blackpie serves the gateway at (\S+):/.exec(m))) return t("Another blackpie serves the gateway at {url}: set its port there, or quit it first", { url: x[1] });
   if (/from 1024 to 65535/.test(m)) return t("A port is a number from 1024 to 65535");
   return t(m);
 }
@@ -64,11 +64,11 @@ function renderPort(s) {
   if (s.addrEnv) {
     field.value = s.addrEnv;
     field.disabled = save.disabled = true;
-    sub.textContent = t("MAGPIE_ADDR={addr} sets the gateway’s whole address, host:port: unset it to set the port here", { addr: s.addrEnv });
+    sub.textContent = t("BLACKPIE_ADDR={addr} sets the gateway’s whole address, host:port: unset it to set the port here", { addr: s.addrEnv });
   } else if (d.err) {
     sub.textContent = d.err;
     sub.classList.add("err");
-  } else sub.textContent = t("Only the port is set here, 1024 to 65535; MAGPIE_ADDR=host:port sets the whole address instead. Agents magpie connected move with it. Now {url}", { url: s.gateway || "" });
+  } else sub.textContent = t("Only the port is set here, 1024 to 65535; BLACKPIE_ADDR=host:port sets the whole address instead. Agents blackpie connected move with it. Now {url}", { url: s.gateway || "" });
   who.append(sub);
   save.onclick = () => {
     const p = Number(field.value.trim());
@@ -113,7 +113,7 @@ function renderBareIds(s) {
 }
 
 // renderBusyLoad: the load past which a model its plugin says is busy
-// (magpie.load) goes behind the others (settings.BusyLoad, axelburks on
+// (blackpie.load) goes behind the others (settings.BusyLoad, axelburks on
 // Discord). Custom… opens a field for any other number, 1 to 9999, which
 // is then shown as its own choice; Enter or Apply saves it, Escape closes
 let busyDraft = null;
@@ -165,7 +165,7 @@ let corsDraft = { value: "", err: "" };
 // corsSays is the gateway's word on an origin it didn't take, in the
 // page's language
 function corsSays(m) {
-  if (/wildcard/.test(m)) return t("Name each origin: a wildcard would let every web page use magpie");
+  if (/wildcard/.test(m)) return t("Name each origin: a wildcard would let every web page use blackpie");
   if (/is not an (extension's )?origin/.test(m)) return t("Write an origin as http://localhost:3000 or https://app.example.com, or a browser extension's as chrome-extension://, moz-extension:// or safari-web-extension:// followed by its ID");
   return t(m);
 }
@@ -193,7 +193,7 @@ function renderCORS(s) {
   field.onkeydown = (e) => { e.stopPropagation(); if (e.key === "Enter") add.onclick(); };
   const r = el("div", "row pref rule-row");
   const who = el("div", "who");
-  who.append(el("div", "name", t("Web pages that may call magpie")),
+  who.append(el("div", "name", t("Web pages that may call blackpie")),
     el("div", "sub" + (d.err ? " err" : ""), d.err || t("Scripts on these origins can call the gateway from a browser, each request with a gateway key from Gateway. A page from any other site is refused; pages on this computer are not")));
   const val = el("div", "val rule-add");
   val.append(field, add);
@@ -212,13 +212,13 @@ function renderCORS(s) {
   }
 }
 
-// renderAllow: the addresses other computers may reach magpie from at
-// all (lc on Discord: magpie in Docker on a public host), as IPs and CIDR
+// renderAllow: the addresses other computers may reach blackpie from at
+// all (lc on Discord: blackpie in Docker on a public host), as IPs and CIDR
 // ranges, under Share on local network — a row to add one, and one row
 // each to take it away. None listed lets every address in, with a gateway
-// key, as before; this computer is always let in. MAGPIE_ALLOW_IPS, where
+// key, as before; this computer is always let in. BLACKPIE_ALLOW_IPS, where
 // set, is the list, shown and not edited here.
-// A list that would shut out the page saving it names the address magpie
+// A list that would shut out the page saving it names the address blackpie
 // sees the page from (Mathresearcher on Discord: which address?), and
 // offers to add it to the list that was refused; behind Docker or a proxy
 // that is the proxy's, not the user's computer's (gateway.peerAddr).
@@ -226,8 +226,8 @@ let allowDraft = { value: "", err: "", addr: "", tried: null };
 function allowSays(m) {
   if (/is not an IP address/.test(m)) return t("Write an address as 203.0.113.7, or a range as 10.0.0.0/8 or 2001:db8::/32");
   const out = /shut out (\S+), the address/.exec(m);
-  if (out) return t("That list leaves out {addr}, the address magpie sees this page open from: add it first, or this page can’t reach magpie", { addr: out[1] });
-  if (/MAGPIE_ALLOW_IPS/.test(m)) return t("MAGPIE_ALLOW_IPS sets this list; change it there");
+  if (out) return t("That list leaves out {addr}, the address blackpie sees this page open from: add it first, or this page can’t reach blackpie", { addr: out[1] });
+  if (/BLACKPIE_ALLOW_IPS/.test(m)) return t("BLACKPIE_ALLOW_IPS sets this list; change it there");
   return t(m);
 }
 function renderAllow(s) {
@@ -247,8 +247,8 @@ function renderAllow(s) {
     });
   const r = el("div", "row pref rule-row");
   const who = el("div", "who");
-  const sub = d.err || (env ? t("Set by MAGPIE_ALLOW_IPS. Other computers reach magpie only from these addresses, even with a gateway key; this computer always can")
-    : t("Other computers reach magpie only from these addresses or ranges (CIDR), even with a gateway key; this computer always can. None listed lets every address in"));
+  const sub = d.err || (env ? t("Set by BLACKPIE_ALLOW_IPS. Other computers reach blackpie only from these addresses, even with a gateway key; this computer always can")
+    : t("Other computers reach blackpie only from these addresses or ranges (CIDR), even with a gateway key; this computer always can. None listed lets every address in"));
   who.append(el("div", "name", t("Allowed addresses")), el("div", "sub" + (d.err ? " err" : ""), sub));
   // the address the refusal named, added to the list that was refused in
   // one click
@@ -298,7 +298,7 @@ function renderAllow(s) {
 // Keep the sidebar’s chosen LAN address after sharing moves to Gateway.
 let lanSelectedURL = "", lanProtocol = "openai";
 let lanWant = "";
-try { lanWant = localStorage.getItem("magpie.lanAddress") || ""; } catch {}
+try { lanWant = localStorage.getItem("blackpie.lanAddress") || ""; } catch {}
 function sideLAN(g) {
   const u = g.lan && g.lanURLs || [];
   return u[0] && (g.publicURL || (u.includes(lanWant) ? lanWant : u[0]));
@@ -333,7 +333,7 @@ function renderGatewayAddress(s) {
         if (address.classList.contains("open")) return closeProtoMenu();
         const suffix = lanProtocol === "openai" ? "/v1" : "";
         openProtoMenu(address, urls.map((u) => ({ v: u, name: u + suffix, note: "" })), lanSelectedURL,
-          (v) => { lanSelectedURL = lanWant = v; keepPick("magpie.lanAddress", v); update(); renderSideGw(); }, "Address", "lan-address-menu");
+          (v) => { lanSelectedURL = lanWant = v; keepPick("blackpie.lanAddress", v); update(); renderSideGw(); }, "Address", "lan-address-menu");
       };
     }
     const copyControl = el("span", "lan-copy");
@@ -357,8 +357,8 @@ function renderGatewayAddress(s) {
 }
 
 // renderWebPage: Browser access, the app's own page served to a browser
-// (apppage.go; jiakun_zhao on X managed magpie through a Cloudflare tunnel
-// with `magpie web` kept running in a terminal beside the app). Off, this
+// (apppage.go; jiakun_zhao on X managed blackpie through a Cloudflare tunnel
+// with `blackpie web` kept running in a terminal beside the app). Off, this
 // computer alone (for a tunnel or an SSH forward to reach), or the local
 // network. The page always asks for its key: the link carries it, and a
 // browser without it gets nothing. The app's windows alone draw it; a
@@ -389,11 +389,11 @@ function renderWebPage(asked) {
     rows.push(r);
     return r;
   };
-  row(t("Open magpie in a browser"),
-    t("The app serves this window’s page with a key in its link, as magpie web does, while it runs. For a tunnel such as Cloudflare Tunnel, point it at http://127.0.0.1:{port}", { port: s.port }),
+  row(t("Open blackpie in a browser"),
+    t("The app serves this window’s page with a key in its link, as blackpie web does, while it runs. For a tunnel such as Cloudflare Tunnel, point it at http://127.0.0.1:{port}", { port: s.port }),
     segs([["", t("Off")], ["local", t("This computer")], ["lan", t("Local network")]], s.mode || "", (mode) => set({ mode }))).classList.add("web-page-mode");
   if (s.mode) {
-    const why = s.error ? el("div", "sub err", s.error.startsWith("port ") ? t("Port {p} is taken by another program, magpie web perhaps: magpie tries again every few seconds", { p: s.port }) : t(s.error))
+    const why = s.error ? el("div", "sub err", s.error.startsWith("port ") ? t("Port {p} is taken by another program, blackpie web perhaps: blackpie tries again every few seconds", { p: s.port }) : t(s.error))
       : el("div", "sub", s.serving ? t("Served; anyone with this link can change every setting") : t("Starting…"));
     const links = [s.link, ...(s.mode === "lan" ? s.network || [] : [])].filter(Boolean);
     const box2 = el("div", "web-page-links");

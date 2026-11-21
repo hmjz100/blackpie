@@ -14,10 +14,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/filelock"
+	"github.com/hmjz100/blackpie/internal/filelock"
 )
 
-const runtimeName = ".moepie-runtime"
+const runtimeName = ".blackpie-runtime"
 const pendingName = "pending"
 
 // strictLock never goes on without the OS lock. Higher-level filelock helpers

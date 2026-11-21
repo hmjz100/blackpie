@@ -3,13 +3,13 @@ package gateway
 import (
 	"bytes"
 	"context"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io"
 	"net/http"
 
 	"github.com/tidwall/gjson"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // Amazon Bedrock's Mantle endpoint (@marktoown on X) serves its OpenAI APIs

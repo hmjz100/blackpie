@@ -30,13 +30,13 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       t.after(() => browser.close());
       const context = await browser.newContext({ viewport: { width: 1000, height: 760 }, reducedMotion: "reduce", colorScheme: "light" });
       const page = await context.newPage();
-      await page.addInitScript(() => { try { localStorage.setItem("magpie.gwConnectFolded", "0"); } catch {} }); // Connect opened, as a user who reads it
+      await page.addInitScript(() => { try { localStorage.setItem("blackpie.gwConnectFolded", "0"); } catch {} }); // Connect opened, as a user who reads it
       page.setDefaultTimeout(6000);
       page.setDefaultNavigationTimeout(60000);
       const events = [], errors = [];
       page.on("pageerror", (e) => errors.push(e.message));
       await page.route("**/*", fixture("en", theme, events, { lan: true }));
-      await page.goto("http://magpie.test/?view=gateway");
+      await page.goto("http://blackpie.test/?view=gateway");
       await page.locator('#gatewayKeys .acc[data-key="server"] .dot').click();
       await page.locator('#gatewayKeys .acc.off[data-key="server"]').waitFor();
       await page.locator("#addGatewayKey").click();
@@ -96,8 +96,8 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       assert.equal(events.filter((e) => e.action === "rotate-key").length, 0);
 
       // Share on local network and its addresses, on the Gateway card (the
-      // fixture's magpie is shared)
-      await page.goto("http://magpie.test/?view=gateway");
+      // fixture's blackpie is shared)
+      await page.goto("http://blackpie.test/?view=gateway");
       await page.waitForFunction(() => document.querySelectorAll("#gatewayLan .gw-url").length === 3);
       await page.mouse.move(500, 20);
       const lan = { card: ".gwcard", text: "#gatewayLan .gw-share .name", key: "#gatewayLan .gw-url:last-child code",
@@ -124,7 +124,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
           assert.equal(e.card.bg, c.card);
           assert.equal(e.key.color, c["fg-2"]);
         }
-        await page.goto("http://magpie.test/?view=settings");
+        await page.goto("http://blackpie.test/?view=settings");
         await page.locator("#themeSegs button.on").waitFor({ state: "attached" });
         assert.equal(await page.locator("#themeSegs button.on").textContent(), "System");
       }

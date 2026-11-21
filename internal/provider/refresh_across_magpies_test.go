@@ -10,15 +10,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/filelock"
+	"github.com/hmjz100/blackpie/internal/filelock"
 )
 
-// anotherMagpieRefreshing holds lock as another magpie mid-refresh would
+// anotherBlackpieRefreshing holds lock as another blackpie mid-refresh would
 // (a restart handing the gateway over runs two at once, xuanwo on X),
 // runs refresh, gives it the time it takes to get past an in-process
-// lock, then has the other magpie's refresh land and let go. What
+// lock, then has the other blackpie's refresh land and let go. What
 // refresh returned.
-func anotherMagpieRefreshing[T any](t *testing.T, lock string, refresh func() T, lands func()) T {
+func anotherBlackpieRefreshing[T any](t *testing.T, lock string, refresh func() T, lands func()) T {
 	t.Helper()
 	unlock, held := filelock.Lock(lock, time.Second)
 	if !held {
@@ -27,7 +27,7 @@ func anotherMagpieRefreshing[T any](t *testing.T, lock string, refresh func() T,
 	got := make(chan T, 1)
 	go func() { got <- refresh() }()
 	select {
-	case v := <-got: // refreshed alongside the other magpie
+	case v := <-got: // refreshed alongside the other blackpie
 		unlock()
 		return v
 	case <-time.After(300 * time.Millisecond):
@@ -43,10 +43,10 @@ func anotherMagpieRefreshing[T any](t *testing.T, lock string, refresh func() T,
 	panic("unreachable")
 }
 
-// A Codex sign-in another magpie is refreshing is waited for, and its
+// A Codex sign-in another blackpie is refreshing is waited for, and its
 // rotated tokens used, rather than refreshed again with the refresh token
 // it spent.
-func TestCodexRefreshWaitsForAnotherMagpie(t *testing.T) {
+func TestCodexRefreshWaitsForAnotherBlackpie(t *testing.T) {
 	isolate(t)
 	var refreshes atomic.Int32
 	fake := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -61,12 +61,12 @@ func TestCodexRefreshWaitsForAnotherMagpie(t *testing.T) {
 	t.Cleanup(func() { codexTokenURL = old })
 
 	path, _ := dueCodexAuth(t)
-	theirs := fakeJWT(map[string]any{"exp": float64(time.Now().Add(time.Hour).Unix()), "by": "the other magpie"})
+	theirs := fakeJWT(map[string]any{"exp": float64(time.Now().Add(time.Hour).Unix()), "by": "the other blackpie"})
 	type answer struct {
 		tok string
 		err error
 	}
-	got := anotherMagpieRefreshing(t, loginsPath()+".codex.lock", func() answer {
+	got := anotherBlackpieRefreshing(t, loginsPath()+".codex.lock", func() answer {
 		tok, _, err := codexToken(context.Background(), filepath.Dir(path))
 		return answer{tok, err}
 	}, func() {
@@ -74,12 +74,12 @@ func TestCodexRefreshWaitsForAnotherMagpie(t *testing.T) {
 			"access_token": theirs, "refresh_token": "r-rotated", "account_id": "acct-1"}})
 	})
 	if got.err != nil || got.tok != theirs || refreshes.Load() != 0 {
-		t.Fatalf("refreshed %d times beside another magpie: %q, %v", refreshes.Load(), got.tok, got.err)
+		t.Fatalf("refreshed %d times beside another blackpie: %q, %v", refreshes.Load(), got.tok, got.err)
 	}
 }
 
 // The same for a ChatGPT API account (siwcFresh).
-func TestChatGPTAPIRefreshWaitsForAnotherMagpie(t *testing.T) {
+func TestChatGPTAPIRefreshWaitsForAnotherBlackpie(t *testing.T) {
 	claudeHome(t)
 	f := newFakeOpenAI(t)
 	if st := signInVia(t, f, "oaiapp_9", same); st.State != "done" {
@@ -104,7 +104,7 @@ func TestChatGPTAPIRefreshWaitsForAnotherMagpie(t *testing.T) {
 		c   siwcCreds
 		err error
 	}
-	got := anotherMagpieRefreshing(t, loginsPath()+".siwc.lock", func() answer {
+	got := anotherBlackpieRefreshing(t, loginsPath()+".siwc.lock", func() answer {
 		c, err := siwcFresh(context.Background(), user, false)
 		return answer{c, err}
 	}, func() {
@@ -116,6 +116,6 @@ func TestChatGPTAPIRefreshWaitsForAnotherMagpie(t *testing.T) {
 	sent := len(f.forms) - n
 	f.mu.Unlock()
 	if got.err != nil || got.c.Access != "at-theirs" || sent != 0 {
-		t.Fatalf("refreshed %d times beside another magpie: %+v, %v", sent, got.c, got.err)
+		t.Fatalf("refreshed %d times beside another blackpie: %+v, %v", sent, got.c, got.err)
 	}
 }

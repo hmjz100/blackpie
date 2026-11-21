@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/proc"
 )
 
 // codexAppStub stands in for Codex's provider, the running app-servers
@@ -95,12 +95,12 @@ func stubCodexApp(t *testing.T) *codexAppStub {
 	return s
 }
 
-// When magpie becomes Codex's provider for its used-up ChatGPT account the
+// When blackpie becomes Codex's provider for its used-up ChatGPT account the
 // Codex app's own app-server is restarted, so the app reads its account
 // again and lifts the grey on Send (Ethereal499, MasterYi), and again when
-// magpie puts Codex back on the account at its reset, so the app's ChatGPT
+// blackpie puts Codex back on the account at its reset, so the app's ChatGPT
 // side comes back. Never while a Codex turn runs: one in flight through
-// magpie, one ended under codexAppIdle ago (a tool between two requests),
+// blackpie, one ended under codexAppIdle ago (a tool between two requests),
 // or one open in Codex's sessions.
 func TestCodexAppServerRestartedEachWay(t *testing.T) {
 	signIn(t)
@@ -126,10 +126,10 @@ func TestCodexAppServerRestartedEachWay(t *testing.T) {
 	}
 	s.turnOpen = false
 	if got := step(idle); !slices.Equal(got, []int{60}) {
-		t.Fatalf("on magpie, idle: ended %v, want [60]", got)
+		t.Fatalf("on blackpie, idle: ended %v, want [60]", got)
 	}
 	if got := step(idle); got != nil {
-		t.Fatalf("the new app-server read magpie as it started: ended %v", got)
+		t.Fatalf("the new app-server read blackpie as it started: ended %v", got)
 	}
 	s.on = false // the reset: back on the account
 	if got := step(idle); !slices.Equal(got, []int{100}) {
@@ -204,7 +204,7 @@ func TestCodexAppEndSaysWhy(t *testing.T) {
 	s := stubCodexApp(t)
 	s.running, s.on = []int{60}, true
 	if got := step(); !slices.Equal(got, []int{60}) {
-		t.Fatalf("first look on magpie: ended %v", got)
+		t.Fatalf("first look on blackpie: ended %v", got)
 	}
 	said("used up")
 	s.on = false
@@ -227,7 +227,7 @@ func TestCodexAppEndSaysWhy(t *testing.T) {
 	}
 }
 
-// A magpie started while it is Codex's provider for a used-up account
+// A blackpie started while it is Codex's provider for a used-up account
 // restarts the app-servers it finds: they may have started before.
 // Started with Codex on its account, it leaves them be.
 func TestCodexAppServerFirstLook(t *testing.T) {
@@ -238,7 +238,7 @@ func TestCodexAppServerFirstLook(t *testing.T) {
 	s.running = []int{60}
 	s.on = true
 	if got := codexAppStep(context.Background(), now, idle); !slices.Equal(got, []int{60}) {
-		t.Fatalf("first look on magpie: ended %v", got)
+		t.Fatalf("first look on blackpie: ended %v", got)
 	}
 
 	s2 := stubCodexApp(t)
@@ -273,7 +273,7 @@ func TestCodexAppServerUnknown(t *testing.T) {
 	}
 }
 
-// An app-server that outlives codexAppTries ends, or that magpie may not
+// An app-server that outlives codexAppTries ends, or that blackpie may not
 // end, is left to the user: CodexAppStuck says so for the Agents row.
 func TestCodexAppServerStuck(t *testing.T) {
 	signIn(t)
@@ -309,14 +309,14 @@ func TestCodexAppServerStuck(t *testing.T) {
 // TestCodexAppHomeHelper is TestCodexAppServersOnHome's app-server: it
 // waits to be ended (a system binary's environment is kept from ps).
 func TestCodexAppHomeHelper(t *testing.T) {
-	if os.Getenv("MAGPIE_CODEX_HOME_HELPER") != "1" {
+	if os.Getenv("BLACKPIE_CODEX_HOME_HELPER") != "1" {
 		return
 	}
 	os.Stdout.WriteString("running\n")
 	time.Sleep(30 * time.Second)
 }
 
-// Only the app-servers on magpie's Codex home are restarted: one under
+// Only the app-servers on blackpie's Codex home are restarted: one under
 // another HOME or CODEX_HOME (a sandbox, another user) is left be.
 func TestCodexAppServersOnHome(t *testing.T) {
 	if runtime.GOOS != "darwin" && runtime.GOOS != "linux" {
@@ -327,7 +327,7 @@ func TestCodexAppServersOnHome(t *testing.T) {
 		cmd := proc.CommandContext(ctx, os.Args[0], "-test.run=^TestCodexAppHomeHelper$")
 		// TMPDIR is this test's: given no testenv.Marker, the helper makes
 		// a test home of its own there, which it never removes once killed
-		cmd.Env = append([]string{"MAGPIE_CODEX_HOME_HELPER=1", "TMPDIR=" + t.TempDir()}, env...)
+		cmd.Env = append([]string{"BLACKPIE_CODEX_HOME_HELPER=1", "TMPDIR=" + t.TempDir()}, env...)
 		out, _ := cmd.StdoutPipe()
 		if err := cmd.Start(); err != nil {
 			t.Fatal(err)
@@ -432,7 +432,7 @@ func TestCodexTurnOpen(t *testing.T) {
 
 // A turn left open by an app-server that is gone doesn't hold the switch
 // back. 蛋仔 (danzi002 on Discord, 10-29 and 10-30) switched the Codex
-// app's used-up account in magpie and the app stayed grey until it was
+// app's used-up account in blackpie and the app stayed grey until it was
 // quit and opened: "点了会话再切换账号就重启不了". Codex 0.164's
 // app-server, killed mid-turn (force quit, crash), writes no turn_aborted,
 // and opening that thread in a new app-server writes
@@ -498,7 +498,7 @@ func TestCodexAppSwitchPastATurnItsServerNeverRan(t *testing.T) {
 }
 
 // While the account Codex is on is near out, or out, it is read every
-// minute, not five: the app greys Send on its own reading, and magpie
+// minute, not five: the app greys Send on its own reading, and blackpie
 // takes over only on its own (Ethereal499). At the reset, as soon.
 func TestCodexLookEvery(t *testing.T) {
 	signIn(t) // me@example.com, active
@@ -523,7 +523,7 @@ func TestCodexLookEvery(t *testing.T) {
 	}
 }
 
-// The Agents row says until when Codex is on magpie: the latest reset of
+// The Agents row says until when Codex is on blackpie: the latest reset of
 // the windows used up.
 func TestCodexOutUntil(t *testing.T) {
 	signIn(t)
@@ -552,7 +552,7 @@ func TestCodexOutUntil(t *testing.T) {
 const codexWindowsAppServer = `C:\Users\yeton\AppData\Local\OpenAI\Codex\bin\2993767bd1dfb009\codex.exe -c features.code_mode_host=true app-server --analytics-default-enabled -c plugins.codex-app-tools@openai-bundled.mcp_servers.codex_app.enabled=true`
 
 // codexLinuxAppServer is the Linux Codex app's own app-server, as the
-// official chatgpt 26.1027 deb ran it in the WSL distro magpie-desktop
+// official chatgpt 26.1027 deb ran it in the WSL distro blackpie-desktop
 // (Ubuntu 24.04).
 const codexLinuxAppServer = "/usr/lib/chatgpt/resources/codex -c features.code_mode_host=true app-server --analytics-default-enabled -c plugins.codex-app-tools@openai-bundled.mcp_servers.codex_app.enabled=true"
 
@@ -703,8 +703,8 @@ func TestRestartCodexAppEndsOnlyItsServer(t *testing.T) {
 	}
 }
 
-// magpie uninstall restarts the Codex app's app-server once, so the app
-// reads a config with magpie out of it with no magpie left to watch it;
+// blackpie uninstall restarts the Codex app's app-server once, so the app
+// reads a config with blackpie out of it with no blackpie left to watch it;
 // a running turn is waited for, never cut short.
 func TestRestartCodexAppWhenIdle(t *testing.T) {
 	s := stubCodexApp(t)
@@ -752,7 +752,7 @@ func TestRestartCodexAppWhenIdle(t *testing.T) {
 // it on the owner's Mac (ChatGPT.app 26.1027).
 const codexMacAppServer = "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex -c features.code_mode_host=true app-server --analytics-default-enabled -c plugins.codex-app-tools@openai-bundled.mcp_servers.codex_app.enabled=true"
 
-// After magpie switched Codex's ChatGPT account the Codex app stayed grey on
+// After blackpie switched Codex's ChatGPT account the Codex app stayed grey on
 // the used-up one until the user quit and opened it (danzi002 on Discord):
 // the switch handed over only the first app-server-looking process of a
 // five-second listing, which can be another program's --listen one (listed
@@ -822,8 +822,8 @@ func TestCodexAppSwitchRestartsTheAppsOwnServers(t *testing.T) {
 }
 
 // The Windows Codex app said "Codex app-server process is not available"
-// on every send after magpie switched its account, until Codex was quit
-// and opened again (蛋仔 on Discord, 10-30): magpie ended its app-server
+// on every send after blackpie switched its account, until Codex was quit
+// and opened again (蛋仔 on Discord, 10-30): blackpie ended its app-server
 // and took the old one gone as the switch done, but the app starts
 // another only once the old one's stdout ends, and a process that
 // app-server started holds that open on Windows. Once the ones ended are
@@ -902,7 +902,7 @@ func TestCodexAppReopenedWhenNoServerComesBack(t *testing.T) {
 	}
 
 	// not reopened (macOS, or the reopen failed): said stuck
-	open, reopenErr = true, errors.New("magpie doesn't reopen it here")
+	open, reopenErr = true, errors.New("blackpie doesn't reopen it here")
 	s.running = []int{700}
 	end(13 * codexAppBackWait)
 	if step(15 * codexAppBackWait); reopened != 3 || !CodexAppStuck() {
@@ -914,7 +914,7 @@ func TestCodexAppReopenedWhenNoServerComesBack(t *testing.T) {
 // had to be restarted (蛋仔 on Discord): the turn stays open in Codex's
 // sessions, and an open turn held the restart for up to codexTurnWindow.
 // After a switch off a used-up account, a turn that has written nothing
-// and sent nothing through magpie for codexTurnStuckAfter is stuck, and
+// and sent nothing through blackpie for codexTurnStuckAfter is stuck, and
 // the app-server is restarted past it. A switch for any other reason, or
 // a turn still writing or sending, holds it as before.
 func TestCodexAppServerRestartedPastATurnStuckOnTheSpentAccount(t *testing.T) {
@@ -933,7 +933,7 @@ func TestCodexAppServerRestartedPastATurnStuckOnTheSpentAccount(t *testing.T) {
 
 	codexAppSpentSwitch()
 	if got := step(func() (int, time.Time) { return 0, now.Add(-time.Minute) }); got != nil {
-		t.Fatalf("Codex's last request through magpie a minute ago: ended %v", got)
+		t.Fatalf("Codex's last request through blackpie a minute ago: ended %v", got)
 	}
 	s.written = true
 	if got := step(quiet); got != nil {
@@ -956,15 +956,15 @@ func TestCodexAppServerRestartedPastATurnStuckOnTheSpentAccount(t *testing.T) {
 	}
 }
 
-// When magpie becomes Codex's provider for the used-up account, the Codex
+// When blackpie becomes Codex's provider for the used-up account, the Codex
 // app's app-server is on that account as a switch off it leaves it: a
 // turn left open when quota ran out mid-turn held the restart for up to
 // codexTurnWindow, and the app kept Send grey though another provider's
 // model was picked (xiaoq6285 on Discord). Past a quiet one it is
 // restarted, as after SwitchWhenSpent; a turn still writing, or sending
-// through magpie, holds it, and the way back at the reset waits for any
+// through blackpie, holds it, and the way back at the reset waits for any
 // open turn as before.
-func TestCodexAppServerRestartedPastATurnStuckWhenMagpieTakesOver(t *testing.T) {
+func TestCodexAppServerRestartedPastATurnStuckWhenBlackpieTakesOver(t *testing.T) {
 	signIn(t)
 	s := stubCodexApp(t)
 	now := time.Now()
@@ -975,9 +975,9 @@ func TestCodexAppServerRestartedPastATurnStuckWhenMagpieTakesOver(t *testing.T) 
 	if got := step(quiet); got != nil {
 		t.Fatalf("on its account with room: ended %v", got)
 	}
-	s.on = true // the account is out: magpie is Codex's provider
+	s.on = true // the account is out: blackpie is Codex's provider
 	if got := step(func() (int, time.Time) { return 0, now.Add(-time.Minute) }); got != nil {
-		t.Fatalf("Codex's last request through magpie a minute ago: ended %v", got)
+		t.Fatalf("Codex's last request through blackpie a minute ago: ended %v", got)
 	}
 	s.written = true
 	if got := step(quiet); got != nil {
@@ -985,10 +985,10 @@ func TestCodexAppServerRestartedPastATurnStuckWhenMagpieTakesOver(t *testing.T) 
 	}
 	s.written = false
 	if got := step(quiet); !slices.Equal(got, []int{60}) {
-		t.Fatalf("a turn stuck on the used-up account as magpie took over: ended %v, want [60]", got)
+		t.Fatalf("a turn stuck on the used-up account as blackpie took over: ended %v, want [60]", got)
 	}
 	if got := step(quiet); got != nil {
-		t.Fatalf("the new app-server read magpie as it started: ended %v", got)
+		t.Fatalf("the new app-server read blackpie as it started: ended %v", got)
 	}
 	// the reset: back on the account, whose app-server may run a real turn
 	s.on = false
@@ -1001,7 +1001,7 @@ func TestCodexAppServerRestartedPastATurnStuckWhenMagpieTakesOver(t *testing.T) 
 	}
 }
 
-// A switch by hand in magpie off an account the Codex app holds (used up)
+// A switch by hand in blackpie off an account the Codex app holds (used up)
 // is one off a used-up account, as SwitchWhenSpent's is: the app-server is
 // restarted past a turn left stuck on it (xiaoq6285 on Discord switched
 // accounts after Codex said the quota ran out, and Send stayed grey). A

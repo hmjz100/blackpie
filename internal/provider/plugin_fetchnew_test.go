@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 // A plugin's account listed with the plugin's providers is not asked for
@@ -22,7 +22,7 @@ import (
 func TestFetchNewLeavesListedPlugins(t *testing.T) {
 	bun := testenv.Bun(t)
 	claudeHome(t)
-	t.Setenv("MAGPIE_BUN", bun)
+	t.Setenv("BLACKPIE_BUN", bun)
 	t.Cleanup(plugin.Settle)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
@@ -63,7 +63,7 @@ func TestFetchNewLeavesListedPlugins(t *testing.T) {
 func TestPluginUsageReadOnceWhicheverName(t *testing.T) {
 	bun := testenv.Bun(t)
 	claudeHome(t)
-	t.Setenv("MAGPIE_BUN", bun)
+	t.Setenv("BLACKPIE_BUN", bun)
 	t.Cleanup(plugin.Settle)
 	var asked atomic.Int32
 	vendor := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

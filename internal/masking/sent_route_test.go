@@ -8,9 +8,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/yetone/magpie/internal/pii"
-	"github.com/yetone/magpie/internal/redact"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/pii"
+	"github.com/hmjz100/blackpie/internal/redact"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // slowReader is the local model on a slow CPU: a text it is asked about

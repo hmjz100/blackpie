@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/claudeseal"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/claudeseal"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // A Claude turn that calls a tool and then thinks without showing it, a

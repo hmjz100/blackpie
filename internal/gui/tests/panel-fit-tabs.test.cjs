@@ -93,7 +93,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         page.on("pageerror", (e) => errors.push(e.message));
         const s = serve(page, lang, agents, held);
         await page.route("**/*", s.handler);
-        await page.goto("http://magpie.test/?mode=panel");
+        await page.goto("http://blackpie.test/?mode=panel");
         return { page, fits: s.fits };
       };
 

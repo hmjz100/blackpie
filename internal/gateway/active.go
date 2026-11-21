@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// Active is one agent request in flight, as /v1/magpie/concurrency lists
+// Active is one agent request in flight, as /v1/blackpie/concurrency lists
 // it for a status bar's hover (#2132, bigbitbox): which agent asked, for
 // which model, since when, and where it stands. It holds no prompt, reply
 // or key. Model and Provider are the routing trace's, once the request has
@@ -91,7 +91,7 @@ func inflightOf(ctx context.Context) *inflight {
 // own requests wait for room in the minute (rpmTransport) is out at the
 // vendor again once they go.
 //
-// A phase is a wait magpie knows of (noteWait): one before a route is
+// A phase is a wait blackpie knows of (noteWait): one before a route is
 // begun has unroutedMost, not unroutedUnknown.
 func notePhase(ctx context.Context, phase string) (restore func()) {
 	f := inflightOf(ctx)
@@ -124,7 +124,7 @@ func noteRoute(ctx context.Context, rt *Route) {
 }
 
 // panicEnded is what a route ended by endBroken says.
-const panicEnded = "magpie broke off this request: an internal error (in magpie's log)"
+const panicEnded = "blackpie broke off this request: an internal error (in blackpie's log)"
 
 // endBroken ends every route begun for f that its handler left in flight
 // when it panicked, and each of their tries still out: net/http recovers

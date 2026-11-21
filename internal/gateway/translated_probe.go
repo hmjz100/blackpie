@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // probeServer is the gateway a translated test is asked through; a var so

@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 // A moved Factory's keys are the plugin's accounts: an imported key is kept
@@ -20,7 +20,7 @@ import (
 func TestFactoryAPIKeyMoved(t *testing.T) {
 	signIn(t)
 	bun := testenv.Bun(t)
-	t.Setenv("MAGPIE_BUN", bun)
+	t.Setenv("BLACKPIE_BUN", bun)
 	t.Setenv("FAKE_ID", "factory")
 	t.Cleanup(plugin.Settle)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)

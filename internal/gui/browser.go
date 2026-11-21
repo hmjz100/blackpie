@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/yetone/magpie/internal/browserext"
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/browserext"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
-// Magpie Browser's extension, as the Library page sets it up: written to a
-// folder of magpie's, which the user loads in their own browser
+// Blackpie Browser's extension, as the Library page sets it up: written to a
+// folder of blackpie's, which the user loads in their own browser
 // (chrome://extensions → Load unpacked), and connected or not as the
 // gateway says.
 
@@ -33,7 +33,7 @@ func browserState(ctx context.Context) browserJSON {
 	out := browserJSON{Dir: browserExtDir(), Version: browserext.Version()}
 	if _, err := os.Stat(filepath.Join(out.Dir, "manifest.json")); err == nil {
 		out.Written = true
-		// kept as this magpie has it, and pointed at its gateway: the browser
+		// kept as this blackpie has it, and pointed at its gateway: the browser
 		// reads the folder again when it starts
 		browserext.Write(out.Dir, gateway.URL())
 	}

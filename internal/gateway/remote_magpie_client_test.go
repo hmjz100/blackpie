@@ -8,12 +8,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // A relay that admits only its official client must see the same client
 // headers after both gateways, on Messages, Responses and Chat Completions.
-func TestRemoteMagpieClientHeaders(t *testing.T) {
+func TestRemoteBlackpieClientHeaders(t *testing.T) {
 	for _, tc := range []struct {
 		name, path, body, agent, originator, reply string
 		proto                                      provider.Protocol
@@ -57,7 +57,7 @@ func TestRemoteMagpieClientHeaders(t *testing.T) {
 			}
 			remote := httptest.NewServer(New().Handler())
 			t.Cleanup(remote.Close)
-			if err := provider.Save(provider.Provider{ID: "office", Preset: provider.RemoteMagpiePreset, Chat: remote.URL, Key: "remote-key"}); err != nil {
+			if err := provider.Save(provider.Provider{ID: "office", Preset: provider.RemoteBlackpiePreset, Chat: remote.URL, Key: "remote-key"}); err != nil {
 				t.Fatal(err)
 			}
 			office, _ := provider.Find("office")

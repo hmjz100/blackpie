@@ -5,16 +5,16 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // The editor receives an authoritative list, even empty, so a Jev Router
 // chat model on a remote isn't guessed to be a System One model.
-func TestRemoteMagpieDecisionPicker(t *testing.T) {
+func TestRemoteBlackpieDecisionPicker(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 	t.Setenv("XDG_CACHE_HOME", t.TempDir())
-	if err := provider.Save(provider.Provider{ID: "office", Preset: provider.RemoteMagpiePreset, Chat: "http://127.0.0.1:1", Key: "remote-key"}); err != nil {
+	if err := provider.Save(provider.Provider{ID: "office", Preset: provider.RemoteBlackpiePreset, Chat: "http://127.0.0.1:1", Key: "remote-key"}); err != nil {
 		t.Fatal(err)
 	}
 	p, _ := provider.Find("office")

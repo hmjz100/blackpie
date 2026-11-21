@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/yetone/magpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/appdir"
 )
 
 // Claude Code's own locks, taken as Claude Code takes them (2.1.316, its
@@ -22,7 +22,7 @@ import (
 // again, posts the refresh token, and writes back the new pair. A switch
 // that read the sign-in it was replacing while a refresh ran kept that
 // account's refresh token as it was before the refresh: spent, and the
-// account signed out of magpie on its next use (#4532). It saves
+// account signed out of blackpie on its next use (#4532). It saves
 // ~/.claude.json under <that file>.lock, stale after 10s, while it may
 // hold the refresh locks: so it is taken after them, as Claude Code does.
 
@@ -33,7 +33,7 @@ var (
 	claudeLockWait = 20 * time.Second
 	// claudeLockPoll is how often a held lock is looked at again.
 	claudeLockPoll = 100 * time.Millisecond
-	// claudeLockTouch is how often a lock magpie holds is touched, as
+	// claudeLockTouch is how often a lock blackpie holds is touched, as
 	// Claude Code's update (5s for the refresh locks, half the stale
 	// time for ~/.claude.json's), so it never reads as left behind.
 	claudeLockTouch = 2 * time.Second
@@ -48,7 +48,7 @@ const (
 var errClaudeLocked = errors.New("Claude Code is refreshing its sign-in: try again in a moment")
 
 // claudeRefreshLocks takes the locks Claude Code refreshes its sign-in
-// under, for the config directory magpie reads the sign-in of. The
+// under, for the config directory blackpie reads the sign-in of. The
 // release lets them go in the reverse order. A directory not there yet
 // (Claude Code never run) has no refresh to wait for.
 func claudeRefreshLocks() (release func(), err error) {

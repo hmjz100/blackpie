@@ -15,9 +15,9 @@ import (
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/services/notifications"
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // notifier is the system's notifications, started the first time an alert
@@ -93,14 +93,14 @@ func (n *notifier) problem() string {
 }
 
 // turnNotice is the id a turn's end is notified under, an alert's
-// "magpie-alert-"; maskNotice a value masked for the first time, followed
+// "blackpie-alert-"; maskNotice a value masked for the first time, followed
 // by its record's key and "-"
 const (
-	turnNotice = "magpie-turn-"
-	maskNotice = "magpie-mask-"
+	turnNotice = "blackpie-turn-"
+	maskNotice = "blackpie-mask-"
 )
 
-func (n *notifier) send(title, body string) { n.sendAs("magpie-alert-", title, body) }
+func (n *notifier) send(title, body string) { n.sendAs("blackpie-alert-", title, body) }
 
 func (n *notifier) sendAs(kind, title, body string) {
 	if !n.allowed() {
@@ -125,7 +125,7 @@ func (n *notifier) sendAs(kind, title, body string) {
 const linuxClick = "default"
 
 var clickCategory = notifications.NotificationCategory{
-	ID:      "magpie-click",
+	ID:      "blackpie-click",
 	Actions: []notifications.NotificationAction{{ID: linuxClick, Title: "Open"}},
 }
 
@@ -141,7 +141,7 @@ func notice(goos, id, title, body string) notifications.NotificationOptions {
 // clickView is the page a response to a notification opens, "" for none.
 // A click on an alert opens Usage; on a value masked, the 脱敏 page at the
 // request that masked it. On a turn's end, where the user goes is their
-// agent, not magpie. On Linux only a click (linuxClick) is one: an alert
+// agent, not blackpie. On Linux only a click (linuxClick) is one: an alert
 // dismissed there opened the main window, maximised if it was left so,
 // over the desktop with the focus (#2513).
 func clickView(goos string, r notifications.NotificationResponse) string {

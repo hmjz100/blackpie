@@ -7,12 +7,12 @@ import (
 
 	"golang.org/x/sys/windows/registry"
 
-	"github.com/yetone/magpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/appdir"
 )
 
-const schemeKey = `Software\Classes\magpie`
+const schemeKey = `Software\Classes\blackpie`
 
-// unregisterScheme takes out the magpie:// handler the app registered
+// unregisterScheme takes out the blackpie:// handler the app registered
 // while it opens exe, or an exe that is gone.
 func unregisterScheme(exe string) error {
 	k, err := registry.OpenKey(registry.CURRENT_USER, schemeKey+`\shell\open\command`, registry.QUERY_VALUE)
@@ -23,7 +23,7 @@ func unregisterScheme(exe string) error {
 	k.Close()
 	if run, _, ok := strings.Cut(strings.TrimPrefix(v, `"`), `"`); ok && !strings.EqualFold(filepath.Clean(run), filepath.Clean(exe)) {
 		if _, err := os.Stat(run); err == nil {
-			return nil // another magpie's
+			return nil // another blackpie's
 		}
 	}
 	for _, sub := range []string{`\shell\open\command`, `\shell\open`, `\shell`, `\DefaultIcon`, ``} {
@@ -34,7 +34,7 @@ func unregisterScheme(exe string) error {
 	return nil
 }
 
-// webData is WebView2's profile of an installed magpie: %APPDATA%\<exe
+// webData is WebView2's profile of an installed blackpie: %APPDATA%\<exe
 // name> (portable, it is in the data folder already).
 func webData() []string {
 	if appdir.Portable() != "" {

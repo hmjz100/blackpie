@@ -7,47 +7,47 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // Every agent's model picker has two halves: the models the agent reaches
-// on its own (its sign-in, its own keys), and magpie's catalog — every model
+// on its own (its sign-in, its own keys), and blackpie's catalog — every model
 // of every provider the user added, reached through the local gateway.
 // A catalog model is spelled "provider/model"; an agent that sends that to
 // the gateway gets the vendor's reply in whichever API the agent speaks.
 
-// magpieID is the provider id agents know the gateway by.
-const magpieID = "magpie"
+// blackpieID is the provider id agents know the gateway by.
+const blackpieID = "blackpie"
 
 // RoutingGroups is the picker's group of routing groups.
 const RoutingGroups = "Routing groups"
 
-// viaMagpie lists the catalog as agent is shown it, for a picker: the
+// viaBlackpie lists the catalog as agent is shown it, for a picker: the
 // routing groups first, in one group of their own, then one group per
 // provider. Built again only when provider.StampNow moved, or
-// magpieModelsFor after it was; each caller is given its own copy.
-func viaMagpie(agent, prefix string) []Option {
-	return slices.Clone(viaMagpieShared(agent, prefix))
+// blackpieModelsFor after it was; each caller is given its own copy.
+func viaBlackpie(agent, prefix string) []Option {
+	return slices.Clone(viaBlackpieShared(agent, prefix))
 }
 
-// viaMagpieShared is viaMagpie without a copy of its own, for a caller
+// viaBlackpieShared is viaBlackpie without a copy of its own, for a caller
 // that only reads it or appends it onto a list of its own: a copy for each
 // of an agent's fields was 42 MB of what twenty window polls allocated.
 // An append onto it makes a copy, but its Options are never written into.
-func viaMagpieShared(agent, prefix string) []Option {
+func viaBlackpieShared(agent, prefix string) []Option {
 	return builtOptions.shared(agent+"\x00"+prefix, func() []Option { return buildVia(agent, prefix) })
 }
 
-// withVia is append(own, viaMagpieShared(agent, prefix)...), the list a
+// withVia is append(own, viaBlackpieShared(agent, prefix)...), the list a
 // model field offers, kept while own reads the same and the catalog's list
 // is the one kept: the append copied the whole catalog for each field of
 // each agent, every poll, about 60 MB of what forty polls of the Agents
-// page allocated with real accounts. Read only, as viaMagpieShared's.
+// page allocated with real accounts. Read only, as viaBlackpieShared's.
 func withVia(own []Option, agent, prefix string) []Option {
-	via := viaMagpieShared(agent, prefix)
+	via := viaBlackpieShared(agent, prefix)
 	if len(own) == 0 {
 		return via
 	}
@@ -97,14 +97,14 @@ func sameOption(a, b Option) bool {
 		a.own == b.own && a.sub == b.sub
 }
 
-// builtOptions is what viaMagpie built last, per agent and prefix. Each
+// builtOptions is what viaBlackpie built last, per agent and prefix. Each
 // agent's model field offers it, and the window's drift poll asked every
 // field's options of every agent each 15s: Claude Code's alone
-// (claudeViaMagpie) allocated 4.7 GB of the 33 GB a live magpie did in 53
+// (claudeViaBlackpie) allocated 4.7 GB of the 33 GB a live blackpie did in 53
 // minutes.
 var builtOptions stampedLists[Option]
 
-// buildVia is viaMagpie built afresh.
+// buildVia is viaBlackpie built afresh.
 func buildVia(agent, prefix string) []Option {
 	var out, groups []Option
 	shown, _ := provider.CatalogFor(agent)
@@ -130,10 +130,10 @@ func buildVia(agent, prefix string) []Option {
 	// firstUser: the account a request for a subscription's model goes to
 	// first, which the note names. A Codex or Claude Code subscription is
 	// the account the agent is signed in to (Account.User), but its
-	// requests go to the first in magpie's order: another one when that
+	// requests go to the first in blackpie's order: another one when that
 	// one is paused, or when the agent is kept signed in to an account
 	// that isn't first (#1957, parkavenue9639: every codex/gpt-* read
-	// "A · via magpie" while each went to B). Asked once a provider.
+	// "A · via blackpie" while each went to B). Asked once a provider.
 	firsts := map[string]string{}
 	firstUser := func(p provider.Provider) string {
 		a := p.Account
@@ -151,13 +151,13 @@ func buildVia(agent, prefix string) []Option {
 	var tiered map[string]bool // provider.UltraModels, read at the first fast model
 	for _, e := range shown {
 		if e.Group != "" {
-			groups = append(groups, Option{Value: prefix + e.ID, Label: e.Name, Note: "routing group · via magpie",
+			groups = append(groups, Option{Value: prefix + e.ID, Label: e.Name, Note: "routing group · via blackpie",
 				Icon: e.Provider.Icon, Icons: e.Icons, Group: RoutingGroups, Ref: e.ID})
 			continue
 		}
-		note := e.Provider.Name + " · via magpie"
+		note := e.Provider.Name + " · via blackpie"
 		if a := e.Provider.Account; a != nil {
-			note = firstUser(e.Provider) + " · via magpie"
+			note = firstUser(e.Provider) + " · via blackpie"
 		}
 		o := Option{Value: prefix + e.ID, Label: e.Name, Note: note,
 			Icon: e.Provider.Icon, Group: e.Provider.Name, Ref: e.ID, Free: e.Free, Rate: e.Rate, RateWas: e.RateWas, Context: e.Context, own: own[e.Provider.ID],
@@ -180,7 +180,7 @@ func buildVia(agent, prefix string) []Option {
 
 // listLabels are the names the agent's own list calls the catalog's models
 // by, by id: provider.Labels, which follows the Provider in model names
-// setting, where an Option's Label is the name alone for magpie's picker.
+// setting, where an Option's Label is the name alone for blackpie's picker.
 func listLabels(agent string) map[string]string {
 	shown, _ := provider.CatalogFor(agent)
 	labels := provider.Labels(shown)
@@ -191,26 +191,26 @@ func listLabels(agent string) map[string]string {
 	return out
 }
 
-// isMagpie reports whether a model value is a catalog reference.
-func isMagpie(v string) bool {
+// isBlackpie reports whether a model value is a catalog reference.
+func isBlackpie(v string) bool {
 	if pid, _, ok := strings.Cut(v, "/"); ok && dryProviders[pid] {
 		return true
 	}
 	if !strings.Contains(v, "/") {
 		return false
 	}
-	return magpieRefs.get(v, func() bool {
+	return blackpieRefs.get(v, func() bool {
 		_, _, ok := provider.Resolve(v)
 		return ok
 	})
 }
 
-// magpieRefs keeps isMagpie's answers while provider.StampNow stays the
+// blackpieRefs keeps isBlackpie's answers while provider.StampNow stays the
 // same, for a minute at most. Outside a request that holds the catalog,
 // each Resolve built every provider's entries again: the window's drift
 // poll, every 15s, asked it for each agent's values, ~6 MB a poll (the
 // procmem heap profile: 235 MB of 1.37 GB in 10 minutes of GUI use).
-var magpieRefs stampedRefs
+var blackpieRefs stampedRefs
 
 // stampedRefs is a model value → answer, dropped when the stamp moves,
 // after a minute (what the stamp can't see: an account another program
@@ -258,15 +258,15 @@ func firstOf(xs []string) string {
 	return ""
 }
 
-// magpieModels is the catalog as agent is shown it, as catalog.Models, for
+// blackpieModels is the catalog as agent is shown it, as catalog.Models, for
 // agents that keep their own model files: built again only when
-// provider.StampNow moved, or magpieModelsFor after it was, each caller
+// provider.StampNow moved, or blackpieModelsFor after it was, each caller
 // given its own copy of the list.
-func magpieModels(agent string) []catalog.Model {
+func blackpieModels(agent string) []catalog.Model {
 	return builtModels.get(agent, func() []catalog.Model { return buildModels(agent) })
 }
 
-// sharedModels is magpieModels without the caller's own copy, for one
+// sharedModels is blackpieModels without the caller's own copy, for one
 // that only reads it: a range over it copies each model, so it can't
 // write into the list kept. A copy per call was 37 MB of what forty polls
 // of the window allocated with real accounts, most of it Pi's and Claude
@@ -275,33 +275,33 @@ func sharedModels(agent string) []catalog.Model {
 	return builtModels.shared(agent, func() []catalog.Model { return buildModels(agent) })
 }
 
-// builtModels is what magpieModels built last, per agent. The window asks
+// builtModels is what blackpieModels built last, per agent. The window asks
 // /api/drift every 15s, and each agent's Drift asked for its list again
 // per field, each built whole with its prices and Vision's ranking of the
-// models that see: 14.5 GB of the 33 GB a live magpie allocated in 53
+// models that see: 14.5 GB of the 33 GB a live blackpie allocated in 53
 // minutes, the garbage its footprint peaks on.
 var builtModels stampedLists[catalog.Model]
 
 // stampedLists keeps a list built per key while provider.StampNow stays
-// the same, magpieModelsFor at most, and gives each caller a copy.
+// the same, blackpieModelsFor at most, and gives each caller a copy.
 type stampedLists[T any] struct {
 	sync.Mutex
 	m map[string]stampedList[T]
-	// sweeping says a sweep is armed. A list past magpieModelsFor is
+	// sweeping says a sweep is armed. A list past blackpieModelsFor is
 	// built again on the next ask, so it is let go then: Pi's alone was
 	// ~11 MB of an idle heap with real accounts, kept for the life of the
 	// process after one window poll.
 	sweeping bool
 }
 
-// sweep lets go of the lists past magpieModelsFor, and looks again when
+// sweep lets go of the lists past blackpieModelsFor, and looks again when
 // the next of the rest will be.
 func (s *stampedLists[T]) sweep() {
 	s.Lock()
 	defer s.Unlock()
-	next := magpieModelsFor
+	next := blackpieModelsFor
 	for k, b := range s.m {
-		if left := magpieModelsFor - time.Since(b.at); left <= 0 {
+		if left := blackpieModelsFor - time.Since(b.at); left <= 0 {
 			delete(s.m, k)
 		} else if left < next {
 			next = left
@@ -332,7 +332,7 @@ func (s *stampedLists[T]) shared(key string, build func() []T) []T {
 	// the stamp is read before the list is built: a change while it is
 	// moves it past the one kept, and the next call builds it again
 	stamp := provider.StampNow()
-	if !ok || b.stamp != stamp || time.Since(b.at) >= magpieModelsFor {
+	if !ok || b.stamp != stamp || time.Since(b.at) >= blackpieModelsFor {
 		b = stampedList[T]{build(), stamp, time.Now()}
 		s.Lock()
 		if s.m == nil {
@@ -341,20 +341,20 @@ func (s *stampedLists[T]) shared(key string, build func() []T) []T {
 		s.m[key] = b
 		if !s.sweeping {
 			s.sweeping = true
-			time.AfterFunc(magpieModelsFor, s.sweep)
+			time.AfterFunc(blackpieModelsFor, s.sweep)
 		}
 		s.Unlock()
 	}
 	return slices.Clip(b.list)
 }
 
-// magpieModelsFor is how long a list is kept while provider.StampNow says
+// blackpieModelsFor is how long a list is kept while provider.StampNow says
 // nothing changed: what the stamp can't see (another app rewriting an
 // account's file, a model retired by its date, a provider resting, which
 // Vision's pick of a model that sees follows) reaches the lists within it.
-const magpieModelsFor = time.Minute
+const blackpieModelsFor = time.Minute
 
-// buildModels is magpieModels built afresh. A model's own lists are
+// buildModels is blackpieModels built afresh. A model's own lists are
 // clipped, so a caller appending to one in its copy makes a new one and
 // never writes into the list kept.
 func buildModels(agent string) []catalog.Model {
@@ -364,7 +364,7 @@ func buildModels(agent string) []catalog.Model {
 	var out []catalog.Model
 	shown, _ := provider.CatalogFor(agent)
 	labels := provider.Labels(shown)
-	// a model magpie describes images to takes them (provider.Described)
+	// a model blackpie describes images to takes them (provider.Described)
 	seen := provider.Described != nil && provider.Described()
 	st, find := settings.Load(), provider.FoundOnce(provider.GroupFinder())
 	priceOf := provider.AgentPricer(st, find)
@@ -375,7 +375,7 @@ func buildModels(agent string) []catalog.Model {
 	for i, e := range shown {
 		efforts := e.Efforts
 		if agent == "codex" {
-			// the levels Codex's picker offers, a model magpie has no
+			// the levels Codex's picker offers, a model blackpie has no
 			// word on included (provider.CodexEfforts)
 			efforts = provider.CodexEfforts(e)
 		}
@@ -419,8 +419,8 @@ func buildModels(agent string) []catalog.Model {
 			m.APIs = []string{string(api)}
 		}
 		// the service tiers Codex is offered on it, as the gateway's own
-		// lists offer them: Fast in the Codex CLI magpie writes
-		// magpie-models.json for (#1530)
+		// lists offer them: Fast in the Codex CLI blackpie writes
+		// blackpie-models.json for (#1530)
 		provider.CodexTiers(&m, e, members)
 		if agent == "codex" {
 			// the entry its vendor lists the model under in Codex's own
@@ -455,7 +455,7 @@ func maxTokens(m catalog.Model) int { return provider.OutputWithin(m.Context, m.
 
 // outputOr is the output limit an agent is handed for m: the Max output the
 // user set for it (catalog.Model.OutputSet), kept within its window, else
-// capped, the agent's own trim of the vendor's figure. A cap of magpie's
+// capped, the agent's own trim of the vendor's figure. A cap of blackpie's
 // never overrides the user's number: DeepSeek V4.1 Flash set to 384k reached
 // VS Code as 250000 and WorkBuddy as 128000 (#2064).
 func outputOr(m catalog.Model, capped int) int {

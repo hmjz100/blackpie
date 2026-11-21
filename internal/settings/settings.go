@@ -1,9 +1,9 @@
 // Package settings keeps the few preferences the desktop app has: which
 // palette to paint with, which language to speak, how the agents are
-// arranged. Everything else magpie knows is derived from the agents' own
+// arranged. Everything else blackpie knows is derived from the agents' own
 // files.
 //
-// The file is ~/.config/magpie/settings.json; a missing file means "follow
+// The file is ~/.config/blackpie/settings.json; a missing file means "follow
 // the system" for both.
 package settings
 
@@ -12,7 +12,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"maps"
 	"math"
 	"net/url"
@@ -25,15 +25,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/filelock"
-	"github.com/yetone/magpie/internal/filememo"
-	"github.com/yetone/magpie/internal/fonts"
-	"github.com/yetone/magpie/internal/lastgood"
-	"github.com/yetone/magpie/internal/redact"
-	"github.com/yetone/magpie/internal/steady"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/filelock"
+	"github.com/hmjz100/blackpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/fonts"
+	"github.com/hmjz100/blackpie/internal/lastgood"
+	"github.com/hmjz100/blackpie/internal/redact"
+	"github.com/hmjz100/blackpie/internal/steady"
 )
 
 // CodexAutoReviewSession is the CodexAutoReview that runs Codex's
@@ -47,7 +47,7 @@ type Settings struct {
 	// and gives each quota curve window, and its legend key, a dash of its
 	// own (#2073).
 	Colorblind bool `json:"colorblind,omitempty"`
-	// ReduceMotion stills magpie's animations as the system's Reduce
+	// ReduceMotion stills blackpie's animations as the system's Reduce
 	// Motion does, for a computer or phone that the moving Routing page
 	// keeps busy (#3813).
 	ReduceMotion bool   `json:"reduceMotion,omitempty"`
@@ -69,24 +69,24 @@ type Settings struct {
 	// rate (see internal/fx). A vendor's own balance, already in its own
 	// currency (a Chinese relay's ¥), is never touched by this.
 	Currency string `json:"currency,omitempty"`
-	// ChineseUnits shortens a large count in 万 and 亿 when magpie speaks
+	// ChineseUnits shortens a large count in 万 and 亿 when blackpie speaks
 	// Chinese (8000 万 rather than 80M); otherwise it is in K, M and B, as
 	// prices per million tokens and context windows (200K, 1M) are, in
 	// Chinese too (#740). It means nothing in English. It replaces
 	// westernUnits, which asked for K/M/B: what that chose is now the
 	// default, so an old file's is left unread.
 	ChineseUnits bool `json:"chineseUnits,omitempty"`
-	// Dock keeps magpie in the Mac's Dock as well as the menu bar, for a
+	// Dock keeps blackpie in the Mac's Dock as well as the menu bar, for a
 	// menu bar too full to show its icon.
 	Dock bool `json:"dock,omitempty"`
-	// DockWindow is the With window choice: magpie is in the Dock, and so
-	// in Command-Tab, only while its window is open. It is what magpie
+	// DockWindow is the With window choice: blackpie is in the Dock, and so
+	// in Command-Tab, only while its window is open. It is what blackpie
 	// does with neither Dock nor DockNever set (ShouguangCao on X: the
 	// window was out of Command-Tab, so going back to it to paste a key
 	// copied elsewhere took the menu bar), so it is still written for an
-	// older magpie reading the file, which took none for Hide.
+	// older blackpie reading the file, which took none for Hide.
 	DockWindow bool `json:"dockWindow,omitempty"`
-	// DockNever keeps magpie out of the Dock and Command-Tab even while
+	// DockNever keeps blackpie out of the Dock and Command-Tab even while
 	// its window is open, the Hide choice. Dock wins over it.
 	DockNever bool `json:"dockNever,omitempty"`
 	// DockSettled says this file's Dock choice is read with With window as
@@ -97,7 +97,7 @@ type Settings struct {
 	// default. A new install, with no file, is settled from the start.
 	// Every save writes it.
 	DockSettled bool `json:"dockSettled,omitempty"`
-	// Proxy for magpie's own requests to vendors: "" follows the
+	// Proxy for blackpie's own requests to vendors: "" follows the
 	// environment and then the system, "direct" uses none, anything else
 	// is the proxy (http://, https:// or socks5://; host:port means http).
 	Proxy string `json:"proxy,omitempty"`
@@ -114,11 +114,11 @@ type Settings struct {
 	// backup or sync without keys leaves it out, as it does LANKey.
 	GitHubToken string `json:"githubToken,omitempty"`
 	// Redact keeps secrets in what agents send (API keys, private keys,
-	// tokens, passwords) from the vendors behind magpie: they go as
+	// tokens, passwords) from the vendors behind blackpie: they go as
 	// placeholders, and come back as they were. RedactPersonal does the same
 	// for emails, phone numbers and ID and bank card numbers, and
 	// RedactWords for the user's own words. RedactRules are the user's own
-	// rules for secrets magpie's don't know (a gateway's oc_sk_… key), a
+	// rules for secrets blackpie's don't know (a gateway's oc_sk_… key), a
 	// prefix or a pattern each, masked with the secrets while Redact is on.
 	// RedactKinds turns the other kinds of personal data on or off one by
 	// one, by redact.Categories' ids (ssn, ip, home…), under
@@ -174,7 +174,7 @@ type Settings struct {
 	// each request; one that isn't now is as unset, masked.
 	RedactRouteTo string `json:"redactRouteTo,omitempty"`
 	// LAN shares the gateway on the local network; remote callers must use
-	// named caller keys. LANKey is retained for older Magpie versions.
+	// named caller keys. LANKey is retained for older Blackpie versions.
 	// LAN is this computer's own (KeepOwn; Lullaby on Discord: sharing
 	// turned on at home came on at work too). LANKey and LANKeyID name the
 	// default key, which rides the synced gateway-key store, so they follow
@@ -193,12 +193,12 @@ type Settings struct {
 	// AllowIPs are the addresses (IPs and CIDR ranges) other computers may
 	// reach the gateway from at all (lc on Discord); any other is refused
 	// 403 even with a gateway key. None: every address, as before. This
-	// computer is always let in. MAGPIE_ALLOW_IPS, where set, is used in
+	// computer is always let in. BLACKPIE_ALLOW_IPS, where set, is used in
 	// its place (gateway.AllowIPs). This computer's own (KeepOwn), as LAN
 	// is: the addresses are of the network this computer is on.
 	AllowIPs []string `json:"allowIPs,omitempty"`
 	// FetchPrivate are the private hosts and ranges (a name, name:port, an
-	// IP or a CIDR range) magpie may download a URL from that it didn't
+	// IP or a CIDR range) blackpie may download a URL from that it didn't
 	// choose itself: an image or video a request names or a vendor answers
 	// with, or a page web_fetch reads. None by default: such a URL is
 	// downloaded from public addresses only, whoever sent the request and
@@ -207,14 +207,14 @@ type Settings struct {
 	FetchPrivate []string `json:"fetchPrivate,omitempty"`
 	// RouterNote is what this computer's MCP router says of itself to the
 	// agents that connect to it (packinggoodsllc_07668 on Discord: two
-	// magpies, one in China and one in Los Angeles, serve the same tools,
+	// blackpies, one in China and one in Los Angeles, serve the same tools,
 	// and an agent fetching Google should pick the one in Los Angeles):
 	// in its initialize instructions, its serverInfo title, and before each
 	// tool's description (gateway.hubWhere). "" is this computer's name, said
 	// only to an agent on another computer. This computer's own (KeepOwn).
 	RouterNote string `json:"routerNote,omitempty"`
 	// Port is the gateway's port on this computer, 0 for DefaultPort.
-	// MAGPIE_ADDR, where it is set, comes first (GatewayAddr).
+	// BLACKPIE_ADDR, where it is set, comes first (GatewayAddr).
 	Port int `json:"port,omitempty"`
 	// LANKeyID remembers the default named key created when sharing is enabled.
 	LANKeyID string `json:"lanKeyId,omitempty"`
@@ -226,7 +226,7 @@ type Settings struct {
 	// MiB: 0 for 32, at most 1024 (#447)
 	RequestArchiveMaxMB int `json:"requestArchiveMaxMB,omitempty"`
 	// RequestArchiveLocal keeps the request archive on this computer's disk,
-	// in magpie's folder (gateway/archive_local.go), while sync has no S3
+	// in blackpie's folder (gateway/archive_local.go), while sync has no S3
 	// bucket for it (CyberCaius on Discord). Its own switch, separate from
 	// RequestArchive, which sync carries to every computer: this computer's
 	// own (KeepOwn), so a request body is written to a disk only where the
@@ -239,7 +239,7 @@ type Settings struct {
 	// GatewayConversations is local, opt-in recording of session traffic.
 	// Only SetGatewayConversations changes it; other saves keep local consent.
 	GatewayConversations bool `json:"gatewayConversations,omitempty"`
-	// SessionReads is which agents' own session files magpie may read
+	// SessionReads is which agents' own session files blackpie may read
 	// (RustCats on X: a first open listed every agent's history unasked).
 	// Nil is not settled yet (sessions.SettleReads decides it once). Only
 	// SetSessionReads changes it; other saves keep what the file holds,
@@ -260,9 +260,9 @@ type Settings struct {
 	// so the windows line up with the day (06:00 gives three by 21:00, where
 	// the first use at 9 gives two by the end of it); "" off. It works
 	// with CodexWarmup or without it. ClaudeWarmAt is the Claude accounts'.
-	// Each is CodexWarmAts' (ClaudeWarmAts') first, all a magpie before
+	// Each is CodexWarmAts' (ClaudeWarmAts') first, all a blackpie before
 	// them read: a file with it and no list has that one time, and it is
-	// kept written for an older magpie to go on starting the day's first.
+	// kept written for an older blackpie to go on starting the day's first.
 	CodexWarmAt  string `json:"codexWarmAt,omitempty"`
 	ClaudeWarmAt string `json:"claudeWarmAt,omitempty"`
 	// CodexWarmAts are the times of day CodexWarmAt's start is made at,
@@ -344,7 +344,7 @@ type Settings struct {
 	// carries over).
 	CheckinOff []string `json:"checkinOff,omitempty"`
 	// MemberModel has a reply's model name the routing group's member
-	// that answered, as magpie's provider/model id (workbuddy/glm-5.3-flash),
+	// that answered, as blackpie's provider/model id (workbuddy/glm-5.3-flash),
 	// for agents that count usage by the reply's model (#822). Off, as by
 	// default, a reply sent under another name than the one asked for (a
 	// group's member, a model's own id, a provider/model id) names the
@@ -381,7 +381,7 @@ type Settings struct {
 	// ClaudeRunsMost is how many Claude Code processes a Claude
 	// subscription may have running at once: conversations' runs, those
 	// waiting for a next turn or on tool results, and one-off tests and
-	// allowance reads alike. 0, as by default, has magpie size it from
+	// allowance reads alike. 0, as by default, has blackpie size it from
 	// this machine's memory on Linux (its cgroup's limit, else MemTotal),
 	// and leaves it unbounded elsewhere: each Claude Code holds about
 	// 100 MiB of its own, and a 512 MiB service was OOM-killed (#2956).
@@ -408,29 +408,29 @@ type Settings struct {
 	// who is signed in, and no subscription is offered; API-key providers
 	// work as before (see AccountDiscoveryOff, provider/discovery.go). Off,
 	// as by default, subscriptions are found as ever. This computer's own
-	// (KeepOwn), set only by its own switch or `magpie accounts discovery`.
+	// (KeepOwn), set only by its own switch or `blackpie accounts discovery`.
 	NoAccountDiscovery bool `json:"noAccountDiscovery,omitempty"`
 	// SignInLinkOnly keeps an account's sign-in page out of the default
 	// browser: the window (and the command line) shows its link to copy
 	// into a browser the user picks, a separate or fingerprint browser
 	// (max2020 on Discord). Off, as by default, the page opens as ever. A
 	// plugin whose own CLI opens its page (Grok Build on macOS and
-	// Windows) still does: magpie can't stop that.
+	// Windows) still does: blackpie can't stop that.
 	SignInLinkOnly bool `json:"signInLinkOnly,omitempty"`
-	// NoStats stops the one event a day that counts magpie's users (see
+	// NoStats stops the one event a day that counts blackpie's users (see
 	// internal/stats).
 	NoStats bool `json:"noStats,omitempty"`
-	// NoUsageStats keeps which agents, providers and models magpie is
+	// NoUsageStats keeps which agents, providers and models blackpie is
 	// used with out of that event, which then counts the user only.
 	NoUsageStats bool `json:"noUsageStats,omitempty"`
-	// NoUpdatePill keeps the header's Update pill away when a newer magpie
+	// NoUpdatePill keeps the header's Update pill away when a newer blackpie
 	// is out; UpdateSkip is the one version it was hidden for, and a newer
-	// one brings it back. Either way magpie still downloads the version and
+	// one brings it back. Either way blackpie still downloads the version and
 	// puts it in as it quits, and Settings' version row still offers it.
 	NoUpdatePill bool   `json:"noUpdatePill,omitempty"`
 	UpdateSkip   string `json:"updateSkip,omitempty"`
-	// NoAutoUpdate stops magpie asking for a newer version by itself, and
-	// so downloading one (#472): only Settings' Check, or magpie update,
+	// NoAutoUpdate stops blackpie asking for a newer version by itself, and
+	// so downloading one (#472): only Settings' Check, or blackpie update,
 	// asks then. UpdateEvery is how often it asks otherwise, in minutes:
 	// one of UpdateEveries, 0 for every six hours.
 	NoAutoUpdate bool `json:"noAutoUpdate,omitempty"`
@@ -439,7 +439,7 @@ type Settings struct {
 	// say a newer version is out (with its notes and size) rather than
 	// download it (#2296): a metered network or a proxy billed by traffic
 	// downloads it only on a click (Download update, the header's Update,
-	// magpie update). Off, as by default, a newer version is downloaded
+	// blackpie update). Off, as by default, a newer version is downloaded
 	// as soon as it is found.
 	NoAutoDownload bool `json:"noAutoDownload,omitempty"`
 	// AutoRestart has the app restart into an update it downloaded by
@@ -451,29 +451,29 @@ type Settings struct {
 	// UpdateMirror is a GitHub download mirror an update's file is fetched
 	// through, its prefix put before the release's github.com URL
 	// (https://mirror.example/https://github.com/…): "" for none, which is
-	// the default — magpie names no mirror of its own. The file is still
-	// checked against the SHA-256 the update feed at usemagpie.ai gives,
-	// never one from the mirror. magpie update mirror sets it.
+	// the default — blackpie names no mirror of its own. The file is still
+	// checked against the SHA-256 the update feed at useblackpie.ai gives,
+	// never one from the mirror. blackpie update mirror sets it.
 	UpdateMirror string `json:"updateMirror,omitempty"`
 	// UpdateChannel is which versions an update is offered: "" every
 	// version as it comes out, the default; UpdateStable ("stable") one a
 	// week, the newest that had been out three days as the week began, or
 	// an urgent one (a security hole, a ban risk, lost data) at once, from
 	// the update feed's ?channel=stable (ssharpcc on X). Settings' Update
-	// channel and magpie update channel set it.
+	// channel and blackpie update channel set it.
 	UpdateChannel string `json:"updateChannel,omitempty"`
 	// Vision is the model that describes an image to a model that can't see
 	// it: a model's id (provider/model, group/<id>), "off" to turn such an
-	// image away, or empty for one magpie picks (see gateway.seer).
+	// image away, or empty for one blackpie picks (see gateway.seer).
 	Vision string `json:"vision,omitempty"`
 	// VisionEffort is how hard the Image recognition model thinks as it
 	// reads an image (MOMO on Discord): a level of catalog.EffortRank,
 	// fitted to the model's own levels when it is asked, or empty for
-	// magpie's choice, the least the model has (gateway.visionEffort).
+	// blackpie's choice, the least the model has (gateway.visionEffort).
 	VisionEffort string `json:"visionEffort,omitempty"`
-	// ImageGen is the model magpie's generate_image tool draws with (the
+	// ImageGen is the model blackpie's generate_image tool draws with (the
 	// gateway's /v1/images/generations when a request names no model): a
-	// model's id, "off", or empty for one magpie picks (gateway.drawer).
+	// model's id, "off", or empty for one blackpie picks (gateway.drawer).
 	// "off" turns the video a request that names no model gets off too
 	// (gateway.videomaker).
 	ImageGen string `json:"imageGen,omitempty"`
@@ -505,15 +505,15 @@ type Settings struct {
 	// load reported, or one older than plugin.LoadFresh, keeps its place.
 	BusyLoad int `json:"busyLoad,omitempty"`
 	// Searcher is the provider that searches the web for a model that
-	// can't: "<provider>" with the small model magpie picks of it,
-	// "<provider>/<model>", or empty for the one magpie picks
+	// can't: "<provider>" with the small model blackpie picks of it,
+	// "<provider>/<model>", or empty for the one blackpie picks
 	// (gateway.searcher). "off" allows only configured search APIs.
-	// One that is gone, off or can't search gives way to magpie's pick.
+	// One that is gone, off or can't search gives way to blackpie's pick.
 	Searcher string `json:"searcher,omitempty"`
 	// SearcherThen are the searchers asked in turn, in this order, when
 	// the one Searcher names fails or finds nothing, each written as
 	// Searcher is (axelburks on Discord: a second provider when the first
-	// fails). Read only while Searcher names one; magpie's own pick hands
+	// fails). Read only while Searcher names one; blackpie's own pick hands
 	// on to the next it would pick by itself.
 	SearcherThen []string `json:"searcherThen,omitempty"`
 	// SearcherEffort is how hard the searcher's model thinks as it searches
@@ -526,19 +526,19 @@ type Settings struct {
 	// SearchFirstAPI for the search APIs, the provider's search after them
 	// when they fail; empty for the provider first, as before.
 	SearchFirst string `json:"searchFirst,omitempty"`
-	// SearchAll is that magpie searches for every model, one whose
+	// SearchAll is that blackpie searches for every model, one whose
 	// provider searches the web by itself too (cybercaius on Discord):
 	// the client's search is answered by the searcher and the search APIs,
 	// as for a model that can't, and the provider is sent no search tool.
-	// Only while magpie can search for it (gateway.magpieSearches).
+	// Only while blackpie can search for it (gateway.blackpieSearches).
 	SearchAll bool `json:"searchAll,omitempty"`
 	// TrayUsages are the subscriptions and plans whose windows are shown
 	// beside the tray icon, in the order shown, each by its provider and
 	// account ("claude|a@b.c"); none when empty.
 	TrayUsages []string `json:"trayUsages,omitempty"`
-	// TrayUsage is TrayUsages' first, all a magpie before them read: a file
+	// TrayUsage is TrayUsages' first, all a blackpie before them read: a file
 	// with it and no TrayUsages shows that one, and it is kept written for
-	// an older magpie to go on showing it.
+	// an older blackpie to go on showing it.
 	TrayUsage string `json:"trayUsage,omitempty"`
 	// TrayUsageEvery is how often, in minutes, that text is brought up to
 	// date; 0 is every 3 (one of TrayEvery).
@@ -547,7 +547,7 @@ type Settings struct {
 	// is its windows stacked alone, a thin line between one card and the
 	// next.
 	TrayNoLogos bool `json:"trayNoLogos,omitempty"`
-	// TrayNoBird leaves magpie's bird out of the Mac menu bar while the
+	// TrayNoBird leaves blackpie's bird out of the Mac menu bar while the
 	// cards are there, the cards alone (KevinXC on Discord); a click on one
 	// still opens the panel, and with no cards the bird is shown.
 	TrayNoBird bool `json:"trayNoBird,omitempty"`
@@ -555,7 +555,7 @@ type Settings struct {
 	// menu bar ("42% +12%"), as the Usage page's cards have it (fflake33
 	// on Discord); off by default, as it widens every card.
 	TrayPace bool `json:"trayPace,omitempty"`
-	// TrayNoCost leaves money out of magpie's own totals in the menu bar:
+	// TrayNoCost leaves money out of blackpie's own totals in the menu bar:
 	// the today and last-7-days cards, their tooltips and the tooltip with
 	// no cards say the tokens alone (BussanQ on Discord); off by default,
 	// the cost shown.
@@ -579,7 +579,7 @@ type Settings struct {
 	// agents work through the gateway and for a while after (xiao_wang24004
 	// on X; internal/awake). This computer's own (KeepOwn).
 	KeepAwake bool `json:"keepAwake,omitempty"`
-	// NoWSLAgents stops magpie looking in WSL on its own, on Windows
+	// NoWSLAgents stops blackpie looking in WSL on its own, on Windows
 	// (#1264): no distro is listed or probed for agents, their sessions or
 	// Claude Code, and the agents found there before aren't shown.
 	NoWSLAgents bool `json:"noWSLAgents,omitempty"`
@@ -587,49 +587,49 @@ type Settings struct {
 	// computer awake (#975, Hu9956: an agent recording the screen to check
 	// its work found it locked). This computer's own (KeepOwn).
 	KeepAwakeDisplay bool `json:"keepAwakeDisplay,omitempty"`
-	// GatewayMode is whether `magpie web` shows only what a gateway serving
+	// GatewayMode is whether `blackpie web` shows only what a gateway serving
 	// other machines needs (Player on Discord): "on", "off", or "" to
-	// decide by itself — on for `magpie web --gateway`, or with no agents
+	// decide by itself — on for `blackpie web --gateway`, or with no agents
 	// on this machine. This computer's own (KeepOwn).
 	GatewayMode string `json:"gatewayMode,omitempty"`
 	// QuotaLeft shows a subscription's windows by how much of each is left,
 	// not used: the Usage page, the tray panel and the menu bar alike.
 	QuotaLeft bool `json:"quotaLeft,omitempty"`
-	// QuotaReads is when magpie reads subscriptions' allowances and keys'
+	// QuotaReads is when blackpie reads subscriptions' allowances and keys'
 	// balances from their vendors (#1518, RooobinYe): "" whenever it needs
 	// them (the Usage page and tray, routing, alerts, the switch to an
 	// account with room), "asked" only when the user asks — the Usage page
-	// opened or refreshed, a card's refresh, `magpie quota`/`accounts`.
+	// opened or refreshed, a card's refresh, `blackpie quota`/`accounts`.
 	// Otherwise the readings kept from the last time stand, marked as of
 	// then; an account the vendor turned away for its quota is still read.
-	// This computer's own (KeepOwn): magpie at login comes up before the
+	// This computer's own (KeepOwn): blackpie at login comes up before the
 	// proxy app, and its reads went out direct.
 	QuotaReads string `json:"quotaReads,omitempty"`
 	// UsageAlert is how much of a subscription's or plan's window, in
-	// percent, is used when magpie says so with a notification (#368):
+	// percent, is used when blackpie says so with a notification (#368):
 	// once for each time the window runs, for every window routing counts
 	// (not one set aside, as on-demand spending is); 0 is off.
 	UsageAlert int `json:"usageAlert,omitempty"`
 	// BalanceAlert is the balance a key or account has fallen to when
-	// magpie says so, in that balance's own currency or credits, once until
+	// blackpie says so, in that balance's own currency or credits, once until
 	// it is topped up past it again; 0 is off.
 	BalanceAlert float64 `json:"balanceAlert,omitempty"`
-	// ResetReminder is how many hours before a renewal magpie says what
+	// ResetReminder is how many hours before a renewal blackpie says what
 	// would be lost by it (#720): a weekly or monthly window with much of
 	// it left before it renews, a reset credit unspent before it runs out;
 	// once each. 0 is off.
 	ResetReminder int `json:"resetReminder,omitempty"`
 	// TurnDoneAlert is how many seconds an agent's turn runs, from the
-	// user's prompt to its last reply, before magpie says it is done with a
+	// user's prompt to its last reply, before blackpie says it is done with a
 	// notification (itieniu on X): a long task set going while the user
 	// works elsewhere. Only turns the app's own gateway serves; 0 is off.
 	TurnDoneAlert int `json:"turnDoneAlert,omitempty"`
-	// MaskAlert has magpie say with a notification when masking swaps a
+	// MaskAlert has blackpie say with a notification when masking swaps a
 	// value it never masked before (Must2333 on X): its kind and how many,
 	// never the value, a burst said once and at most once a minute. Only
 	// requests the app's own gateway serves; off until turned on.
 	MaskAlert bool `json:"maskAlert,omitempty"`
-	// PlainNames has the model lists magpie gives agents name each model
+	// PlainNames has the model lists blackpie gives agents name each model
 	// by its name alone, without its provider's or "routing group" after it
 	// (#335) — but for two in one list that would read the same, which keep
 	// it (see provider.Labels).
@@ -644,27 +644,27 @@ type Settings struct {
 	// "codex/gpt-5.6-sol"), for clients moved from another proxy that ask
 	// for bare ids (love1sbug on X; provider.BareEntries). Off by default.
 	BareModelIDs bool `json:"bareModelIDs,omitempty"`
-	// CodexAgentsV1 has the OpenAI models magpie hands Codex — the ChatGPT
+	// CodexAgentsV1 has the OpenAI models blackpie hands Codex — the ChatGPT
 	// account's own, their codex/ ids and the groups one is in — say
 	// multi_agent_version "v1" (#141): their subagents are then handed
-	// their tasks as text, which a magpie-served subagent can read, where
+	// their tasks as text, which a blackpie-served subagent can read, where
 	// V2's are sealed by OpenAI's server, and it is V1 that a ChatGPT
-	// lead's subagent on a magpie-served model needs (a V2 task to a
+	// lead's subagent on a blackpie-served model needs (a V2 task to a
 	// non-ChatGPT model fails). Codex's own features.multi_agent_v2 would
-	// still win: where it is on in the config magpie routes, magpie says so
+	// still win: where it is on in the config blackpie routes, blackpie says so
 	// (internal/agent/codex.go, and the Settings row) and leaves it to the
 	// user to turn off. A thread keeps the version it started with.
 	CodexAgentsV1 bool `json:"codexAgentsV1,omitempty"`
 	// CodexTitles is where the requests Codex makes for a thread's title
 	// (thread_title, thread_title_reconsideration: a hidden turn of their
 	// own, on Codex's own model through its ChatGPT sign-in) go (#705): ""
-	// as Codex sends them, "off" answered by magpie with no title and sent
+	// as Codex sends them, "off" answered by blackpie with no title and sent
 	// nowhere, or a model's id (provider/model, group/<id>) that writes it.
 	CodexTitles string `json:"codexTitles,omitempty"`
 	// CodexDescriptions is where the request Codex makes for a thread's
 	// description (thread_description: its own hidden turn, on Codex's own
 	// model through its ChatGPT sign-in) goes: "" as Codex sends it, "off"
-	// answered by magpie with no description and sent nowhere, or a
+	// answered by blackpie with no description and sent nowhere, or a
 	// model's id (provider/model, group/<id>) that writes it. It is not
 	// CodexTitles: a description asks for {"description"} alone.
 	CodexDescriptions string `json:"codexDescriptions,omitempty"`
@@ -672,24 +672,24 @@ type Settings struct {
 	// the user's next message for its composer (composer_predictions: a
 	// hidden turn on a fork of the whole conversation, on the thread's own
 	// model through its ChatGPT sign-in) goes (#1970, pluo): "" as Codex
-	// sends it, "off" answered by magpie with no prediction and sent
+	// sends it, "off" answered by blackpie with no prediction and sent
 	// nowhere, or a model's id (provider/model, group/<id>) that writes it.
 	CodexPredictions string `json:"codexPredictions,omitempty"`
 	// CodexAutoReview is the model Codex's auto-review (approvals_reviewer
 	// = "auto_review": the guardian that decides an approval in the user's
 	// place) runs on (#938): a model's id (provider/model, group/<id>) put
-	// in every entry of the list magpie hands Codex as
+	// in every entry of the list blackpie hands Codex as
 	// auto_review_model_override, which Codex takes before its own
 	// codex-auto-review or the conversation's model at low effort. ""
 	// leaves the list as it was. CodexAutoReviewSession has each of
-	// magpie's entries name itself, so the review runs on the session's
-	// model when that is one of magpie's, not on codex-auto-review through
+	// blackpie's entries name itself, so the review runs on the session's
+	// model when that is one of blackpie's, not on codex-auto-review through
 	// the ChatGPT sign-in (cybercaius on Discord).
 	CodexAutoReview string `json:"codexAutoReview,omitempty"`
 	// CodexSubagentModel is the model the gateway puts every subagent
 	// Codex spawns on (a request x-openai-subagent names collab_spawn),
 	// whatever model its lead asked for in spawn_agent: a model a ChatGPT
-	// account in magpie serves (provider/model), since a subagent's task
+	// account in blackpie serves (provider/model), since a subagent's task
 	// is sealed for one (willz on Discord). "" leaves each on the model its
 	// lead asked for.
 	CodexSubagentModel string `json:"codexSubagentModel,omitempty"`
@@ -728,7 +728,7 @@ type Settings struct {
 	// CodexAsyncCompactPercent of the model's window (#2490, lantern2077
 	// on Discord): [features.async_compaction] enabled in the config Codex
 	// is routed through, and capabilities.remote_compaction = "v2" on
-	// magpie's provider table, without which Codex never starts one on a
+	// blackpie's provider table, without which Codex never starts one on a
 	// provider other than OpenAI's. A value the user set there is theirs
 	// and stays (internal/agent/codex_async.go).
 	CodexAsyncCompact bool `json:"codexAsyncCompact,omitempty"`
@@ -740,7 +740,7 @@ type Settings struct {
 	// addresses after (see source.China).
 	ChinaMirror bool `json:"chinaMirror,omitempty"`
 	// NPMRegistry is the npm registry set on the Plugins page or with
-	// `magpie plugin registry`: plugins are installed from it and npm's
+	// `blackpie plugin registry`: plugins are installed from it and npm's
 	// answers asked of it, before a registry the user's .npmrc, bunfig or
 	// shell names and before the 「国内镜像」 switch (plugin.Registry).
 	// "" leaves it to those.
@@ -755,14 +755,14 @@ type Settings struct {
 	CodeFont *fonts.Face `json:"codeFont,omitempty"`
 	// How the agents are listed, by agent id. AgentOrder comes first, as
 	// ordered; an agent it doesn't name (one installed since) follows in
-	// magpie's own order. A hidden agent is folded away at the bottom of the
+	// blackpie's own order. A hidden agent is folded away at the bottom of the
 	// list; a shown one stays in view even while nothing is set on it, which
 	// otherwise folds it away too. The agents' own files never hear of it.
 	AgentOrder   []string `json:"agentOrder,omitempty"`
 	AgentsHidden []string `json:"agentsHidden,omitempty"`
 	AgentsShown  []string `json:"agentsShown,omitempty"`
 	// UsageOrder is how the Usage page's cards are listed, by provider id,
-	// as they were dragged there; one it doesn't name follows in magpie's
+	// as they were dragged there; one it doesn't name follows in blackpie's
 	// own order. Only the page's: the order providers are tried in is the
 	// Providers page's.
 	UsageOrder []string `json:"usageOrder,omitempty"`
@@ -783,7 +783,7 @@ type Settings struct {
 	// stays. Only what that page shows: routing, caps, counting, the tray
 	// panel (PanelUsageHidden is its own) and the menu bar's cells keep them.
 	UsageCardsHidden []string `json:"usageCardsHidden,omitempty"`
-	// ClientAgents counts a client magpie doesn't know as one of the agents
+	// ClientAgents counts a client blackpie doesn't know as one of the agents
 	// it does, on the Usage and Sessions pages (#1958, NorethSea): a bridge
 	// that starts Codex's app-server under a name of its own
 	// ("hermes-codex-thread-bridge") is counted as Codex. Keyed by the
@@ -809,7 +809,7 @@ type Settings struct {
 	// or a group's) taken out of an agent's lists one by one, by agent id,
 	// after Visible: a model not named here, a new one among them, is shown.
 	HiddenModels map[string][]string `json:"hiddenModels,omitempty"`
-	// DisabledModels are models turned off for every request through magpie
+	// DisabledModels are models turned off for every request through blackpie
 	// (#1867), each an exact id or a glob ("*fable*"), matched ignoring case
 	// against "<provider>/<model>" and the bare model id: they are left out
 	// of every list, and the gateway refuses them on every route.
@@ -821,8 +821,8 @@ type Settings struct {
 	// read for such an agent. An agent named with no entries is shown none.
 	PickedModels map[string][]string `json:"pickedModels,omitempty"`
 	// OwnModelsHidden are the agents, by id, whose pickers leave out the
-	// models the agent reaches on its own, not through magpie (DeepSeek
-	// Harness's own DeepSeek models, #1642): only magpie's are offered, and
+	// models the agent reaches on its own, not through blackpie (DeepSeek
+	// Harness's own DeepSeek models, #1642): only blackpie's are offered, and
 	// one the agent is set to stays.
 	OwnModelsHidden []string `json:"ownModelsHidden,omitempty"`
 	// AgentEfforts are the reasoning efforts the gateway asks for on an
@@ -856,18 +856,18 @@ type Settings struct {
 	// whose keys are not a model's is not one of these, and is not named
 	// Model* — Visible, which is by agent id, among them.
 	// ModelNames are the names the user gave models, by "<provider
-	// id>/<model id>": agents, the gateway's model list and magpie itself
+	// id>/<model id>": agents, the gateway's model list and blackpie itself
 	// show them for the vendor's (see provider.SetModelName).
 	ModelNames map[string]string `json:"modelNames,omitempty"`
 	// ModelEfforts are the reasoning levels the user keeps of a model's,
-	// by "<provider id>/<model id>": the lists magpie hands out offer only
+	// by "<provider id>/<model id>": the lists blackpie hands out offer only
 	// those, while the vendor is still asked at any level it has; for a
 	// model with no levels known they are the levels given it, and the
 	// gateway fits a request to them (see provider.SetModelEfforts,
-	// magpie model spec).
+	// blackpie model spec).
 	ModelEfforts map[string][]string `json:"modelEfforts,omitempty"`
 	// ModelReasonless are the models the user said take no reasoning ask,
-	// by "<provider id>/<model id>": magpie offers them no levels and
+	// by "<provider id>/<model id>": blackpie offers them no levels and
 	// sends them no reasoning field, on any API, though their list says
 	// they think (see provider.SetModelReasonless; yuexian7 on Discord: a
 	// model models.dev lists with reasoning answered reasoning_effort
@@ -898,17 +898,17 @@ type Settings struct {
 	// own is longer, over CompactAt and FullContext. One at or above the
 	// model's window is its whole window.
 	ModelCompacts map[string]int `json:"modelCompacts,omitempty"`
-	// ModelWires is the name to send a vendor for a model magpie knows by
+	// ModelWires is the name to send a vendor for a model blackpie knows by
 	// another, by "<provider id>/<model id>", and "*" for every model of that
 	// provider. A "*" in the name is the model itself, so one name covers a
 	// relay that namespaces its models — vendor-c/* asks for model-3 as
 	// vendor-c/model-3 — while a name with no "*" in it sends every model of
 	// that key under that one name. Everything else — the catalog agents see,
 	// the routing groups, the usage records and what a call is priced at —
-	// keeps the name magpie knows the model by.
+	// keeps the name blackpie knows the model by.
 	ModelWires map[string]string `json:"modelWires,omitempty"`
 	// ModelIDs are the ids the user lists a provider's models by, from
-	// "<provider id>/<the id magpie lists it by>" to the id the provider
+	// "<provider id>/<the id blackpie lists it by>" to the id the provider
 	// itself serves it under (zeewell on X: deepseek-v4.1-flash-1017 known
 	// as deepseek-v4.1-flash). The model is listed, picked, grouped, found
 	// in routing groups, limited by gateway keys and recorded in usage by
@@ -926,8 +926,8 @@ type Settings struct {
 	ModelAPIs map[string]string `json:"modelAPIs,omitempty"`
 	// ModelSameAs is the model another vendor sells under another name
 	// that a model is, by "<provider id>/<model id>": the routing groups
-	// magpie finds (provider's autoGroups) merge it with that one rather
-	// than by its own id, for an id no rule of magpie's matches up
+	// blackpie finds (provider's autoGroups) merge it with that one rather
+	// than by its own id, for an id no rule of blackpie's matches up
 	// (kyzhouxu, #583), and a call to it that no list prices is costed at
 	// that model's maker's price (provider.SamePriceIn, #2344). Absent
 	// leaves it to its id.
@@ -979,7 +979,7 @@ type ModelPrice struct {
 	// else at the 5-minute price (catalog.OneHourFor).
 	CacheWrite1h *float64 `json:"cache_write_1h,omitempty"`
 	// Tiers are the prices of a request whose input is over a size, each
-	// whole: "magpie model price … --tier 272k …" (PAMI on Discord).
+	// whole: "blackpie model price … --tier 272k …" (PAMI on Discord).
 	Tiers []catalog.Tier `json:"tiers,omitempty"`
 }
 
@@ -1031,7 +1031,7 @@ func StatedPrice(p catalog.Price) ModelPrice {
 	return m
 }
 
-// CheckModelPrice is whether a price the user gives is one magpie will bill a
+// CheckModelPrice is whether a price the user gives is one blackpie will bill a
 // call at: the key names a model the way the per-model maps key one, and
 // every part of the price is a number a vendor could charge, naming the first
 // that is not. It is where a price is checked rather than in Save: one a hand
@@ -1200,9 +1200,9 @@ const (
 )
 
 // DefaultTextSize is the text size of settings that have never had one
-// saved. Windows' and Linux's body text is 14px against magpie's 13px at
+// saved. Windows' and Linux's body text is 14px against blackpie's 13px at
 // 100%, a size smaller than what is around it there, so they start at
-// 110% (#914); the Mac's is 13px, as magpie's. A size once saved, 100%
+// 110% (#914); the Mac's is 13px, as blackpie's. A size once saved, 100%
 // too, is kept as it is. A var so tests can be any system.
 var DefaultTextSize = func() int {
 	if runtime.GOOS == "windows" || runtime.GOOS == "linux" {
@@ -1321,7 +1321,7 @@ func (s Settings) Compact() int {
 // looked in, whether agents' sign-ins are read, when allowances are read, the terminal app a session resumes
 // in, the quick panel's shortcut, whether the local masking model is on
 // (it is downloaded on this computer alone), how many Claude Code processes may run (its memory),
-// and what the menu bar or tray shows beside magpie's icon (yoooo on
+// and what the menu bar or tray shows beside blackpie's icon (yoooo on
 // Discord: usage turned off on a Mac came back from a Windows box that
 // shows it; Lullaby: sharing turned on at home came on at work).
 func (s *Settings) KeepOwn(cur Settings) {
@@ -1455,11 +1455,11 @@ func renameInMap(m reflect.Value, from, to string) bool {
 // Path is the settings file.
 func Path() string { return appdir.Join(Dir(), "settings.json") }
 
-// Dir is the folder every magpie file lives in: the data folder beside a
-// portable magpie (appdir.Portable), else ~/.config/magpie.
+// Dir is the folder every blackpie file lives in: the data folder beside a
+// portable blackpie (appdir.Portable), else ~/.config/blackpie.
 func Dir() string { return appdir.Config() }
 
-// Portable is the data folder of a portable magpie, or "" when installed.
+// Portable is the data folder of a portable blackpie, or "" when installed.
 func Portable() string { return appdir.Portable() }
 
 // Serialize reads with saves too: the editor preserves hard links by
@@ -1468,15 +1468,15 @@ var fileMu sync.RWMutex
 
 // writing is set while fileMu is held for a write: what a write is made
 // from is read from the disk even while a request holds what was read
-// (filememo.Hold), or a change another magpie or the user made in the
+// (filememo.Hold), or a change another blackpie or the user made in the
 // held second would be written over. Only set or read under fileMu.
 var writing bool
 
-// lockWait is how long a write waits for another magpie; a test shortens it.
+// lockWait is how long a write waits for another blackpie; a test shortens it.
 var lockWait = filelock.Wait
 
-// lockFile takes fileMu for a write and the lock other magpies take on
-// the file, and returns what lets them go. Another magpie holding it past
+// lockFile takes fileMu for a write and the lock other blackpies take on
+// the file, and returns what lets them go. Another blackpie holding it past
 // lockWait is an error, not a write over its change.
 func lockFile() (unlock func(), err error) {
 	fileMu.Lock()
@@ -1628,7 +1628,7 @@ func loadChecked() (Settings, error) {
 }
 
 // settleDock reads a Dock choice written before With window was the
-// default (DockSettled unset) as that magpie did: no choice is Hide.
+// default (DockSettled unset) as that blackpie did: no choice is Hide.
 func (s Settings) settleDock() Settings {
 	if s.DockSettled {
 		return s
@@ -1702,7 +1702,7 @@ func validSettings(b []byte) bool {
 	return json.Unmarshal(bytes.TrimPrefix(b, []byte("\xef\xbb\xbf")), &s) == nil
 }
 
-// CheckProxy says whether p is a proxy setting magpie takes: "" (follow),
+// CheckProxy says whether p is a proxy setting blackpie takes: "" (follow),
 // "direct", or an http://, https:// or socks5:// address (host:port
 // meaning http). The global Proxy and a provider's own are both checked
 // with it.
@@ -1722,7 +1722,7 @@ func CheckProxy(p string) error {
 	return nil
 }
 
-// DefaultPort is the gateway's port unless Settings or MAGPIE_ADDR say
+// DefaultPort is the gateway's port unless Settings or BLACKPIE_ADDR say
 // another.
 const DefaultPort = 3425
 
@@ -1736,18 +1736,18 @@ func CheckPort(p int) error {
 	return nil
 }
 
-// GatewayAddr is where the gateway listens: MAGPIE_ADDR when it is set,
+// GatewayAddr is where the gateway listens: BLACKPIE_ADDR when it is set,
 // else the port Settings has, on loopback (Magic_zero on Discord: 3425 was
 // taken, and a port of one's own is easier to tell apart).
 func GatewayAddr() string {
-	if a := os.Getenv("MAGPIE_ADDR"); a != "" {
+	if a := os.Getenv("BLACKPIE_ADDR"); a != "" {
 		return a
 	}
 	return SavedAddr()
 }
 
-// SavedAddr is GatewayAddr with MAGPIE_ADDR left aside: the address of the
-// magpie whose settings these are, which one the variable moves (magpie-dev,
+// SavedAddr is GatewayAddr with BLACKPIE_ADDR left aside: the address of the
+// blackpie whose settings these are, which one the variable moves (blackpie-dev,
 // a sandbox) runs beside.
 func SavedAddr() string {
 	p := Shared().Port
@@ -1758,7 +1758,7 @@ func SavedAddr() string {
 }
 
 // Edit changes the settings as edit makes them from what the file holds
-// now, so a change saved meanwhile, here or by another magpie, isn't
+// now, so a change saved meanwhile, here or by another blackpie, isn't
 // written over from an older copy. A file that can't be read is left as
 // it is, with the error, and an error from edit saves nothing. edit must
 // not Load or Save: the file is held.
@@ -1789,7 +1789,7 @@ func Save(s Settings) error {
 	return save(s, false)
 }
 
-// SessionReads is the user's answer to which agents' session files magpie
+// SessionReads is the user's answer to which agents' session files blackpie
 // reads. Before it is asked (Asked false) no agent's are read. Then an
 // agent named in Agents is read as it says, and any other as All says:
 // "allow all" is All with no Agents, so an agent installed later is read
@@ -2123,7 +2123,7 @@ func saveOwn(s Settings, recording, reads bool) error {
 		return fmt.Errorf("the menu bar's usage is refreshed every %v minutes, not %d", TrayEvery, s.TrayUsageEvery)
 	}
 	if !slices.Contains(UpdateEveries, s.UpdateEvery) {
-		return fmt.Errorf("magpie checks for updates every %v minutes, not %d", UpdateEveries, s.UpdateEvery)
+		return fmt.Errorf("blackpie checks for updates every %v minutes, not %d", UpdateEveries, s.UpdateEvery)
 	}
 	if !slices.Contains(UpdateChannels, s.UpdateChannel) {
 		return fmt.Errorf("the update channel is %q (stable) or empty (every version), not %q", UpdateStable, s.UpdateChannel)
@@ -2163,7 +2163,7 @@ func saveOwn(s Settings, recording, reads bool) error {
 		return fmt.Errorf("a balance alert is at an amount of 0 or more (0 for off), not %v", s.BalanceAlert)
 	}
 	if s.QuotaReads != "" && s.QuotaReads != "asked" {
-		return fmt.Errorf(`allowances are read "" (whenever magpie needs them) or "asked" (only when asked), not %q`, s.QuotaReads)
+		return fmt.Errorf(`allowances are read "" (whenever blackpie needs them) or "asked" (only when asked), not %q`, s.QuotaReads)
 	}
 	if err := CheckPort(s.Port); err != nil {
 		return err
@@ -2382,15 +2382,15 @@ func (s Settings) normal() Settings {
 	if s.TextSize == 0 {
 		s.TextSize = DefaultTextSize()
 	}
-	// one card, as a magpie before TrayUsages kept it; an empty list
+	// one card, as a blackpie before TrayUsages kept it; an empty list
 	// sent on purpose (all of them turned off) stays empty
 	if s.TrayUsages == nil && s.TrayUsage != "" {
 		s.TrayUsages = []string{s.TrayUsage}
 	}
-	// the times of day: the one a magpie before the lists kept, when the
+	// the times of day: the one a blackpie before the lists kept, when the
 	// list isn't there (an empty one sent on purpose stays empty), each as
 	// 06:00 whichever way it came (6:00, 06:00:00), earliest first, once;
-	// and the first kept as the one for that older magpie
+	// and the first kept as the one for that older blackpie
 	for _, w := range []struct {
 		at  *string
 		ats *[]string

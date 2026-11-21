@@ -3,9 +3,9 @@ package gateway
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // OpenCode 2 (its @ai-sdk/openai-compatible) puts "strict": false on every

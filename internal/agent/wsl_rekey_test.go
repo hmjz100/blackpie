@@ -5,19 +5,19 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/edit"
-	"github.com/yetone/magpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/gateway"
 )
 
 // Codex in a WSL distro under NAT connected while the gateway wasn't shared
 // was written gateway.Token, which the gateway turns away from beyond
 // loopback; turning sharing on afterwards left it there, and every request
-// was 401 "not an enabled magpie gateway key" (tried on Windows with
-// magpie-desktop). Rekey, run as sharing changes, gives it the sharing key,
+// was 401 "not an enabled blackpie gateway key" (tried on Windows with
+// blackpie-desktop). Rekey, run as sharing changes, gives it the sharing key,
 // and gateway.Token again once sharing is off.
 func TestRekeyGivesWSLAgentTheSharingKey(t *testing.T) {
-	t.Setenv("MAGPIE_ADDR", "")
+	t.Setenv("BLACKPIE_ADDR", "")
 	home, _ := codexHome(t, "", "model = \"gpt-5.5\"\n")
 	probe := "home:/" + filepath.Base(home) + "\ndir:.codex\nroute:default via 172.23.80.1 dev eth0 proto kernel\nnet:nat\n"
 	fakeWSL(t, "Ubuntu\r\n", "Ubuntu\r\n", map[string]string{"Ubuntu": probe},
@@ -36,7 +36,7 @@ func TestRekeyGivesWSLAgentTheSharingKey(t *testing.T) {
 	cfg := filepath.Join(home, ".codex", "config.toml")
 	token := func() string {
 		t.Helper()
-		tb, err := edit.GetTOMLTable(cfg, "model_providers."+magpieID)
+		tb, err := edit.GetTOMLTable(cfg, "model_providers."+blackpieID)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -92,7 +92,7 @@ func TestRekeyGivesWSLAgentTheSharingKey(t *testing.T) {
 // Rekey leaves an agent on this machine's loopback as it is: its key
 // doesn't follow sharing.
 func TestRekeyLeavesLoopback(t *testing.T) {
-	t.Setenv("MAGPIE_ADDR", "")
+	t.Setenv("BLACKPIE_ADDR", "")
 	_, read := codexHome(t, "", "model = \"gpt-5.5\"\n")
 	var as []*Agent
 	for _, a := range All() {
@@ -109,7 +109,7 @@ func TestRekeyLeavesLoopback(t *testing.T) {
 	if moved, err := Rekey(as); err != nil || len(moved) != 0 {
 		t.Fatalf("moved %v, %v", moved, err)
 	}
-	if cfg := read(); strings.Contains(cfg, "magpie") {
+	if cfg := read(); strings.Contains(cfg, "blackpie") {
 		t.Fatalf("written:\n%s", cfg)
 	}
 }

@@ -6,20 +6,20 @@ import (
 	"net/http"
 	"slices"
 
-	"github.com/yetone/magpie/internal/access"
-	"github.com/yetone/magpie/internal/gwmw"
-	"github.com/yetone/magpie/internal/middleware"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/access"
+	"github.com/hmjz100/blackpie/internal/gwmw"
+	"github.com/hmjz100/blackpie/internal/middleware"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // serveAgent is serve for a request an agent sent: the agent middleware
 // of the gateway's middleware point (gwmw.Agents: the JS gateway middleware
 // plugins, internal/middleware, while plugins/middleware is on) see its
 // body first, and its reply on the way back, in the agent's own API.
-// magpie's own requests through serve (titles, the router's classifier,
+// blackpie's own requests through serve (titles, the router's classifier,
 // search and vision stand-ins) go without them, as their replies are
-// magpie's to read.
+// blackpie's to read.
 func (s *Server) serveAgent(w http.ResponseWriter, r *http.Request, from provider.Protocol, body []byte) {
 	withGatewaySession(w, r)
 	// the agent's own turn, which the user's model for requests masking
@@ -47,7 +47,7 @@ func (s *Server) serveAgent(w http.ResponseWriter, r *http.Request, from provide
 	var runs mwRuns
 	for _, a := range agents {
 		// the user's middleware runs before a route is begun: a wait
-		// magpie knows of (unrouted.go)
+		// blackpie knows of (unrouted.go)
 		waited := noteWait(r.Context())
 		run := a.Begin(info)
 		if run == nil {
@@ -125,9 +125,9 @@ func accountSkipped(ctx context.Context, p provider.Provider, model string) (by 
 	return ""
 }
 
-// ownAsk is ctx for a request magpie asks of its own gateway while it
+// ownAsk is ctx for a request blackpie asks of its own gateway while it
 // serves an agent's (a web search, an image's description): the agent's
-// middleware isn't run on it, as on magpie's other own requests. Its
+// middleware isn't run on it, as on blackpie's other own requests. Its
 // runtimes are the agent request's, which one goroutine may use at a time
 // (moejs), and Run has no lock to hold callers to it, while these asks go
 // beside the request and each other: images described at once ran
@@ -136,7 +136,7 @@ func accountSkipped(ctx context.Context, p provider.Provider, model string) (by 
 // description's body is Chat and a search's Anthropic, whatever
 // ctx.protocol names, and ctx.model and ctx.stream are the agent's. Nor
 // is it the agent's turn, which a model set for requests masking would
-// change takes (maskRouteFor): it is masked as magpie's own asks are.
+// change takes (maskRouteFor): it is masked as blackpie's own asks are.
 func ownAsk(ctx context.Context) context.Context {
 	return context.WithValue(context.WithValue(ctx, triedKey{}, mwRuns{}), agentTurnKey{}, false)
 }
@@ -159,7 +159,7 @@ func gatewayHooks(w http.ResponseWriter, r *http.Request, from provider.Protocol
 		info.Cwd = workDir(req)
 		info.Query = gatewayQuery(req)
 	}
-	// the plugin host, started for it if need be: a wait magpie knows of
+	// the plugin host, started for it if need be: a wait blackpie knows of
 	// before a route is begun (unrouted.go)
 	waited := noteWait(r.Context())
 	run := plugin.GatewayBegin(r.Context(), body, info)
@@ -190,8 +190,8 @@ func gatewayQuery(req *Request) string {
 // Forwarded traffic remains remote even when the administrator trusts its
 // proxy for authentication: that trust does not establish conversation ownership.
 //
-// The sharing key magpie made itself is "magpie-key" only when it comes
-// from this computer (ownComputer): that is where magpie writes it into
+// The sharing key blackpie made itself is "blackpie-key" only when it comes
+// from this computer (ownComputer): that is where blackpie writes it into
 // the owner's own agents. The same key is listed under Gateway keys with
 // a Copy button and offered to connect other computers, so it can be in a
 // friend's hands too, and from anywhere else it stays "gateway-key", as
@@ -201,7 +201,7 @@ func gatewayQuery(req *Request) string {
 // (plugins#526). Plugins that trust only "local" see both as not local.
 func gatewayOrigin(r *http.Request) string {
 	if who := access.Caller(r.Context()); who.KeyID != "" && who.Default && ownComputer(r) {
-		return "magpie-key"
+		return "blackpie-key"
 	} else if who.KeyID != "" || managedKey(r) {
 		return "gateway-key"
 	}
@@ -215,13 +215,13 @@ func forwarded(r *http.Request) bool {
 	return slices.ContainsFunc(forwardHeaders, func(h string) bool { return r.Header.Get(h) != "" })
 }
 
-// ownComputer: r's connection was made on this computer, where magpie
+// ownComputer: r's connection was made on this computer, where blackpie
 // writes the sharing key into agents (agent.keyAt): loopback (a WSL
 // distro on the WSL network is mapped to it by lanGuard), one of this
-// computer's own addresses (an agent calling MAGPIE_ADDR beyond loopback),
+// computer's own addresses (an agent calling BLACKPIE_ADDR beyond loopback),
 // or a WSL distro's address under NAT calling this computer's network
 // address. Never a request with forwarding headers, a trusted proxy's
-// included, nor one through magpie web's page port.
+// included, nor one through blackpie web's page port.
 func ownComputer(r *http.Request) bool {
 	if forwarded(r) || viaPagePort(r) {
 		return false

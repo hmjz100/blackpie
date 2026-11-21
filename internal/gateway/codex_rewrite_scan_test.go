@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // The rewrites a Codex request goes through on its way (#1532, #2354):
@@ -63,11 +63,11 @@ var codexRewrites = func() []codexRewrite {
 		}},
 		{"forVendor", func(b []byte) []byte { return forVendor(relay, b, false) }, func(b []byte) []byte { return wasForVendor(relay, b) }},
 	}
-	for _, magpie := range []bool{false, true} {
+	for _, blackpie := range []bool{false, true} {
 		for _, native := range []bool{false, true} {
-			rs = append(rs, codexRewrite{fmt.Sprintf("codexInputAs(%v,%v)", magpie, native),
-				func(b []byte) []byte { b, c := codexInputAs(b, magpie, native); return append(b, fmt.Sprint(c)...) },
-				func(b []byte) []byte { b, c := wasCodexInputAs(b, magpie, native); return append(b, fmt.Sprint(c)...) }})
+			rs = append(rs, codexRewrite{fmt.Sprintf("codexInputAs(%v,%v)", blackpie, native),
+				func(b []byte) []byte { b, c := codexInputAs(b, blackpie, native); return append(b, fmt.Sprint(c)...) },
+				func(b []byte) []byte { b, c := wasCodexInputAs(b, blackpie, native); return append(b, fmt.Sprint(c)...) }})
 		}
 	}
 	return rs
@@ -149,11 +149,11 @@ var codexMarks = []func(it map[string]any){
 	func(it map[string]any) { it["type"] = "reasoning"; it["content"] = map[string]any{} },
 	func(it map[string]any) {
 		it["type"] = "compaction"
-		it["encrypted_content"] = magpieCompaction + base64.StdEncoding.EncodeToString([]byte("sum"))
+		it["encrypted_content"] = blackpieCompaction + base64.StdEncoding.EncodeToString([]byte("sum"))
 	},
 	func(it map[string]any) {
 		it["type"] = "compaction_summary"
-		it["encrypted_content"] = magpieCompaction + "!!"
+		it["encrypted_content"] = blackpieCompaction + "!!"
 	},
 	func(it map[string]any) { it["type"] = "compaction"; it["encrypted_content"] = "gAAAA" },
 	func(it map[string]any) { it["type"] = "compaction_trigger" },
@@ -288,7 +288,7 @@ func wasWithModel(body []byte, model string) []byte {
 	return b
 }
 
-func wasCodexInputAs(body []byte, magpieModel, native bool) (_ []byte, compact bool) {
+func wasCodexInputAs(body []byte, blackpieModel, native bool) (_ []byte, compact bool) {
 	var q map[string]json.RawMessage
 	if json.Unmarshal(body, &q) != nil {
 		return body, false
@@ -303,7 +303,7 @@ func wasCodexInputAs(body []byte, magpieModel, native bool) (_ []byte, compact b
 		switch it["type"] {
 		case "compaction", "compaction_summary":
 			enc, _ := it["encrypted_content"].(string)
-			sum, ok := strings.CutPrefix(enc, magpieCompaction)
+			sum, ok := strings.CutPrefix(enc, blackpieCompaction)
 			if !ok {
 				out = append(out, it) // OpenAI's own, for OpenAI
 				continue
@@ -313,7 +313,7 @@ func wasCodexInputAs(body []byte, magpieModel, native bool) (_ []byte, compact b
 				out = append(out, userMessage(codexSummaryPrefix+"\n"+string(b)))
 			}
 		case "compaction_trigger":
-			if !magpieModel || native {
+			if !blackpieModel || native {
 				out = append(out, it)
 				continue
 			}
@@ -322,7 +322,7 @@ func wasCodexInputAs(body []byte, magpieModel, native bool) (_ []byte, compact b
 		case "reasoning":
 			// OpenAI accepts no reasoning content parts in replayed input.
 			// Drop the item so its encrypted_content cannot fail there too.
-			if !magpieModel {
+			if !blackpieModel {
 				if content, present := it["content"]; present && content != nil {
 					parts, ok := content.([]any)
 					if !ok || len(parts) > 0 {

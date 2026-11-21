@@ -64,7 +64,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout moepie source code
+      - name: Checkout blackpie source code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           ref: ${{ needs.prepare.outputs.sha }}
@@ -115,34 +115,34 @@ jobs:
           echo "Signing as: $IDENTITY"
           echo "IDENTITY=$IDENTITY" >> $GITHUB_ENV
 
-      - name: Build moepie.app
+      - name: Build blackpie.app
         run: make app VERSION="$VERSION"
 
-      - name: Sign moepie.app
+      - name: Sign blackpie.app
         run: |
           if [ -n "$IDENTITY" ]; then
-            codesign --force --options runtime --timestamp --sign "$IDENTITY" moepie.app
+            codesign --force --options runtime --timestamp --sign "$IDENTITY" blackpie.app
           else
-            codesign --force --sign - moepie.app
+            codesign --force --sign - blackpie.app
           fi
-          codesign --verify --strict --verbose=2 moepie.app
-          codesign -dv --verbose=2 moepie.app 2>&1 | grep -E 'Authority|TeamIdentifier|flags|Identifier'
+          codesign --verify --strict --verbose=2 blackpie.app
+          codesign -dv --verbose=2 blackpie.app 2>&1 | grep -E 'Authority|TeamIdentifier|flags|Identifier'
 
       - name: Build dmg
         run: |
-          DMG=moepie-darwin-${{ matrix.arch }}.dmg
+          DMG=blackpie-darwin-${{ matrix.arch }}.dmg
           mkdir -p $RUNNER_TEMP/dmg
-          cp -R moepie.app $RUNNER_TEMP/dmg/
+          cp -R blackpie.app $RUNNER_TEMP/dmg/
           ln -s /Applications $RUNNER_TEMP/dmg/Applications
           # The Intel runners' hdiutil fails now and then with "create
           # failed - Resource busy" while something still holds the image
-          # it makes; the release was lost each time (yetone/magpie#1846).
+          # it makes; the release was lost each time (hmjz100/blackpie#1846).
           # The image's size is given, not left to hdiutil's guess from the
           # folder: on the Intel runners the guess came out short and every
           # try failed "No space left on device" copying the app in.
           SIZE=$(( $(du -sm $RUNNER_TEMP/dmg | cut -f1) * 5 / 4 + 32 ))m
           for try in 1 2 3 4 5; do
-            hdiutil create -volname moepie -srcfolder $RUNNER_TEMP/dmg -size $SIZE -ov -format UDZO "$DMG" && break
+            hdiutil create -volname blackpie -srcfolder $RUNNER_TEMP/dmg -size $SIZE -ov -format UDZO "$DMG" && break
             [ "$try" = 5 ] && exit 1
             echo "hdiutil create failed (try $try), trying again"
             rm -f "$DMG"
@@ -199,19 +199,19 @@ jobs:
             stapled=0
           }
           staple "$DMG"
-          staple moepie.app
+          staple blackpie.app
           if [ "$stapled" = 1 ]; then
-            spctl --assess --type execute --verbose=2 moepie.app
+            spctl --assess --type execute --verbose=2 blackpie.app
             spctl --assess --type open --context context:primary-signature --verbose=2 "$DMG"
           else
             # spctl would ask the same unreachable service; the signature is
             # still checked, offline
-            codesign --verify --deep --strict --verbose=2 moepie.app
+            codesign --verify --deep --strict --verbose=2 blackpie.app
             codesign --verify --strict --verbose=2 "$DMG"
           fi
 
-      - name: Zip moepie.app
-        run: ditto -c -k --keepParent moepie.app moepie-darwin-${{ matrix.arch }}.zip
+      - name: Zip blackpie.app
+        run: ditto -c -k --keepParent blackpie.app blackpie-darwin-${{ matrix.arch }}.zip
 
       - name: Remove signing keychain
         if: always() && steps.signing.outputs.enabled == 'true'
@@ -222,11 +222,11 @@ jobs:
         with:
           name: build-darwin-${{ matrix.arch }}
           path: |
-            moepie-darwin-*.dmg
-            moepie-darwin-*.zip
+            blackpie-darwin-*.dmg
+            blackpie-darwin-*.zip
           if-no-files-found: error
 
-  # The terminal-only moepie (no GUI, no cgo) and the Windows app (WebView2,
+  # The terminal-only blackpie (no GUI, no cgo) and the Windows app (WebView2,
   # no cgo either) cross-compile from one runner.
   cli:
     needs: prepare
@@ -236,7 +236,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout moepie source code
+      - name: Checkout blackpie source code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           ref: ${{ needs.prepare.outputs.sha }}
@@ -255,8 +255,8 @@ jobs:
         with:
           name: build-cli
           path: |
-            dist/moepie-cli-*
-            dist/moepie-windows-*.exe
+            dist/blackpie-cli-*
+            dist/blackpie-windows-*.exe
           if-no-files-found: error
 
   # Launch the Windows app for real: it has to come up and serve the gateway.
@@ -281,28 +281,28 @@ jobs:
           name: build-cli
           path: dist
 
-      - name: Launch moepie
+      - name: Launch blackpie
         shell: pwsh
         run: |
-          $env:MAGPIE_UPDATE_FEED = "http://127.0.0.1:9/"
-          $exe = "dist\moepie-windows-${{ matrix.arch }}.exe"
+          $env:BLACKPIE_UPDATE_FEED = "http://127.0.0.1:9/"
+          $exe = "dist\blackpie-windows-${{ matrix.arch }}.exe"
           $v = (& $exe --version | Out-String).Trim()
           Write-Output $v
-          if ($v -notlike "moepie $env:VERSION*") { throw "unexpected version: $v" }
-          $log = "$env:RUNNER_TEMP\moepie"
+          if ($v -notlike "blackpie $env:VERSION*") { throw "unexpected version: $v" }
+          $log = "$env:RUNNER_TEMP\blackpie"
           $p = Start-Process -FilePath $exe -ArgumentList app -PassThru -RedirectStandardOutput "$log.out" -RedirectStandardError "$log.err"
           function Fail($why) { Get-Content "$log.out", "$log.err" -ErrorAction SilentlyContinue; throw $why }
           $ok = $false
           foreach ($i in 1..30) {
             Start-Sleep -Seconds 2
-            if ($p.HasExited) { Fail "moepie exited with $($p.ExitCode)" }
+            if ($p.HasExited) { Fail "blackpie exited with $($p.ExitCode)" }
             try { Invoke-WebRequest http://127.0.0.1:3425/v1/models -UseBasicParsing | Out-Null; $ok = $true; break } catch {}
           }
           if (-not $ok) { Fail "the gateway never answered" }
           Start-Sleep -Seconds 5
-          if ($p.HasExited) { Fail "moepie exited with $($p.ExitCode)" }
+          if ($p.HasExited) { Fail "blackpie exited with $($p.ExitCode)" }
           Stop-Process -Id $p.Id
-          Write-Output "moepie ran and served the gateway"
+          Write-Output "blackpie ran and served the gateway"
 
   # The Linux app links GTK 3 and WebKitGTK 4.1, so each arch builds on its
   # own runner. Ubuntu 22.04 keeps the glibc requirement low.
@@ -322,7 +322,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout moepie source code
+      - name: Checkout blackpie source code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           ref: ${{ needs.prepare.outputs.sha }}
@@ -341,30 +341,30 @@ jobs:
       - name: Build
         run: make release-linux VERSION="$VERSION"
 
-      - name: Launch moepie
+      - name: Launch blackpie
         run: |
-          BIN=dist/moepie-linux-${{ matrix.arch }}
-          $BIN --version | grep -F "moepie $VERSION"
-          export XDG_CONFIG_HOME="$RUNNER_TEMP/moepie-config"
+          BIN=dist/blackpie-linux-${{ matrix.arch }}
+          $BIN --version | grep -F "blackpie $VERSION"
+          export XDG_CONFIG_HOME="$RUNNER_TEMP/blackpie-config"
           # no update: a release published while this one builds is newer,
           # and the app would download it beside itself as $BIN.new, which
-          # went out as v0.1.1611's moepie-linux-amd64.new (15.8MB of 1612)
-          export MAGPIE_UPDATE_FEED=http://127.0.0.1:9/
-          xvfb-run -a dbus-launch --exit-with-session $BIN app > $RUNNER_TEMP/moepie.log 2>&1 &
+          # went out as v0.1.1611's blackpie-linux-amd64.new (15.8MB of 1612)
+          export BLACKPIE_UPDATE_FEED=http://127.0.0.1:9/
+          xvfb-run -a dbus-launch --exit-with-session $BIN app > $RUNNER_TEMP/blackpie.log 2>&1 &
           for i in $(seq 30); do
             sleep 2
             curl -fs -o /dev/null http://127.0.0.1:3425/v1/models && break
           done
           sleep 5
-          curl -fs -o /dev/null http://127.0.0.1:3425/v1/models || { cat $RUNNER_TEMP/moepie.log; echo "::error::moepie did not come up"; exit 1; }
+          curl -fs -o /dev/null http://127.0.0.1:3425/v1/models || { cat $RUNNER_TEMP/blackpie.log; echo "::error::blackpie did not come up"; exit 1; }
           pkill -f "$BIN" || true
-          echo "moepie ran and served the gateway"
+          echo "blackpie ran and served the gateway"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: build-linux-${{ matrix.arch }}
-          path: dist/moepie-linux-${{ matrix.arch }}
+          path: dist/blackpie-linux-${{ matrix.arch }}
           if-no-files-found: error
   publish:
     needs: [prepare, mac, cli, windows-check, linux]

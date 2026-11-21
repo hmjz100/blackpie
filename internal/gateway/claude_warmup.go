@@ -10,10 +10,10 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/yetone/magpie/internal/claudetui"
-	"github.com/yetone/magpie/internal/netproxy"
-	"github.com/yetone/magpie/internal/proc"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/claudetui"
+	"github.com/hmjz100/blackpie/internal/netproxy"
+	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // claudeProxy is the proxy a Claude Code run on an account's behalf goes
@@ -46,7 +46,7 @@ func askClaude(ctx context.Context, configDir, model string) error {
 	if claudeTUIOnly() {
 		return askClaudeTUI(ctx, binary, configDir, model)
 	}
-	tmp, err := os.MkdirTemp("", "magpie-claude-")
+	tmp, err := os.MkdirTemp("", "blackpie-claude-")
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func askClaudeTUI(ctx context.Context, binary claudeCLI, configDir, model string
 			return claudeOnlyErr("Windows can't read " + dir + ", where Claude Code in WSL writes its transcripts")
 		}
 	}
-	tmp, err := os.MkdirTemp("", "magpie-claude-")
+	tmp, err := os.MkdirTemp("", "blackpie-claude-")
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func askClaudeTUI(ctx context.Context, binary claudeCLI, configDir, model string
 	if err != nil {
 		return err
 	}
-	// the folder is magpie's own: asked whether to trust it, say yes
+	// the folder is blackpie's own: asked whether to trust it, say yes
 	env = append(env, claudetui.TrustEnv+"=1")
 	cmd.Env = binary.tuiEnv(binary.env(binary.asRoot(env), configDir), configDir)
 	stdin, err := cmd.StdinPipe()
@@ -177,7 +177,7 @@ func claudeUsage(ctx context.Context, configDir string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	tmp, err := os.MkdirTemp("", "magpie-claude-")
+	tmp, err := os.MkdirTemp("", "blackpie-claude-")
 	if err != nil {
 		return "", err
 	}
@@ -225,10 +225,10 @@ func claudeUsage(ctx context.Context, configDir string) (string, error) {
 
 // runClaudeTree runs a one-off Claude Code (a test, a /usage) and ends,
 // with it, whatever it started: its context ending kills only the
-// process magpie started, and on Windows that is cmd.exe running npm's
+// process blackpie started, and on Windows that is cmd.exe running npm's
 // claude.cmd, whose node went on running with nobody waiting for it
 // (#1894). In a tree, a job on Windows and a session elsewhere, what is
-// left once the head is gone is ended with it, and on Windows when magpie
+// left once the head is gone is ended with it, and on Windows when blackpie
 // exits mid-run.
 func runClaudeTree(ctx context.Context, cmd *exec.Cmd, what string) error {
 	room, err := claudeRoom.take(ctx, what)

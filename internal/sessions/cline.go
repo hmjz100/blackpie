@@ -2,13 +2,13 @@ package sessions
 
 import (
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/appdir"
 )
 
 // Cline's CLI (3, on the Cline SDK) keeps a session in a folder of its own

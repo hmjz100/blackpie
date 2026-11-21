@@ -1,13 +1,13 @@
 // Run with Node's test runner and Playwright on the module path; see README.md.
 // penershu on X (v0.1.2123): with two agents sending at once through one
-// group, the Routing stage's magpies were drawn over the cards — one over
+// group, the Routing stage's blackpies were drawn over the cards — one over
 // the hub's "127.0.0.1:3425", its request's dot beside it, another over a
 // member's row — and the row smart routing's intent picked ran its long
-// intent off the row's right edge, its name squeezed out. The magpies fly
+// intent off the row's right edge, its name squeezed out. The blackpies fly
 // under the cards now: nothing in the sky covers a card's words, a dot held
-// at its seat or waiting at magpie sits whole beside the card, and a long
+// at its seat or waiting at blackpie sits whole beside the card, and a long
 // intent is cut short on its row, read whole in its tooltip, the name kept.
-// Three agents at once (one still waiting at magpie), at a wide window (the
+// Three agents at once (one still waiting at blackpie), at a wide window (the
 // reporter's, where a row says it on its name's line), at 1100px, at the
 // narrow stage and at a phone's width, in every language, both engines.
 const assert = require("node:assert/strict");
@@ -35,7 +35,7 @@ const order = () => [{ id: "b", provider: "b", name: "B", kind: "account", model
 const group = { id: "jd", name: "jd-auto-balanced", members: ["a/fast", "b/opus"] };
 const at = (ms) => new Date(now - ms).toISOString();
 // claude's request is with b (the intent's pick), codex's with a, and
-// kimi's waits at magpie for routing to pick
+// kimi's waits at blackpie for routing to pick
 const routes = () => [
   { id: 7, seq: 7, time: at(3000), agent: "claude", model: "group/jd", provider: "b", tokens: 9000, group, order: order(),
     tries: [{ id: "b", model: "opus", start: at(2500) }], done: false,
@@ -126,7 +126,7 @@ const intentRow = (intent) => {
 for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium", "webkit"])) {
   for (const lang of ["en", "zh", "zh-TW", "ja", "de"]) {
     for (const width of [1600, 1100, 560, 390]) {
-      test(`${engine} ${lang} ${width}px: three agents at once, the magpies fly under the cards and a long intent stays in its row`, async (t) => {
+      test(`${engine} ${lang} ${width}px: three agents at once, the blackpies fly under the cards and a long intent stays in its row`, async (t) => {
         const browser = await (engine === "webkit" ? webkit.launch() : chromium.launch({ channel: "chromium" }));
         const page = await (await browser.newContext({ viewport: { width, height: 1000 } })).newPage();
         page.setDefaultTimeout(8000);
@@ -141,14 +141,14 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
           await browser.close();
         });
         await page.route("**/*", serve(lang));
-        await page.goto("http://magpie.test/?view=routing");
+        await page.goto("http://blackpie.test/?view=routing");
         // the two requests routing picked for are held at their seats, the
-        // third's dot waits at magpie
+        // third's dot waits at blackpie
         await page.waitForFunction(() => document.querySelectorAll(".rt-sky .pkt.held").length === 2);
         await page.waitForFunction(() => document.querySelectorAll(".rt-sky .pkt:not([visibility])").length === 3);
-        await page.waitForTimeout(900); // the third's flight to magpie lands
-        // no magpie carries it here (its pulses fly bare dots): the waiting
-        // request's own dot stays with it at magpie, the card nearest it
+        await page.waitForTimeout(900); // the third's flight to blackpie lands
+        // no blackpie carries it here (its pulses fly bare dots): the waiting
+        // request's own dot stays with it at blackpie, the card nearest it
         const waiting = await page.evaluate(() => {
           const cards = [...document.querySelectorAll(".rt-stage .rt-node, .rt-accts li:not(.rt-gap)")];
           return [...document.querySelectorAll(".rt-sky .pkt:not(.held)")].filter((d) => d.getAttribute("visibility") !== "hidden").map((d) => {
@@ -157,7 +157,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
             return cards.reduce((a, e) => (far(e) < far(a) ? e : a)).classList.contains("rt-hub");
           });
         });
-        assert.deepEqual(waiting, [true], "the waiting request's dot stays with it at magpie");
+        assert.deepEqual(waiting, [true], "the waiting request's dot stays with it at blackpie");
 
         assert.deepEqual(await page.evaluate(covered), [], "nothing in the sky may be drawn over a card's words");
         const ds = await page.evaluate(dots);

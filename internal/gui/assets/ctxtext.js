@@ -43,7 +43,7 @@ function picture(src) {
   img.alt = t("Image");
   img.decoding = "async";
   img.onload = () => fig.classList.add("in");
-  img.onerror = () => fig.replaceWith(el("div", "ctx-piece-note", t("An image: magpie doesn't show it here")));
+  img.onerror = () => fig.replaceWith(el("div", "ctx-piece-note", t("An image: blackpie doesn't show it here")));
   img.src = src;
   fig.append(img);
   fig.onclick = (e) => {
@@ -68,7 +68,7 @@ function pieceView(pc) {
   if (pc.text) head.append(copyBtn(pc.text, pc.name || t(ROLE_NAMES[pc.role] || "Text")));
   box.append(head);
   if (pc.role === "image" && pc.src) box.append(picture(pc.src));
-  else if (pc.role === "image") box.append(el("div", "ctx-piece-note", t("An image: magpie doesn't show it here")));
+  else if (pc.role === "image") box.append(el("div", "ctx-piece-note", t("An image: blackpie doesn't show it here")));
   else if (pc.role === "sealed") box.append(el("div", "ctx-piece-note", t("Sealed by the vendor, {n} bytes: only the vendor can read it", { n: (pc.size || 0).toLocaleString(intlLang()) })));
   else {
     if (pc.size) box.append(el("div", "ctx-piece-note", t("Sealed by the vendor, {n} bytes: only the vendor can read it", { n: pc.size.toLocaleString(intlLang()) })));
@@ -95,14 +95,14 @@ export async function open(kit, id, kind, pick) {
   confirmAsk = ed;
   openModal(ed);
   $("#modal").classList.add("lib");
-  const gone = (n) => el("p", "ctx-view-gone", t("This request's text is no longer kept: magpie keeps the text of the last {n} requests, in memory only, while it runs.", { n }));
+  const gone = (n) => el("p", "ctx-view-gone", t("This request's text is no longer kept: blackpie keeps the text of the last {n} requests, in memory only, while it runs.", { n }));
   let list;
   try { list = await readText(id, kind); } catch (err) { body.replaceChildren(el("p", "ctx-view-gone", err.message)); return; }
   if (confirmAsk !== ed) return;
   if (!list) return body.replaceChildren(gone(10));
   const items = list.items || [];
   total.textContent = fmtK(items.reduce((s, it) => s + it.tokens, 0)) + " " + t("tokens");
-  const note = el("p", "ctx-view-note", t("As magpie sent it, masked where masking is on. Kept in memory for the last {n} requests only.", { n: list.kept }));
+  const note = el("p", "ctx-view-note", t("As blackpie sent it, masked where masking is on. Kept in memory for the last {n} requests only.", { n: list.kept }));
   // an item: its text alone; "N more" or the earlier turns: the part's list
   const at = pick && pick.tag !== "more" && pick.tag !== "turns"
     ? items.findIndex((it) => it.name === pick.name && (it.tag || "") === (pick.tag || "")) : -1;

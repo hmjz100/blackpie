@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 const grokBalanceOut402 = `{"error":{"message":"Grok: Grok Build usage balance exhausted"}}`

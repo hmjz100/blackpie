@@ -9,26 +9,26 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/daemon"
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/gui"
+	"github.com/hmjz100/blackpie/internal/daemon"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/gui"
 )
 
-const daemonUsage = "usage: magpie daemon [install|uninstall|start|stop|restart|status] · magpie daemon install [--web] [--lan] [--addr host:port] [--no-web] [--tls-cert <file> --tls-key <file>|--no-tls] · magpie daemon web [on|off] [--lan] [--addr host:port]"
+const daemonUsage = "usage: blackpie daemon [install|uninstall|start|stop|restart|status] · blackpie daemon install [--web] [--lan] [--addr host:port] [--no-web] [--tls-cert <file> --tls-key <file>|--no-tls] · blackpie daemon web [on|off] [--lan] [--addr host:port]"
 
 // daemonWait is how long install, start and restart wait for the gateway
 // to answer before saying where its log is; a var for the tests.
 var daemonWait = 5 * time.Second
 
 // daemonWeb is what a daemon command says of the page the service serves
-// beside the gateway (`magpie serve --web`, HuanCheng on Discord).
+// beside the gateway (`blackpie serve --web`, HuanCheng on Discord).
 type daemonWeb struct {
 	set  bool   // the command says whether it is served; not set, it stays as it is
 	on   bool   // served
 	addr string // where, "" for the default
 }
 
-// parseDaemon reads magpie daemon's arguments: the command, and what it
+// parseDaemon reads blackpie daemon's arguments: the command, and what it
 // says of the page.
 func parseDaemon(args []string) (cmd string, w daemonWeb, err error) {
 	cmd = "status"
@@ -65,24 +65,24 @@ func parseDaemon(args []string) (cmd string, w daemonWeb, err error) {
 		case strings.HasPrefix(a, "--addr="):
 			w.addr = strings.TrimPrefix(a, "--addr=")
 		default:
-			return "", w, fmt.Errorf("magpie daemon %s: unknown %q · %s", cmd, a, daemonUsage)
+			return "", w, fmt.Errorf("blackpie daemon %s: unknown %q · %s", cmd, a, daemonUsage)
 		}
 	}
 	if w.addr != "" {
 		if _, _, err := net.SplitHostPort(w.addr); err != nil {
-			return "", w, fmt.Errorf("magpie daemon %s: --addr %s isn't host:port", cmd, w.addr)
+			return "", w, fmt.Errorf("blackpie daemon %s: --addr %s isn't host:port", cmd, w.addr)
 		}
 	}
 	// --lan and --addr say where the page is: it is served
 	if lan || w.addr != "" {
 		if cmd == "web" && w.set && !w.on || off {
-			return "", w, fmt.Errorf("magpie daemon %s: --lan and --addr are for a page that is served", cmd)
+			return "", w, fmt.Errorf("blackpie daemon %s: --lan and --addr are for a page that is served", cmd)
 		}
 		w.set, w.on = true, true
 	}
 	if off {
 		if w.on {
-			return "", w, errors.New("magpie daemon install: --web and --no-web both")
+			return "", w, errors.New("blackpie daemon install: --web and --no-web both")
 		}
 		w.set = true
 	}
@@ -98,7 +98,7 @@ func parseDaemon(args []string) (cmd string, w daemonWeb, err error) {
 
 // webOptions is what the service is to serve: what w asks, or what it
 // serves now (prevAddr, prevKey) when w says nothing. The page keeps its
-// key across installs, so a browser stays signed in: MAGPIE_WEB_KEY
+// key across installs, so a browser stays signed in: BLACKPIE_WEB_KEY
 // (envKey) when set, else the key the service has, else a new one.
 func webOptions(w daemonWeb, prevAddr, prevKey, envKey string) (daemon.Options, error) {
 	if !w.set {
@@ -120,11 +120,11 @@ func webOptions(w daemonWeb, prevAddr, prevKey, envKey string) (daemon.Options, 
 	return daemon.Options{Web: w.addr, Key: key}, nil
 }
 
-// magpie daemon …: `magpie serve` as a service of the user's, started at
+// blackpie daemon …: `blackpie serve` as a service of the user's, started at
 // boot or login and again when it stops (systemd --user, launchd).
 func daemonCmd(args []string) error {
 	// install takes the gateway's TLS files, written into the service as
-	// MAGPIE_TLS_CERT and MAGPIE_TLS_KEY (daemon.carried); a pair that
+	// BLACKPIE_TLS_CERT and BLACKPIE_TLS_KEY (daemon.carried); a pair that
 	// doesn't load is refused before anything is written. --no-tls takes
 	// the service's away.
 	noTLS := false
@@ -142,7 +142,7 @@ func daemonCmd(args []string) error {
 			return err
 		}
 		if noTLS && gateway.TLSOn() {
-			return errors.New("magpie daemon install: --no-tls and a certificate both")
+			return errors.New("blackpie daemon install: --no-tls and a certificate both")
 		}
 		args = append([]string{"install"}, rest...)
 	}
@@ -163,7 +163,7 @@ func daemonCmd(args []string) error {
 			return daemonWebStatus()
 		}
 		if st, _ := daemon.Get(); !st.Installed && !web.on {
-			fmt.Println("the magpie service isn't installed ·", muted.Render("magpie daemon install"))
+			fmt.Println("the blackpie service isn't installed ·", muted.Render("blackpie daemon install"))
 			return nil
 		}
 		err = daemonInstall(web)
@@ -171,7 +171,7 @@ func daemonCmd(args []string) error {
 		if err := daemon.Uninstall(); err != nil {
 			return err
 		}
-		fmt.Println(green.Render("✓"), "the magpie service is removed")
+		fmt.Println(green.Render("✓"), "the blackpie service is removed")
 		return nil
 	case "start":
 		err = daemon.Start()
@@ -179,7 +179,7 @@ func daemonCmd(args []string) error {
 		if err := daemon.Stop(); err != nil {
 			return err
 		}
-		fmt.Println(green.Render("✓"), "the magpie service is stopped")
+		fmt.Println(green.Render("✓"), "the blackpie service is stopped")
 		return nil
 	case "restart":
 		err = daemon.Restart()
@@ -192,7 +192,7 @@ func daemonCmd(args []string) error {
 	st, _ := daemon.Get()
 	switch cmd {
 	case "install", "web":
-		fmt.Println(green.Render("✓"), "magpie serves the gateway as a service, from boot or login, started again when it stops")
+		fmt.Println(green.Render("✓"), "blackpie serves the gateway as a service, from boot or login, started again when it stops")
 		fmt.Println(muted.Render("  file   "), st.File)
 		if c, _ := gateway.TLSFiles(); c != "" && gateway.TLSOn() {
 			fmt.Println(muted.Render("  TLS    "), c, muted.Render("· https:// from other computers"))
@@ -206,10 +206,10 @@ func daemonCmd(args []string) error {
 			fmt.Println(amber.Render("!"), a)
 		}
 		if daemon.Node() == "" {
-			fmt.Println(amber.Render("!"), "no node on the service's PATH: plugins, and the MCP servers they start, need Node.js; install it, then run `magpie daemon install` again")
+			fmt.Println(amber.Render("!"), "no node on the service's PATH: plugins, and the MCP servers they start, need Node.js; install it, then run `blackpie daemon install` again")
 		}
 	default:
-		fmt.Println(green.Render("✓"), "the magpie service is "+cmd+"ed")
+		fmt.Println(green.Render("✓"), "the blackpie service is "+cmd+"ed")
 	}
 	deadline := time.Now().Add(daemonWait)
 	for {
@@ -247,7 +247,7 @@ func keepTLS(noTLS bool) {
 // daemonInstall installs the service, serving the page as w says.
 func daemonInstall(w daemonWeb) error {
 	a, k := daemon.Web()
-	o, err := webOptions(w, a, k, os.Getenv("MAGPIE_WEB_KEY"))
+	o, err := webOptions(w, a, k, os.Getenv("BLACKPIE_WEB_KEY"))
 	if err != nil {
 		return err
 	}
@@ -270,19 +270,19 @@ func printDaemonWeb(addr, key string) {
 	}
 }
 
-// daemonWebStatus: magpie daemon web — the page the service serves.
+// daemonWebStatus: blackpie daemon web — the page the service serves.
 func daemonWebStatus() error {
 	st, err := daemon.Get()
 	if err != nil {
 		return err
 	}
 	if !st.Installed {
-		fmt.Println("the magpie service isn't installed ·", muted.Render("magpie daemon install --web"))
+		fmt.Println("the blackpie service isn't installed ·", muted.Render("blackpie daemon install --web"))
 		return nil
 	}
 	a, k := daemon.Web()
 	if a == "" {
-		fmt.Println("the magpie service serves no page ·", muted.Render("magpie daemon web on"))
+		fmt.Println("the blackpie service serves no page ·", muted.Render("blackpie daemon web on"))
 		return nil
 	}
 	printDaemonWeb(a, k)
@@ -296,9 +296,9 @@ func daemonStatus() error {
 	}
 	served := gateway.ServedBy()
 	if !st.Installed {
-		fmt.Println("the magpie service isn't installed ·", muted.Render("magpie daemon install"))
+		fmt.Println("the blackpie service isn't installed ·", muted.Render("blackpie daemon install"))
 		if served.Running {
-			fmt.Println(muted.Render("  another magpie (the app, magpie serve) answers on"), gateway.URL())
+			fmt.Println(muted.Render("  another blackpie (the app, blackpie serve) answers on"), gateway.URL())
 		}
 		return nil
 	}
@@ -306,7 +306,7 @@ func daemonStatus() error {
 	if st.Running {
 		mark, word = green.Render("●"), "running"
 	}
-	line := "the magpie service is " + word
+	line := "the blackpie service is " + word
 	if st.PID > 0 {
 		line += " · pid " + strconv.Itoa(st.PID)
 	}

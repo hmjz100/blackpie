@@ -22,13 +22,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/agent"
-	"github.com/yetone/magpie/internal/filememo"
-	"github.com/yetone/magpie/internal/proc"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/sessions"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/proc"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/sessions"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 // statsAnswer encodes a stats snapshot one day at a time, with exactly the
@@ -107,13 +107,13 @@ type sessionJSON struct {
 	Name string `json:"name"`
 	Icon string `json:"icon"`
 	// Via: the models the gateway sent its calls to, at the reasoning
-	// each was asked for, when it went through magpie
+	// each was asked for, when it went through blackpie
 	Via []usage.Via `json:"via,omitempty"`
 }
 
 type sessionsJSON struct {
 	Sessions []sessionJSON `json:"sessions"`
-	// Terminal is set where magpie can open Terminal on the session: the
+	// Terminal is set where blackpie can open Terminal on the session: the
 	// Mac app, not a browser tab that may be on another computer.
 	Terminal bool     `json:"terminal"`
 	Dirs     []string `json:"dirs"` // where they were read from
@@ -142,7 +142,7 @@ func gatewayDays(g usage.GatewaySession) []sessions.ExternalDayUsage {
 }
 
 // gatewayListed is a gateway session as a list shows it: titled by what it
-// was first asked, when magpie recorded it, not by its ses_… id (YOU on
+// was first asked, when blackpie recorded it, not by its ses_… id (YOU on
 // Discord). title is a sessions.GatewayTitler's.
 func gatewayListed(g usage.GatewaySession, title func(agent, id string) string) sessions.ExternalSession {
 	e := gatewayExternal(g)
@@ -192,14 +192,14 @@ func sessionRoutes(mux *http.ServeMux, w Windows) {
 		now := listTag{log: logV, drawn: drawn.String(), aliases: aliases}
 		made := -1
 		listTags.Lock()
-		if t, ok := listTags.m[n]; ok && logKnown && t.same(now) && r.Header.Get("X-Magpie-Had") == t.tag {
+		if t, ok := listTags.m[n]; ok && logKnown && t.same(now) && r.Header.Get("X-Blackpie-Had") == t.tag {
 			made = t.made
 		}
 		listTags.Unlock()
 		list, made, same := sessions.ListUnless(sessions.All, made)
 		if same {
-			rw.Header().Set("X-Magpie-Tag", r.Header.Get("X-Magpie-Had"))
-			rw.Header().Set("X-Magpie-Same", "1")
+			rw.Header().Set("X-Blackpie-Tag", r.Header.Get("X-Blackpie-Had"))
+			rw.Header().Set("X-Blackpie-Same", "1")
 			rw.WriteHeader(http.StatusOK)
 			return
 		}
@@ -295,9 +295,9 @@ func sessionRoutes(mux *http.ServeMux, w Windows) {
 		statsTags.Lock()
 		t, ok := statsTags.m[n]
 		statsTags.Unlock()
-		if ok && t.gen == gen && maps.Equal(t.agents, agents) && r.Header.Get("X-Magpie-Had") == t.tag {
-			rw.Header().Set("X-Magpie-Tag", t.tag)
-			rw.Header().Set("X-Magpie-Same", "1")
+		if ok && t.gen == gen && maps.Equal(t.agents, agents) && r.Header.Get("X-Blackpie-Had") == t.tag {
+			rw.Header().Set("X-Blackpie-Tag", t.tag)
+			rw.Header().Set("X-Blackpie-Same", "1")
 			rw.WriteHeader(http.StatusOK)
 			return
 		}
@@ -422,7 +422,7 @@ func sessionRoutes(mux *http.ServeMux, w Windows) {
 	})
 	// markdown is a session's whole conversation as a Markdown file (#1276),
 	// read from the agent's own file as transcript is: to the browser that
-	// asks (magpie web), which saves it itself, and, in the app, to
+	// asks (blackpie web), which saves it itself, and, in the app, to
 	// Downloads.
 	mux.HandleFunc("GET /api/sessions/markdown", func(rw http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()
@@ -554,9 +554,9 @@ func sessionRoutes(mux *http.ServeMux, w Windows) {
 // page. It is made whole before any of it is sent, so a file that can't be
 // read is an error and not half a download.
 //
-// A session only magpie's gateway recorded is written from that record, as
-// transcript reads it: the agent of one that reaches this magpie through a
-// remote magpie ran on another machine, so there is no file of it here, and
+// A session only blackpie's gateway recorded is written from that record, as
+// transcript reads it: the agent of one that reaches this blackpie through a
+// remote blackpie ran on another machine, so there is no file of it here, and
 // its download was a 400 "no such session" (akic404 on Discord).
 func sessionMarkdown(agentID, id string) (stem string, md []byte, err error) {
 	s, ok := sessions.Find(agentID, id)
@@ -596,7 +596,7 @@ func sessionMarkdown(agentID, id string) (stem string, md []byte, err error) {
 		}
 		return '-'
 	}, s.Agent+"-"+string(short))
-	return "magpie-session-" + safe, b.Bytes(), nil
+	return "blackpie-session-" + safe, b.Bytes(), nil
 }
 
 // wslName is an agent's name for a session it ran in a WSL distro, as the
@@ -651,7 +651,7 @@ type statsTag struct {
 }
 
 // listTags is, by ?limit, what the last list sent was made from and its
-// tag: an ask with that tag while all of it stands gets X-Magpie-Same
+// tag: an ask with that tag while all of it stands gets X-Blackpie-Same
 // without the list being made. What a row shows beyond these (a Codex
 // thread's effort, a gateway session's title) is bounded by the listing,
 // made again at least once in sessions' listKeptFor.
@@ -837,7 +837,7 @@ func withGatewaySessions(st sessions.Stats, days int, nativeKeys map[string]bool
 	return sessions.MergeExternalStats(st, daily, ext)
 }
 
-// warmSessions reads every session file once magpie is up, so the Sessions
+// warmSessions reads every session file once blackpie is up, so the Sessions
 // page opens on the kept index and not on a first read of them all. Usage ›
 // Requests' whole history is read after it, not beside it on the disk: a
 // first All parsing 12k sessions kept that page a skeleton for 40 s.
@@ -889,7 +889,7 @@ var warmCodexEffort = func() { usage.CodexModelEffort(usage.All) }
 // the system at once. Reading a long history allocates many times what it
 // keeps (a 13k-session Codex and Claude Code history: ~830 MB allocated to
 // keep ~80 MB of indexes), and Go's scavenger returns those pages only over
-// the next minutes: a magpie that had just started read ~470 MB for its
+// the next minutes: a blackpie that had just started read ~470 MB for its
 // first two minutes at rest.
 func warmUp(steps ...func()) {
 	// each file read looked at once a second, not for each session or row
@@ -1168,7 +1168,7 @@ func openTerminal(command, label, choice string) error {
 	if err != nil {
 		return err
 	}
-	f, err := os.CreateTemp("", "magpie-resume-*.command")
+	f, err := os.CreateTemp("", "blackpie-resume-*.command")
 	if err != nil {
 		return err
 	}

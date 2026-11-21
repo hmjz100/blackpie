@@ -6,7 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io"
 	"io/fs"
 	"log"
@@ -19,27 +19,27 @@ import (
 	"github.com/klauspost/compress/zstd"
 	"github.com/tidwall/gjson"
 
-	"github.com/yetone/magpie/internal/claudeseal"
-	"github.com/yetone/magpie/internal/codexsummary"
-	"github.com/yetone/magpie/internal/filelock"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/steady"
+	"github.com/hmjz100/blackpie/internal/claudeseal"
+	"github.com/hmjz100/blackpie/internal/codexsummary"
+	"github.com/hmjz100/blackpie/internal/filelock"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/steady"
 )
 
-// A Codex conversation magpie compacted keeps magpie's compaction item in
+// A Codex conversation blackpie compacted keeps blackpie's compaction item in
 // its rollout, and Codex sends it back with every later turn: to OpenAI
-// itself, once magpie is quit or disconnected, it is refused
+// itself, once blackpie is quit or disconnected, it is refused
 // (invalid_encrypted_content) and the conversation can't go on (LukeMa on
 // X). PortCodexRollouts writes, in each rollout that has one, the message
 // it stands for in its place (codexsummary.Message): what Codex's own
 // local compaction keeps, and what the gateway sends for it anyway, so a
-// rollout so written reads the same through magpie and goes on without it.
+// rollout so written reads the same through blackpie and goes on without it.
 //
-// A reasoning item magpie gave Codex with Claude's block in its
+// A reasoning item blackpie gave Codex with Claude's block in its
 // encrypted_content (claudeseal) is refused the same way; it is written
 // as its summary, as the gateway sends it to OpenAI.
 //
-// A reasoning item magpie gave Codex for a reply another vendor made
+// A reasoning item blackpie gave Codex for a reply another vendor made
 // (WorkBuddy, DeepSeek, Kimi …) isn't one OpenAI sealed, and once Codex
 // talks to OpenAI itself every turn of the thread is refused, which
 // Codex doesn't retry (hentulong on X, after routing Codex to WorkBuddy
@@ -55,15 +55,15 @@ import (
 //
 // Every reasoning item OpenAI didn't seal (its encrypted_content is a
 // Fernet token, "gAAAA…"), one with Claude's block too, is written as
-// magpie_reasoning, a type Codex reads as one it doesn't know and never
-// sends (ResponseItem::Other), its summary and content kept for magpie's
-// own reading. That is done only as magpie lets Codex go
-// (PortCodexRolloutsLeft), as through magpie the gateway sends each as
+// blackpie_reasoning, a type Codex reads as one it doesn't know and never
+// sends (ResponseItem::Other), its summary and content kept for blackpie's
+// own reading. That is done only as blackpie lets Codex go
+// (PortCodexRolloutsLeft), as through blackpie the gateway sends each as
 // the model it goes to takes it (a DeepSeek or Kimi one gets its
 // reasoning back from them), and only in a thread begun on OpenAI's or
-// magpie's provider: one on another provider of the user's own is theirs.
+// blackpie's provider: one on another provider of the user's own is theirs.
 //
-// Only magpie's compaction items and those reasoning items change, in
+// Only blackpie's compaction items and those reasoning items change, in
 // whichever line holds them (a response_item, a compacted line's
 // replacement_history); every other line keeps its bytes, and the file
 // its line count, mode and time. A rollout is changed as Codex publishes
@@ -86,21 +86,21 @@ type codexPortHome struct {
 	Since   time.Time `json:"since"`
 	Pending []string  `json:"pending,omitempty"`
 	// Lineage: every fork's place in its parent was looked at once
-	// (repairLineages), after magpie before it moved them
+	// (repairLineages), after blackpie before it moved them
 	Lineage bool `json:"lineage,omitempty"`
 }
 
-// codexPortFirst is the first day magpie wrote a compaction item of its
+// codexPortFirst is the first day blackpie wrote a compaction item of its
 // own (c3931c91d, 2026-09-25): no rollout last written before then has one.
 var codexPortFirst = time.Date(2026, 9, 24, 0, 0, 0, 0, time.UTC)
 
-// codexLeftFirst is the day before magpie's first commit (2026-09-22): no
-// rollout last written before then has a reasoning item of magpie's.
+// codexLeftFirst is the day before blackpie's first commit (2026-09-22): no
+// rollout last written before then has a reasoning item of blackpie's.
 var codexLeftFirst = time.Date(2026, 9, 21, 0, 0, 0, 0, time.UTC)
 
 // codexLeftKey is the state a PortCodexRolloutsLeft pass keeps for a
 // home, apart from the other passes': one of those, while Codex went
-// through magpie, left magpie's reasoning items as they were.
+// through blackpie, left blackpie's reasoning items as they were.
 const codexLeftKey = " (left)"
 
 // codexPortSlack is how far before a pass began the next one looks again:
@@ -112,22 +112,22 @@ func codexPortPath() string { return filepath.Join(settings.Dir(), "codex-portab
 // CodexPort is what a pass did.
 type CodexPort struct {
 	Rewritten []string // rollouts written portable
-	Held      []string // rollouts with magpie's item a Codex holds, left for a later pass
+	Held      []string // rollouts with blackpie's item a Codex holds, left for a later pass
 	Repaired  []string // forks whose place in their parent was set again (repairLineages)
 	Done      bool     // every rollout due was looked at
 }
 
 // PortCodexRollouts makes the rollouts of the Codex home home portable,
 // those written since the last whole pass and those it left before, until
-// ctx ends. The first pass reads every rollout written since magpie began
+// ctx ends. The first pass reads every rollout written since blackpie began
 // to compact; later ones only what changed since.
 func PortCodexRollouts(ctx context.Context, home string) (CodexPort, error) {
 	return portCodexRollouts(ctx, home, false)
 }
 
 // PortCodexRolloutsLeft is PortCodexRollouts for a Codex that no longer
-// goes through magpie: magpie's reasoning items are written as
-// magpie_reasoning too, as OpenAI can't take them as a base.
+// goes through blackpie: blackpie's reasoning items are written as
+// blackpie_reasoning too, as OpenAI can't take them as a base.
 func PortCodexRolloutsLeft(ctx context.Context, home string) (CodexPort, error) {
 	return portCodexRollouts(ctx, home, true)
 }
@@ -138,7 +138,7 @@ func portCodexRollouts(ctx context.Context, home string, left bool) (CodexPort, 
 	if fi, err := os.Stat(locks); err != nil || !fi.IsDir() {
 		return res, nil
 	}
-	// one pass at a time across magpies
+	// one pass at a time across blackpies
 	unlock, held := filelock.Lock(codexPortPath()+".lock", 0)
 	if !held {
 		return res, nil
@@ -266,10 +266,10 @@ func codexThreadOf(name string) string {
 	return strings.ToLower(m[1])
 }
 
-var magpieMark = []byte(codexsummary.Mark)
+var blackpieMark = []byte(codexsummary.Mark)
 
 // claudeMark begins a reasoning item's encrypted_content carrying Claude's
-// block (claudeseal), which only magpie reads.
+// block (claudeseal), which only blackpie reads.
 var claudeMark = []byte(claudeseal.Mark)
 
 // reasoningMark is in a line with a reasoning item, as Codex writes it;
@@ -285,15 +285,15 @@ func unsealedReasoning(line []byte) bool {
 	return n > 0 && (n > bytes.Count(line, openAISealed) || bytes.Contains(line[:min(len(line), 256)], []byte(`"type":"compacted"`)))
 }
 
-// portRollout writes the rollout at path portable, if it has magpie's
+// portRollout writes the rollout at path portable, if it has blackpie's
 // compaction item (or, left, a reasoning item OpenAI didn't seal), and
 // says whether it did.
 func portRollout(ctx context.Context, home, path string, left bool) (bool, error) {
-	ours := true // begun on OpenAI's provider or magpie's
+	ours := true // begun on OpenAI's provider or blackpie's
 	return editRollout(ctx, home, path, func(line []byte, paged bool) ([]byte, bool) {
 		if isMetaLine(line) {
 			switch gjson.GetBytes(line, "payload.model_provider").String() {
-			case "", "openai", "magpie":
+			case "", "openai", "blackpie":
 			default:
 				ours = false
 			}
@@ -323,7 +323,7 @@ func editRollout(ctx context.Context, home, path string, edit func(line []byte, 
 		return false, err
 	}
 	defer in.Close()
-	tmp, err := os.CreateTemp(filepath.Dir(path), ".magpie-"+filepath.Base(path)+"-*")
+	tmp, err := os.CreateTemp(filepath.Dir(path), ".blackpie-"+filepath.Base(path)+"-*")
 	if err != nil {
 		return false, err
 	}
@@ -429,7 +429,7 @@ func editRollout(ctx context.Context, home, path string, edit func(line []byte, 
 // longer moves every place after it, and a rollout that shrinks leaves
 // them past its end: Codex then won't open the thread ("invalid paginated
 // history lineage …: cutoff byte offset is past the source rollout",
-// xybio on Discord). So a line magpie rewrites keeps its length: a
+// xybio on Discord). So a line blackpie rewrites keeps its length: a
 // shorter one is padded with spaces after its JSON, which Codex's reader
 // (serde_json) skips, and a longer one, in a rollout whose history is
 // paginated, is not written at all.
@@ -465,7 +465,7 @@ func fitLine(line, out []byte, paged bool) ([]byte, bool) {
 	return append(fit, end...), true
 }
 
-// A fork made before magpie kept a parent's lines whole names a byte in
+// A fork made before blackpie kept a parent's lines whole names a byte in
 // it that a shorter parent no longer ends a line at, or no longer has:
 // Codex refuses to open it. Every line kept its place by count, though,
 // and Codex names each line's ordinal, so repairLineages sets each such
@@ -589,8 +589,8 @@ func ordinalEnds(path string) map[int64]int64 {
 	}
 }
 
-// portLineAs is portLine, with magpie's reasoning items written as
-// magpie_reasoning first when left.
+// portLineAs is portLine, with blackpie's reasoning items written as
+// blackpie_reasoning first when left.
 func portLineAs(line []byte, left bool) ([]byte, bool) {
 	retired := false
 	if left && unsealedReasoning(line) {
@@ -602,11 +602,11 @@ func portLineAs(line []byte, left bool) ([]byte, bool) {
 
 // retireReasoning is a rollout line with each reasoning item in it that
 // OpenAI didn't seal (a response_item's, those in a compacted line's
-// replacement_history) written as magpie_reasoning: a type Codex reads
+// replacement_history) written as blackpie_reasoning: a type Codex reads
 // as one it doesn't know (ResponseItem::Other) and never sends. The item
 // keeps its summary, content and keys' order, without its id and
 // encrypted_content, so the line is no longer; the rest of the line keeps
-// its bytes, as magpie's own readers read a line's head by them.
+// its bytes, as blackpie's own readers read a line's head by them.
 func retireReasoning(line []byte) ([]byte, bool) {
 	body := bytes.TrimRight(line, "\r\n")
 	if !gjson.ValidBytes(body) {
@@ -654,7 +654,7 @@ func retireReasoning(line []byte) ([]byte, bool) {
 			obj = append(obj, k.Raw...)
 			obj = append(obj, ':')
 			if k.String() == "type" {
-				obj = append(obj, `"magpie_reasoning"`...)
+				obj = append(obj, `"blackpie_reasoning"`...)
 			} else {
 				obj = append(obj, v.Raw...)
 			}
@@ -673,14 +673,14 @@ func retireReasoning(line []byte) ([]byte, bool) {
 	return out, true
 }
 
-// portLine is a rollout line with each of magpie's compaction items in it
+// portLine is a rollout line with each of blackpie's compaction items in it
 // written as the message it stands for; any other line as it is, byte for
-// byte. One of magpie's items whose summary can't be read is left out of
+// byte. One of blackpie's items whose summary can't be read is left out of
 // a list (and its entry of replacement_history_metadata with it), as the
 // gateway leaves it out; a line that is one alone stays as it is, as
 // leaving a line out would move every line after it.
 func portLine(line []byte) ([]byte, bool) {
-	if !bytes.Contains(line, magpieMark) && !bytes.Contains(line, claudeMark) {
+	if !bytes.Contains(line, blackpieMark) && !bytes.Contains(line, claudeMark) {
 		return line, false
 	}
 	body := bytes.TrimRight(line, "\r\n")
@@ -704,8 +704,8 @@ func portLine(line []byte) ([]byte, bool) {
 	return append(bytes.TrimRight(buf.Bytes(), "\n"), end...), true
 }
 
-// portValue is v with magpie's compaction items in it written as their
-// messages; drop says v is one of magpie's that can't be read.
+// portValue is v with blackpie's compaction items in it written as their
+// messages; drop says v is one of blackpie's that can't be read.
 func portValue(v any) (_ any, changed, drop bool) {
 	switch x := v.(type) {
 	case map[string]any:
@@ -720,9 +720,9 @@ func portValue(v any) (_ any, changed, drop bool) {
 			return x, false, false
 		}
 		if t, _ := x["type"].(string); t == "reasoning" {
-			// Claude's block magpie gave Codex to carry back: sent to
+			// Claude's block blackpie gave Codex to carry back: sent to
 			// OpenAI it would be refused as invalid_encrypted_content, so
-			// the item goes as its summary, as magpie sends it to OpenAI
+			// the item goes as its summary, as blackpie sends it to OpenAI
 			if enc, _ := x["encrypted_content"].(string); claudeseal.Is(enc) {
 				delete(x, "encrypted_content")
 				return x, true, false

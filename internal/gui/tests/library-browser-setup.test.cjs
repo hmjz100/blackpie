@@ -1,5 +1,5 @@
 // Run with Node's test runner and Playwright on the module path; see README.md.
-// Magpie Browser's sheet in the Library's Discover: the agents it gives the
+// Blackpie Browser's sheet in the Library's Discover: the agents it gives the
 // browser act in the user's own tabs, so the sheet says so, and sets up the
 // extension it needs in the browser the user is signed in to. Not set up,
 // it offers Set up the extension…, which writes the folder and shows it,
@@ -19,8 +19,8 @@ const { I18N } = strings();
 const LANGS = ["en", "zh", "zh-TW", "ja", "de"];
 const tr = (lang, s, vars = {}) => Object.entries(vars).reduce((o, [k, v]) => o.replace(`{${k}}`, v), lang === "en" ? s : I18N[lang]?.[s] ?? s);
 const HOME = "/Users/tester";
-const DIR = `${HOME}/.config/magpie/browser-extension`;
-const ABOUT = "Use your own browser: your tabs, signed in to the sites you use. Open pages, click, type, upload, read and take screenshots, through the Magpie Browser extension.";
+const DIR = `${HOME}/.config/blackpie/browser-extension`;
+const ABOUT = "Use your own browser: your tabs, signed in to the sites you use. Open pages, click, type, upload, read and take screenshots, through the Blackpie Browser extension.";
 
 function fixture(lang) {
   const st = { written: false, connected: false, setups: 0 };
@@ -34,14 +34,14 @@ function fixture(lang) {
     if (url.pathname === "/api/plugins") return json({ plugins: [] });
     if (url.pathname === "/api/library") {
       return json({
-        dir: `${HOME}/.magpie/library`, backups: `${HOME}/.magpie/backups`, home: HOME,
+        dir: `${HOME}/.blackpie/library`, backups: `${HOME}/.blackpie/backups`, home: HOME,
         agents: [{ id: "claude", name: "Claude Code", icon: "claudecode-color", mcp: `${HOME}/.claude.json`, skills: `${HOME}/.claude/skills` }],
         instructions: { agents: [], sets: [] }, servers: [], foundServers: [], projects: [], foundSkills: [], skills: [], problems: [],
       });
     }
     if (url.pathname === "/api/library/market/servers") {
       return json({ items: [
-        { id: "magpie-browser", name: "magpie-browser", title: "Magpie Browser", publisher: "Magpie", description: ABOUT, transport: "stdio", runs: "magpie", featured: true, optIn: true, have: "" },
+        { id: "blackpie-browser", name: "blackpie-browser", title: "Blackpie Browser", publisher: "Blackpie", description: ABOUT, transport: "stdio", runs: "blackpie", featured: true, optIn: true, have: "" },
         { id: "fetch", name: "fetch", title: "Fetch", description: "Read the web.", transport: "stdio", runs: "uvx", featured: true, have: "" },
       ] });
     }
@@ -66,7 +66,7 @@ function fixture(lang) {
 const wide = (page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 
 for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium", "webkit"])) {
-  test(engine + ": Magpie Browser's sheet sets up the extension in the user's browser", async (t) => {
+  test(engine + ": Blackpie Browser's sheet sets up the extension in the user's browser", async (t) => {
     assert(["chromium", "webkit"].includes(engine), "BROWSER must be chromium or webkit");
     const browser = await (engine === "webkit" ? webkit.launch() : chromium.launch({ channel: "chromium" }));
     const shots = [];
@@ -89,12 +89,12 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
           const errors = [];
           page.on("pageerror", (e) => errors.push(e.message));
           await page.route("**/*", f.route);
-          await page.addInitScript(() => { localStorage.setItem("magpie.libTab", "mcp"); });
-          await page.goto("http://magpie.test/?view=library");
-          await page.locator('#view-library .mk[data-market="mcp"] .mk-card[data-id="magpie-browser"]').click();
+          await page.addInitScript(() => { localStorage.setItem("blackpie.libTab", "mcp"); });
+          await page.goto("http://blackpie.test/?view=library");
+          await page.locator('#view-library .mk[data-market="mcp"] .mk-card[data-id="blackpie-browser"]').click();
           const sheet = page.locator("#modal .mk-sheet");
           await sheet.waitFor();
-          assert.equal((await sheet.locator(".mk-name.big").textContent()).trim(), "Magpie Browser");
+          assert.equal((await sheet.locator(".mk-name.big").textContent()).trim(), "Blackpie Browser");
           assert.equal(await sheet.locator(".mk-about").textContent(), w(ABOUT));
           const hints = await sheet.locator(".mk-hint").allTextContents();
           assert(hints.includes(w("Pick the agents that may use your browser: they act in your tabs, signed in as you are.")), hints.join(" | "));
@@ -120,7 +120,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
           assert.deepEqual(await box.locator(".mk-browser-steps li").allTextContents(), [
             w("Open chrome://extensions (edge://extensions in Edge) in the browser you use every day."),
             w("Turn on Developer mode."),
-            w("Click Load unpacked and choose {dir}.", { dir: "~/.config/magpie/browser-extension" }),
+            w("Click Load unpacked and choose {dir}.", { dir: "~/.config/blackpie/browser-extension" }),
           ]);
           assert.equal(await box.locator(".mk-browser-steps").isVisible(), true);
           // nothing in the sheet runs off its side, the folder's path included

@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-// Where magpie runs from, as the update sees it: a magpie opened in a
+// Where blackpie runs from, as the update sees it: a blackpie opened in a
 // download folder (the Desktop, Downloads) keeps that folder clear of what
 // it writes, and its download goes out of sight (StageBinary).
 //
-// Upstream reads this for its self-install too (a Windows magpie opened from
-// Downloads installs itself in Programs\magpie); this fork drops that, so
+// Upstream reads this for its self-install too (a Windows blackpie opened from
+// Downloads installs itself in Programs\blackpie); this fork drops that, so
 // only the Desktop's companion (com.go) and the staging ask.
 
 // downloadFolder says whether dir is one downloads land in: Downloads, the

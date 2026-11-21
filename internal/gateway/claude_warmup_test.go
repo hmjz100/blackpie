@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 // fakeWarmClaude is a claude that writes what it was run with to log and
@@ -46,7 +46,7 @@ func TestWarmClaudeAsksClaudeCodeOnce(t *testing.T) {
 	b, _ := os.ReadFile(log)
 	got := string(b)
 	for _, want := range []string{"[-p]", "[--model][haiku]", "[--tools][]", "[--setting-sources][]", "[--no-session-persistence]",
-		"dir:/saved/account\n", "base:\n", "stdin:hi", "magpie-claude-"} {
+		"dir:/saved/account\n", "base:\n", "stdin:hi", "blackpie-claude-"} {
 		if !strings.Contains(got, want) {
 			t.Errorf("run lacks %q:\n%s", want, got)
 		}

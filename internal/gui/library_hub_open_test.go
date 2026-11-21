@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/library"
+	"github.com/hmjz100/blackpie/internal/library"
 )
 
 // opens records the links handed to the system, opening none.

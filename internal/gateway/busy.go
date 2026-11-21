@@ -6,15 +6,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/yetone/magpie/internal/datamove"
+	"github.com/hmjz100/blackpie/internal/datamove"
 )
 
-// Busy is what a restart of the magpie serving the gateway would cut
+// Busy is what a restart of the blackpie serving the gateway would cut
 // short (#577): the agents' requests in flight — a reply streaming, an
 // image being made — and the turns of Claude Code run through the
 // subscription bridge waiting on their caller's tool results, whose
 // Claude Code lives only in this process. A request in flight is one
-// that does work (not a GET: the model lists, the info another magpie
+// that does work (not a GET: the model lists, the info another blackpie
 // asks for every 15 s); the bridge's own helper calls are not counted
 // apart, a turn waiting on them being in Tools. Last is when the last
 // counted request ended, so a caller can tell a tool chain's gap — the
@@ -23,7 +23,7 @@ import (
 // Bridge and BridgeLast are the same for the bridge's turns alone, which
 // a restart that hands the gateway over (handover.go) still waits for:
 // their Claude Code lives in this process, and only here can the turn go
-// on. Every other request finishes in the magpie that hands over while
+// on. Every other request finishes in the blackpie that hands over while
 // the new one takes the next.
 type Busy struct {
 	Requests   int       `json:"requests"`
@@ -81,7 +81,7 @@ func (s *Server) bridgeTurn() (done func()) {
 // counted is h with its requests counted for Busy.
 func (s *Server) counted(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodGet || r.Method == http.MethodHead || r.Method == http.MethodOptions || strings.HasPrefix(r.URL.Path, "/_magpie/") || strings.HasPrefix(r.URL.Path, "/mcp/") {
+		if r.Method == http.MethodGet || r.Method == http.MethodHead || r.Method == http.MethodOptions || strings.HasPrefix(r.URL.Path, "/_blackpie/") || strings.HasPrefix(r.URL.Path, "/mcp/") {
 			h.ServeHTTP(w, r)
 			return
 		}
@@ -114,8 +114,8 @@ func (s *Server) counted(h http.Handler) http.Handler {
 	})
 }
 
-// admitted is h closed to new work while a data move waits for this magpie
-// to be idle (datamove.Business): reads and magpie's own calls go on
+// admitted is h closed to new work while a data move waits for this blackpie
+// to be idle (datamove.Business): reads and blackpie's own calls go on
 // uncounted, and so does a bridge turn waiting on its tool results, whose
 // next request is the caller's answer. MCP isn't counted either, its
 // streams being open for as long as an agent runs, but none is taken once
@@ -124,7 +124,7 @@ func (s *Server) admitted(h http.Handler) http.Handler {
 	guarded := datamove.Business.Guard(h, func(r *http.Request) bool {
 		switch {
 		case r.Method == http.MethodGet || r.Method == http.MethodHead || r.Method == http.MethodOptions,
-			strings.HasPrefix(r.URL.Path, "/_magpie/"), strings.HasPrefix(r.URL.Path, "/mcp/"):
+			strings.HasPrefix(r.URL.Path, "/_blackpie/"), strings.HasPrefix(r.URL.Path, "/mcp/"):
 			return true
 		}
 		return anthropicPath(r.URL.Path) && s.subscription.parked() > 0
@@ -132,7 +132,7 @@ func (s *Server) admitted(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, "/mcp/") && datamove.Business.Closed() {
 			w.Header().Set("Retry-After", "2")
-			http.Error(w, "magpie is moving its data directory", http.StatusServiceUnavailable)
+			http.Error(w, "blackpie is moving its data directory", http.StatusServiceUnavailable)
 			return
 		}
 		guarded.ServeHTTP(w, r)
@@ -145,7 +145,7 @@ func anthropicPath(p string) bool { return p == "/v1/messages" || p == "/message
 type busyCounters struct {
 	inFlight atomic.Int64
 	lastDone atomic.Int64 // unix ns
-	active   inflights    // what each is, for /v1/magpie/concurrency
+	active   inflights    // what each is, for /v1/blackpie/concurrency
 	// the subscription bridge's turns among them, and when the last ended
 	bridgeInFlight atomic.Int64
 	bridgeDone     atomic.Int64 // unix ns

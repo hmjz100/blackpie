@@ -11,7 +11,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // streamingHold is a ResponseWriter that passes a reply on as it comes.

@@ -1,6 +1,6 @@
 package cli
 
-// magpie tools and magpie tool: the tools magpie's own MCP servers give
+// blackpie tools and blackpie tool: the tools blackpie's own MCP servers give
 // agents (image generation, image recognition, web search, plugins'
 // tools), listed and called from the terminal (iwinux on Discord). They
 // are asked of the running gateway's MCP servers themselves
@@ -13,7 +13,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"io"
 	"net/http"
 	"net/url"
@@ -24,38 +24,38 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/imagemcp"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/imagemcp"
 )
 
 const toolUsage = `usage:
-  magpie tools                  every tool magpie's MCP servers give agents, with its parameters
-  magpie tools <name>           one tool: what it does and each parameter
-  magpie tool <name> [--<param> <value>…] [<words>…] [-o <file|folder>] [--json]
-                                call one through the running magpie, as an agent's MCP call is
+  blackpie tools                  every tool blackpie's MCP servers give agents, with its parameters
+  blackpie tools <name>           one tool: what it does and each parameter
+  blackpie tool <name> [--<param> <value>…] [<words>…] [-o <file|folder>] [--json]
+                                call one through the running blackpie, as an agent's MCP call is
 
   A parameter is --<param> <value> or --<param>=<value> (- and _ alike); a list
   parameter is given once per item. The words left over are the tool's one required
   text (generate_image's prompt, web_search's query, analyze_image's image), else its
-  prompt. A file named in a parameter is read by magpie on this computer.
+  prompt. A file named in a parameter is read by blackpie on this computer.
   An image or video the tool makes is saved: -o names a file or a folder (with --n 2 or
   more a number is added to the name), else it goes in this folder, named from the
   prompt; a file that is there is never written over. Text is printed. --json prints
   the tool's answer as it came and saves nothing.
   An unknown parameter, or a missing required one, is refused before anything is
-  called. The models are the ones magpie's Settings pick (Images › Image generation,
+  called. The models are the ones blackpie's Settings pick (Images › Image generation,
   Image recognition, Web search); generate_image and generate_video take --model
-  provider/model for another one set up (magpie tools generate_image lists them). It asks the gateway at the port in the Gateway page's Gateway
-  address (or MAGPIE_ADDR; MAGPIE_GATEWAY=<url> for another).
+  provider/model for another one set up (blackpie tools generate_image lists them). It asks the gateway at the port in the Gateway page's Gateway
+  address (or BLACKPIE_ADDR; BLACKPIE_GATEWAY=<url> for another).
 
-  e.g. magpie tool generate_image "a magpie on a branch, watercolour" --size 1536x1024 -o hero.png
-       magpie tool generate_image --n 2 --quality high --background transparent "an app icon"
-       magpie tool analyze_image ./shot.png --prompt "what does the error say?"
-       magpie tool web_search "go 1.27 release notes"`
+  e.g. blackpie tool generate_image "a blackpie on a branch, watercolour" --size 1536x1024 -o hero.png
+       blackpie tool generate_image --n 2 --quality high --background transparent "an app icon"
+       blackpie tool analyze_image ./shot.png --prompt "what does the error say?"
+       blackpie tool web_search "go 1.27 release notes"`
 
-// toolAgent is the User-Agent the calls go with: magpie's own, as the
-// image tool's (gateway.DrawAgent), so a vendor is sent magpie's.
-const toolAgent = "magpie-tool/1"
+// toolAgent is the User-Agent the calls go with: blackpie's own, as the
+// image tool's (gateway.DrawAgent), so a vendor is sent blackpie's.
+const toolAgent = "blackpie-tool/1"
 
 // toolCallMost bounds one ask of the gateway: the image server answers
 // within about 20s, a plugin's tool within 55s, and a look at a large
@@ -77,21 +77,21 @@ type toolGateway struct {
 }
 
 func newToolGateway() *toolGateway {
-	base := strings.TrimRight(os.Getenv("MAGPIE_GATEWAY"), "/")
+	base := strings.TrimRight(os.Getenv("BLACKPIE_GATEWAY"), "/")
 	if base == "" {
 		base = gateway.URL()
 	}
 	return &toolGateway{base: base, client: &http.Client{Timeout: toolCallMost}}
 }
 
-// errNoMagpie is a gateway that doesn't answer at all.
-type errNoMagpie struct {
+// errNoBlackpie is a gateway that doesn't answer at all.
+type errNoBlackpie struct {
 	base string
 	err  error
 }
 
-func (e errNoMagpie) Error() string {
-	return fmt.Sprintf("magpie isn't running at %s: open the app or run magpie serve, then try again (%v)", e.base, e.err)
+func (e errNoBlackpie) Error() string {
+	return fmt.Sprintf("blackpie isn't running at %s: open the app or run blackpie serve, then try again (%v)", e.base, e.err)
 }
 
 func (g *toolGateway) do(method, path string, body []byte) (*http.Response, error) {
@@ -107,7 +107,7 @@ func (g *toolGateway) do(method, path string, body []byte) (*http.Response, erro
 	r.Header.Set("User-Agent", toolAgent)
 	res, err := g.client.Do(r)
 	if err != nil {
-		return nil, errNoMagpie{g.base, err}
+		return nil, errNoBlackpie{g.base, err}
 	}
 	return res, nil
 }
@@ -128,9 +128,9 @@ func (g *toolGateway) rpc(path, method string, params any) (json.RawMessage, err
 	}
 	switch {
 	case res.StatusCode == http.StatusNotFound:
-		return nil, fmt.Errorf("the magpie at %s has no %s: it is older than this one, update it", g.base, path)
+		return nil, fmt.Errorf("the blackpie at %s has no %s: it is older than this one, update it", g.base, path)
 	case res.StatusCode != http.StatusOK:
-		return nil, fmt.Errorf("the magpie at %s answered %s: %s", g.base, res.Status, strings.TrimSpace(string(data)))
+		return nil, fmt.Errorf("the blackpie at %s answered %s: %s", g.base, res.Status, strings.TrimSpace(string(data)))
 	}
 	var m struct {
 		Result json.RawMessage `json:"result"`
@@ -139,7 +139,7 @@ func (g *toolGateway) rpc(path, method string, params any) (json.RawMessage, err
 		} `json:"error"`
 	}
 	if err := json.Unmarshal(data, &m); err != nil {
-		return nil, fmt.Errorf("what %s answered isn't JSON-RPC: is it magpie? (%v)", g.base, err)
+		return nil, fmt.Errorf("what %s answered isn't JSON-RPC: is it blackpie? (%v)", g.base, err)
 	}
 	if m.Error != nil {
 		return nil, errors.New(m.Error.Message)
@@ -148,12 +148,12 @@ func (g *toolGateway) rpc(path, method string, params any) (json.RawMessage, err
 }
 
 // fetch is a file the gateway made, at u's path on the gateway asked: a
-// URL may name the address agents are given (MAGPIE_PUBLIC_URL), and the
+// URL may name the address agents are given (BLACKPIE_PUBLIC_URL), and the
 // key goes nowhere else.
 func (g *toolGateway) fetch(u string) ([]byte, error) {
 	pu, err := url.Parse(u)
 	if err != nil || !strings.HasPrefix(pu.Path, "/") {
-		return nil, fmt.Errorf("%q isn't a file of magpie's", u)
+		return nil, fmt.Errorf("%q isn't a file of blackpie's", u)
 	}
 	res, err := g.do(http.MethodGet, pu.RequestURI(), nil)
 	if err != nil {
@@ -256,7 +256,7 @@ func listTools(g *toolGateway) ([]listedTool, []string, error) {
 	for _, srv := range gateway.OwnMCPServers {
 		res, err := g.rpc(srv.Path, "tools/list", map[string]any{})
 		if err != nil {
-			var no errNoMagpie
+			var no errNoBlackpie
 			if errors.As(err, &no) {
 				return nil, nil, err
 			}
@@ -336,15 +336,15 @@ func paramShape(p toolParam) string {
 	return "<" + shape + ">"
 }
 
-// toolsCmd: magpie tools [<name>]
+// toolsCmd: blackpie tools [<name>]
 func toolsCmd(args []string) error {
 	for _, a := range args {
 		if strings.HasPrefix(a, "-") {
-			return fmt.Errorf("unknown flag %s (magpie tools [<name>])", a)
+			return fmt.Errorf("unknown flag %s (blackpie tools [<name>])", a)
 		}
 	}
 	if len(args) > 1 {
-		return errors.New("magpie tools takes one tool's name at most (magpie tools [<name>])")
+		return errors.New("blackpie tools takes one tool's name at most (blackpie tools [<name>])")
 	}
 	g := newToolGateway()
 	tools, notes, err := listTools(g)
@@ -382,12 +382,12 @@ func toolsCmd(args []string) error {
 		}
 	}
 	if len(tools) == 0 {
-		fmt.Println(muted.Render("  no tools: the magpie running has none on"))
+		fmt.Println(muted.Render("  no tools: the blackpie running has none on"))
 	}
 	for _, n := range notes {
 		fmt.Println(muted.Render("  " + n))
 	}
-	fmt.Println(muted.Render("\nmagpie tools <name> for one in full · magpie tool <name> --<param> <value> … to call it"))
+	fmt.Println(muted.Render("\nblackpie tools <name> for one in full · blackpie tool <name> --<param> <value> … to call it"))
 	return nil
 }
 
@@ -408,7 +408,7 @@ func toolHelp(t listedTool) string {
 		}
 	}
 	if w := t.wordsParam(); w != "" {
-		fmt.Fprintf(&b, "\n  the words after the name are its --%s: magpie tool %s <%s>\n", w, t.Name, w)
+		fmt.Fprintf(&b, "\n  the words after the name are its --%s: blackpie tool %s <%s>\n", w, t.Name, w)
 	}
 	return b.String()
 }
@@ -418,9 +418,9 @@ func unknownTool(name string, tools []listedTool, notes []string) error {
 	for _, t := range tools {
 		names = append(names, t.Name)
 	}
-	msg := fmt.Sprintf("no tool called %q: nothing was called; there is %s (magpie tools)", name, strings.Join(names, ", "))
+	msg := fmt.Sprintf("no tool called %q: nothing was called; there is %s (blackpie tools)", name, strings.Join(names, ", "))
 	if len(names) == 0 {
-		msg = fmt.Sprintf("no tool called %q: the magpie running has no tools on", name)
+		msg = fmt.Sprintf("no tool called %q: the blackpie running has no tools on", name)
 	}
 	if len(notes) > 0 {
 		msg += " (" + strings.Join(notes, "; ") + ")"
@@ -435,7 +435,7 @@ type toolCall struct {
 	json   bool
 }
 
-// parseToolArgs reads in, what follows magpie tool <name>, against t's
+// parseToolArgs reads in, what follows blackpie tool <name>, against t's
 // parameters: nothing is called on an error.
 func parseToolArgs(t listedTool, in []string) (toolCall, error) {
 	c := toolCall{args: map[string]any{}}
@@ -476,7 +476,7 @@ func parseToolArgs(t listedTool, in []string) (toolCall, error) {
 		name, val, hasVal := strings.Cut(a[2:], "=")
 		key := paramKey(props, name)
 		if key == "" {
-			return c, fmt.Errorf("%s takes no --%s: nothing was called; it takes %s (magpie tools %s)", t.Name, name, paramList(t), t.Name)
+			return c, fmt.Errorf("%s takes no --%s: nothing was called; it takes %s (blackpie tools %s)", t.Name, name, paramList(t), t.Name)
 		}
 		p := props[key]
 		if !hasVal {
@@ -540,7 +540,7 @@ func parseToolArgs(t listedTool, in []string) (toolCall, error) {
 		}
 	}
 	if len(missing) > 0 {
-		return c, fmt.Errorf("%s needs %s: nothing was called (magpie tools %s)", t.Name, strings.Join(missing, " and "), t.Name)
+		return c, fmt.Errorf("%s needs %s: nothing was called (blackpie tools %s)", t.Name, strings.Join(missing, " and "), t.Name)
 	}
 	return c, nil
 }
@@ -679,10 +679,10 @@ func callTool(g *toolGateway, t listedTool, args map[string]any) (json.RawMessag
 	return res, err
 }
 
-// toolCmd: magpie tool <name> [--<param> <value>…] [<words>…] [-o <path>] [--json]
+// toolCmd: blackpie tool <name> [--<param> <value>…] [<words>…] [-o <path>] [--json]
 func toolCmd(args []string) error {
 	if len(args) == 0 || strings.HasPrefix(args[0], "-") {
-		return errors.New("magpie tool needs a tool's name first: magpie tool <name> --<param> <value> … (magpie tools lists them)")
+		return errors.New("blackpie tool needs a tool's name first: blackpie tool <name> --<param> <value> … (blackpie tools lists them)")
 	}
 	g := newToolGateway()
 	tools, notes, err := listTools(g)

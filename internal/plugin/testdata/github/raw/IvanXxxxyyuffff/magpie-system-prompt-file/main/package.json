@@ -1,12 +1,12 @@
 {
-  "name": "magpie-system-prompt-file",
+  "name": "blackpie-system-prompt-file",
   "version": "0.3.0",
-  "description": "Magpie plugin: a system prompt (persona) loaded from a local .md / .txt file and injected into every agent request. macOS + Windows.",
+  "description": "Blackpie plugin: a system prompt (persona) loaded from a local .md / .txt file and injected into every agent request. macOS + Windows.",
   "type": "module",
   "license": "MIT",
   "keywords": [
-    "magpie",
-    "magpie-plugin",
+    "blackpie",
+    "blackpie-plugin",
     "gateway-hook",
     "system-prompt",
     "persona",
@@ -17,10 +17,10 @@
     "codex",
     "gemini"
   ],
-  "magpie": {
+  "blackpie": {
     "hooks": "./system-prompt.hooks.mjs",
     "options": {
-      "prompt_file": "~/.config/magpie/prompts/system.md",
+      "prompt_file": "~/.config/blackpie/prompts/system.md",
       "prompt_files": [],
       "system_prompt": "",
       "override": true,

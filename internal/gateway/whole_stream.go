@@ -6,7 +6,7 @@ import (
 	"maps"
 	"net/http"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // wholeAsStream writes a reply its vendor gave whole, in proto's own shape,

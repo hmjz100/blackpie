@@ -1,5 +1,5 @@
 // Package filelock keeps a change to a file one at a time across the
-// magpies on a computer: the gateway that runs all day, and each magpie
+// blackpies on a computer: the gateway that runs all day, and each blackpie
 // run from a terminal or a script meanwhile.
 package filelock
 
@@ -13,9 +13,9 @@ import (
 	"time"
 )
 
-// Wait is how long Mutex waits for another magpie to let go, before it
-// goes on without the lock, as it did before there was one: a magpie
-// stuck holding it (or two magpies each waiting on a lock the other
+// Wait is how long Mutex waits for another blackpie to let go, before it
+// goes on without the lock, as it did before there was one: a blackpie
+// stuck holding it (or two blackpies each waiting on a lock the other
 // holds) never hangs every other.
 const Wait = 10 * time.Second
 
@@ -32,16 +32,16 @@ var mkdirAll = os.MkdirAll
 func Lock(path string, wait time.Duration) (unlock func(), held bool) {
 	unlock, held, late := take(path, wait)
 	if late {
-		log.Printf("%s: another magpie held it for %v; going on without it", path, wait)
+		log.Printf("%s: another blackpie held it for %v; going on without it", path, wait)
 	}
 	return unlock, held
 }
 
-// ErrHeld is Take's error: another magpie held the lock past the wait.
-var ErrHeld = errors.New("another magpie is changing it; try again")
+// ErrHeld is Take's error: another blackpie held the lock past the wait.
+var ErrHeld = errors.New("another blackpie is changing it; try again")
 
 // Take is Lock, but held past wait it is ErrHeld, not going on without
-// it: for a change better refused than made over another magpie's.
+// it: for a change better refused than made over another blackpie's.
 func Take(path string, wait time.Duration) (unlock func(), err error) {
 	unlock, _, late := take(path, wait)
 	if late {
@@ -50,7 +50,7 @@ func Take(path string, wait time.Duration) (unlock func(), err error) {
 	return unlock, nil
 }
 
-// take is Lock; late when another magpie held it past wait.
+// take is Lock; late when another blackpie held it past wait.
 func take(path string, wait time.Duration) (unlock func(), held, late bool) {
 	// the folder is made only when the file can't be opened for want of
 	// it: made first, each lock asked the system for the folder too, on
@@ -84,7 +84,7 @@ func take(path string, wait time.Duration) (unlock func(), held, late bool) {
 
 // Mutex is a sync.Mutex that also holds the lock on the file Path names
 // while it is held, so a read, change and write of a file under it is
-// one at a time across magpies too, not only within this one. Every
+// one at a time across blackpies too, not only within this one. Every
 // read of the file a change is made from is to be made after Lock.
 type Mutex struct {
 	mu sync.Mutex
@@ -92,7 +92,7 @@ type Mutex struct {
 	Path func() string
 	// Locked, when set, is called once both locks are held: to have the
 	// file guarded read afresh, not from what was parsed of it before
-	// another magpie wrote it.
+	// another blackpie wrote it.
 	Locked func()
 	unlock func()
 }

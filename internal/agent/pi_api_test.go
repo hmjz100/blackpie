@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // Pi asks each model on the API its provider serves it on, so the gateway
@@ -52,14 +52,14 @@ func TestPiModelsAskedOnTheirNativeAPI(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	if err := pi(home).Field("model").Set("magpie/resp/grok-5"); err != nil {
+	if err := pi(home).Field("model").Set("blackpie/resp/grok-5"); err != nil {
 		t.Fatal(err)
 	}
 	var file map[string]any
 	if err := json.Unmarshal([]byte(readFile(filepath.Join(home, ".pi", "agent", "models.json"))), &file); err != nil {
 		t.Fatal(err)
 	}
-	pm := file["providers"].(map[string]any)["magpie"].(map[string]any)
+	pm := file["providers"].(map[string]any)["blackpie"].(map[string]any)
 	if pm["api"] != "openai-completions" || pm["baseUrl"] != gatewayV1() {
 		t.Fatalf("provider: %v", pm)
 	}
@@ -119,7 +119,7 @@ func TestPiModelsAskedOnTheirNativeAPI(t *testing.T) {
 			t.Errorf("Pi: %s baseUrl: %v", id, e)
 		}
 	}
-	if err := omo(home).Field("model").Set("magpie/resp/grok-5"); err != nil {
+	if err := omo(home).Field("model").Set("blackpie/resp/grok-5"); err != nil {
 		t.Fatal(err)
 	}
 	var omoFile map[string]any
@@ -127,7 +127,7 @@ func TestPiModelsAskedOnTheirNativeAPI(t *testing.T) {
 		t.Fatal(err)
 	}
 	omoAPIs := map[string]map[string]any{}
-	for _, raw := range omoFile["providers"].(map[string]any)["magpie"].(map[string]any)["models"].([]any) {
+	for _, raw := range omoFile["providers"].(map[string]any)["blackpie"].(map[string]any)["models"].([]any) {
 		m := raw.(map[string]any)
 		omoAPIs[m["id"].(string)] = m
 	}

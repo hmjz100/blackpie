@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/filememo"
+	"github.com/hmjz100/blackpie/internal/filememo"
 )
 
 // Once nothing has used a file's whole parse for tomlIdle it is let go,
@@ -26,11 +26,11 @@ func TestTOMLParseLetGoWhenIdle(t *testing.T) {
 		os.Chtimes(p, old, old)
 		filememo.Forget()
 	}
-	write("model_provider = \"magpie\"\nother = 2\n\n[model_providers.magpie]\nbase_url = \"http://x\"\n")
-	if v, ok := GetTOMLTop(p, "model_provider"); v != "magpie" || !ok {
+	write("model_provider = \"blackpie\"\nother = 2\n\n[model_providers.blackpie]\nbase_url = \"http://x\"\n")
+	if v, ok := GetTOMLTop(p, "model_provider"); v != "blackpie" || !ok {
 		t.Fatalf("model_provider = %q, %v", v, ok)
 	}
-	tb, _ := GetTOMLTable(p, "model_providers.magpie")
+	tb, _ := GetTOMLTable(p, "model_providers.blackpie")
 	if tb["base_url"] != "http://x" {
 		t.Fatalf("table = %v", tb)
 	}
@@ -43,13 +43,13 @@ func TestTOMLParseLetGoWhenIdle(t *testing.T) {
 
 	n := tomlParses.Load()
 	for range 3 {
-		if v, _ := GetTOMLTop(p, "model_provider"); v != "magpie" {
+		if v, _ := GetTOMLTop(p, "model_provider"); v != "blackpie" {
 			t.Fatalf("model_provider after the let-go = %q", v)
 		}
 		if _, ok := GetTOMLTop(p, "absent"); ok {
 			t.Fatal("absent key found after the let-go")
 		}
-		if tb, _ := GetTOMLTable(p, "model_providers.magpie"); tb["base_url"] != "http://x" {
+		if tb, _ := GetTOMLTable(p, "model_providers.blackpie"); tb["base_url"] != "http://x" {
 			t.Fatalf("table after the let-go = %v", tb)
 		}
 	}
@@ -64,7 +64,7 @@ func TestTOMLParseLetGoWhenIdle(t *testing.T) {
 	if v, _ := GetTOMLTop(p, "model_provider"); v != "openai" {
 		t.Fatalf("after a change model_provider = %q", v)
 	}
-	if tb, err := GetTOMLTable(p, "model_providers.magpie"); tb != nil || err != nil {
+	if tb, err := GetTOMLTable(p, "model_providers.blackpie"); tb != nil || err != nil {
 		t.Fatalf("after a change the table = %v, %v", tb, err)
 	}
 }

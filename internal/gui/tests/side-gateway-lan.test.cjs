@@ -19,13 +19,13 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       const line = () => p.locator("#sideGw span").textContent();
       const tip = () => p.locator("#sideGw").getAttribute("title");
       const says = host => p.waitForFunction(h => document.querySelector("#sideGw span")?.textContent.includes(h), host);
-      await p.goto("http://magpie.test/?view=settings");
+      await p.goto("http://blackpie.test/?view=settings");
       await p.locator("#sideGw").waitFor();
       assert.match(await line(), /192\.168\.1\.10:3999/);
       assert.doesNotMatch(await line(), /127\.0\.0\.1/);
       assert.match(await tip(), /192\.168\.1\.10:3999/);
       assert.match(await tip(), /127\.0\.0\.1:3999/);
-      await p.goto("http://magpie.test/?view=gateway");
+      await p.goto("http://blackpie.test/?view=gateway");
       const picker = p.locator("#gatewayLan .lan-interface");
       await picker.waitFor();
       await reach(p, picker); await picker.click();
@@ -52,7 +52,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
     const errors = []; p.on("pageerror", e => errors.push(e.message));
     await p.route("**/*", fixture("en", "light", [], { lanURLs, bootGateway: true }));
     const read = p.waitForResponse(r => r.url().endsWith("/api/providers"));
-    await p.goto("http://magpie.test/?view=settings"); await p.locator("#sideGw").waitFor(); await read;
+    await p.goto("http://blackpie.test/?view=settings"); await p.locator("#sideGw").waitFor(); await read;
     await p.evaluate(() => new Promise(requestAnimationFrame));
     assert.equal(await p.locator("#sideGw span").textContent(), "Gateway 127.0.0.1:3999");
     assert.equal(await p.locator("#sideGw").getAttribute("title"), "Gateway " + LOCAL);

@@ -10,9 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/claudetui"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/wslrun"
+	"github.com/hmjz100/blackpie/internal/claudetui"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/wslrun"
 )
 
 // A Claude run is Claude Code's interactive mode on macOS, Linux and

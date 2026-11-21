@@ -10,41 +10,41 @@ import (
 
 // The Windows app is linked as a GUI program, so a double click opens no
 // console window; but a shell doesn't wait for a GUI program either. In
-// PowerShell or cmd, `magpie plugin login` gave the prompt back at once,
-// printed after it, and the shell and magpie both read the keys typed:
-// a hidden password never reached magpie (TomXPRIME, #3737). A shell looks
-// for `magpie` by PATHEXT, which lists .COM before .EXE, so magpie writes
-// magpie.com beside the app: a small console program (./launcher) that
+// PowerShell or cmd, `blackpie plugin login` gave the prompt back at once,
+// printed after it, and the shell and blackpie both read the keys typed:
+// a hidden password never reached blackpie (TomXPRIME, #3737). A shell looks
+// for `blackpie` by PATHEXT, which lists .COM before .EXE, so blackpie writes
+// blackpie.com beside the app: a small console program (./launcher) that
 // the shell waits for, which runs the app with its console and exits with
-// the app's code. Double clicks and the Start menu still open magpie.exe.
+// the app's code. Double clicks and the Start menu still open blackpie.exe.
 //
-// It is written wherever a terminal runs magpie from: when the app's
-// folder is on PATH, where Settings › Command line puts it, or a magpie.com
-// or magpie.cmd is there already. On the Desktop or in Downloads only Add
+// It is written wherever a terminal runs blackpie from: when the app's
+// folder is on PATH, where Settings › Command line puts it, or a blackpie.com
+// or blackpie.cmd is there already. On the Desktop or in Downloads only Add
 // writes it, and a start only keeps one there up to date. The app writes it again as it starts
 // when its bytes differ, so an update brings it along. They differ only
 // when the launcher does: it is built without the release's commit in it
-// (the Makefile's -buildvcs=false), or every update wrote a new magpie.com
+// (the Makefile's -buildvcs=false), or every update wrote a new blackpie.com
 // (lucky_eagle_38410 on Discord, TestLauncherSameAtEveryCommit).
 
-// ComEnv is set by magpie.com for the app it runs: the standard handles it
+// ComEnv is set by blackpie.com for the app it runs: the standard handles it
 // hands over are the terminal's console or a redirection, and its console
 // is the one to borrow (cli's console_windows.go).
-const ComEnv = "MAGPIE_COM"
+const ComEnv = "BLACKPIE_COM"
 
-// comName is the companion's file name; it runs as `magpie`.
-const comName = "magpie.com"
+// comName is the companion's file name; it runs as `blackpie`.
+const comName = "blackpie.com"
 
-// comMagic ends magpie.com; the app it runs is named just before it,
+// comMagic ends blackpie.com; the app it runs is named just before it,
 // after a NUL (launcher's targetName).
-const comMagic = "\x00magpie-com-target"
+const comMagic = "\x00blackpie-com-target"
 
 // comLauncher is the launcher program, built for this system and put in
 // the Windows app by `make release-windows` (com_embed_windows_*.go); nil
-// in any other build, which writes no magpie.com.
+// in any other build, which writes no blackpie.com.
 var comLauncher []byte
 
-// comText is the magpie.com that runs the program exe in its folder.
+// comText is the blackpie.com that runs the program exe in its folder.
 func comText(launcher []byte, exe string) []byte {
 	name := filepath.Base(strings.ReplaceAll(exe, `\`, "/"))
 	out := make([]byte, 0, len(launcher)+1+len(name)+len(comMagic))
@@ -54,7 +54,7 @@ func comText(launcher []byte, exe string) []byte {
 	return append(out, comMagic...)
 }
 
-// comTarget is the program name in a magpie.com's last bytes, "" when it
+// comTarget is the program name in a blackpie.com's last bytes, "" when it
 // has none.
 func comTarget(b []byte) string {
 	if !bytes.HasSuffix(b, []byte(comMagic)) {
@@ -64,7 +64,7 @@ func comTarget(b []byte) string {
 	return string(b[bytes.LastIndexByte(b, 0)+1:])
 }
 
-// comRuns says whether cmd is a magpie.com beside exe that runs it.
+// comRuns says whether cmd is a blackpie.com beside exe that runs it.
 func comRuns(cmd, exe string) bool {
 	if !strings.EqualFold(filepath.Base(cmd), comName) || !strings.EqualFold(filepath.Dir(cmd), filepath.Dir(exe)) {
 		return false
@@ -86,20 +86,20 @@ func comRuns(cmd, exe string) bool {
 	return strings.EqualFold(comTarget(b), filepath.Base(exe))
 }
 
-// comOwner says whether exe is the program a magpie.com in its folder
-// should run: a magpie.exe there is what `magpie` ran before, so another
-// copy beside it (magpie-windows-amd64 (1).exe) leaves it be.
+// comOwner says whether exe is the program a blackpie.com in its folder
+// should run: a blackpie.exe there is what `blackpie` ran before, so another
+// copy beside it (blackpie-windows-amd64 (1).exe) leaves it be.
 func comOwner(exe string) bool {
-	if strings.EqualFold(filepath.Base(exe), "magpie.exe") {
+	if strings.EqualFold(filepath.Base(exe), "blackpie.exe") {
 		return true
 	}
-	st, err := os.Stat(filepath.Join(filepath.Dir(exe), "magpie.exe"))
+	st, err := os.Stat(filepath.Join(filepath.Dir(exe), "blackpie.exe"))
 	return err != nil || st.IsDir()
 }
 
-// EnsureCompanion writes the magpie.com that runs exe beside it when a
-// terminal runs magpie from that folder (on PATH, or a magpie.com or
-// magpie.cmd there), or brings one there up to this version. Nothing in
+// EnsureCompanion writes the blackpie.com that runs exe beside it when a
+// terminal runs blackpie from that folder (on PATH, or a blackpie.com or
+// blackpie.cmd there), or brings one there up to this version. Nothing in
 // a build without the launcher, or when it is as it should be already.
 func EnsureCompanion(exe string) error {
 	if comLauncher == nil || !comOwner(exe) {
@@ -121,8 +121,8 @@ func EnsureCompanion(exe string) error {
 	return err
 }
 
-// writeCom writes the magpie.com that runs exe beside it, unless it is
-// there already, and is its path. A magpie.com running now (a `magpie
+// writeCom writes the blackpie.com that runs exe beside it, unless it is
+// there already, and is its path. A blackpie.com running now (a `blackpie
 // serve` in a terminal) can't be written over, but can be moved aside,
 // as an update moves the running app; the next run clears it.
 func writeCom(launcher []byte, exe string) (string, error) {
@@ -133,9 +133,9 @@ func writeCom(launcher []byte, exe string) (string, error) {
 	if b, err := os.ReadFile(p); err == nil && bytes.Equal(b, want) {
 		return p, nil
 	}
-	f, err := os.CreateTemp(filepath.Dir(p), ".magpie-com-*")
+	f, err := os.CreateTemp(filepath.Dir(p), ".blackpie-com-*")
 	if err != nil {
-		return "", fmt.Errorf("writing %s, which runs %s as magpie: %w", p, filepath.Base(exe), err)
+		return "", fmt.Errorf("writing %s, which runs %s as blackpie: %w", p, filepath.Base(exe), err)
 	}
 	tmp := f.Name()
 	_, err = f.Write(want)
@@ -151,7 +151,7 @@ func writeCom(launcher []byte, exe string) (string, error) {
 	}
 	if err != nil {
 		os.Remove(tmp)
-		return "", fmt.Errorf("writing %s, which runs %s as magpie: %w", p, filepath.Base(exe), err)
+		return "", fmt.Errorf("writing %s, which runs %s as blackpie: %w", p, filepath.Base(exe), err)
 	}
 	return p, nil
 }

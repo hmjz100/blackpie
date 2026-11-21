@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 // testingPlugin installs the fake plugin with one signed-in account and
@@ -20,7 +20,7 @@ func testingPlugin(t *testing.T, ctx context.Context, vendor http.Handler) Provi
 	t.Helper()
 	bun := testenv.Bun(t)
 	claudeHome(t)
-	t.Setenv("MAGPIE_BUN", bun)
+	t.Setenv("BLACKPIE_BUN", bun)
 	testenv.FakeVendor(t, vendor)
 	t.Cleanup(plugin.Settle)
 	abs, _ := filepath.Abs("../plugin/testdata/fake/index.js")
@@ -46,7 +46,7 @@ func testingPlugin(t *testing.T, ctx context.Context, vendor http.Handler) Provi
 }
 
 // answers is a vendor that streams one word on chat completions, and
-// keeps the X-Magpie-Fallback and X-Saw-Fallback each request came with.
+// keeps the X-Blackpie-Fallback and X-Saw-Fallback each request came with.
 type answers struct {
 	mu   sync.Mutex
 	seen []string

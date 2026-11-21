@@ -29,8 +29,8 @@ const FEED = `<?xml version="1.0" encoding="UTF-8"?>
   <entry>
     <id>tag:github.com,2008:Repository/1/v0.1.3</id>
     <updated>2026-10-03T08:54:51Z</updated>
-    <link rel="alternate" type="text/html" href="https://github.com/yetone/magpie-releases/releases/tag/v0.1.3"/>
-    <title>magpie v0.1.3</title>
+    <link rel="alternate" type="text/html" href="https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.3"/>
+    <title>blackpie v0.1.3</title>
     <content type="html">&lt;h3&gt;Features&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;One thing (#1)&lt;/li&gt;
@@ -45,7 +45,7 @@ const FEED = `<?xml version="1.0" encoding="UTF-8"?>
   <entry>
     <id>tag:github.com,2008:Repository/1/v0.1.2</id>
     <updated>2026-10-02T08:54:51Z</updated>
-    <link rel="alternate" type="text/html" href="https://github.com/yetone/magpie-releases/releases/tag/v0.1.2"/>
+    <link rel="alternate" type="text/html" href="https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.2"/>
     <content type="html">&lt;h3&gt;Fixes&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;Older, &lt;strong&gt;English&lt;/strong&gt; alone, &lt;code&gt;a &amp;amp;lt; b&lt;/code&gt; &lt;a href=&quot;https://x.dev/&quot;&gt;link&lt;/a&gt;&lt;/li&gt;
@@ -64,19 +64,19 @@ globalThis.fetch = async (u, init = {}) => {
     seen.push(new Headers(init.headers));
     if (apiDown) return new Response('{"message":"API rate limit exceeded"}', { status: 403 });
   } else if (pagesDown) return new Response("unicorn", { status: 503 });
-  if (u === "https://github.com/yetone/magpie-releases/releases/latest")
-    return new Response(null, { status: 302, headers: { Location: "https://github.com/yetone/magpie-releases/releases/tag/v0.1.3" } });
+  if (u === "https://github.com/hmjz100/blackpie-releases/releases/latest")
+    return new Response(null, { status: 302, headers: { Location: "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.3" } });
   if (u.endsWith("/releases.atom")) return new Response(FEED);
-  const gh = (tag) => ({ tag_name: tag, body: BODIES[tag], html_url: "https://github.com/r/" + tag, published_at: "2026-10-01T00:00:00Z", draft: false, prerelease: false, assets: [{ name: "magpie-linux-amd64", size: 1, browser_download_url: "https://dl/x" }] });
+  const gh = (tag) => ({ tag_name: tag, body: BODIES[tag], html_url: "https://github.com/r/" + tag, published_at: "2026-10-01T00:00:00Z", draft: false, prerelease: false, assets: [{ name: "blackpie-linux-amd64", size: 1, browser_download_url: "https://dl/x" }] });
   if (u.endsWith("/releases/latest")) return Response.json(gh("v0.1.3"));
   if (u.includes("/releases?per_page=")) return Response.json(Object.keys(BODIES).map(gh));
-  if (u.endsWith("/SHA256SUMS")) return new Response("abc  magpie-linux-amd64\n");
+  if (u.endsWith("/SHA256SUMS")) return new Response("abc  blackpie-linux-amd64\n");
   return new Response("not found", { status: 404 });
 };
 
 const ctx = { waitUntil: (p) => p };
 const get = async (path) => {
-  const res = await worker.fetch(new Request("https://usemagpie.ai" + path), {}, ctx);
+  const res = await worker.fetch(new Request("https://useblackpie.ai" + path), {}, ctx);
   assert.equal(res.status, 200, path);
   return { body: await res.json(), cc: res.headers.get("Cache-Control") };
 };
@@ -130,7 +130,7 @@ test("i18n: every string the home page marks has its Chinese, and no other", asy
 
 test("home: / sends a browser that prefers Chinese, Japanese or German to its page, until a language is picked", async () => {
   const env = { ASSETS: { fetch: async () => new Response("<html></html>", { headers: { "Content-Type": "text/plain" } }) } };
-  const home = (headers) => worker.fetch(new Request("https://usemagpie.ai/", { headers }), env, ctx);
+  const home = (headers) => worker.fetch(new Request("https://useblackpie.ai/", { headers }), env, ctx);
   const to = async (headers) => {
     const res = await home(headers);
     assert.match(res.headers.get("Vary") || "", /Accept-Language/);
@@ -152,7 +152,7 @@ test("home: / sends a browser that prefers Chinese, Japanese or German to its pa
   assert.equal(await to({ "Accept-Language": "de", Cookie: "lang=en" }), null);
   assert.equal(await to({ Cookie: "lang=de" }), "/de/");
   for (const lang of ["zh", "de"]) {
-    const res = await worker.fetch(new Request("https://usemagpie.ai/" + lang), env, ctx);
+    const res = await worker.fetch(new Request("https://useblackpie.ai/" + lang), env, ctx);
     assert.equal(res.status, 301);
     assert.equal(new URL(res.headers.get("Location")).pathname, `/${lang}/`);
   }
@@ -161,14 +161,14 @@ test("home: / sends a browser that prefers Chinese, Japanese or German to its pa
 test("docs: the bare docs paths open each language's guide", async () => {
   const env = { ASSETS: { fetch: async () => new Response("asset") } };
   for (const [from, to] of [["/docs", "/docs/start"], ["/docs/zh/", "/docs/zh/start"], ["/docs/ja", "/docs/ja/start"]]) {
-    const res = await worker.fetch(new Request("https://usemagpie.ai" + from), env, ctx);
-    assert.equal(new URL(res.headers.get("Location"), "https://usemagpie.ai").pathname, to, from);
+    const res = await worker.fetch(new Request("https://useblackpie.ai" + from), env, ctx);
+    assert.equal(new URL(res.headers.get("Location"), "https://useblackpie.ai").pathname, to, from);
   }
 });
 
 // #661: the update window showed no notes while GitHub's API limited the
 // worker, and the failure was kept for five minutes.
-const ask = (path, env = {}) => worker.fetch(new Request("https://usemagpie.ai" + path), env, ctx);
+const ask = (path, env = {}) => worker.fetch(new Request("https://useblackpie.ai" + path), env, ctx);
 
 test("latest: with the API limited, the notes come from the releases feed, kept briefly", async () => {
   store.clear();
@@ -180,7 +180,7 @@ test("latest: with the API limited, the notes come from the releases feed, kept 
     assert.equal(body.version, "0.1.3");
     assert.match(body.notes, /One thing \(#1\)/);
     assert.doesNotMatch(body.notes, /一件事/);
-    assert.equal(body.assets["magpie-linux-amd64"].sha256, "abc");
+    assert.equal(body.assets["blackpie-linux-amd64"].sha256, "abc");
     assert.equal(res.headers.get("Cache-Control"), "public, max-age=60");
     const zh = await (await ask("/api/latest?lang=zh")).json();
     assert.match(zh.notes, /^### 新功能\n\n- 一件事 \(#1\)$/);
@@ -200,7 +200,7 @@ test("notes: with the API limited, the releases feed's notes, in either language
     assert.deepEqual(list.map((r) => r.version), ["0.1.3", "0.1.2"]);
     assert.equal(list[0].notes, "### 新功能\n\n- 一件事 (#1)");
     assert.equal(list[1].notes, "### Fixes\n\n- Older, **English** alone, `a &lt; b` [link](https://x.dev/)");
-    assert.equal(list[0].url, "https://github.com/yetone/magpie-releases/releases/tag/v0.1.3");
+    assert.equal(list[0].url, "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.3");
   } finally {
     apiDown = false;
   }
@@ -219,7 +219,7 @@ test("notes and latest: GitHub failing altogether is an error never kept, then t
     apiDown = pagesDown = false;
     assert.equal((await ask("/api/notes?upto=0.1.3")).headers.get("Cache-Control"), "public, max-age=300");
     assert.equal((await ask("/api/latest")).status, 200);
-    for (const k of ["https://usemagpie.ai/__v2/releases", "https://usemagpie.ai/__v2/latest"]) store.delete(k);
+    for (const k of ["https://useblackpie.ai/__v2/releases", "https://useblackpie.ai/__v2/latest"]) store.delete(k);
     apiDown = pagesDown = true;
     const res = await ask("/api/notes?upto=0.1.3");
     assert.equal(res.status, 200);
@@ -245,10 +245,10 @@ test("api: a GITHUB_TOKEN secret is sent to GitHub's API, and none without it", 
 
 test("cache: what an older worker kept, in its own shape, is never read as this one's", async () => {
   store.clear();
-  store.set("https://usemagpie.ai/__latest", JSON.stringify({ version: "0.1.1", notes: "", assets: {} }));
-  store.set("https://usemagpie.ai/__releases", JSON.stringify([{ version: "0.1.1", notes: "old" }]));
-  store.set("https://usemagpie.ai/__v2/latest", JSON.stringify({ version: "0.1.1" }));
-  store.set("https://usemagpie.ai/__v2/releases", JSON.stringify([{ version: "0.1.1" }]));
+  store.set("https://useblackpie.ai/__latest", JSON.stringify({ version: "0.1.1", notes: "", assets: {} }));
+  store.set("https://useblackpie.ai/__releases", JSON.stringify([{ version: "0.1.1", notes: "old" }]));
+  store.set("https://useblackpie.ai/__v2/latest", JSON.stringify({ version: "0.1.1" }));
+  store.set("https://useblackpie.ai/__v2/releases", JSON.stringify([{ version: "0.1.1" }]));
   const notes = await ask("/api/notes?upto=0.1.3");
   assert.equal(notes.status, 200);
   assert.equal((await notes.json()).releases[0].version, "0.1.3");
@@ -268,7 +268,7 @@ test("docs: an English docs page sends a browser that prefers Chinese or Japanes
   const have = new Set(["/docs/start", "/docs/zh/start", "/docs/ja/start", "/docs/only-en"]);
   const env = { ASSETS: { fetch: async (r) => new Response(have.has(new URL(r.url).pathname) ? "<html></html>" : "nf", { status: have.has(new URL(r.url).pathname) ? 200 : 404, headers: { "Content-Type": "text/plain" } }) } };
   const to = async (path, headers) => {
-    const res = await worker.fetch(new Request("https://usemagpie.ai" + path, { headers }), env, ctx);
+    const res = await worker.fetch(new Request("https://useblackpie.ai" + path, { headers }), env, ctx);
     assert.match(res.headers.get("Vary") || "", /Accept-Language/);
     return res.status === 302 ? res.headers.get("Location") : res.status;
   };
@@ -283,7 +283,7 @@ test("docs: an English docs page sends a browser that prefers Chinese or Japanes
   // a page not written in Chinese yet
   assert.equal(await to("/docs/only-en", { "Accept-Language": "zh-CN" }), 200);
   // a language's own page is never moved
-  const res = await worker.fetch(new Request("https://usemagpie.ai/docs/zh/start", { headers: { Cookie: "lang=en" } }), env, ctx);
+  const res = await worker.fetch(new Request("https://useblackpie.ai/docs/zh/start", { headers: { Cookie: "lang=en" } }), env, ctx);
   assert.equal(res.status, 200);
 });
 
@@ -326,11 +326,11 @@ test("partners: links go through /go", () => {
   const out = served(LIST, NOW);
   assert.deepEqual(out.map((p) => p.id), ["acme", "plain"]);
   const [acme, plain] = out;
-  assert.equal(acme.website, "https://usemagpie.ai/go/acme/site");
-  assert.equal(acme.keysUrl, "https://usemagpie.ai/go/acme/keys");
+  assert.equal(acme.website, "https://useblackpie.ai/go/acme/site");
+  assert.equal(acme.keysUrl, "https://useblackpie.ai/go/acme/keys");
   assert.equal(acme.iconUrl, LIST[0].iconUrl);
   assert.equal(acme.chat, LIST[0].chat);
-  assert.equal(acme.regions[0].keysUrl, "https://usemagpie.ai/go/acme/keys/cn");
+  assert.equal(acme.regions[0].keysUrl, "https://useblackpie.ai/go/acme/keys/cn");
   assert.equal(acme.regions[0].website, undefined);
   // the editor names a /go website by the host it sends the browser to
   assert.equal(acme.siteHost, "acme.example");
@@ -343,18 +343,18 @@ test("partners: links go through /go", () => {
   assert.equal(served([{ ...LIST[0], until: "2026-10-10T00:00:01Z" }], NOW).length, 1);
 });
 
-test("partners: /go sends the browser on, saying it came from magpie", () => {
-  assert.equal(goTarget(LIST, "acme", "keys"), "https://acme.example/keys?ref=magpie");
-  assert.equal(goTarget(LIST, "acme", "site"), "https://acme.example/?ref=magpie");
-  assert.equal(goTarget(LIST, "acme", "keys", "cn"), "https://cn.acme.example/keys?ref=magpie");
+test("partners: /go sends the browser on, saying it came from blackpie", () => {
+  assert.equal(goTarget(LIST, "acme", "keys"), "https://acme.example/keys?ref=blackpie");
+  assert.equal(goTarget(LIST, "acme", "site"), "https://acme.example/?ref=blackpie");
+  assert.equal(goTarget(LIST, "acme", "keys", "cn"), "https://cn.acme.example/keys?ref=blackpie");
   // a region without its own page has the partner's
-  assert.equal(goTarget(LIST, "acme", "keys", "us east"), "https://acme.example/keys?ref=magpie");
-  assert.equal(goTarget(LIST, "acme", "site", "cn"), "https://acme.example/?ref=magpie");
+  assert.equal(goTarget(LIST, "acme", "keys", "us east"), "https://acme.example/keys?ref=blackpie");
+  assert.equal(goTarget(LIST, "acme", "site", "cn"), "https://acme.example/?ref=blackpie");
   // ended, still goes
-  assert.equal(goTarget(LIST, "gone", "keys"), "https://gone.example/keys?ref=magpie");
+  assert.equal(goTarget(LIST, "gone", "keys"), "https://gone.example/keys?ref=blackpie");
   // the partner's own query and fragment stay; its own ref is its referral code and stays as it is
   const own = [{ id: "own", keysUrl: "https://own.example/keys?aff=7#signup", website: "https://own.example/?ref=abc" }];
-  assert.equal(goTarget(own, "own", "keys"), "https://own.example/keys?aff=7&ref=magpie#signup");
+  assert.equal(goTarget(own, "own", "keys"), "https://own.example/keys?aff=7&ref=blackpie#signup");
   assert.equal(goTarget(own, "own", "site"), "https://own.example/?ref=abc");
   for (const [id, what, region] of [["nobody", "keys"], ["acme", "chat"], ["acme", "keys", "mars"], ["plain", "keys"], ["acme", "constructor"]])
     assert.equal(goTarget(LIST, id, what, region), "", [id, what, region].join(" "));
@@ -372,19 +372,19 @@ test("partners: /go counts the click", async () => {
   }
   const what = p.keysUrl ? "keys" : "site";
   captured.length = 0;
-  const res = await worker.fetch(new Request("https://usemagpie.ai/go/" + p.id + "/" + what), {}, ctx);
+  const res = await worker.fetch(new Request("https://useblackpie.ai/go/" + p.id + "/" + what), {}, ctx);
   assert.equal(res.status, 302);
   assert.equal(res.headers.get("Location"), goTarget(PARTNERS, p.id, what));
   assert.equal(new URL(res.headers.get("Location")).searchParams.has("ref"), true);
   await Promise.resolve();
   assert.equal(captured.length, 1);
-  assert.equal(captured[0].event, "magpie partner go");
+  assert.equal(captured[0].event, "blackpie partner go");
   assert.equal(captured[0].properties.id, p.id);
   assert.equal(captured[0].properties.what, what);
   assert.equal(captured[0].properties.$process_person_profile, false);
   // a HEAD goes on but isn't counted
   captured.length = 0;
-  const head = await worker.fetch(new Request("https://usemagpie.ai/go/" + p.id + "/" + what, { method: "HEAD" }), {}, ctx);
+  const head = await worker.fetch(new Request("https://useblackpie.ai/go/" + p.id + "/" + what, { method: "HEAD" }), {}, ctx);
   assert.equal(head.status, 302);
   assert.deepEqual(captured, []);
   assert.equal((await ask("/go/nobody-at-all/keys")).status, 404);
@@ -404,7 +404,7 @@ test("partners: the list's fetches are counted, one in ten", async () => {
       await new Promise((ok) => setTimeout(ok, 0));
       assert.equal(captured.length, sent ? 1 : 0, "random " + r);
       if (sent) {
-        assert.equal(captured[0].event, "magpie partners fetch");
+        assert.equal(captured[0].event, "blackpie partners fetch");
         assert.equal(captured[0].properties.weight, 10);
       }
     }
@@ -429,8 +429,8 @@ test("icon proxy passes on a picture and nothing of the asker", async () => {
     throw new Error("a test reached " + u); // never the real network
   };
   try {
-    const req = new Request("https://usemagpie.ai/api/icon?url=" + encodeURIComponent("https://author.example/logo.png"), {
-      headers: { Cookie: "lang=zh", "User-Agent": "magpie/0.1.1168", "X-Forwarded-For": "203.0.113.9", "CF-Connecting-IP": "203.0.113.9" },
+    const req = new Request("https://useblackpie.ai/api/icon?url=" + encodeURIComponent("https://author.example/logo.png"), {
+      headers: { Cookie: "lang=zh", "User-Agent": "blackpie/0.1.1168", "X-Forwarded-For": "203.0.113.9", "CF-Connecting-IP": "203.0.113.9" },
     });
     const res = await worker.fetch(req, {}, { waitUntil() {} });
     assert.equal(res.status, 200);
@@ -441,7 +441,7 @@ test("icon proxy passes on a picture and nothing of the asker", async () => {
     assert.deepEqual([...h.keys()].sort(), ["accept", "user-agent"]);
     assert.doesNotMatch(h.get("user-agent"), /0\.1\.1168/);
 
-    const ask = async (u) => (await worker.fetch(new Request("https://usemagpie.ai/api/icon?url=" + encodeURIComponent(u)), {}, { waitUntil() {} })).status;
+    const ask = async (u) => (await worker.fetch(new Request("https://useblackpie.ai/api/icon?url=" + encodeURIComponent(u)), {}, { waitUntil() {} })).status;
     assert.equal(await ask("https://author.example/page"), 415);
     assert.equal(await ask("https://author.example/big.png"), 413);
     assert.equal(await ask("https://author.example/gone.png"), 502);
@@ -449,9 +449,9 @@ test("icon proxy passes on a picture and nothing of the asker", async () => {
     assert.equal(await ask("https://u:p@author.example/logo.png"), 400);
     assert.equal(await ask("https://author.example:8443/logo.png"), 400);
     assert.equal(await ask("not a url"), 400);
-    assert.equal(await ask("https://usemagpie.ai/api/icon?url=x"), 400);
-    assert.equal(await ask("https://www.usemagpie.ai/logo.png"), 400);
-    assert.ok(asked.every((a) => !new URL(a.u).hostname.endsWith("usemagpie.ai")), "the worker asked itself");
+    assert.equal(await ask("https://useblackpie.ai/api/icon?url=x"), 400);
+    assert.equal(await ask("https://www.useblackpie.ai/logo.png"), 400);
+    assert.ok(asked.every((a) => !new URL(a.u).hostname.endsWith("useblackpie.ai")), "the worker asked itself");
   } finally {
     globalThis.fetch = was;
   }
@@ -469,17 +469,17 @@ test("sponsors: /go/<id>/home and /readme send the browser to the sponsor's own 
       if (!s[where]) continue;
       assert.equal(new URL(s[where]).protocol, "https:");
       captured.length = 0;
-      const res = await worker.fetch(new Request(`https://usemagpie.ai/go/${s.id}/${where}`), {}, ctx);
+      const res = await worker.fetch(new Request(`https://useblackpie.ai/go/${s.id}/${where}`), {}, ctx);
       assert.equal(res.status, 302);
       assert.equal(res.headers.get("Location"), s[where]);
       await Promise.resolve();
       assert.equal(captured.length, 1);
-      assert.equal(captured[0].event, "magpie sponsor go");
+      assert.equal(captured[0].event, "blackpie sponsor go");
       assert.equal(captured[0].properties.id, s.id);
       assert.equal(captured[0].properties.where, where);
       // a HEAD goes on but isn't counted
       captured.length = 0;
-      assert.equal((await worker.fetch(new Request(`https://usemagpie.ai/go/${s.id}/${where}`, { method: "HEAD" }), {}, ctx)).status, 302);
+      assert.equal((await worker.fetch(new Request(`https://useblackpie.ai/go/${s.id}/${where}`, { method: "HEAD" }), {}, ctx)).status, 302);
       assert.deepEqual(captured, []);
     }
     assert.equal((await ask(`/go/${s.id}/home/x`)).status, 404);
@@ -497,7 +497,7 @@ test("sponsors: the home page and the READMEs link every sponsor through /go", a
       for (const s of SPONSORS) {
         if (s[where]) assert.equal(text.includes(s[where]), false, `${f.pathname} links ${s.id} directly`);
         // the home page links its own /go; a README, on GitHub, the site's
-        const go = (where === "home" ? "" : "https://usemagpie.ai") + `/go/${s.id}/${where}`;
+        const go = (where === "home" ? "" : "https://useblackpie.ai") + `/go/${s.id}/${where}`;
         if (text.includes(`/go/${s.id}/`)) assert.ok(s[where] && text.includes(`href="${go}"`), `${f.pathname}: ${go}`);
       }
     }

@@ -3,7 +3,7 @@ package gui
 import (
 	"net/http"
 
-	"github.com/yetone/magpie/internal/usage"
+	"github.com/hmjz100/blackpie/internal/usage"
 )
 
 // speedJSON is how fast a model answered on one provider over the last

@@ -65,7 +65,7 @@ func (f *fakeSocketBackend) turn(i int) socketTurn {
 }
 
 // rem_thank on X: Codex sends a turn on its kept socket as only its new
-// input after previous_response_id, while magpie sent the whole
+// input after previous_response_id, while blackpie sent the whole
 // conversation on a new socket every turn, and a long one was closed 1009
 // as too big. A conversation's next turn now goes on its kept socket as a
 // delta, and one that doesn't carry on from the last goes whole.

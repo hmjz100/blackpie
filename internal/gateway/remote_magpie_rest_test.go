@@ -10,16 +10,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
-// bigsteven on Discord: another computer's magpie (LAN share) serves each
+// bigsteven on Discord: another computer's blackpie (LAN share) serves each
 // of its models from its own providers, and rests them itself. When one of
-// them was out of quota there, its 429 rested the whole remote magpie here
+// them was out of quota there, its 429 rested the whole remote blackpie here
 // for the 3 hours it named, so a group whose member was another of its
 // models, with quota left, went to its next member, or had none. Such a
 // refusal rests only the model it was about.
-func TestRemoteMagpieQuotaRestsTheModel(t *testing.T) {
+func TestRemoteBlackpieQuotaRestsTheModel(t *testing.T) {
 	fresh(t)
 	var asked []string
 	remote := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +42,7 @@ func TestRemoteMagpieQuotaRestsTheModel(t *testing.T) {
 		io.WriteString(w, `{"id":"x","choices":[{"index":0,"message":{"role":"assistant","content":"from `+req.Model+`"},"finish_reason":"stop"}]}`)
 	}))
 	t.Cleanup(remote.Close)
-	if err := provider.Save(provider.Provider{ID: "office", Name: "Office", Preset: provider.RemoteMagpiePreset, Key: "k",
+	if err := provider.Save(provider.Provider{ID: "office", Name: "Office", Preset: provider.RemoteBlackpiePreset, Key: "k",
 		Chat: remote.URL + "/v1", Models: []string{"codex/gpt-5.5", "glm/glm-5", "kimi/kimi-k3"}}); err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +56,7 @@ func TestRemoteMagpieQuotaRestsTheModel(t *testing.T) {
 		t.Fatalf("codex on the remote: %d %s", code, body)
 	}
 	if r, ok := restOf("office"); ok {
-		t.Errorf("the whole remote magpie rests for one model's quota: %+v", r)
+		t.Errorf("the whole remote blackpie rests for one model's quota: %+v", r)
 	}
 	if _, ok := restOf("office/codex/gpt-5.5"); !ok {
 		t.Errorf("codex/gpt-5.5 doesn't rest: %v", rests())
@@ -70,7 +70,7 @@ func TestRemoteMagpieQuotaRestsTheModel(t *testing.T) {
 		t.Fatalf("glm on the remote: %d %s", code, body)
 	}
 	if r, ok := restOf("office"); ok {
-		t.Errorf("the whole remote magpie rests for one model's rate limit: %+v", r)
+		t.Errorf("the whole remote blackpie rests for one model's rate limit: %+v", r)
 	}
 	if r, ok := restOf("office/glm/glm-5"); !ok || r.Why != failRate {
 		t.Errorf("glm/glm-5 doesn't rest as rate limited: %+v %v", r, rests())
@@ -82,11 +82,11 @@ func TestRemoteMagpieQuotaRestsTheModel(t *testing.T) {
 	}
 }
 
-// One of a remote magpie's models rate limited with quota left sinks only
+// One of a remote blackpie's models rate limited with quota left sinks only
 // its own rest (restID, as its rest is keyed): sinking the remote's whole
 // key sends its other models, which were never limited, behind the next
 // provider too, the same mistake resting the whole remote was.
-func TestRemoteMagpieRateLimitSinksTheModel(t *testing.T) {
+func TestRemoteBlackpieRateLimitSinksTheModel(t *testing.T) {
 	fresh(t)
 	forgetSinks(t)
 	var mu sync.Mutex
@@ -108,7 +108,7 @@ func TestRemoteMagpieRateLimitSinksTheModel(t *testing.T) {
 		io.WriteString(w, `{"id":"x","choices":[{"index":0,"message":{"role":"assistant","content":"from `+req.Model+`"},"finish_reason":"stop"}]}`)
 	}))
 	t.Cleanup(remote.Close)
-	if err := provider.Save(provider.Provider{ID: "office", Name: "Office", Preset: provider.RemoteMagpiePreset, Key: "k",
+	if err := provider.Save(provider.Provider{ID: "office", Name: "Office", Preset: provider.RemoteBlackpiePreset, Key: "k",
 		Chat: remote.URL + "/v1", Models: []string{"glm/glm-5", "kimi/kimi-k3"}}); err != nil {
 		t.Fatal(err)
 	}
@@ -137,13 +137,13 @@ func TestRemoteMagpieRateLimitSinksTheModel(t *testing.T) {
 	}
 }
 
-// The same for a magpie added by hand, as a plain OpenAI-compatible
+// The same for a blackpie added by hand, as a plain OpenAI-compatible
 // endpoint: its reply names the provider there (providerHeader), so its
 // model's 429 rests that model alone (remoteModelRest) and sinks it
 // alone, and it is that model, not the endpoint's others, that the next
 // Sink order sends to the back. Read at the model's own sink key, not only
-// for the remote magpie preset, or it sinks nothing at all.
-func TestMagpieAddedByHandRateLimitSinksTheModel(t *testing.T) {
+// for the remote blackpie preset, or it sinks nothing at all.
+func TestBlackpieAddedByHandRateLimitSinksTheModel(t *testing.T) {
 	fresh(t)
 	forgetSinks(t)
 	var mu sync.Mutex
@@ -166,7 +166,7 @@ func TestMagpieAddedByHandRateLimitSinksTheModel(t *testing.T) {
 		io.WriteString(w, `{"id":"x","choices":[{"index":0,"message":{"role":"assistant","content":"from `+req.Model+`"},"finish_reason":"stop"}]}`)
 	}))
 	t.Cleanup(remote.Close)
-	if err := provider.Save(provider.Provider{ID: "rm", Name: "Remote Magpie", Key: "k",
+	if err := provider.Save(provider.Provider{ID: "rm", Name: "Remote Blackpie", Key: "k",
 		Chat: remote.URL + "/v1", Models: []string{"glm/glm-5", "kimi/kimi-k3"}}); err != nil {
 		t.Fatal(err)
 	}

@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/claudetui"
-	"github.com/yetone/magpie/internal/settings"
-	"github.com/yetone/magpie/internal/testenv"
+	"github.com/hmjz100/blackpie/internal/claudetui"
+	"github.com/hmjz100/blackpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/testenv"
 )
 
 // tuiOnly sets the user's "Interactive only" (ClaudeTUIOnly), and
@@ -81,7 +81,7 @@ func TestClaudeTUIOnlyTellsHelper(t *testing.T) {
 	claudeTUIRuns = true
 	t.Cleanup(func() { claudeTUIRuns = false })
 	env := filepath.Join(t.TempDir(), "env")
-	helper := filepath.Join(t.TempDir(), "magpie")
+	helper := filepath.Join(t.TempDir(), "blackpie")
 	testenv.Program(t, helper, `#!/bin/sh
 echo "only=$`+claudetui.OnlyEnv+` trust=$`+claudetui.TrustEnv+`" >> '`+env+`'
 shift; claude=$1; shift
@@ -106,7 +106,7 @@ func TestAskClaudeTUIOnly(t *testing.T) {
 	claudeTUIRuns = true
 	t.Cleanup(func() { claudeTUIRuns = false })
 	env := filepath.Join(t.TempDir(), "env")
-	helper := filepath.Join(t.TempDir(), "magpie")
+	helper := filepath.Join(t.TempDir(), "blackpie")
 	testenv.Program(t, helper, `#!/bin/sh
 [ "$1" = "`+claudetui.Command+`" ] || exit 9
 echo "only=$`+claudetui.OnlyEnv+` trust=$`+claudetui.TrustEnv+`" >> '`+env+`'

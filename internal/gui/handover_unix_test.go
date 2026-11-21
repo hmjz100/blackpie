@@ -18,21 +18,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yetone/magpie/internal/gateway"
-	"github.com/yetone/magpie/internal/provider"
-	"github.com/yetone/magpie/internal/update"
+	"github.com/hmjz100/blackpie/internal/gateway"
+	"github.com/hmjz100/blackpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/update"
 )
 
-// successorEnv has this test binary, started again, play the new magpie
+// successorEnv has this test binary, started again, play the new blackpie
 // (TestHandoverSuccessor).
-const successorEnv = "MAGPIE_TEST_SUCCESSOR"
+const successorEnv = "BLACKPIE_TEST_SUCCESSOR"
 
 // TestHandoverSuccessor is the new version a restart starts, in a process
-// of its own: it takes the gateway over from the magpie that started it
+// of its own: it takes the gateway over from the blackpie that started it
 // and serves it until it is ended.
 func TestHandoverSuccessor(t *testing.T) {
 	if os.Getenv(successorEnv) == "" {
-		t.Skip("the new magpie of TestRestartHandsTheGatewayOver")
+		t.Skip("the new blackpie of TestRestartHandsTheGatewayOver")
 	}
 	exe, err := update.Executable()
 	if err != nil {
@@ -48,15 +48,15 @@ func TestHandoverSuccessor(t *testing.T) {
 	}
 }
 
-// handoverSandbox is a magpie serving the gateway on a port of its own,
+// handoverSandbox is a blackpie serving the gateway on a port of its own,
 // as the app does, to restart; what it set is put back after.
 func handoverSandbox(t *testing.T, up string) *gateway.Server {
 	t.Helper()
 	if err := provider.Save(provider.Provider{ID: "plan", Name: "Plan", Key: "upstream", Chat: up + "/v1", Models: []string{"m1"}}); err != nil {
 		t.Fatal(err)
 	}
-	t.Setenv("MAGPIE_ADDR", "127.0.0.1:0")
-	t.Setenv("MAGPIE_NO_HANDOVER", "")
+	t.Setenv("BLACKPIE_ADDR", "127.0.0.1:0")
+	t.Setenv("BLACKPIE_NO_HANDOVER", "")
 	oldExe, oldHello, oldAck := startExe, helloWait, ackWait
 	oldStart, oldRelaunch := startBeside, relaunchBinary
 	exe, err := update.Executable()
@@ -82,7 +82,7 @@ func handoverSandbox(t *testing.T, up string) *gateway.Server {
 		t.Fatal("the gateway wasn't served")
 	}
 	eventually(t, "the gateway never listened", func() bool { return gw.Addr() != "" })
-	t.Setenv("MAGPIE_ADDR", gw.Addr()) // as the new one finds it in settings
+	t.Setenv("BLACKPIE_ADDR", gw.Addr()) // as the new one finds it in settings
 	return gw
 }
 
@@ -110,7 +110,7 @@ func slowUpstream(t *testing.T, release <-chan struct{}) *httptest.Server {
 	return up
 }
 
-// servedByPid is the pid of the magpie answering at addr, 0 when none.
+// servedByPid is the pid of the blackpie answering at addr, 0 when none.
 func servedByPid(addr string) int {
 	c := &http.Client{Timeout: 2 * time.Second, Transport: &http.Transport{DisableKeepAlives: true}}
 	r, err := c.Get("http://" + addr + "/")
@@ -209,7 +209,7 @@ func TestRestartHandsTheGatewayOver(t *testing.T) {
 	quit := make(chan struct{})
 	leave(func() { close(quit) })
 
-	eventually2(t, 30*time.Second, "the new magpie never served the gateway", func() bool {
+	eventually2(t, 30*time.Second, "the new blackpie never served the gateway", func() bool {
 		return child != nil && child.Process != nil && servedByPid(addr) == child.Process.Pid
 	})
 	if !handedOver.Load() {

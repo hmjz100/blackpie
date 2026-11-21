@@ -8,13 +8,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yetone/magpie/internal/backup"
-	"github.com/yetone/magpie/internal/profile"
-	"github.com/yetone/magpie/internal/provider"
+	"github.com/hmjz100/blackpie/internal/backup"
+	"github.com/hmjz100/blackpie/internal/profile"
+	"github.com/hmjz100/blackpie/internal/provider"
 )
 
 // codexPick writes Codex's model and effort into this computer's
-// config.toml, as a pick in Codex or in magpie does.
+// config.toml, as a pick in Codex or in blackpie does.
 func codexPick(t *testing.T, model, effort string) {
 	t.Helper()
 	dir := os.Getenv("CODEX_HOME")

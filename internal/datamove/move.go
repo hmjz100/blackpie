@@ -1,7 +1,7 @@
-// Package datamove moves magpie's data between its two places, the
+// Package datamove moves blackpie's data between its two places, the
 // installed one (the user's config and cache folders, and on Windows the
 // WebView2 profile in %AppData%) and the portable one (the data folder
-// beside magpie), with no magpie running on it meanwhile. See
+// beside blackpie), with no blackpie running on it meanwhile. See
 // docs/data-directory.md.
 package datamove
 
@@ -23,13 +23,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/appdir"
-	"github.com/yetone/magpie/internal/edit"
+	"github.com/hmjz100/blackpie/internal/appdir"
+	"github.com/hmjz100/blackpie/internal/edit"
 )
 
 // TransactionName is the move's record, beside the mode file: outside
 // both places, so neither move nor backup takes it along.
-const TransactionName = "moepie-data-migration.json"
+const TransactionName = "blackpie-data-migration.json"
 
 // A move's states. Prepared is the window stopping work; copying is the
 // helper copying into staging folders; published has the copies in place
@@ -75,7 +75,7 @@ const stageOwner = "stage-owner"
 // Windows, where the system webview keeps its storage where it is.
 type Places struct{ Config, Cache, SystemCache, Web string }
 
-// PlacesOf are the folders of mode for a magpie run from exe.
+// PlacesOf are the folders of mode for a blackpie run from exe.
 func PlacesOf(exe, mode string) (Places, error) {
 	win := runtime.GOOS == "windows"
 	systemCache, err := appdir.InstalledSystemCache()
@@ -149,7 +149,7 @@ type BrowserProof struct {
 	Created uint64 `json:"created"`
 }
 
-// Transaction is a move, recorded beside magpie.
+// Transaction is a move, recorded beside blackpie.
 type Transaction struct {
 	Browser        *BrowserProof     `json:"browser,omitempty"`
 	CleanupStarted bool              `json:"cleanupStarted,omitempty"`
@@ -234,7 +234,7 @@ func Dismiss(exe string) error {
 var ErrNoMove = errors.New("no data move is waiting")
 
 // ErrMoving is a start while a move runs.
-var ErrMoving = errors.New("magpie is moving its data directory; it opens again once the move is done")
+var ErrMoving = errors.New("blackpie is moving its data directory; it opens again once the move is done")
 
 func lockFor(exe string, d time.Duration) (func(), error) {
 	ctx, cancel := context.WithTimeout(context.Background(), d)
@@ -246,7 +246,7 @@ func lockFor(exe string, d time.Duration) (func(), error) {
 	return unlock, err
 }
 
-// Preflight says why magpie run from exe can't move its data to mode's
+// Preflight says why blackpie run from exe can't move its data to mode's
 // place: the folders it would write in can't be written.
 func Preflight(exe, mode string) error {
 	if mode != appdir.ModeInstalled && mode != appdir.ModePortable {
@@ -263,7 +263,7 @@ func Preflight(exe, mode string) error {
 	if err := validatePaths(exe, &Transaction{Exe: exe, From: other, To: mode, Pairs: pairs}); err != nil {
 		return err
 	}
-	// the mode file and the move's record go beside magpie either way
+	// the mode file and the move's record go beside blackpie either way
 	if err := Writable(filepath.Dir(appdir.ModePath(exe))); err != nil {
 		return err
 	}
@@ -300,7 +300,7 @@ var Writable = func(dir string) error {
 		}
 		dir = parent
 	}
-	f, err := os.CreateTemp(dir, ".moepie-probe-*")
+	f, err := os.CreateTemp(dir, ".blackpie-probe-*")
 	if err != nil {
 		return fmt.Errorf("%s can't be written: %w", dir, err)
 	}
@@ -369,9 +369,9 @@ func targets(tx *Transaction) []string {
 	return d
 }
 
-const closedNote = "magpie is moving its data directory; wait for it to finish"
+const closedNote = "blackpie is moving its data directory; wait for it to finish"
 
-// Authorize closes both places to every other magpie and lets the helper
+// Authorize closes both places to every other blackpie and lets the helper
 // run the move: the window has stopped its work and its children.
 func Authorize(ctx context.Context, exe, id string) error {
 	unlock, err := lockFor(exe, 5*time.Second)
@@ -471,7 +471,7 @@ func move(ctx context.Context, exe string, tx *Transaction) error {
 	release, err := Exclusive(wait, append(sources(tx), targets(tx)...))
 	cancel()
 	if err != nil {
-		return fmt.Errorf("magpie didn't exit in time: %w", err)
+		return fmt.Errorf("blackpie didn't exit in time: %w", err)
 	}
 	defer release()
 	if err := validatePaths(exe, tx); err != nil {
@@ -535,7 +535,7 @@ func move(ctx context.Context, exe string, tx *Transaction) error {
 // finish ends a published move whose mode file is written: the copies are
 // the data now, and the old place says where it went.
 func finish(exe string, tx *Transaction) error {
-	if err := block(context.Background(), sources(tx), "magpie's data moved to "+targetsNote(tx)); err != nil {
+	if err := block(context.Background(), sources(tx), "blackpie's data moved to "+targetsNote(tx)); err != nil {
 		return err
 	}
 	return cleanup(context.Background(), exe, tx)
@@ -637,7 +637,7 @@ func stageAll(ctx context.Context, exe string, tx *Transaction) error {
 }
 
 // skipper says what of pair p's folder on side isn't its to copy or
-// compare: magpie's runtime folder, another pair's folder, and in a
+// compare: blackpie's runtime folder, another pair's folder, and in a
 // WebView2 profile what Chromium makes again.
 func skipper(tx *Transaction, p Pair, side func(Pair) string) func(rel string) bool {
 	top := inner(tx.Pairs, side(p), side)
@@ -697,7 +697,7 @@ func publish(exe string, tx *Transaction) error {
 	return save(exe, tx)
 }
 
-// isEmpty is whether dir has nothing but magpie's runtime folder in it,
+// isEmpty is whether dir has nothing but blackpie's runtime folder in it,
 // or isn't there: the move's own lock and marker don't make it the user's.
 func isEmpty(dir string) (bool, error) {
 	names, err := readNames(dir)
@@ -810,15 +810,15 @@ func settle(exe string, force bool) error {
 		return ErrMoving
 	}
 	release()
-	why := "the data move was interrupted; magpie's data stayed where it was"
+	why := "the data move was interrupted; blackpie's data stayed where it was"
 	if force {
-		why = "the data move was cancelled; magpie's data stayed where it was"
+		why = "the data move was cancelled; blackpie's data stayed where it was"
 	}
 	fail(exe, tx, errors.New(why))
 	return nil
 }
 
-// Roots are the folders a magpie of mode takes a lease in.
+// Roots are the folders a blackpie of mode takes a lease in.
 func Roots(exe, mode string) ([]string, error) {
 	p, err := PlacesOf(exe, mode)
 	if err != nil {

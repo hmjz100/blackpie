@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/yetone/magpie/internal/catalog"
-	"github.com/yetone/magpie/internal/plugin"
-	"github.com/yetone/magpie/internal/settings"
+	"github.com/hmjz100/blackpie/internal/catalog"
+	"github.com/hmjz100/blackpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/settings"
 )
 
 // A model listed with a 512-token window (H20 on Discord: hy3 and Cline's
@@ -18,7 +18,7 @@ import (
 // (4096) stands, and so does one the user sets.
 func TestTinyListedWindowIsUnknown(t *testing.T) {
 	claudeHome(t)
-	t.Setenv("MAGPIE_BUN", "")
+	t.Setenv("BLACKPIE_BUN", "")
 	os.MkdirAll(filepath.Dir(catalog.CachePath()), 0o755)
 	// models.dev's rows as it has them (2026-10-12): hy3's input under its
 	// context, mimo's context

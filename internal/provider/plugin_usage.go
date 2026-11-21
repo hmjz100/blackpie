@@ -9,12 +9,12 @@ package provider
 import (
 	"context"
 	"encoding/json"
-	"github.com/yetone/magpie/internal/lazyre"
+	"github.com/hmjz100/blackpie/internal/lazyre"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/yetone/magpie/internal/plugin"
+	"github.com/hmjz100/blackpie/internal/plugin"
 )
 
 // movedCards are the names and icons the built-ins' usage cards have,

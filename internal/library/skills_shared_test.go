@@ -6,7 +6,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/yetone/magpie/internal/agent"
+	"github.com/hmjz100/blackpie/internal/agent"
 )
 
 func setOmpVersion(t *testing.T, v string) {
