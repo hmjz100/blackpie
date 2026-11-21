@@ -19,7 +19,7 @@ const words = {
   zh: { policy: "智能应用控制", stays: "blackpie 仍是 0.1.900", download: "下载", check: "检查", other: "没能在这台电脑上启动" },
 };
 
-const blocked = (policy) => ({ state: "blocked", current: "0.1.900", latest: "0.1.901", url: "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.901",
+const blocked = (policy) => ({ state: "blocked", current: "0.1.900", latest: "0.1.901", url: "https://github.com/hmjz100/blackpie/releases/tag/v0.1.901",
   blocked: { version: "0.1.901", policy, error: policy ? "fork/exec blackpie.exe: An Application Control policy has blocked this file." : "it quit as soon as it started" } });
 
 function server(lang, ctl) {

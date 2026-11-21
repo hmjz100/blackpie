@@ -37,7 +37,7 @@ func TestUpdateThroughAMirror(t *testing.T) {
 	updateHome(t)
 	body := []byte("new blackpie")
 	sum := sha256.Sum256(body)
-	asset := Asset{URL: "https://github.com/hmjz100/blackpie-releases/releases/download/v9.9.9/blackpie-cli-linux-amd64", SHA256: hex.EncodeToString(sum[:])}
+	asset := Asset{URL: "https://github.com/hmjz100/blackpie/releases/download/v9.9.9/blackpie-cli-linux-amd64", SHA256: hex.EncodeToString(sum[:])}
 
 	var mu sync.Mutex
 	var seen []string
@@ -201,7 +201,7 @@ func TestMirrorFailuresAreTheMirrors(t *testing.T) {
 	updateHome(t)
 	body := []byte("new blackpie")
 	sum := sha256.Sum256(body)
-	asset := Asset{URL: "https://github.com/hmjz100/blackpie-releases/releases/download/v9.9.9/blackpie-cli-linux-amd64", SHA256: hex.EncodeToString(sum[:])}
+	asset := Asset{URL: "https://github.com/hmjz100/blackpie/releases/download/v9.9.9/blackpie-cli-linux-amd64", SHA256: hex.EncodeToString(sum[:])}
 	tampered := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("not blackpie")) }))
 	defer tampered.Close()
 	missing := httptest.NewServer(http.NotFoundHandler())

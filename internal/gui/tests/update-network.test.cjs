@@ -26,7 +26,7 @@ const words = {
 // what the backend says after the tries: the cause, the file, no address
 const failed = {
   state: "error", current: "0.1.1615", latest: "0.1.1618", retry: true, network: true,
-  url: "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.1618",
+  url: "https://github.com/hmjz100/blackpie/releases/tag/v0.1.1618",
   error: "the download of blackpie.exe.new broke off (EOF)",
 };
 

@@ -36,7 +36,7 @@ package provider
 // signed-in account's: its body is the agent's own, as its headers are —
 // except a ChatGPT (Codex) account's, whose requests blackpie builds as Codex
 // CLI would (codexBody), and which take fields Codex CLI adds by choice
-// (access_programs, OpenAI's Daybreak, blackpie-releases#18). On it the
+// (access_programs, OpenAI's Daybreak, blackpie#18). On it the
 // fields codexBody decides for the backend to answer at all — not stored,
 // tool_choice auto, its reasoning carried — can't be set either
 // (codexOwned).

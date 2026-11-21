@@ -23,8 +23,8 @@ const words = {
   de: { why: "blackpie kann nicht in den Ordner schreiben, aus dem es läuft (C:\\), und kann sich daher nicht selbst aktualisieren; verschieben Sie es in einen Ordner mit Schreibrechten und öffnen Sie es von dort." },
 };
 
-const folder = { state: "available", current: "0.1.400", latest: "0.1.401", url: "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.401", stuck: "not-writable", stuckDir: DIR };
-const container = { state: "available", current: "0.1.400", latest: "0.1.401", url: "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.401", stuck: "container" };
+const folder = { state: "available", current: "0.1.400", latest: "0.1.401", url: "https://github.com/hmjz100/blackpie/releases/tag/v0.1.401", stuck: "not-writable", stuckDir: DIR };
+const container = { state: "available", current: "0.1.400", latest: "0.1.401", url: "https://github.com/hmjz100/blackpie/releases/tag/v0.1.401", stuck: "container" };
 const pull = {
   en: "blackpie runs in a container, so it can't update itself; pull the new image (docker pull ghcr.io/hmjz100/blackpie:latest) and recreate the container.",
   zh: "blackpie 运行在容器里，无法自动更新；请拉取新镜像（docker pull ghcr.io/hmjz100/blackpie:latest）并重新创建容器。",
@@ -104,7 +104,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
 // version is out and the command that updates the package, with no
 // Download (the release's binary isn't for this install) and no Update
 // pill (the package can come days after the release).
-const packaged = { state: "available", current: "0.1.400", latest: "0.1.401", url: "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.401", stuck: "package", packaged: { manager: "pacman", package: "blackpie-bin", command: "yay -S blackpie-bin" } };
+const packaged = { state: "available", current: "0.1.400", latest: "0.1.401", url: "https://github.com/hmjz100/blackpie/releases/tag/v0.1.401", stuck: "package", packaged: { manager: "pacman", package: "blackpie-bin", command: "yay -S blackpie-bin" } };
 const byManager = {
   en: "pacman installed blackpie (blackpie-bin), so pacman updates it, not blackpie: yay -S blackpie-bin",
   zh: "pacman 安装了 blackpie（blackpie-bin），所以由 pacman 更新它，而不是 blackpie 自己：yay -S blackpie-bin",

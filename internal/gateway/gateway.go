@@ -7564,7 +7564,7 @@ func (s *Server) translate(w http.ResponseWriter, r *http.Request, p provider.Pr
 			}
 		}
 		// a request the vendor refused in its stream is answered as
-		// refused, with its code (blackpie-releases#18); anything else is
+		// refused, with its code (blackpie#18); anything else is
 		// the vendor failing, with the status its words would have come
 		// with: a minute limit in a 200 stream is a 429, not a 502
 		return writeVendorError(w, from, cmp.Or(col.errStatus, streamStatus(said)), p.Name+": "+said, col.errSaid), said
@@ -8720,7 +8720,7 @@ func writeError(w http.ResponseWriter, proto provider.Protocol, status int, msg 
 // shape, as writeError does, keeping the code and param the vendor named
 // (an OpenAI-shaped error's strings) for a client of OpenAI's shape: the
 // ChatGPT backend's invalid_access_program on access_programs.cyber
-// (blackpie-releases#18) reaches the agent as the backend said it.
+// (blackpie#18) reaches the agent as the backend said it.
 func writeVendorError(w http.ResponseWriter, proto provider.Protocol, status int, msg string, body []byte) int {
 	var code, param any
 	if e := gjson.GetBytes(body, "error"); e.IsObject() {

@@ -17,7 +17,7 @@ import (
 // site is asked for that many alone, once per language and longest range:
 // a shorter range, or the same again, is cut from what was had. A failed
 // ask is said, with the shorter range had before; a range blackpie doesn't
-// offer is the default. The site's list is blackpie-releases' shape, with
+// offer is the default. The site's list is blackpie' shape, with
 // 0.1.1407 never released and each note's Install section.
 func TestWhatsNewBackRanges(t *testing.T) {
 	home := t.TempDir()
@@ -30,7 +30,7 @@ func TestWhatsNewBackRanges(t *testing.T) {
 		s := strconv.Itoa(v)
 		list = append(list, update.Note{
 			Version: "0.1." + s,
-			Notes:   "## Bug Fixes\n\n- fix " + s + "\n\n## Install\n\n- macOS: [blackpie-0.1." + s + "-mac-arm64.dmg](https://github.com/hmjz100/blackpie-releases/releases/download/v0.1." + s + "/blackpie-0.1." + s + "-mac-arm64.dmg)",
+			Notes:   "## Bug Fixes\n\n- fix " + s + "\n\n## Install\n\n- macOS: [blackpie-0.1." + s + "-mac-arm64.dmg](https://github.com/hmjz100/blackpie/releases/download/v0.1." + s + "/blackpie-0.1." + s + "-mac-arm64.dmg)",
 		})
 	}
 	var mu sync.Mutex

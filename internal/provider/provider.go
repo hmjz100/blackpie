@@ -897,7 +897,7 @@ func accountSettings(a, pk Provider) Provider {
 	// keeps them for the account like the rest of these
 	a.RateWindows = pk.RateWindows
 	// the extra body fields written for it, which a ChatGPT account's
-	// requests take (WithExtraBody, blackpie-releases#18)
+	// requests take (WithExtraBody, blackpie#18)
 	a.ExtraBody = pk.ExtraBody
 	// and the image models unticked in its editor (HiddenDrawers)
 	a.HiddenDrawers = pk.HiddenDrawers

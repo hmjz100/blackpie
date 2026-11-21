@@ -19,7 +19,7 @@ func TestAllProxyFromTheEnvironment(t *testing.T) {
 
 	t.Setenv("all_proxy", "socks5h://127.0.0.1:1080")
 	t.Setenv("NO_PROXY", "internal.example, .corp.example:443")
-	gh, _ := url.Parse("https://github.com/hmjz100/blackpie-releases/releases/download/v1/blackpie")
+	gh, _ := url.Parse("https://github.com/hmjz100/blackpie/releases/download/v1/blackpie")
 	if p, err := For(gh); err != nil || p == nil || p.String() != "socks5h://127.0.0.1:1080" {
 		t.Fatalf("ALL_PROXY: %v %v", p, err)
 	}

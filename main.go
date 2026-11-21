@@ -12,7 +12,7 @@ import (
 )
 
 // version is set at build time: -ldflags "-X main.version=…" (Makefile,
-// Dockerfile, blackpie-releases), so it stays in package main.
+// Dockerfile, blackpie), so it stays in package main.
 var version = "dev"
 
 // the notices of what is compiled into every build (moejs's Intl data and

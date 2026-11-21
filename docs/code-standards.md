@@ -123,7 +123,7 @@ A release counts only when all of these hold:
 - A CI Test run on the tagged commit, or a later one containing it, finished
   green. A run cancelled by the next push is not a pass.
 - The tag `vX.Y.Z` is on `main`, an ancestor of `origin/main`.
-- The release in `hmjz100/blackpie-releases` has all 16 assets.
+- The release in `hmjz100/blackpie` has all 16 assets.
 - That release is marked Latest, the highest version.
 
 Check `git tag` for the next free version first, because releases can be

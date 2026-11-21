@@ -22,7 +22,7 @@ func TestUpdateInContainerSaysPullTheImage(t *testing.T) {
 	}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// no checksum: a download is refused before anything is fetched or written
-		json.NewEncoder(w).Encode(update.Release{Version: "0.1.11", URL: "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.11",
+		json.NewEncoder(w).Encode(update.Release{Version: "0.1.11", URL: "https://github.com/hmjz100/blackpie/releases/tag/v0.1.11",
 			Assets: map[string]update.Asset{update.BinaryAsset(): {URL: "http://" + r.Host + "/asset"}}})
 	}))
 	defer srv.Close()

@@ -251,7 +251,7 @@ func TestWhatsNewTodayRoute(t *testing.T) {
 // Settings' What's new with an update waiting lists every release after
 // the one running up to it, not the update's alone (小八 on Discord: on
 // 0.1.1398 with 0.1.1409 waiting, it showed 0.1.1409 and then 0.1.1398 and
-// older). The site's list is the shape blackpie-releases had that day, with
+// older). The site's list is the shape blackpie had that day, with
 // 0.1.1407 never released and each note's Install section.
 func TestWhatsNewListsEveryReleaseUpToTheWaitingUpdate(t *testing.T) {
 	home := t.TempDir()
@@ -264,8 +264,8 @@ func TestWhatsNewListsEveryReleaseUpToTheWaitingUpdate(t *testing.T) {
 		s := strconv.Itoa(v)
 		list = append(list, update.Note{
 			Version: "0.1." + s,
-			Notes:   "## Bug Fixes\n\n- fix " + s + "\n\n## Install\n\n- macOS: [blackpie-0.1." + s + "-mac-arm64.dmg](https://github.com/hmjz100/blackpie-releases/releases/download/v0.1." + s + "/blackpie-0.1." + s + "-mac-arm64.dmg)",
-			URL:     "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1." + s,
+			Notes:   "## Bug Fixes\n\n- fix " + s + "\n\n## Install\n\n- macOS: [blackpie-0.1." + s + "-mac-arm64.dmg](https://github.com/hmjz100/blackpie/releases/download/v0.1." + s + "/blackpie-0.1." + s + "-mac-arm64.dmg)",
+			URL:     "https://github.com/hmjz100/blackpie/releases/tag/v0.1." + s,
 		})
 	}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

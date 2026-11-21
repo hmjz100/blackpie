@@ -23,7 +23,7 @@ func TestUpdatePackagedLeavesItToTheManager(t *testing.T) {
 		if r.URL.Path == "/asset" {
 			t.Errorf("a packaged binary downloaded the release")
 		}
-		json.NewEncoder(w).Encode(update.Release{Version: "0.1.11", URL: "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.11", Assets: map[string]update.Asset{
+		json.NewEncoder(w).Encode(update.Release{Version: "0.1.11", URL: "https://github.com/hmjz100/blackpie/releases/tag/v0.1.11", Assets: map[string]update.Asset{
 			update.BinaryAsset(): {URL: "http://" + r.Host + "/asset"},
 		}})
 	}))

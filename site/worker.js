@@ -1,4 +1,4 @@
-// usemagpie.ai. Releases live on GitHub (hmjz100/blackpie-releases); this
+// usemagpie.ai. Releases live on GitHub (hmjz100/blackpie); this
 // worker turns the newest one into the update feed the app reads and into
 // download links that never go stale.
 //
@@ -40,7 +40,7 @@ import { LANGS } from "./i18n.js";
 import { PARTNERS } from "./partners.js";
 import { SPONSORS } from "./sponsors.js";
 
-const REPO = "hmjz100/blackpie-releases";
+const REPO = "hmjz100/blackpie";
 const TTL = 300; // seconds the newest release is remembered
 
 const SHORT = {
@@ -496,7 +496,7 @@ async function releases(ctx, env) {
 //     as soon as it is out, until a weekly pick passes it.
 //
 // A release is urgent when its notes have a line that starts with
-// URGENT_MARK: "**Urgent release:** why". blackpie-releases' release run
+// URGENT_MARK: "**Urgent release:** why". blackpie' release run
 // writes it from an `Urgent:` trailer on any commit since the version
 // before, and it can be added to a published release's notes by hand
 // (gh release edit) within a day, while the release is on the ledger's

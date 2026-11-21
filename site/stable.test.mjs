@@ -121,7 +121,7 @@ globalThis.fetch = async (u) => {
   if (u.startsWith("https://api.github.com/")) {
     asks++;
     if (apiDown) return new Response('{"message":"API rate limit exceeded"}', { status: 403 });
-    const path = u.split("/repos/hmjz100/blackpie-releases/")[1];
+    const path = u.split("/repos/hmjz100/blackpie/")[1];
     const tag = path.match(/^releases\/tags\/v(.+)$/);
     if (tag) {
       const r = GITHUB.find((r) => r.version === tag[1]);
@@ -137,7 +137,7 @@ globalThis.fetch = async (u) => {
   if (u.endsWith("/releases.atom")) {
     // the feed: the ten newest, their notes as HTML, the date the last edit's
     const entries = GITHUB.slice(0, 10).map(
-      (r) => `<entry><updated>2030-01-01T00:00:00Z</updated><link rel="alternate" type="text/html" href="https://github.com/hmjz100/blackpie-releases/releases/tag/v${r.version}"/><content type="html">${esc(r.html || `<p>${r.notes} (as the feed has it)</p>`)}</content></entry>`,
+      (r) => `<entry><updated>2030-01-01T00:00:00Z</updated><link rel="alternate" type="text/html" href="https://github.com/hmjz100/blackpie/releases/tag/v${r.version}"/><content type="html">${esc(r.html || `<p>${r.notes} (as the feed has it)</p>`)}</content></entry>`,
     );
     return new Response(`<feed>${entries.join("")}</feed>`);
   }

@@ -82,7 +82,7 @@ func daybreak(t *testing.T) *daybreakBackend {
 	return d
 }
 
-// blackpie-releases#18 (NonMirror, OpenCode): a client's access_programs, the
+// blackpie#18 (NonMirror, OpenCode): a client's access_programs, the
 // Daybreak program Codex CLI sends the ChatGPT backend on each turn it was
 // picked for (codex-rs ResponsesApiRequest.access_programs), reaches the
 // backend on a Codex account's model on every path that asks it: Responses
@@ -174,7 +174,7 @@ func TestCodexAccessProgramsReachBackend(t *testing.T) {
 	}
 }
 
-// blackpie-releases#18: the extraBody written for the built-in codex
+// blackpie#18: the extraBody written for the built-in codex
 // provider (by hand: its editor has no box for it) goes on its requests,
 // as a key provider's does — filling in what the client left out, a
 // "!name" replacing it — on every API the request came in on. What Codex

@@ -29,7 +29,7 @@ const FEED = `<?xml version="1.0" encoding="UTF-8"?>
   <entry>
     <id>tag:github.com,2008:Repository/1/v0.1.3</id>
     <updated>2026-10-03T08:54:51Z</updated>
-    <link rel="alternate" type="text/html" href="https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.3"/>
+    <link rel="alternate" type="text/html" href="https://github.com/hmjz100/blackpie/releases/tag/v0.1.3"/>
     <title>blackpie v0.1.3</title>
     <content type="html">&lt;h3&gt;Features&lt;/h3&gt;
 &lt;ul&gt;
@@ -45,7 +45,7 @@ const FEED = `<?xml version="1.0" encoding="UTF-8"?>
   <entry>
     <id>tag:github.com,2008:Repository/1/v0.1.2</id>
     <updated>2026-10-02T08:54:51Z</updated>
-    <link rel="alternate" type="text/html" href="https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.2"/>
+    <link rel="alternate" type="text/html" href="https://github.com/hmjz100/blackpie/releases/tag/v0.1.2"/>
     <content type="html">&lt;h3&gt;Fixes&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;Older, &lt;strong&gt;English&lt;/strong&gt; alone, &lt;code&gt;a &amp;amp;lt; b&lt;/code&gt; &lt;a href=&quot;https://x.dev/&quot;&gt;link&lt;/a&gt;&lt;/li&gt;
@@ -64,8 +64,8 @@ globalThis.fetch = async (u, init = {}) => {
     seen.push(new Headers(init.headers));
     if (apiDown) return new Response('{"message":"API rate limit exceeded"}', { status: 403 });
   } else if (pagesDown) return new Response("unicorn", { status: 503 });
-  if (u === "https://github.com/hmjz100/blackpie-releases/releases/latest")
-    return new Response(null, { status: 302, headers: { Location: "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.3" } });
+  if (u === "https://github.com/hmjz100/blackpie/releases/latest")
+    return new Response(null, { status: 302, headers: { Location: "https://github.com/hmjz100/blackpie/releases/tag/v0.1.3" } });
   if (u.endsWith("/releases.atom")) return new Response(FEED);
   const gh = (tag) => ({ tag_name: tag, body: BODIES[tag], html_url: "https://github.com/r/" + tag, published_at: "2026-10-01T00:00:00Z", draft: false, prerelease: false, assets: [{ name: "blackpie-linux-amd64", size: 1, browser_download_url: "https://dl/x" }] });
   if (u.endsWith("/releases/latest")) return Response.json(gh("v0.1.3"));
@@ -200,7 +200,7 @@ test("notes: with the API limited, the releases feed's notes, in either language
     assert.deepEqual(list.map((r) => r.version), ["0.1.3", "0.1.2"]);
     assert.equal(list[0].notes, "### 新功能\n\n- 一件事 (#1)");
     assert.equal(list[1].notes, "### Fixes\n\n- Older, **English** alone, `a &lt; b` [link](https://x.dev/)");
-    assert.equal(list[0].url, "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.3");
+    assert.equal(list[0].url, "https://github.com/hmjz100/blackpie/releases/tag/v0.1.3");
   } finally {
     apiDown = false;
   }

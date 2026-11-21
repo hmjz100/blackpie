@@ -2652,7 +2652,7 @@ keeps itself current: the app
 downloads a new version in the background and installs it when you restart
 (*Restart to Update* in the menu) or quit; `blackpie update` does the same from
 a terminal. Every release is on
-[hmjz100/blackpie-releases](https://github.com/hmjz100/blackpie-releases/releases).
+[hmjz100/blackpie](https://github.com/hmjz100/blackpie/releases).
 
 ### Update channel
 
@@ -2678,7 +2678,7 @@ by hand. A release is urgent when its notes have a line that starts with
 **Urgent release:** the gateway sent requests without a key to a page on another site.
 ```
 
-blackpie-releases' release run writes it from an `Urgent: <why>` trailer on
+blackpie' release run writes it from an `Urgent: <why>` trailer on
 any commit since the version before. It can also be added to a published
 release with `gh release edit` while the release is among the newest 100
 (about a day of releases); the feed's ledger reads them every quarter

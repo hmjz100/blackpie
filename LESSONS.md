@@ -626,7 +626,7 @@ update feed and the tap, unless the publish step checks.**
 - 10-28: v0.1.1891 finished 16s after v0.1.1892. 1891 became Latest,
   which usemagpie.ai's /api/latest serves, and the Homebrew tap went from
   1892 back to 1891 (tap 1d47b64). v0.1.1890, still notarising, would
-  have done it again. blackpie-releases ee73d7a now passes `make_latest`
+  have done it again. blackpie ee73d7a now passes `make_latest`
   only to the highest version and runs the tap update only then.
 - A fix made by hand once is a fix for that release only. When it comes
   back, fix the step that does it.

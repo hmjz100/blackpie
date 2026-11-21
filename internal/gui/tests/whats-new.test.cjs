@@ -34,7 +34,7 @@ const NOTES_604 = [
   "- See [the guide](https://usemagpie.ai/docs) and [not a link](javascript:window.__pwned=2).",
 ].join("\n");
 const RELEASES = [
-  { version: "0.1.604", notes: NOTES_604, url: "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.604" },
+  { version: "0.1.604", notes: NOTES_604, url: "https://github.com/hmjz100/blackpie/releases/tag/v0.1.604" },
   // the Chinese notes' translation words a heading its own way, or keeps
   // the English (Wei He on Discord); a heading blackpie doesn't know reads as
   // written
@@ -226,7 +226,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       assert.equal(await dialog(page).count(), 0, "shown once");
 
       // Settings → What's new → Open opens them again, the waiting update's first
-      ctl.update = { state: "ready", current: "0.1.604", latest: "0.1.607", notes: "## New Features\n\n- A new thing. (#470)", url: "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.607" };
+      ctl.update = { state: "ready", current: "0.1.604", latest: "0.1.607", notes: "## New Features\n\n- A new thing. (#470)", url: "https://github.com/hmjz100/blackpie/releases/tag/v0.1.607" };
       ctl.ahead = [
         { version: "0.1.607", notes: ctl.update.notes, url: ctl.update.url, pending: true },
         { version: "0.1.606", notes: "- Six.", pending: true },

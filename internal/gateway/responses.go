@@ -2006,7 +2006,7 @@ func (d *responsesDecoder) decode(data string, emit func(Event)) error {
 // Responses stream's error event or failed response says the request
 // itself is at fault (type invalid_request_error): the ChatGPT backend
 // answers an access program the workspace doesn't have with a 200 stream
-// whose error event is access_program_not_enabled (blackpie-releases#18).
+// whose error event is access_program_not_enabled (blackpie#18).
 // Asked again, on this account or another, it is refused the same way, so
 // it is neither retried nor resumed, and a client answered whole gets its
 // code and param. Read by the error object's type, never by its words.
@@ -2024,7 +2024,7 @@ func requestRefused(data string) (int, json.RawMessage) {
 // Event's Said) on the error a stream encoder writes, so a request the
 // vendor refused reads as refused (invalid_request_error) to the agent and
 // to the hold that decides whether to ask again, not as blackpie's api_error
-// (blackpie-releases#18). Without Said it is left as it was.
+// (blackpie#18). Without Said it is left as it was.
 func saidError(failed map[string]any, said json.RawMessage) {
 	e := gjson.GetBytes(said, "error")
 	for _, k := range []string{"type", "code", "param"} {

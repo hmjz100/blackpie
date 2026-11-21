@@ -3154,7 +3154,7 @@ func forVendor(p provider.Provider, body []byte, compaction bool) []byte {
 
 // keepsAccessPrograms says a Responses request to p goes with its top-level
 // access_programs, the Cyber program a request asks the model under
-// (OpenAI's Daybreak, blackpie-releases#18): to the ChatGPT backend, to
+// (OpenAI's Daybreak, blackpie#18): to the ChatGPT backend, to
 // OpenAI's API, to another blackpie (whose own upstream decides), and to a
 // relay that takes Codex's requests as Codex sent them (CodexAsSent). Codex
 // itself sends the field to nobody else: only with a ChatGPT sign-in, or an

@@ -15,7 +15,7 @@ const { chromium, webkit } = require("playwright");
 const { watchSettingsReads, settingsDrawn } = require("./reader.cjs");
 
 const assets = path.resolve(__dirname, "../assets");
-const PAGE = "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.737";
+const PAGE = "https://github.com/hmjz100/blackpie/releases/tag/v0.1.737";
 
 function settingsPayload(lang) {
   return {

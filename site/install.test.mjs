@@ -28,7 +28,7 @@ function install(t, { termux = true, arch = "aarch64", override = false, prefixO
   // A Linux asset is present even when Android's is missing: never use it.
   for (const name of new Set([file, `blackpie-cli-linux-${cpu}`, `blackpie-linux-${cpu}`])) {
     if (missing && name === file) continue;
-    assets[name] = { url: github ? `https://github.com/hmjz100/blackpie-releases/releases/download/vtest/${name}` : `https://download.invalid/${name}`, sha256: corrupt ? "0".repeat(64) : createHash("sha256").update(payload).digest("hex") };
+    assets[name] = { url: github ? `https://github.com/hmjz100/blackpie/releases/download/vtest/${name}` : `https://download.invalid/${name}`, sha256: corrupt ? "0".repeat(64) : createHash("sha256").update(payload).digest("hex") };
   }
   const requests = join(dir, "requests");
   writeFileSync(join(tools, "uname"), `#!/bin/sh\ncase "$1" in -m) echo '${arch}';; -s) echo Linux;; esac\n`, { mode: 0o755 });
@@ -168,7 +168,7 @@ test("no proxy and no mirror unless given", (t) => {
   const r = install(t, { termux: false, github: true });
   assert.equal(r.status, 0, r.stderr);
   for (const a of r.calls) assert.ok(!a.includes("--proxy"), JSON.stringify(a));
-  assert.match(r.requests, /^https:\/\/github\.com\/yetone\/blackpie-releases\//m);
+  assert.match(r.requests, /^https:\/\/github\.com\/hmjz100\/blackpie\//m);
 });
 
 test("--proxy takes every download through it, as does BLACKPIE_PROXY", (t) => {
@@ -193,7 +193,7 @@ test("--mirror fetches the file through the mirror, the feed and its checksum fr
   assert.equal(r.status, 0, r.stderr);
   const [feed, file] = r.requests.trim().split("\n");
   assert.equal(feed, "https://usemagpie.ai/api/latest");
-  assert.equal(file, "https://gh.mirror.example/https://github.com/hmjz100/blackpie-releases/releases/download/vtest/blackpie-cli-linux-arm64");
+  assert.equal(file, "https://gh.mirror.example/https://github.com/hmjz100/blackpie/releases/download/vtest/blackpie-cli-linux-arm64");
   assert.equal(readFileSync(join(r.bin, "blackpie"), "utf8"), r.payload);
   assert.match(r.stdout, /through https:\/\/gh\.mirror\.example\//);
 
