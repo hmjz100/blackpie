@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/hmjz100/blackpie/internal/agent"
 	"github.com/hmjz100/blackpie/internal/provider"
 )
 
@@ -19,6 +20,7 @@ func TestAccountArrangeRouteAndEditorSave(t *testing.T) {
 	t.Setenv("USERPROFILE", home)
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 	t.Setenv("XDG_CACHE_HOME", t.TempDir())
+	t.Cleanup(agent.SyncCatalogSettled)
 	p := provider.Provider{ID: "arrange-test", Name: "Arrange", Chat: "https://example.invalid/v1", Key: "primary", Keys: []provider.KeyAccount{{Key: "second"}}}
 	if err := provider.Save(p); err != nil {
 		t.Fatal(err)
