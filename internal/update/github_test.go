@@ -98,6 +98,29 @@ type forkRoundTrip func(*http.Request) (*http.Response, error)
 
 func (f forkRoundTrip) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }
 
+func TestForkUpdateFailureDoesNotTryUpstream(t *testing.T) {
+	t.Setenv("BLACKPIE_UPDATE_FEED", "")
+	t.Setenv("BLACKPIE_NOTES_FEED", "")
+	stableFor(t, "")
+	before := client
+	var asked []string
+	client = &http.Client{Transport: forkRoundTrip(func(r *http.Request) (*http.Response, error) {
+		asked = append(asked, r.URL.String())
+		return &http.Response{StatusCode: 503, Status: "503 unavailable", Body: io.NopCloser(strings.NewReader("unavailable")), Header: http.Header{}, Request: r}, nil
+	})}
+	t.Cleanup(func() { client = before })
+	if _, err := Latest(context.Background()); err == nil {
+		t.Fatal("unavailable GitHub release accepted")
+	}
+	if _, err := NotesBack(context.Background(), "0.1.1", 10, ""); err == nil {
+		t.Fatal("unavailable GitHub release history accepted")
+	}
+	want := []string{releaseAPI + "/latest", releaseAPI + "?per_page=100&page=1"}
+	if len(asked) != len(want) || asked[0] != want[0] || asked[1] != want[1] {
+		t.Fatalf("release requests = %q, want %q", asked, want)
+	}
+}
+
 // Metadata and its checksums are the trust anchor, not mirrorable files.
 func TestForkTrustAnchorNeverUsesMirrors(t *testing.T) {
 	t.Setenv("BLACKPIE_MIRRORS", "on")

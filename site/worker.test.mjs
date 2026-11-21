@@ -219,7 +219,7 @@ test("notes and latest: GitHub failing altogether is an error never kept, then t
     apiDown = pagesDown = false;
     assert.equal((await ask("/api/notes?upto=0.1.3")).headers.get("Cache-Control"), "public, max-age=300");
     assert.equal((await ask("/api/latest")).status, 200);
-    for (const k of ["https://usemagpie.ai/__v2/releases", "https://usemagpie.ai/__v2/latest"]) store.delete(k);
+    for (const k of ["https://blackpie.invalid/__v2/releases", "https://blackpie.invalid/__v2/latest"]) store.delete(k);
     apiDown = pagesDown = true;
     const res = await ask("/api/notes?upto=0.1.3");
     assert.equal(res.status, 200);
@@ -247,8 +247,8 @@ test("cache: what an older worker kept, in its own shape, is never read as this 
   store.clear();
   store.set("https://usemagpie.ai/__latest", JSON.stringify({ version: "0.1.1", notes: "", assets: {} }));
   store.set("https://usemagpie.ai/__releases", JSON.stringify([{ version: "0.1.1", notes: "old" }]));
-  store.set("https://usemagpie.ai/__v2/latest", JSON.stringify({ version: "0.1.1" }));
-  store.set("https://usemagpie.ai/__v2/releases", JSON.stringify([{ version: "0.1.1" }]));
+  store.set("https://blackpie.invalid/__v2/latest", JSON.stringify({ version: "0.1.1" }));
+  store.set("https://blackpie.invalid/__v2/releases", JSON.stringify([{ version: "0.1.1" }]));
   const notes = await ask("/api/notes?upto=0.1.3");
   assert.equal(notes.status, 200);
   assert.equal((await notes.json()).releases[0].version, "0.1.3");

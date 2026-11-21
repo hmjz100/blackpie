@@ -107,7 +107,9 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await row.locator(".sub", { hasText: w.viaGitHub }).waitFor();
         assert.equal((await row.locator("code").innerText()).trim(), "GitHub");
         // the tooltip's second half reads as a sentence (AlwaySleepyZzz on Discord)
-        assert.ok((await row.locator(".sub").getAttribute("title")).includes(w.tip), "the tooltip says a mismatched mirror file is not installed");
+        const tip = await row.locator(".sub").getAttribute("title");
+        assert.ok(tip.includes(w.tip), "the tooltip says a mismatched mirror file is not installed");
+        assert.ok(tip.includes("GitHub"), "the tooltip names the checksum source");
         assert.equal(await page.locator("#about select").count(), 0, "no native select");
         const widths = await row.evaluate((e) => [e, ...e.querySelectorAll("*")].map((x) => parseFloat(getComputedStyle(x).borderLeftWidth) || 0));
         assert.ok(widths.every((x) => x === 0), "no left border");
@@ -126,6 +128,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
         await row.locator("input.update-mirror-input").fill(M);
         await row.locator("input.update-mirror-input").press("Enter");
         await row.locator(".sub", { hasText: w.viaMirror }).waitFor();
+        assert.ok((await row.locator(".sub").innerText()).includes("GitHub"), "the mirror description names the checksum source");
         assert.equal((await row.locator("code").innerText()).trim(), M);
         assert.deepEqual(ctl.posts, [["mirror", { mirror: "http://mirror.example/" }], ["mirror", { mirror: M }]]);
 

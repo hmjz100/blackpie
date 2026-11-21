@@ -335,7 +335,7 @@ function cacheFor(got) {
 // cached and remember are the edge's cache (caches.default) by name. The
 // names carry a version: an entry an older worker kept in another shape is
 // never read as this one's. Anything unreadable is a miss.
-const CACHE = "https://usemagpie.ai/__v2/";
+const CACHE = "https://blackpie.invalid/__v2/";
 
 async function cached(name) {
   try {
@@ -381,7 +381,7 @@ async function latest(ctx, env) {
   return got;
 }
 
-const UA = { "User-Agent": "usemagpie.ai" };
+const UA = { "User-Agent": "blackpie-site" };
 
 // api asks GitHub's API, with the GITHUB_TOKEN secret where one is set.
 function api(path, env) {

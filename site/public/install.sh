@@ -1,5 +1,5 @@
 #!/bin/sh
-# blackpie installer: curl -fsSL https://usemagpie.ai/install.sh | sh
+# blackpie installer: curl -fsSL https://raw.githubusercontent.com/hmjz100/blackpie/main/site/public/install.sh | sh
 #
 # macOS: puts blackpie.app in /Applications (~/Applications when that is not
 # writable) and links the blackpie command into ~/.local/bin.
@@ -11,7 +11,7 @@
 # Termux: installs the Android terminal build into $PREFIX/bin.
 # Every download is checked against the release's SHA-256.
 #
-# Options (curl -fsSL https://usemagpie.ai/install.sh | sh -s -- --proxy …):
+# Options (curl -fsSL https://raw.githubusercontent.com/hmjz100/blackpie/main/site/public/install.sh | sh -s -- --proxy …):
 #   --proxy <url>      a proxy for every download: http://, https://,
 #                      socks5:// or socks5h:// (BLACKPIE_PROXY= does the same;
 #                      without either, curl's own https_proxy / HTTPS_PROXY /
@@ -19,7 +19,7 @@
 #   --mirror <prefix>  a GitHub download mirror: the release file is fetched
 #                      from <prefix><its github.com URL> (BLACKPIE_MIRROR= does
 #                      the same). None is used unless given. The release
-#                      list and its SHA-256 still come from usemagpie.ai,
+#                      SHA-256 still comes from blackpie's GitHub release,
 #                      never from the mirror, so a file the mirror changed is
 #                      refused.
 #   --gui              the desktop app, on Linux even before its libraries are
@@ -37,7 +37,8 @@
 #                      blackpie's settings, providers and usage deleted.
 set -eu
 
-site=https://usemagpie.ai
+site=https://raw.githubusercontent.com/hmjz100/blackpie/main/site/public
+release=https://github.com/hmjz100/blackpie/releases/latest/download
 bin="${BLACKPIE_BIN_DIR:-$HOME/.local/bin}"
 proxy="${BLACKPIE_PROXY:-}"
 mirror="${BLACKPIE_MIRROR:-}"
@@ -64,7 +65,7 @@ while [ $# -gt 0 ]; do
         "       curl -fsSL $site/install.sh | sh -s -- --uninstall [--purge]" \
         "  --proxy <url>      http://, https://, socks5:// or socks5h:// proxy for the downloads (or BLACKPIE_PROXY=)" \
         "  --mirror <prefix>  GitHub download mirror put before the release's github.com URL (or BLACKPIE_MIRROR=);" \
-        "                     the SHA-256 is still checked against $site's" \
+        "                     the SHA-256 is still checked against blackpie's GitHub release" \
         "  --gui              Linux: the desktop app, even before GTK 3 and WebKitGTK 4.1 are installed" \
         "  --tui              Linux: the terminal build (TUI, web UI, CLI), even on a desktop (or BLACKPIE_CLI=1)" \
         "  --uninstall        take off what this script installed; your settings in ~/.config/blackpie stay" \
@@ -300,29 +301,29 @@ esac
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
-# the release list and its checksums: always from the site, never a mirror
-feed=$(get "$site/api/latest") || die "could not reach $site${proxy:+ through $proxy}"
-# The feed is one line of JSON; pull this file's url and hash out of it.
-entry=$(printf '%s' "$feed" | sed -n "s/.*\"$file\":{\([^}]*\)}.*/\1/p")
-url=$(printf '%s' "$entry" | sed -n 's/.*"url":"\([^"]*\)".*/\1/p')
-sum=$(printf '%s' "$entry" | sed -n 's/.*"sha256":"\([^"]*\)".*/\1/p')
-version=$(printf '%s' "$feed" | sed -n 's/.*"version":"\([^"]*\)".*/\1/p')
-if [ "$os" = android ] && { [ -z "$url" ] || [ -z "$sum" ]; }; then
-  die "the newest release has no $file; build in Termux with go build -tags nogui (see $site/docs/start)"
+# Checksums come from the fork's release, never from a mirror.
+sums=$(get "$release/SHA256SUMS") || die "could not reach blackpie's release checksums${proxy:+ through $proxy}"
+sum=$(printf '%s\n' "$sums" | awk -v file="$file" '$2 == file { print $1 }')
+if [ "$os" = android ] && [ -z "$sum" ]; then
+  die "the newest release has no $file; build in Termux with go build -tags nogui"
 fi
-[ -n "$url" ] && [ -n "$sum" ] || die "the newest release has no $file"
+case "$sum" in
+  ''|*[!0-9a-f]*) die "the newest release has no valid checksum for $file" ;;
+esac
+[ "${#sum}" -eq 64 ] || die "the newest release has no valid checksum for $file"
+url="$release/$file"
 
 from=$url
 case "$url" in
   https://github.com/*) [ -z "$mirror" ] || from="$mirror$url" ;;
 esac
-if [ "$from" != "$url" ]; then say "downloading blackpie $version ($file) through $mirror"
-else say "downloading blackpie $version ($file)"; fi
+if [ "$from" != "$url" ]; then say "downloading blackpie ($file) through $mirror"
+else say "downloading blackpie ($file)"; fi
 get -o "$tmp/$file" "$from" || die "could not download $from"
 if command -v sha256sum >/dev/null; then got=$(sha256sum "$tmp/$file" | cut -d' ' -f1)
 else got=$(shasum -a 256 "$tmp/$file" | cut -d' ' -f1); fi
 if [ "$got" != "$sum" ]; then
-  [ "$from" = "$url" ] || die "$file from $mirror does not match its checksum from $site; not installed"
+  [ "$from" = "$url" ] || die "$file from $mirror does not match its checksum from blackpie's GitHub release; not installed"
   die "$file does not match its checksum"
 fi
 

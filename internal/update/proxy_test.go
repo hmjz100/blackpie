@@ -17,7 +17,7 @@ import (
 
 // The update feed and a release's download go through the proxy set in
 // Settings, as blackpie's other requests do (#294): a network that reaches
-// usemagpie.ai and GitHub only through it gets its updates too.
+// GitHub only through it gets its updates too.
 func TestUpdateGoesThroughTheProxy(t *testing.T) {
 	h := t.TempDir()
 	t.Setenv("HOME", h)

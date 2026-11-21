@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 
 const installer = fileURLToPath(new URL("./public/install.sh", import.meta.url));
 
-function install(t, { termux = true, arch = "aarch64", override = false, prefixOnly = false, missing = false, corrupt = false, desktop = false, github = false, args = [], env: extra = {}, tamper = "", libs = desktop, cli = !desktop, distro = "ID=ubuntu\nID_LIKE=debian\n", sessions = [], login = "" } = {}) {
+function install(t, { termux = true, arch = "aarch64", override = false, prefixOnly = false, missing = false, corrupt = false, desktop = false, args = [], env: extra = {}, tamper = "", libs = desktop, cli = !desktop, distro = "ID=ubuntu\nID_LIKE=debian\n", sessions = [], login = "" } = {}) {
   const dir = mkdtempSync(join(tmpdir(), "blackpie-install-"));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   const tools = join(dir, "tools");
@@ -28,7 +28,7 @@ function install(t, { termux = true, arch = "aarch64", override = false, prefixO
   // A Linux asset is present even when Android's is missing: never use it.
   for (const name of new Set([file, `blackpie-cli-linux-${cpu}`, `blackpie-linux-${cpu}`])) {
     if (missing && name === file) continue;
-    assets[name] = { url: github ? `https://github.com/hmjz100/blackpie/releases/download/vtest/${name}` : `https://download.invalid/${name}`, sha256: corrupt ? "0".repeat(64) : createHash("sha256").update(payload).digest("hex") };
+    assets[name] = corrupt ? "0".repeat(64) : createHash("sha256").update(payload).digest("hex");
   }
   const requests = join(dir, "requests");
   writeFileSync(join(tools, "uname"), `#!/bin/sh\ncase "$1" in -m) echo '${arch}';; -s) echo Linux;; esac\n`, { mode: 0o755 });
@@ -68,7 +68,7 @@ const url = args.at(-1);
 fs.appendFileSync(process.env.INSTALL_REQUESTS, url + String.fromCharCode(10));
 fs.appendFileSync(process.env.INSTALL_ARGS, JSON.stringify(args) + String.fromCharCode(10));
 const tamper = process.env.INSTALL_TAMPER;
-if (url.endsWith("/api/latest")) process.stdout.write(process.env.INSTALL_FEED);
+if (url.endsWith("/SHA256SUMS")) process.stdout.write(process.env.INSTALL_SUMS);
 else fs.writeFileSync(args[args.indexOf("-o") + 1], tamper && url.startsWith(tamper) ? "changed by the mirror" : process.env.INSTALL_PAYLOAD);
 `, { mode: 0o755 });
   const env = {
@@ -92,7 +92,7 @@ else fs.writeFileSync(args[args.indexOf("-o") + 1], tamper && url.startsWith(tam
     XDG_CONFIG_HOME: join(dir, "config"),
     XDG_DATA_HOME: join(dir, "share"),
     INSTALL_REQUESTS: requests,
-    INSTALL_FEED: JSON.stringify({ version: "test", assets }),
+    INSTALL_SUMS: Object.entries(assets).map(([name, hash]) => `${hash}  ${name}`).join("\n") + "\n",
     INSTALL_PAYLOAD: payload,
     INSTALL_ARGS: join(dir, "args"),
     INSTALL_TAMPER: tamper,
@@ -165,7 +165,7 @@ test("ordinary Linux still selects its CLI or desktop build", (t) => {
 // akic404 on Discord: installing without a way round the firewall. A proxy
 // and a GitHub mirror can be given; neither is used unless given.
 test("no proxy and no mirror unless given", (t) => {
-  const r = install(t, { termux: false, github: true });
+  const r = install(t, { termux: false });
   assert.equal(r.status, 0, r.stderr);
   for (const a of r.calls) assert.ok(!a.includes("--proxy"), JSON.stringify(a));
   assert.match(r.requests, /^https:\/\/github\.com\/hmjz100\/blackpie\//m);
@@ -177,7 +177,7 @@ test("--proxy takes every download through it, as does BLACKPIE_PROXY", (t) => {
     [{ args: ["--proxy=http://127.0.0.1:7890"] }, "http://127.0.0.1:7890"],
     [{ env: { BLACKPIE_PROXY: "http://10.0.0.1:3128" } }, "http://10.0.0.1:3128"],
   ]) {
-    const r = install(t, { termux: false, desktop: true, github: true, ...opts });
+    const r = install(t, { termux: false, desktop: true, ...opts });
     assert.equal(r.status, 0, r.stderr);
     assert.equal(r.calls.length, 3); // the feed, the file, the icon
     for (const a of r.calls) assert.equal(a[a.indexOf("--proxy") + 1], want, JSON.stringify(a));
@@ -188,28 +188,41 @@ test("--proxy takes every download through it, as does BLACKPIE_PROXY", (t) => {
   assert.equal(bad.calls.length, 0);
 });
 
-test("--mirror fetches the file through the mirror, the feed and its checksum from the site", (t) => {
-  const r = install(t, { termux: false, github: true, args: ["--mirror", "https://gh.mirror.example"] });
+test("--mirror fetches the file through the mirror, its checksum from the fork", (t) => {
+  const r = install(t, { termux: false, args: ["--mirror", "https://gh.mirror.example"] });
   assert.equal(r.status, 0, r.stderr);
   const [feed, file] = r.requests.trim().split("\n");
-  assert.equal(feed, "https://usemagpie.ai/api/latest");
-  assert.equal(file, "https://gh.mirror.example/https://github.com/hmjz100/blackpie/releases/download/vtest/blackpie-cli-linux-arm64");
+  assert.equal(feed, "https://github.com/hmjz100/blackpie/releases/latest/download/SHA256SUMS");
+  assert.equal(file, "https://gh.mirror.example/https://github.com/hmjz100/blackpie/releases/latest/download/blackpie-cli-linux-arm64");
   assert.equal(readFileSync(join(r.bin, "blackpie"), "utf8"), r.payload);
   assert.match(r.stdout, /through https:\/\/gh\.mirror\.example\//);
 
-  const env = install(t, { termux: false, github: true, env: { BLACKPIE_MIRROR: "https://gh.mirror.example/" } });
+  const env = install(t, { termux: false, env: { BLACKPIE_MIRROR: "https://gh.mirror.example/" } });
   assert.equal(env.status, 0, env.stderr);
   assert.match(env.requests, /^https:\/\/gh\.mirror\.example\/https:\/\/github\.com\//m);
 });
 
 test("a file the mirror changed is refused and the installed blackpie kept", (t) => {
-  const r = install(t, { termux: false, github: true, args: ["--mirror", "https://gh.mirror.example/"], tamper: "https://gh.mirror.example/" });
+  const r = install(t, { termux: false, args: ["--mirror", "https://gh.mirror.example/"], tamper: "https://gh.mirror.example/" });
   assert.notEqual(r.status, 0);
-  assert.match(r.stderr, /from https:\/\/gh\.mirror\.example\/ does not match its checksum from https:\/\/useblackpie\.ai; not installed/);
+  assert.match(r.stderr, /from https:\/\/gh\.mirror\.example\/ does not match its checksum from blackpie's GitHub release; not installed/);
   assert.equal(readFileSync(join(r.bin, "blackpie"), "utf8"), "old installation");
   const bad = install(t, { termux: false, args: ["--mirror", "gh.mirror.example"] });
   assert.notEqual(bad.status, 0);
   assert.match(bad.stderr, /--mirror is an http\(s\) address/);
+});
+
+test("invalid or duplicate release checksums leave the installation intact", (t) => {
+  for (const sums of [
+    `not-a-hash  blackpie-cli-android-arm64\n`,
+    `${"a".repeat(64)}  blackpie-cli-android-arm64\n${"a".repeat(64)}  blackpie-cli-android-arm64\n`,
+  ]) {
+    const r = install(t, { env: { INSTALL_SUMS: sums } });
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /no valid checksum/);
+    assert.equal(readFileSync(join(r.bin, "blackpie"), "utf8"), "old installation");
+    assert.equal(r.calls.length, 1);
+  }
 });
 
 // pota on Discord: the script installed blackpie and had no way to take it

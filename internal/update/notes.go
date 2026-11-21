@@ -26,7 +26,7 @@ type Note struct {
 }
 
 // NotesFeed is where the notes of past releases are listed: beside the
-// update feed, on blackpie's site. BLACKPIE_NOTES_FEED points it elsewhere.
+// fork's GitHub release history. BLACKPIE_NOTES_FEED points it elsewhere.
 func NotesFeed() string {
 	if f := os.Getenv("BLACKPIE_NOTES_FEED"); f != "" {
 		return f
@@ -160,8 +160,8 @@ func MostNotes() int {
 // Stable is whether Settings' Update channel is Stable: the update feed is
 // asked for a version a week, the newest that had been out three days as
 // the week began (Monday 00:00 UTC), or an urgent one (a security hole, a
-// ban risk, lost data) as soon as it is out. usemagpie.ai chooses it from
-// the release list (site/worker.js, "The Stable channel"); a release is
+// ban risk, lost data) as soon as it is out. githubLatest chooses it from
+// the fork's release list; a release is
 // urgent when a line of its notes starts with "**Urgent release:**".
 func Stable() bool { return settings.Load().UpdateChannel == settings.UpdateStable }
 

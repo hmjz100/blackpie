@@ -452,14 +452,14 @@ type Settings struct {
 	// through, its prefix put before the release's github.com URL
 	// (https://mirror.example/https://github.com/…): "" for none, which is
 	// the default — blackpie names no mirror of its own. The file is still
-	// checked against the SHA-256 the update feed at usemagpie.ai gives,
+	// checked against the SHA-256 from the fork's GitHub release,
 	// never one from the mirror. blackpie update mirror sets it.
 	UpdateMirror string `json:"updateMirror,omitempty"`
 	// UpdateChannel is which versions an update is offered: "" every
 	// version as it comes out, the default; UpdateStable ("stable") one a
 	// week, the newest that had been out three days as the week began, or
 	// an urgent one (a security hole, a ban risk, lost data) at once, from
-	// the update feed's ?channel=stable (ssharpcc on X). Settings' Update
+	// the fork's release history (ssharpcc on X). Settings' Update
 	// channel and blackpie update channel set it.
 	UpdateChannel string `json:"updateChannel,omitempty"`
 	// Vision is the model that describes an image to a model that can't see

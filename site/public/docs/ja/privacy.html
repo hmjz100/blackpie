@@ -89,7 +89,7 @@
     <div class="table-wrap"><table>
       <tr><th>内容</th><th>送り先</th><th>既定</th><th>止め方</th></tr>
       <tr><td><a href="#count">毎日のカウント</a></td><td>PostHog（<code>us.i.posthog.com</code>）</td><td>リリース版でオン。ソースからのビルドは送らない</td><td><span class="ui">設定</span> → <span class="ui">プライバシー</span>、<code>DO_NOT_TRACK=1</code></td></tr>
-      <tr><td><a href="#site">更新確認</a>、リリースノート、パートナー一覧、アイコン</td><td><code>usemagpie.ai</code></td><td>オン</td><td>更新確認は <code>noAutoUpdate</code>。ほかはアプリの動作に必要</td></tr>
+      <tr><td><a href="#site">更新確認</a>、リリースノート、パートナー一覧、アイコン</td><td>GitHub（更新とノート）、<code>usemagpie.ai</code>（パートナーとアイコン）</td><td>オン</td><td>更新確認は <code>noAutoUpdate</code>。ほかはアプリの動作に必要</td></tr>
       <tr><td><a href="#lists">モデルカタログと為替レート</a></td><td><code>models.dev</code>、<code>open.er-api.com</code></td><td>オン</td><td>切り替え不可。あなたの情報は送らない</td></tr>
       <tr><td><a href="#otel">OTLP エクスポート</a></td><td>あなたが指定したコレクター</td><td>オフ</td><td>オフのままにする</td></tr>
     </table></div>
@@ -143,7 +143,7 @@
       <li><span class="ui">設定</span> → <span class="ui">プライバシー</span> → <span class="ui">ユーザー数に含める</span> をオフ、または <code>settings.json</code> に <code>"noStats": true</code>：毎日のカウント全体。</li>
       <li>blackpie の環境に <code>DO_NOT_TRACK=1</code> か <code>BLACKPIE_NO_STATS=1</code>（空、<code>0</code>、<code>false</code> 以外の値）：設定にかかわらず、毎日のカウント全体。</li>
       <li><span class="ui">設定</span> → <span class="ui">プライバシー</span> → <span class="ui">使っているエージェント、プロバイダー、モデルを共有</span> をオフ、または <code>"noUsageStats": true</code>：<code>blackpie uses</code> と <code>blackpie partner</code> イベント、<code>blackpie active</code> の数。ID、バージョン、システムは送られます。パートナーの回数も記録しなくなります。</li>
-      <li><span class="ui">設定</span> → <span class="ui">情報</span> → <span class="ui">自動アップデート</span> をオフ、または <code>"noAutoUpdate": true</code>：blackpie が自分から <code>usemagpie.ai</code> に新しいバージョンを尋ねること（そうでなければ 6 時間ごと）。カウントの一部ではありません。</li>
+      <li><span class="ui">設定</span> → <span class="ui">情報</span> → <span class="ui">自動アップデート</span> をオフ、または <code>"noAutoUpdate": true</code>：blackpie が自分から GitHub に新しいバージョンを尋ねること（そうでなければ 6 時間ごと）。カウントの一部ではありません。</li>
     </ul>
     <p>設定の変更は次の 1 時間ごとの確認で反映され、再起動はいりません。<code>settings.json</code> は blackpie のフォルダーにあります（<a href="#files">下記</a>）。</p>
     <div class="code">
@@ -169,9 +169,9 @@
     <p>アプリは自分のしたことをログ <code>app.log</code> に書きます。macOS では <code>~/Library/Logs/blackpie</code>、Windows では <code>%LOCALAPPDATA%\blackpie\logs</code>、Linux では <code>~/.local/state/blackpie</code> です（<a href="/docs/ja/start#log">blackpie のログはどこにありますか？</a>）。読めるのはあなたのユーザーだけです。blackpie がしたことと出会ったエラーを記録し、キー、プロンプト、返答は記録しません。あなたが送らない限り、このコンピューターから出ません。上限は 5 MiB で、古いもの 1 つ（<code>app.old.log</code>）を残します。いつでも削除できます。</p>
 
     <h2 id="site"><a class="anchor" href="#site">usemagpie.ai に見えるもの</a></h2>
-    <p>blackpie はプライバシー設定にかかわらず、どのアプリも自分の更新サーバーに尋ねるのと同じように、自分のサイトにいくつか尋ねます。どのリクエストにもインストール ID やアカウントは付きません。</p>
+    <p>blackpie は更新とリリースノートを GitHub に、下記の公開データを usemagpie.ai に尋ねます。どのリクエストにもインストール ID やアカウントは付きません。</p>
     <ul>
-      <li><code>/api/latest</code>：更新情報。<code>noAutoUpdate</code> がオンでなければ 6 時間ごと。<code>?lang=</code> であなたの言語のノートを取ります。<span class="ui">設定</span> → <span class="ui">情報</span> → <span class="ui">アップデートチャネル</span>が安定版なら <code>?channel=stable</code> も付けます。どちらもあなたが誰かは含みません。<code>/api/notes</code> は更新後の「新機能」です。</li>
+      <li>GitHub API がこのフォークのリリースとノートを提供します。安定版はローカルで選び、更新ファイルとチェックサムは GitHub Releases から取得します。リクエストにインストール ID やアカウントは付きません。</li>
       <li><code>/api/partners</code>：プロバイダー追加シートのパートナー一覧。6 時間ごと。パートナーが載っている間、10 回に 1 回の取得を Cloudflare が示す国とともに <code>blackpie partners fetch</code> として数えます。</li>
       <li><code>/go/&lt;パートナー&gt;/site</code> と <code>/go/&lt;パートナー&gt;/keys</code>：パートナーの公式サイトとキーのページへのリンクをブラウザーで開くと、移動の前に <code>blackpie partner go</code>（どのパートナーか、どのリンクか、地域、国）として数えます。</li>
       <li><code>/api/icon?url=…</code>：プラグイン、インポートリンク、ライブラリが示すアイコンはここを経由して取得するので、アイコンのあるホストに見えるのはあなたではなく Cloudflare のアドレスです。画像を中継するだけで、数えることも記録することもしません。</li>

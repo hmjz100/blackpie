@@ -2608,12 +2608,12 @@ with a link builder: <https://usemagpie.ai/docs/import>.
 ## Install
 
 Download the app for macOS, Windows or Linux from
-[usemagpie.ai](https://usemagpie.ai), or install it from a terminal (on
+[blackpie Releases](https://github.com/hmjz100/blackpie/releases), or install it from a terminal (on
 Linux, the desktop app when GTK 3 and WebKitGTK 4.1 are installed, the
 terminal build otherwise):
 
 ```sh
-curl -fsSL https://usemagpie.ai/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/hmjz100/blackpie/main/site/public/install.sh | sh
 ```
 
 On Linux the installer asks nothing. A computer with a desktop (a
@@ -2639,12 +2639,12 @@ the release's github.com URL (or `BLACKPIE_MIRROR`; `blackpie update mirror
 <prefix>|off` keeps one for every update, the app's too):
 
 ```sh
-curl -fsSL https://usemagpie.ai/install.sh | sh -s -- --proxy http://127.0.0.1:7890
+curl -fsSL https://raw.githubusercontent.com/hmjz100/blackpie/main/site/public/install.sh | sh -s -- --proxy http://127.0.0.1:7890
 blackpie update --mirror https://mirror.example/
 ```
 
 No mirror is used unless you give one, and the SHA-256 every download is
-checked against still comes from usemagpie.ai, never from the mirror.
+checked against still comes from blackpie's GitHub release, never from the mirror.
 
 Mac releases are signed and notarised; the Windows and Linux builds are not
 signed yet (Windows SmartScreen may ask before the first run). Every build
@@ -2669,9 +2669,8 @@ version channel first. A release marked urgent goes to Stable at once.
 When Stable moves past several versions, What's new lists the notes of
 every version since yours as one list.
 
-The update feed works this out from the release list
-(`https://usemagpie.ai/api/latest?channel=stable`); nothing is promoted
-by hand. A release is urgent when its notes have a line that starts with
+Blackpie works this out from the fork's GitHub release list; nothing is
+promoted by hand. A release is urgent when its notes have a line that starts with
 `**Urgent release:**` and says why, for example:
 
 ```md
