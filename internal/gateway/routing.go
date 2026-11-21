@@ -896,11 +896,11 @@ var narrowing sync.WaitGroup
 // in. A reading that says nothing of pools, or none in time, leaves the
 // account's rest as it is, and so does a rest lifted or made again since.
 // It waits off the request, which has failed over already.
-func narrowWhenRead(c candidate, r Rest) {
+func narrowWhenRead(c candidate, r Rest, await func(context.Context, string, string) bool) {
 	defer narrowing.Done()
 	ctx, done := context.WithTimeout(context.Background(), allowanceWait)
 	defer done()
-	if !awaitAllowance(ctx, r.agent, r.user) || !c.pooled(time.Now()) {
+	if !await(ctx, r.agent, r.user) || !c.pooled(time.Now()) {
 		return
 	}
 	id, rid := c.restKey(), c.restID()
@@ -1658,7 +1658,7 @@ func (s *Server) restAfterMarked(c candidate, status int, header http.Header, bo
 	}
 	if unread && id == c.restKey() && id != c.restID() {
 		narrowing.Add(1)
-		go narrowWhenRead(c, r)
+		go narrowWhenRead(c, r, awaitAllowance)
 	}
 	return r
 }
