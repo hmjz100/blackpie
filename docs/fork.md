@@ -1,7 +1,8 @@
 # This fork
 
-`hmjz100/blackpie` builds on [hmjz100/blackpie](https://github.com/hmjz100/blackpie)
-and removes what this fork does not use. Upstream moves fast, so the two
+`hmjz100/blackpie` builds on [moepie](https://github.com/lingqiqi5211/moepie),
+itself a fork of [magpie](https://github.com/yetone/magpie), and removes
+what this fork does not use. Upstream moves fast, so the two
 branches have different jobs:
 
 | Branch | Who writes it | What it holds |
