@@ -3,6 +3,7 @@ package gateway
 import (
 	"context"
 	"errors"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -134,7 +135,15 @@ func TestServingGatesTools(t *testing.T) {
 	defer cancel()
 	done := make(chan error, 1)
 	go func() { done <- s.ListenAndServe(ctx) }()
-	deadline := time.Now().Add(3 * time.Second)
+	defer func() {
+		cancel()
+		if done != nil {
+			if err := <-done; err != nil {
+				t.Error(err)
+			}
+		}
+	}()
+	deadline := time.Now().Add(30 * time.Second)
 	for {
 		s.lnMu.Lock()
 		ln := s.ln
@@ -147,11 +156,28 @@ func TestServingGatesTools(t *testing.T) {
 		}
 		time.Sleep(10 * time.Millisecond)
 	}
+	s.lnMu.Lock()
+	addr := s.ln.Addr().String()
+	s.lnMu.Unlock()
+	// Binding precedes installing the tool gate; a response proves Serve began.
+	readyCtx, readyCancel := context.WithTimeout(ctx, 30*time.Second)
+	defer readyCancel()
+	req, err := http.NewRequestWithContext(readyCtx, http.MethodGet, "http://"+addr+"/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("gateway did not start serving: %v", err)
+	}
+	res.Body.Close()
 	if gwtool.Served(gwtool.WebSearch) {
 		t.Error("serving, with the plugin off: web search still served")
 	}
 	cancel()
-	if err := <-done; err != nil {
+	err = <-done
+	done = nil
+	if err != nil {
 		t.Fatal(err)
 	}
 	if !gwtool.Served(gwtool.WebSearch) {
