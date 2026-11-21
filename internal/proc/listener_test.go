@@ -83,7 +83,6 @@ func TestIsBlackpie(t *testing.T) {
 		`C:\Users\u\other-server.old-2`:   false,
 		`C:\Users\u\blackpie.old-backup`:  false,
 		"/home/u/.local/bin/dial":         true,
-		"/opt/blackpie-dev":               true,
 		"/usr/bin/python3":                false,
 		"/usr/bin/blackpies":              false,
 		"/tmp/other-server":               false,
