@@ -624,7 +624,7 @@ update feed and the tap, unless the publish step checks.**
 - 10-15: v0.1.1255 was published 25 minutes after v0.1.1256, and
   GitHub marked the older one Latest (moved back by hand then).
 - 10-28: v0.1.1891 finished 16s after v0.1.1892. 1891 became Latest,
-  which useblackpie.ai's /api/latest serves, and the Homebrew tap went from
+  which usemagpie.ai's /api/latest serves, and the Homebrew tap went from
   1892 back to 1891 (tap 1d47b64). v0.1.1890, still notarising, would
   have done it again. blackpie-releases ee73d7a now passes `make_latest`
   only to the highest version and runs the tap update only then.

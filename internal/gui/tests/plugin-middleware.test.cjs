@@ -104,8 +104,8 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
     const browser = await (engine === "webkit" ? webkit.launch() : chromium.launch({ channel: "chromium" }));
     t.after(() => browser.close());
     const I = {
-      en: { h: "Plugins extend blackpie", p: /run in blackpie's gateway .* give every agent tools, connect an agent, or add a page of its own/, a: "Write a plugin", url: "https://useblackpie.ai/docs/plugins", trust: /sign-in or your requests/ },
-      zh: { h: "插件扩展 blackpie", p: /在 blackpie 网关里处理.*给每个 Agent 提供工具.*加一个自己的页面/, a: "编写插件", url: "https://useblackpie.ai/docs/zh/plugins", trust: /登录或看到你的请求/ },
+      en: { h: "Plugins extend blackpie", p: /run in blackpie's gateway .* give every agent tools, connect an agent, or add a page of its own/, a: "Write a plugin", url: "https://usemagpie.ai/docs/plugins", trust: /sign-in or your requests/ },
+      zh: { h: "插件扩展 blackpie", p: /在 blackpie 网关里处理.*给每个 Agent 提供工具.*加一个自己的页面/, a: "编写插件", url: "https://usemagpie.ai/docs/zh/plugins", trust: /登录或看到你的请求/ },
     };
     for (const lang of ["en", "zh"]) {
       await t.test(lang, async () => {

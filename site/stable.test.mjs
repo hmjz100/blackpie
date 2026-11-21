@@ -276,7 +276,7 @@ test("keepLedger: a ledger left a day behind is mended past its hole", async () 
 
 const ctx = { waitUntil: (p) => p };
 const ask = async (path, env) => {
-  const res = await worker.fetch(new Request("https://useblackpie.ai" + path), env, ctx);
+  const res = await worker.fetch(new Request("https://usemagpie.ai" + path), env, ctx);
   return { status: res.status, body: await res.json() };
 };
 
@@ -329,7 +329,7 @@ test("latest?channel=stable: unknown (503, never kept) without a ledger that rea
   const now = Date.now();
   GITHUB = [{ version: "0.1.2", published: iso(now - 3600e3), notes: "- new" }];
   for (const env of [{}, { LEDGER: kv() }]) {
-    const res = await worker.fetch(new Request("https://useblackpie.ai/api/latest?channel=stable"), env, ctx);
+    const res = await worker.fetch(new Request("https://usemagpie.ai/api/latest?channel=stable"), env, ctx);
     assert.equal(res.status, 503);
     assert.equal(res.headers.get("Cache-Control"), "no-store");
   }

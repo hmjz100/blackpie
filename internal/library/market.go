@@ -176,7 +176,7 @@ const selfServerName = "blackpie-image"
 // in the project. It costs what the model does, so it is given only to the
 // agents picked for it.
 func selfServer() MarketServer {
-	m := localServer(selfServerName, "Blackpie Image", "Blackpie", "https://useblackpie.ai/favicon.png", "https://useblackpie.ai",
+	m := localServer(selfServerName, "Blackpie Image", "Blackpie", "https://usemagpie.ai/favicon.png", "https://usemagpie.ai",
 		"Generate and edit images with the image model set in Blackpie (Settings → Images), and make short videos with a video model set up in Blackpie (Grok Imagine, Seedance), saved in the project.", blackpieCommand, []string{"mcp", "image"})
 	m.OptIn = true
 	return m
@@ -190,7 +190,7 @@ const browserServerName = "blackpie-browser"
 // sets up (gateway/browser.go). It acts as the user wherever they are
 // signed in, so it is given only to the agents picked for it.
 func browserServer() MarketServer {
-	m := localServer(browserServerName, "Blackpie Browser", "Blackpie", "https://useblackpie.ai/favicon.png", "https://useblackpie.ai",
+	m := localServer(browserServerName, "Blackpie Browser", "Blackpie", "https://usemagpie.ai/favicon.png", "https://usemagpie.ai",
 		"Use your own browser: your tabs, signed in to the sites you use. Open pages, click, type, upload, read and take screenshots, through the Blackpie Browser extension.", blackpieCommand, []string{"mcp", "browser"})
 	m.OptIn = true
 	return m
@@ -208,7 +208,7 @@ const searchServerName = "blackpie-web-search"
 // or the search API it asks charges, and an agent mostly has a search of
 // its own, so it is given only to the agents picked for it.
 func searchServer() MarketServer {
-	m := localServer(searchServerName, "Blackpie Web Search", "Blackpie", "https://useblackpie.ai/favicon.png", "https://useblackpie.ai",
+	m := localServer(searchServerName, "Blackpie Web Search", "Blackpie", "https://usemagpie.ai/favicon.png", "https://usemagpie.ai",
 		"Search the web with the search set in Blackpie (Settings → Models → Web search), and read a page by its URL.", blackpieCommand, []string{"mcp", "search"})
 	m.OptIn = true
 	return m
@@ -228,7 +228,7 @@ const visionServerName = "blackpie-vision"
 // most agents' models see for themselves, so it is given only to the
 // agents picked for it.
 func visionServer() MarketServer {
-	m := localServer(visionServerName, "Blackpie Image Recognition", "Blackpie", "https://useblackpie.ai/favicon.png", "https://useblackpie.ai",
+	m := localServer(visionServerName, "Blackpie Image Recognition", "Blackpie", "https://usemagpie.ai/favicon.png", "https://usemagpie.ai",
 		"Read an image (a file, a URL, a screenshot) with the image recognition model set in Blackpie (Settings → Models → Images), for a model that can't see.", blackpieCommand, []string{"mcp", "vision"})
 	m.OptIn = true
 	return m
@@ -1186,7 +1186,7 @@ func offered(u string) bool {
 	return false
 }
 
-// fetchImage downloads an icon through useblackpie.ai's icon proxy, so the
+// fetchImage downloads an icon through usemagpie.ai's icon proxy, so the
 // host a server's author picked never sees the user's IP.
 func fetchImage(u string) ([]byte, string, error) {
 	b, err := get(iconproxy.URL(u), "image/*", 1<<20)

@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-// A plugin's or an import link's icon is asked for through useblackpie.ai's
+// A plugin's or an import link's icon is asked for through usemagpie.ai's
 // icon proxy, so the host its author picked never sees the user's IP.
 func TestFetchIconGoesThroughTheProxy(t *testing.T) {
 	home := t.TempDir()

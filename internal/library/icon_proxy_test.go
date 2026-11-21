@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-// A market icon is asked for through useblackpie.ai's icon proxy, never from
+// A market icon is asked for through usemagpie.ai's icon proxy, never from
 // the host its author picked, which would see the user's IP.
 func TestIconGoesThroughTheProxy(t *testing.T) {
 	h := sandbox(t)

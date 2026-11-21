@@ -14,7 +14,7 @@ import (
 // <think> tags led by a Windows line end ("\r\n<think>{results}</think>\r\n"
 // in process_model_response), then Grok's answer token by token, with no
 // finish_reason before [DONE].
-const grokRelaySearchStream = `data: {"id": "chatcmpl-6c1f0e3a-1b7e-4a51-9a51-0c6e8f1f2d11", "created": 1761700000, "model": "grok-3-search", "object": "chat.completion.chunk", "choices": [{"index": 0, "delta": {"content": "\r\n<think>\r\n<details><summary>\u8d44\u6599[0]: blackpie</summary>\r\nA local LLM gateway\r\n\n[Link](https://useblackpie.ai)\r\n</details></think>\r\n"}}]}
+const grokRelaySearchStream = `data: {"id": "chatcmpl-6c1f0e3a-1b7e-4a51-9a51-0c6e8f1f2d11", "created": 1761700000, "model": "grok-3-search", "object": "chat.completion.chunk", "choices": [{"index": 0, "delta": {"content": "\r\n<think>\r\n<details><summary>\u8d44\u6599[0]: blackpie</summary>\r\nA local LLM gateway\r\n\n[Link](https://usemagpie.ai)\r\n</details></think>\r\n"}}]}
 
 data: {"id": "chatcmpl-1f0b2c4d-8e9a-4b3c-a2d1-5e6f7a8b9c0d", "created": 1761700000, "model": "grok-3-search", "object": "chat.completion.chunk", "choices": [{"index": 0, "delta": {"content": "Blackpie"}}]}
 
@@ -49,7 +49,7 @@ func TestGrokRelayThinkAfterLineEnd(t *testing.T) {
 				t.Fatalf("code %d: %s", code, out)
 			}
 			think, text := grokRelayParts(t, out)
-			if !strings.Contains(think, "资料[0]: blackpie") || !strings.Contains(think, "[Link](https://useblackpie.ai)") {
+			if !strings.Contains(think, "资料[0]: blackpie") || !strings.Contains(think, "[Link](https://usemagpie.ai)") {
 				t.Errorf("thinking %q, want the search results", think)
 			}
 			if text != "Blackpie is a gateway." {

@@ -5,7 +5,7 @@ The full manual: every agent blackpie wires, every provider option, the gateway,
 Renamed a project folder? See [relocating Claude Code sessions](session-relocation.md).
 
 One place to pick every agent's model: Codex on DeepSeek, Claude Code
-on Kimi, Gemini CLI on GLM, from the menu bar. [useblackpie.ai](https://useblackpie.ai)
+on Kimi, Gemini CLI on GLM, from the menu bar. [usemagpie.ai](https://usemagpie.ai)
 
 `blackpie` is a single screen that lists each AI agent on your machine and
 the model it is set to. Click a value, pick a model. That is the whole app.
@@ -2600,7 +2600,7 @@ you press *Add*. `blackpie import <link>` does the same in a terminal.
 
 Base URLs must be https (plain http only to this machine or the local
 network). Web pages and GitHub don't link custom schemes reliably, so link
-to `https://useblackpie.ai/import#<same parameters>` instead: it opens
+to `https://usemagpie.ai/import#<same parameters>` instead: it opens
 blackpie, and offers the download when it is not installed. The parameters
 stay in the fragment, which browsers never send to a server. The full guide,
 with a link builder: <https://usemagpie.ai/docs/import>.
@@ -2608,12 +2608,12 @@ with a link builder: <https://usemagpie.ai/docs/import>.
 ## Install
 
 Download the app for macOS, Windows or Linux from
-[useblackpie.ai](https://useblackpie.ai), or install it from a terminal (on
+[usemagpie.ai](https://usemagpie.ai), or install it from a terminal (on
 Linux, the desktop app when GTK 3 and WebKitGTK 4.1 are installed, the
 terminal build otherwise):
 
 ```sh
-curl -fsSL https://useblackpie.ai/install.sh | sh
+curl -fsSL https://usemagpie.ai/install.sh | sh
 ```
 
 On Linux the installer asks nothing. A computer with a desktop (a
@@ -2639,12 +2639,12 @@ the release's github.com URL (or `BLACKPIE_MIRROR`; `blackpie update mirror
 <prefix>|off` keeps one for every update, the app's too):
 
 ```sh
-curl -fsSL https://useblackpie.ai/install.sh | sh -s -- --proxy http://127.0.0.1:7890
+curl -fsSL https://usemagpie.ai/install.sh | sh -s -- --proxy http://127.0.0.1:7890
 blackpie update --mirror https://mirror.example/
 ```
 
 No mirror is used unless you give one, and the SHA-256 every download is
-checked against still comes from useblackpie.ai, never from the mirror.
+checked against still comes from usemagpie.ai, never from the mirror.
 
 Mac releases are signed and notarised; the Windows and Linux builds are not
 signed yet (Windows SmartScreen may ask before the first run). Every build
@@ -2670,7 +2670,7 @@ When Stable moves past several versions, What's new lists the notes of
 every version since yours as one list.
 
 The update feed works this out from the release list
-(`https://useblackpie.ai/api/latest?channel=stable`); nothing is promoted
+(`https://usemagpie.ai/api/latest?channel=stable`); nothing is promoted
 by hand. A release is urgent when its notes have a line that starts with
 `**Urgent release:**` and says why, for example:
 
@@ -3510,10 +3510,10 @@ Settings → Privacy → Count me as a user, or with `DO_NOT_TRACK=1` or
 new one at the next send. The [Privacy page](https://usemagpie.ai/docs/privacy)
 shows a whole batch and everything else blackpie sends by itself.
 
-Partners are also counted where useblackpie.ai sees them, whatever these
+Partners are also counted where usemagpie.ai sees them, whatever these
 settings say, as any website sees its visits. The partner list
 (`/api/partners`) gives each partner's website and key page as a
-`https://useblackpie.ai/go/<id>/site|keys[/<region>]` link, which sends a
+`https://usemagpie.ai/go/<id>/site|keys[/<region>]` link, which sends a
 `blackpie partner go` event (the partner, which link, the region, and the
 country Cloudflare gives) before sending the browser on; and one in ten
 fetches of the list sends a `blackpie partners fetch` event with weight 10
@@ -3523,7 +3523,7 @@ own: no install id, address or account goes with it. The code is
 
 A plugin's, an import link's and the library's icons sit on hosts their
 authors picked. blackpie fetches each through
-`https://useblackpie.ai/api/icon?url=<https URL>`, so the host sees
+`https://usemagpie.ai/api/icon?url=<https URL>`, so the host sees
 Cloudflare's address and never the user's. The worker sends only
 `Accept: image/*` and its own User-Agent, passes on a PNG, JPEG, GIF, WebP,
 ICO or SVG of at most 1 MB and refuses anything else, and counts and keeps

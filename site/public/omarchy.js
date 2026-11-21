@@ -1,4 +1,4 @@
-// useblackpie.ai on Omarchy (omarchy.org), the Hyprland desktop: the pages draw
+// usemagpie.ai on Omarchy (omarchy.org), the Hyprland desktop: the pages draw
 // themselves in Omarchy's own look (its theme's palette, its monospace font,
 // square flat surfaces framed in the accent) and, where blackpie runs on the
 // same computer, in the very theme Omarchy has on, followed as it changes.
@@ -8,7 +8,7 @@
 // Omarchy is told by its font: it installs "omarchy" (its logo, U+E900)
 // system-wide, and a page may load a local font by name. The theme comes from
 // blackpie's gateway, GET http://127.0.0.1:3425/v1/blackpie/omarchy, which only
-// useblackpie.ai may read. Chrome asks the reader before a site reaches this
+// usemagpie.ai may read. Chrome asks the reader before a site reaches this
 // computer, so the page asks blackpie by itself only once that was allowed;
 // until then it takes Omarchy's default theme for light or dark, and the chip
 // in the corner offers to follow the computer, or any built-in theme.

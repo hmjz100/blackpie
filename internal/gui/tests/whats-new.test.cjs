@@ -31,7 +31,7 @@ const NOTES_604 = [
   "",
   "## Improvements",
   "",
-  "- See [the guide](https://useblackpie.ai/docs) and [not a link](javascript:window.__pwned=2).",
+  "- See [the guide](https://usemagpie.ai/docs) and [not a link](javascript:window.__pwned=2).",
 ].join("\n");
 const RELEASES = [
   { version: "0.1.604", notes: NOTES_604, url: "https://github.com/hmjz100/blackpie-releases/releases/tag/v0.1.604" },
@@ -187,7 +187,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
       const issue = notes.getByRole("link", { name: "#464" });
       assert.equal(await issue.getAttribute("href"), "https://github.com/hmjz100/blackpie/issues/464");
       assert.equal(await dialog(page).getByRole("link", { name: "#446" }).getAttribute("href"), "https://github.com/hmjz100/blackpie/issues/446");
-      assert.equal(await notes.getByRole("link", { name: "the guide" }).getAttribute("href"), "https://useblackpie.ai/docs");
+      assert.equal(await notes.getByRole("link", { name: "the guide" }).getAttribute("href"), "https://usemagpie.ai/docs");
       assert.equal(await notes.getByRole("link", { name: "not a link" }).count(), 0, "a javascript: link is not a link");
       assert.equal(await dialog(page).locator("a[href^='javascript']").count(), 0);
       assert.equal(ctl.seen, 1, "the app is told they were seen");

@@ -19324,7 +19324,7 @@ function renderCLI(r) {
 // Settings' Download source (#893): where an update's file is downloaded
 // from — GitHub, or a GitHub download mirror put before its URL, the same
 // setting `blackpie update mirror` writes. blackpie names no mirror of its
-// own; the feed and each file's SHA-256 still come from useblackpie.ai, and a
+// own; the feed and each file's SHA-256 still come from usemagpie.ai, and a
 // file that doesn't match is never installed. A draft and its error are
 // kept across the page being drawn again.
 let mirrorEditing = false, mirrorDraft = "", mirrorErr = "";
@@ -19340,10 +19340,10 @@ function renderUpdateMirror(r, s) {
   const sub = el("div", "sub");
   who.append(sub);
   const m = s.updateMirror || "";
-  sub.textContent = mirrorErr || (m ? t("Updates are downloaded through this mirror, each checked against useblackpie.ai's checksum")
+  sub.textContent = mirrorErr || (m ? t("Updates are downloaded through this mirror, each checked against usemagpie.ai's checksum")
     : t("Updates are downloaded from GitHub; a mirror can be used where GitHub is slow"));
   sub.classList.toggle("err", !!mirrorErr);
-  sub.title = t("The update and its checksum always come from useblackpie.ai; a file from the mirror that doesn't match it is not installed.");
+  sub.title = t("The update and its checksum always come from usemagpie.ai; a file from the mirror that doesn't match it is not installed.");
   if (!mirrorEditing) {
     if (m) {
       const official = el("button", "text", t("Use GitHub"));
@@ -19567,8 +19567,8 @@ function renderSettings() {
   // BLACKPIE_PUBLIC_URL, where other machines reach it (#1551)
   if (s.publicURL && gw !== s.publicURL) row(t("Public address"), t("BLACKPIE_PUBLIC_URL: where other computers reach the gateway, with a gateway key"), s.publicURL, copyBtn(s.publicURL, t("Public address"))).id = "publicURLRow";
   const site = el("button", "text", t("Open"));
-  site.onclick = () => api("open", { url: "https://useblackpie.ai" }).catch(() => {});
-  row(t("Website"), t("downloads, docs and what's new"), "useblackpie.ai", site);
+  site.onclick = () => api("open", { url: "https://usemagpie.ai" }).catch(() => {});
+  row(t("Website"), t("downloads, docs and what's new"), "usemagpie.ai", site);
   const lic = el("button", "text", t("View"));
   lic.onclick = showNotices;
   row(t("Open-source licenses"), t("the notices of the code and data blackpie is built with"), "", lic);

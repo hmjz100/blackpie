@@ -74,7 +74,7 @@ func StoreIcon(data []byte) (string, error) {
 // so a crafted request can't point blackpie at anything but a public https
 // picture, and the read stops one byte past MaxIcon so a huge body is
 // refused rather than buffered. The picture is asked for through
-// useblackpie.ai's icon proxy, so its host never sees the user's IP.
+// usemagpie.ai's icon proxy, so its host never sees the user's IP.
 func FetchIcon(ctx context.Context, rawURL string) (string, error) {
 	u, err := iconURL(rawURL)
 	if err != nil {

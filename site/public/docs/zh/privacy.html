@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>隐私 · blackpie 文档</title>
-<meta name="description" content="blackpie 自己会发出什么、发到哪里：每天一次的用户计数、更新检查和其他公开列表、useblackpie.ai 能看到什么、OTLP 导出，以及关闭它们的每个开关。">
+<meta name="description" content="blackpie 自己会发出什么、发到哪里：每天一次的用户计数、更新检查和其他公开列表、usemagpie.ai 能看到什么、OTLP 导出，以及关闭它们的每个开关。">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#fafafa">
 <script>
@@ -27,14 +27,14 @@
 <script>try{if(/Linux/.test(navigator.userAgent)&&!/Android/.test(navigator.userAgent)||localStorage.getItem("omarchy")||/[?&]omarchy=/.test(location.search))document.write('<script src="/omarchy.js"><\/script>')}catch(e){}</script>
 <link rel="icon" href="/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="/img/icon-256.png">
-<link rel="alternate" hreflang="en" href="https://useblackpie.ai/docs/privacy">
-<link rel="alternate" hreflang="zh" href="https://useblackpie.ai/docs/zh/privacy">
-<link rel="alternate" hreflang="ja" href="https://useblackpie.ai/docs/ja/privacy">
+<link rel="alternate" hreflang="en" href="https://usemagpie.ai/docs/privacy">
+<link rel="alternate" hreflang="zh" href="https://usemagpie.ai/docs/zh/privacy">
+<link rel="alternate" hreflang="ja" href="https://usemagpie.ai/docs/ja/privacy">
 <link rel="stylesheet" href="/docs.css">
 <meta property="og:title" content="隐私">
 <meta property="og:description" content="blackpie 自己发出的所有内容，以及怎么关掉。">
-<meta property="og:image" content="https://useblackpie.ai/img/og.png">
-<meta property="og:url" content="https://useblackpie.ai/docs/zh/privacy">
+<meta property="og:image" content="https://usemagpie.ai/img/og.png">
+<meta property="og:url" content="https://usemagpie.ai/docs/zh/privacy">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
@@ -74,7 +74,7 @@
     <a href="#count">每日计数</a>
     <a href="#off">关闭</a>
     <a href="#files">本机上的文件</a>
-    <a href="#site">useblackpie.ai 能看到什么</a>
+    <a href="#site">usemagpie.ai 能看到什么</a>
     <a href="#lists">blackpie 拉取的公开列表</a>
     <a href="#otel">OTLP 导出</a>
     <a href="#masking">发给供应商的内容脱敏</a>
@@ -89,7 +89,7 @@
     <div class="table-wrap"><table>
       <tr><th>内容</th><th>发往</th><th>默认</th><th>怎么关</th></tr>
       <tr><td><a href="#count">每日计数</a></td><td>PostHog（<code>us.i.posthog.com</code>）</td><td>正式版开启；源码构建从不发送</td><td><span class="ui">设置</span> → <span class="ui">隐私</span>，<code>DO_NOT_TRACK=1</code></td></tr>
-      <tr><td><a href="#site">更新检查</a>、更新说明、合作伙伴列表、图标</td><td><code>useblackpie.ai</code></td><td>开启</td><td>更新检查用 <code>noAutoUpdate</code>；其余是应用运行所需</td></tr>
+      <tr><td><a href="#site">更新检查</a>、更新说明、合作伙伴列表、图标</td><td><code>usemagpie.ai</code></td><td>开启</td><td>更新检查用 <code>noAutoUpdate</code>；其余是应用运行所需</td></tr>
       <tr><td><a href="#lists">模型目录和汇率</a></td><td><code>models.dev</code>、<code>open.er-api.com</code></td><td>开启</td><td>不可关；不发送任何你的信息</td></tr>
       <tr><td><a href="#otel">OTLP 导出</a></td><td>你指定的收集器</td><td>关闭</td><td>保持关闭即可</td></tr>
     </table></div>
@@ -143,7 +143,7 @@
       <li>关掉 <span class="ui">设置</span> → <span class="ui">隐私</span> → <span class="ui">计入用户数</span>，或在 <code>settings.json</code> 里写 <code>"noStats": true</code>：整个每日计数。</li>
       <li>在 blackpie 的环境变量里设 <code>DO_NOT_TRACK=1</code> 或 <code>BLACKPIE_NO_STATS=1</code>（除空、<code>0</code>、<code>false</code> 之外的任何值）：整个每日计数，不管设置里怎么选。</li>
       <li>关掉 <span class="ui">设置</span> → <span class="ui">隐私</span> → <span class="ui">分享我用的 agent、provider 和模型</span>，或 <code>"noUsageStats": true</code>：<code>blackpie uses</code>、<code>blackpie partner</code> 事件和 <code>blackpie active</code> 里的数量；ID、版本和系统仍会发送。合作伙伴次数也不再记录。</li>
-      <li>关掉 <span class="ui">设置</span> → <span class="ui">关于</span> → <span class="ui">自动更新</span>，或 <code>"noAutoUpdate": true</code>：blackpie 自己向 <code>useblackpie.ai</code> 询问新版本（否则每 6 小时一次）。这不属于计数。</li>
+      <li>关掉 <span class="ui">设置</span> → <span class="ui">关于</span> → <span class="ui">自动更新</span>，或 <code>"noAutoUpdate": true</code>：blackpie 自己向 <code>usemagpie.ai</code> 询问新版本（否则每 6 小时一次）。这不属于计数。</li>
     </ul>
     <p>设置里的改动在下一次每小时检查时生效，不用重启。<code>settings.json</code> 在 blackpie 的文件夹里（见<a href="#files">下文</a>）：</p>
     <div class="code">
@@ -168,7 +168,7 @@
     <p>请求存档（<span class="ui">用量</span>页请求列表上方的<span class="ui">请求存档</span>开关）<b>默认关闭</b>。同步没有 S3 存储桶时打开它，每次经过网关的调用的请求头和正文会存到 blackpie 文件夹里的 <code>request-archive</code>，一次调用一个文件，只有你的用户能读，密钥按 S3 存档同样的方式遮掉。它最多占 1 GiB（settings.json 里的 <code>requestArchiveLocalMB</code>），超过后先删最早的调用。这个开关只属于这台电脑，同步不会在别的电脑上把它打开。有 S3 存储桶时调用存到桶里，这里不写任何东西。这个文件夹随时可以删。</p>
     <p>应用会把它做了什么写进日志 <code>app.log</code>：macOS 上在 <code>~/Library/Logs/blackpie</code>，Windows 上在 <code>%LOCALAPPDATA%\blackpie\logs</code>，Linux 上在 <code>~/.local/state/blackpie</code>（见 <a href="/docs/zh/start#log">blackpie 的日志在哪里？</a>），只有你的用户能读。它记下 blackpie 做了什么和遇到的错误，从不记密钥、提示词或回复，除非你发出去，否则只留在你的电脑上。它最多 5 MiB，另留一个更早的 <code>app.old.log</code>。随时可以删。</p>
 
-    <h2 id="site"><a class="anchor" href="#site">useblackpie.ai 能看到什么</a></h2>
+    <h2 id="site"><a class="anchor" href="#site">usemagpie.ai 能看到什么</a></h2>
     <p>blackpie 会向自己的网站请求几样东西，不受隐私设置影响，就像任何应用访问自己的更新服务器。这些请求都不带安装 ID 或账号。</p>
     <ul>
       <li><code>/api/latest</code>：更新信息，每 6 小时一次（开了 <code>noAutoUpdate</code> 则不请求），带 <code>?lang=</code> 取对应语言的说明；<span class="ui">设置</span> → <span class="ui">关于</span> → <span class="ui">更新渠道</span>选了稳定版时还带 <code>?channel=stable</code>。两者都不含你是谁。<code>/api/notes</code> 在更新后给出“新功能”。</li>

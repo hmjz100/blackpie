@@ -27,14 +27,14 @@
 <script>try{if(/Linux/.test(navigator.userAgent)&&!/Android/.test(navigator.userAgent)||localStorage.getItem("omarchy")||/[?&]omarchy=/.test(location.search))document.write('<script src="/omarchy.js"><\/script>')}catch(e){}</script>
 <link rel="icon" href="/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="/img/icon-256.png">
-<link rel="alternate" hreflang="en" href="https://useblackpie.ai/docs/import">
-<link rel="alternate" hreflang="zh" href="https://useblackpie.ai/docs/zh/import">
-<link rel="alternate" hreflang="ja" href="https://useblackpie.ai/docs/ja/import">
+<link rel="alternate" hreflang="en" href="https://usemagpie.ai/docs/import">
+<link rel="alternate" hreflang="zh" href="https://usemagpie.ai/docs/zh/import">
+<link rel="alternate" hreflang="ja" href="https://usemagpie.ai/docs/ja/import">
 <link rel="stylesheet" href="/docs.css">
 <meta property="og:title" content="Add to blackpie">
 <meta property="og:description" content="一个链接，把你的模型送进用户的每个 Agent。">
-<meta property="og:image" content="https://useblackpie.ai/img/og.png">
-<meta property="og:url" content="https://useblackpie.ai/docs/zh/import">
+<meta property="og:image" content="https://usemagpie.ai/img/og.png">
+<meta property="og:url" content="https://usemagpie.ai/docs/zh/import">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
@@ -102,17 +102,17 @@
     <div class="code" style="margin-top:20px">
       <span class="lang">链接</span>
       <button class="copy" data-copy="ex1">复制</button>
-      <pre id="ex1">https://useblackpie.ai/import#name=Acme%20Relay&amp;chat=https://api.acme.example/v1&amp;anthropic=https://api.acme.example&amp;key=sk-…&amp;models=gpt-5.5,claude-sonnet-5</pre>
+      <pre id="ex1">https://usemagpie.ai/import#name=Acme%20Relay&amp;chat=https://api.acme.example/v1&amp;anthropic=https://api.acme.example&amp;key=sk-…&amp;models=gpt-5.5,claude-sonnet-5</pre>
     </div>
 
     <h2 id="link"><a class="anchor" href="#link">链接格式</a></h2>
     <p>blackpie 会向系统注册 <code>blackpie://</code> 协议。导入链接就是这个协议，加上 <code>import</code> 和一串查询参数：</p>
     <div class="url"><span class="n">blackpie://import</span><span class="p">?</span><span class="n">name</span><span class="p">=</span><span class="v">Acme%20Relay</span><span class="p">&amp;</span><span class="n">chat</span><span class="p">=</span><span class="v">https://api.acme.example/v1</span><span class="p">&amp;</span><span class="n">key</span><span class="p">=</span><span class="v">sk-…</span></div>
-    <p>在网页上，请改用 <code>useblackpie.ai/import</code>，把同样的参数放在 <code>#</code> 后面：</p>
-    <div class="url"><span class="n">https://useblackpie.ai/import</span><span class="p">#</span><span class="n">name</span><span class="p">=</span><span class="v">Acme%20Relay</span><span class="p">&amp;</span><span class="n">chat</span><span class="p">=</span><span class="v">https://api.acme.example/v1</span><span class="p">&amp;</span><span class="n">key</span><span class="p">=</span><span class="v">sk-…</span></div>
+    <p>在网页上，请改用 <code>usemagpie.ai/import</code>，把同样的参数放在 <code>#</code> 后面：</p>
+    <div class="url"><span class="n">https://usemagpie.ai/import</span><span class="p">#</span><span class="n">name</span><span class="p">=</span><span class="v">Acme%20Relay</span><span class="p">&amp;</span><span class="n">chat</span><span class="p">=</span><span class="v">https://api.acme.example/v1</span><span class="p">&amp;</span><span class="n">key</span><span class="p">=</span><span class="v">sk-…</span></div>
     <div class="cards" style="margin-top:20px">
       <div><h3>为什么用 https 链接</h3><p>普通链接能用的地方它都能用：GitHub README、聊天软件和邮件客户端常常会去掉或拦截自定义协议。它会打开 blackpie；还没装 blackpie 时，会引导下载。</p></div>
-      <div><h3>为什么放在 <code>#</code> 后面</h3><p>浏览器从不把 # 后面的部分发给服务器。密钥从你的页面直接到用户电脑上，不经过 useblackpie.ai，连日志里也不会出现。</p></div>
+      <div><h3>为什么放在 <code>#</code> 后面</h3><p>浏览器从不把 # 后面的部分发给服务器。密钥从你的页面直接到用户电脑上，不经过 usemagpie.ai，连日志里也不会出现。</p></div>
     </div>
     <p>每个值都要做 URL 编码，<code>URLSearchParams</code> 或 <code>urlencode</code> 的结果即可。空格写成 <code>%20</code> 或 <code>+</code> 都行。</p>
 
@@ -183,14 +183,14 @@
     <div class="code">
       <span class="lang">HTML</span>
       <button class="copy" data-copy="ex-html">复制</button>
-      <pre id="ex-html">&lt;a href="https://useblackpie.ai/import#preset=deepseek&amp;key=sk-…"&gt;
-  &lt;img src="https://useblackpie.ai/img/add-to-blackpie.svg" alt="Add to blackpie" width="176" height="40"&gt;
+      <pre id="ex-html">&lt;a href="https://usemagpie.ai/import#preset=deepseek&amp;key=sk-…"&gt;
+  &lt;img src="https://usemagpie.ai/img/add-to-blackpie.svg" alt="Add to blackpie" width="176" height="40"&gt;
 &lt;/a&gt;</pre>
     </div>
     <div class="code">
       <span class="lang">Markdown</span>
       <button class="copy" data-copy="ex-md">复制</button>
-      <pre id="ex-md">[![Add to blackpie](https://useblackpie.ai/img/add-to-blackpie.svg)](https://useblackpie.ai/import#preset=deepseek)</pre>
+      <pre id="ex-md">[![Add to blackpie](https://usemagpie.ai/img/add-to-blackpie.svg)](https://usemagpie.ai/import#preset=deepseek)</pre>
     </div>
     <p>深色页面请用 <code>add-to-blackpie-light.svg</code>。README 这类公开页面绝不能带密钥：去掉 <code>key</code>，让用户粘贴自己的。</p>
 
@@ -207,14 +207,14 @@
   models: [<span class="s">"gpt-5.5"</span>, <span class="s">"claude-sonnet-5"</span>].join(<span class="s">","</span>),
   icon: <span class="s">"https://acme.example/logo.svg"</span>,
 });
-<span class="k">const</span> href = <span class="s">"https://useblackpie.ai/import#"</span> + params;</pre>
+<span class="k">const</span> href = <span class="s">"https://usemagpie.ai/import#"</span> + params;</pre>
     </div>
     <div class="code">
       <span class="lang">Python</span>
       <button class="copy" data-copy="ex-py">复制</button>
       <pre id="ex-py"><span class="k">from</span> urllib.parse <span class="k">import</span> urlencode
 
-href = <span class="s">"https://useblackpie.ai/import#"</span> + urlencode({
+href = <span class="s">"https://usemagpie.ai/import#"</span> + urlencode({
     <span class="s">"name"</span>: <span class="s">"Acme Relay"</span>,
     <span class="s">"chat"</span>: <span class="s">"https://api.acme.example/v1"</span>,
     <span class="s">"anthropic"</span>: <span class="s">"https://api.acme.example"</span>,
@@ -236,7 +236,7 @@ href = <span class="s">"https://useblackpie.ai/import#"</span> + urlencode({
       <li><b>不会悄悄覆盖。</b>id 已被占用时，对话框会说明，按钮也会变成「替换」。</li>
       <li><b>只接受 https。</b>除了本机和局域网，一律拒绝 http；<code>file:</code>、URL 里带账号密码以及其他协议直接拒绝。</li>
       <li><b>只读一次。</b>在应用里，链接内容只交给窗口一次；刷新后对话框不会再出现。</li>
-      <li><b>图标是下载的，不是嵌入的。</b><code>icon=</code> 地址由 blackpie 下载，只在用户确认导入之后，只走 https，只存进它自己的图标目录，最大 1&nbsp;MB，并校验类型。blackpie 经 useblackpie.ai 的图标代理去取，所以你的服务器只看到 Cloudflare 的地址，看不到用户的 IP；请求从 Cloudflare 发出，碰不到用户本机和内网。回环或内网的域名在发出请求前就被拒绝。页面和对话框从不直接加载远程图片。</li>
+      <li><b>图标是下载的，不是嵌入的。</b><code>icon=</code> 地址由 blackpie 下载，只在用户确认导入之后，只走 https，只存进它自己的图标目录，最大 1&nbsp;MB，并校验类型。blackpie 经 usemagpie.ai 的图标代理去取，所以你的服务器只看到 Cloudflare 的地址，看不到用户的 IP；请求从 Cloudflare 发出，碰不到用户本机和内网。回环或内网的域名在发出请求前就被拒绝。页面和对话框从不直接加载远程图片。</li>
       <li><b>密钥不经过服务器。</b>网页链接把参数放在 # 片段里。密钥最终只存在 <code>~/.config/blackpie/providers.json</code>，只有用户本人可读。</li>
     </ul>
     <div class="note"><b>链接里的密钥就是机密。</b>只在该用户本人能看到的页面上把密钥放进链接，最好是专门给 blackpie 生成、可以随时吊销的密钥。绝不要把共享密钥放进公开链接。</div>
@@ -379,12 +379,12 @@ href = <span class="s">"https://useblackpie.ai/import#"</span> + urlencode({
     // Readable, and what blackpie parses: only what must be escaped is.
     const enc = (v) => encodeURIComponent(v).replace(/%3A/gi, ":").replace(/%2F/gi, "/").replace(/%2C/gi, ",");
     const s = [...q].map(([k, v]) => k + "=" + enc(v)).join("&");
-    const web = "https://useblackpie.ai/import#" + s;
+    const web = "https://usemagpie.ai/import#" + s;
     const app = "blackpie://import?" + s;
     document.getElementById("o-web").textContent = web;
     document.getElementById("o-app").textContent = app;
-    document.getElementById("o-html").textContent = `<a href="${esc(web)}"><img src="https://useblackpie.ai/img/add-to-blackpie.svg" alt="Add to blackpie" width="176" height="40"></a>`;
-    document.getElementById("o-md").textContent = `[![Add to blackpie](https://useblackpie.ai/img/add-to-blackpie.svg)](${web})`;
+    document.getElementById("o-html").textContent = `<a href="${esc(web)}"><img src="https://usemagpie.ai/img/add-to-blackpie.svg" alt="Add to blackpie" width="176" height="40"></a>`;
+    document.getElementById("o-md").textContent = `[![Add to blackpie](https://usemagpie.ai/img/add-to-blackpie.svg)](${web})`;
     document.getElementById("o-try").href = "/import#" + s;
     const msg = document.getElementById("o-msg");
     msg.textContent = errs.join(" ");

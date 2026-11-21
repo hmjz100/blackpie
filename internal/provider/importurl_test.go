@@ -168,7 +168,7 @@ func TestParseImportGemini(t *testing.T) {
 
 func TestParseImportRejects(t *testing.T) {
 	for _, link := range []string{
-		"https://useblackpie.ai/import?preset=deepseek",
+		"https://usemagpie.ai/import?preset=deepseek",
 		"blackpie://delete?id=deepseek",
 		"blackpie://import",
 		"blackpie://import?preset=nope",

@@ -14,7 +14,7 @@ import (
 // that can't be read keeps the list's first, a partner whose regions are
 // no places (APIKEY.FAN's Default and Direct) keeps its own endpoints, and
 // a provider added before keeps its region when the user moves. The feed
-// is useblackpie.ai/api/partners as served on 2026-10-27.
+// is usemagpie.ai/api/partners as served on 2026-10-27.
 func TestPartnerStartsAtTheUsersRegion(t *testing.T) {
 	feed, err := os.ReadFile("testdata/partners-2026-10-27.json")
 	if err != nil {
@@ -40,8 +40,8 @@ func TestPartnerStartsAtTheUsersRegion(t *testing.T) {
 		return p
 	}
 	type want struct{ chat, anthropic, keys, site, siteHost, catalog string }
-	cn := want{"https://api.kimi.com/coding/v1", "https://api.kimi.com/coding", "https://useblackpie.ai/go/kimi/keys/cn", "https://useblackpie.ai/go/kimi/site/cn", "www.kimi.com", "kimi-code-plan-cn"}
-	global := want{"https://api.kimi.ai/coding/v1", "https://api.kimi.ai/coding", "https://useblackpie.ai/go/kimi/keys/global", "https://useblackpie.ai/go/kimi/site/global", "www.kimi.ai", "kimi-code-plan-global"}
+	cn := want{"https://api.kimi.com/coding/v1", "https://api.kimi.com/coding", "https://usemagpie.ai/go/kimi/keys/cn", "https://usemagpie.ai/go/kimi/site/cn", "www.kimi.com", "kimi-code-plan-cn"}
+	global := want{"https://api.kimi.ai/coding/v1", "https://api.kimi.ai/coding", "https://usemagpie.ai/go/kimi/keys/global", "https://usemagpie.ai/go/kimi/site/global", "www.kimi.ai", "kimi-code-plan-global"}
 	for _, c := range []struct {
 		name  string
 		where int

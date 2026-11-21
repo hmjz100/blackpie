@@ -1,5 +1,5 @@
 #!/bin/sh
-# blackpie installer: curl -fsSL https://useblackpie.ai/install.sh | sh
+# blackpie installer: curl -fsSL https://usemagpie.ai/install.sh | sh
 #
 # macOS: puts blackpie.app in /Applications (~/Applications when that is not
 # writable) and links the blackpie command into ~/.local/bin.
@@ -11,7 +11,7 @@
 # Termux: installs the Android terminal build into $PREFIX/bin.
 # Every download is checked against the release's SHA-256.
 #
-# Options (curl -fsSL https://useblackpie.ai/install.sh | sh -s -- --proxy …):
+# Options (curl -fsSL https://usemagpie.ai/install.sh | sh -s -- --proxy …):
 #   --proxy <url>      a proxy for every download: http://, https://,
 #                      socks5:// or socks5h:// (BLACKPIE_PROXY= does the same;
 #                      without either, curl's own https_proxy / HTTPS_PROXY /
@@ -19,7 +19,7 @@
 #   --mirror <prefix>  a GitHub download mirror: the release file is fetched
 #                      from <prefix><its github.com URL> (BLACKPIE_MIRROR= does
 #                      the same). None is used unless given. The release
-#                      list and its SHA-256 still come from useblackpie.ai,
+#                      list and its SHA-256 still come from usemagpie.ai,
 #                      never from the mirror, so a file the mirror changed is
 #                      refused.
 #   --gui              the desktop app, on Linux even before its libraries are
@@ -37,7 +37,7 @@
 #                      blackpie's settings, providers and usage deleted.
 set -eu
 
-site=https://useblackpie.ai
+site=https://usemagpie.ai
 bin="${BLACKPIE_BIN_DIR:-$HOME/.local/bin}"
 proxy="${BLACKPIE_PROXY:-}"
 mirror="${BLACKPIE_MIRROR:-}"

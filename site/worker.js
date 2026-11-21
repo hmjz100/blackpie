@@ -1,4 +1,4 @@
-// useblackpie.ai. Releases live on GitHub (hmjz100/blackpie-releases); this
+// usemagpie.ai. Releases live on GitHub (hmjz100/blackpie-releases); this
 // worker turns the newest one into the update feed the app reads and into
 // download links that never go stale.
 //
@@ -178,7 +178,7 @@ export default {
 // fetch" with weight FETCH_SAMPLE (sum it), and only while someone is
 // listed. No id, address or account goes: a country, at most.
 const FETCH_SAMPLE = 10;
-const GO = "https://useblackpie.ai/go/";
+const GO = "https://usemagpie.ai/go/";
 const POSTHOG = "https://us.i.posthog.com/i/v0/e/";
 // the Blackpie project's PostHog key, as the app's (internal/stats): it can
 // send events and read nothing
@@ -193,7 +193,7 @@ function live(p, now) {
 // ended one stays in partners.js, so the /go links of providers added from
 // it keep working), with their website and key page as /go links. A
 // website's own host goes beside it as siteHost, for the editor's link to
-// read (www.kimi.com, not useblackpie.ai).
+// read (www.kimi.com, not usemagpie.ai).
 export function served(list, now) {
   const go = (p, what, r) => GO + [p.id, what, r && r.id].filter(Boolean).map(encodeURIComponent).join("/");
   const host = (u) => { try { return new URL(u).host; } catch { return ""; } };
@@ -335,7 +335,7 @@ function cacheFor(got) {
 // cached and remember are the edge's cache (caches.default) by name. The
 // names carry a version: an entry an older worker kept in another shape is
 // never read as this one's. Anything unreadable is a miss.
-const CACHE = "https://useblackpie.ai/__v2/";
+const CACHE = "https://usemagpie.ai/__v2/";
 
 async function cached(name) {
   try {
@@ -381,7 +381,7 @@ async function latest(ctx, env) {
   return got;
 }
 
-const UA = { "User-Agent": "useblackpie.ai" };
+const UA = { "User-Agent": "usemagpie.ai" };
 
 // api asks GitHub's API, with the GITHUB_TOKEN secret where one is set.
 function api(path, env) {
@@ -870,14 +870,14 @@ export async function icon(raw) {
   }
   if (u.protocol !== "https:" || u.username || u.password || (u.port && u.port !== "443"))
     return new Response("only a public https picture\n", { status: 400 });
-  // the app asks for useblackpie.ai's own pictures straight; asking here for
+  // the app asks for usemagpie.ai's own pictures straight; asking here for
   // one would only send the worker round to itself
-  if (u.hostname === "useblackpie.ai" || u.hostname.endsWith(".useblackpie.ai"))
-    return new Response("a useblackpie.ai picture is fetched as it is\n", { status: 400 });
+  if (u.hostname === "usemagpie.ai" || u.hostname.endsWith(".usemagpie.ai"))
+    return new Response("a usemagpie.ai picture is fetched as it is\n", { status: 400 });
   let res;
   try {
     res = await fetch(u.toString(), {
-      headers: { Accept: "image/*", "User-Agent": "blackpie-icon/1 (+https://useblackpie.ai)" },
+      headers: { Accept: "image/*", "User-Agent": "blackpie-icon/1 (+https://usemagpie.ai)" },
       redirect: "follow",
       signal: AbortSignal.timeout(10000),
       // a missing or failing picture is asked for again soon, not in a day

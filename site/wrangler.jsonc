@@ -1,4 +1,4 @@
-// useblackpie.ai: the static site in public/, plus worker.js for the update
+// usemagpie.ai: the static site in public/, plus worker.js for the update
 // feed and the download links. Deploy with `npx wrangler deploy` from here.
 {
   "name": "useblackpie",
@@ -7,12 +7,12 @@
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
-    // every request, so worker.js can send www.useblackpie.ai to useblackpie.ai
+    // every request, so worker.js can send www.usemagpie.ai to usemagpie.ai
     "run_worker_first": true
   },
   "routes": [
-    { "pattern": "useblackpie.ai", "custom_domain": true },
-    { "pattern": "www.useblackpie.ai", "custom_domain": true }
+    { "pattern": "usemagpie.ai", "custom_domain": true },
+    { "pattern": "www.usemagpie.ai", "custom_domain": true }
   ],
   // the ledger of releases the Stable channel is chosen from (worker.js,
   // "The Stable channel"), kept by the cron every quarter hour

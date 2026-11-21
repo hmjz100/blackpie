@@ -102,7 +102,7 @@ func keyedCaller(r *http.Request) bool {
 // computer (localhost, *.localhost, 127.0.0.0/8, [::1], any port) nor the
 // request's own origin (a page served at the address the request names,
 // such as blackpie's web app on a LAN address), so a browser sent it for a
-// site elsewhere. useblackpie.ai may still read the Omarchy theme
+// site elsewhere. usemagpie.ai may still read the Omarchy theme
 // (omarchyTheme).
 //
 // Only http and https are judged. A scheme only an app or an extension

@@ -11,10 +11,10 @@ const partner = (id, name, extra = {}) => ({ id, name, icon: "generic", kind: "p
 const partners = [
   partner("acme", "Acme AI", { notes: { en: "Fast relay", zh: "快速中转", ja: "高速な中継" },
     // its pages are /go links, named by the host they send the browser to
-    website: "https://useblackpie.ai/go/acme/site", siteHost: "www.acme.example",
+    website: "https://usemagpie.ai/go/acme/site", siteHost: "www.acme.example",
     regions: [
-      { id: "cn", name: "China", chat: "https://api.acme.example.com/v1", website: "https://useblackpie.ai/go/acme/site/cn", siteHost: "cn.acme.example" },
-      { id: "global", name: "Global", chat: "https://global.acme.example.com/v1", website: "https://useblackpie.ai/go/acme/site/global", siteHost: "global.acme.example" },
+      { id: "cn", name: "China", chat: "https://api.acme.example.com/v1", website: "https://usemagpie.ai/go/acme/site/cn", siteHost: "cn.acme.example" },
+      { id: "global", name: "Global", chat: "https://global.acme.example.com/v1", website: "https://usemagpie.ai/go/acme/site/global", siteHost: "global.acme.example" },
     ], splitAccounts: true }),
   partner("zhonly", "China Only", { langs: ["zh"], notes: { en: "Mainland relay", zh: "国内中转" } }),
   partner("taken", "Taken", { added: true }),

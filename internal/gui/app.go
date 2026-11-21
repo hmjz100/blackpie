@@ -456,7 +456,7 @@ func Run(version string, showMain bool, link string) error {
 		appMenu := application.DefaultApplicationMenu()
 		help := appMenu.FindByRole(application.HelpMenu).GetSubmenu()
 		help.Clear()
-		help.Add("Learn More").OnClick(func(*application.Context) { _ = h.OpenURL("https://useblackpie.ai") })
+		help.Add("Learn More").OnClick(func(*application.Context) { _ = h.OpenURL("https://usemagpie.ai") })
 		h.app.Menu.Set(appMenu)
 	}
 	if Started != nil {

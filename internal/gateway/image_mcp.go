@@ -50,8 +50,8 @@ const ImageMCPFiles = ImageMCPPath + "/files/"
 // agent: the id to wait on with generation_result, and each file made, at
 // its URL, and whether it is in the answer itself.
 const (
-	PendingMeta = "useblackpie.ai/pending"
-	FilesMeta   = "useblackpie.ai/files"
+	PendingMeta = "usemagpie.ai/pending"
+	FilesMeta   = "usemagpie.ai/files"
 )
 
 // MadeFile is one file a tool result's FilesMeta names.

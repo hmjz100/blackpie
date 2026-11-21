@@ -708,7 +708,7 @@ func register(ctx context.Context, m meta, redirect string) (id, secret, method 
 	}
 	reg := map[string]any{
 		"client_name":                "Blackpie",
-		"client_uri":                 "https://useblackpie.ai",
+		"client_uri":                 "https://usemagpie.ai",
 		"redirect_uris":              []string{redirect},
 		"grant_types":                []string{"authorization_code", "refresh_token"},
 		"response_types":             []string{"code"},

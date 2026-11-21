@@ -192,7 +192,7 @@ test("--mirror fetches the file through the mirror, the feed and its checksum fr
   const r = install(t, { termux: false, github: true, args: ["--mirror", "https://gh.mirror.example"] });
   assert.equal(r.status, 0, r.stderr);
   const [feed, file] = r.requests.trim().split("\n");
-  assert.equal(feed, "https://useblackpie.ai/api/latest");
+  assert.equal(feed, "https://usemagpie.ai/api/latest");
   assert.equal(file, "https://gh.mirror.example/https://github.com/hmjz100/blackpie-releases/releases/download/vtest/blackpie-cli-linux-arm64");
   assert.equal(readFileSync(join(r.bin, "blackpie"), "utf8"), r.payload);
   assert.match(r.stdout, /through https:\/\/gh\.mirror\.example\//);

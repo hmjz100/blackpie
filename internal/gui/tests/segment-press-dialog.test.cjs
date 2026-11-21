@@ -17,7 +17,7 @@ const assets = path.resolve(__dirname, "../assets");
 const kimi = {
   id: "kimi", name: "Kimi Code", icon: "generic", kind: "partner", sponsored: true, regionLabel: "Plan",
   notes: { en: "One subscription, one K3 quota shared by every agent", zh: "一份订阅，所有 agent 共享 K3 额度" },
-  website: "https://useblackpie.ai/go/kimi/site", keysUrl: "https://useblackpie.ai/go/kimi/keys",
+  website: "https://usemagpie.ai/go/kimi/site", keysUrl: "https://usemagpie.ai/go/kimi/keys",
   chat: "https://api.kimi.example/coding/v1", anthropic: "https://api.kimi.example/coding",
   regions: [
     { id: "cn", name: "China", chat: "https://api.kimi.example/coding/v1", anthropic: "https://api.kimi.example/coding" },
