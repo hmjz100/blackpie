@@ -109,8 +109,8 @@ var evalCases = []evalCase{
 	},
 	{
 		ID: "home-path", From: "611b9e173",
-		Text: "cd /Users/jdoe/workspace/projects/blackpie && go test ./internal/redact",
-		Keep: []evalValue{{V: "jdoe", Kind: "PERSON"}, {V: "blackpie", Kind: "PERSON"}},
+		Text: "cd /Users/jdoe/workspace/projects/magpie && go test ./internal/redact",
+		Keep: []evalValue{{V: "jdoe", Kind: "PERSON"}, {V: "magpie", Kind: "PERSON"}},
 	},
 	{
 		ID: "grep-pattern", From: "611b9e173",
@@ -119,7 +119,7 @@ var evalCases = []evalCase{
 	},
 	{
 		ID: "sizes-versions", From: "611b9e173",
-		Text: "Screenshot 1624x1487 at 2x; blackpie v0.1.1513 built with go1.26.8 on darwin/arm64.",
+		Text: "Screenshot 1624x1487 at 2x; magpie v0.1.1513 built with go1.26.8 on darwin/arm64.",
 		Keep: []evalValue{{V: "1624x1487", Kind: "PHONE"}, {V: "v0.1.1513", Kind: "ACCOUNT"}, {V: "1.26.8", Kind: "PHONE"}},
 	},
 	{
@@ -181,7 +181,7 @@ var evalCases = []evalCase{
 	},
 	{
 		ID: "user-path", From: "d3db461bb",
-		Text: "read /Users/user/workspace/projects/blackpie/AGENTS.md and C:\\Users\\vdxz\\notes.txt, then /home/rina/.config/app.toml",
+		Text: "read /Users/yetone/workspace/projects/magpie/AGENTS.md and C:\\Users\\vdxz\\notes.txt, then /home/rina/.config/app.toml",
 		Keep: []evalValue{{V: "yetone", Kind: "PERSON"}, {V: "AGENTS.md", Kind: "PERSON"}, {V: "vdxz", Kind: "PERSON"}, {V: "rina", Kind: "PERSON"}},
 	},
 	{
@@ -211,7 +211,7 @@ var evalCases = []evalCase{
 	},
 	{
 		ID: "go-caches", From: "d3db461bb",
-		Text: "open /Users/x/Library/Caches/go-build/63700b7ab65fd1d3@v63: no such file\nP=/Users/user/.npm/_npx/1e7f6d9597241db0 d6426ecaaf0a28de@v31",
+		Text: "open /Users/x/Library/Caches/go-build/63700b7ab65fd1d3@v63: no such file\nP=/Users/yetone/.npm/_npx/1e7f6d9597241db0 d6426ecaaf0a28de@v31",
 		Keep: []evalValue{{V: "63700b7ab65fd1d3@v63", Kind: "EMAIL"}, {V: "d6426ecaaf0a28de@v31", Kind: "EMAIL"}, {V: "1e7f6d9597241db0", Kind: "SECRET"}},
 	},
 	{
