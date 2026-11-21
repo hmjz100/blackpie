@@ -145,6 +145,7 @@ var routingNames = []struct {
 	{provider.FreeFirst, "free", []string{"free-first", "freest", "no-cost"}},
 	{provider.Fastest, "fast", []string{"fastest", "speed", "speed-first"}},
 	{provider.Cheapest, "cheap", []string{"cheapest", "cheapest-first", "price", "cost"}},
+	{provider.SmallFirst, "fit", []string{"small-first", "smallest-first", "small-context-first", "context"}},
 	{provider.Drain, "drain", []string{"until-used-up", "use-up", "sticky"}},
 	{provider.Manual, "manual", []string{"pick", "picked", "pinned"}},
 }

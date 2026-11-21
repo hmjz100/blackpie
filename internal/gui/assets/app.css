@@ -19,7 +19,7 @@
   --fg-2: #4b4b53;
   --muted: #85858d;
   --faint: #b9b9c2;
-  --accent: #4f46e5;
+  --accent: #574ab8;
   --accent-soft: #eeedfd;
   --accent-fg: #ffffff;
   --sel: #ecebfb;
@@ -103,6 +103,10 @@
 :root[data-theme="dark"][data-colorblind="1"] {
   --c1: #56b4e9; --c2: #fbbf24; --c3: #2dd4bf; --c4: #fb7185; --c5: #e879f9; --c6: #f0e442; --c7: #94a3b8;
 }
+.accent-pick { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+.accent-pick button, .accent-pick input { width: 26px; height: 26px; border: 2px solid var(--card); border-radius: 50%; background: var(--sw); box-shadow: 0 0 0 1px var(--line); cursor: pointer; }
+.accent-pick button[aria-checked="true"] { box-shadow: 0 0 0 2px var(--fg); }
+.accent-pick input { padding: 0; overflow: hidden; }
 /* Windows' own text faces, and Chinese in YaHei UI, its UI face for it, not
    the webview's fallback; the Mac's and Linux's stack is the one above */
 :root.win { --font: "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif; }

@@ -973,7 +973,7 @@ func Handler(w Windows, gw *gateway.Server) http.Handler {
 		s := settings.Load()
 		// and the text size, which the Mac's header measures against the
 		// traffic lights
-		boot := map[string]any{"lang": s.Lang, "theme": s.Theme, "textSize": s.TextSize, "web": isWeb(w)}
+		boot := map[string]any{"lang": s.Lang, "theme": s.Theme, "accent": s.Accent, "textSize": s.TextSize, "web": isWeb(w)}
 		if s.Colorblind {
 			boot["colorblind"] = true
 		}
@@ -1463,6 +1463,9 @@ func Handler(w Windows, gw *gateway.Server) http.Handler {
 			// nor whether animations are stilled (#3813)
 			if _, sent := fields["reduceMotion"]; !sent {
 				in.ReduceMotion = cur.ReduceMotion
+			}
+			if _, sent := fields["accent"]; !sent {
+				in.Accent = cur.Accent
 			}
 			// nor whether a value masked for the first time is told (Must2333)
 			if _, sent := fields["maskAlert"]; !sent {

@@ -42,7 +42,8 @@ const CodexAutoReviewSession = "session"
 
 // Settings is what the user chose. "" and "system" both mean "follow the OS".
 type Settings struct {
-	Theme string `json:"theme,omitempty"` // system | light | dark
+	Theme  string `json:"theme,omitempty"`  // system | light | dark
+	Accent string `json:"accent,omitempty"` // #rrggbb, empty uses blackpie's default
 	// Colorblind switches chart series (--c1…--c7) to an Okabe–Ito palette
 	// and gives each quota curve window, and its legend key, a dash of its
 	// own (#2073).
@@ -1212,6 +1213,7 @@ var DefaultTextSize = func() int {
 }
 
 var validTerminalBundleID = lazyre.New(`^[A-Za-z0-9][A-Za-z0-9.-]{0,254}$`)
+var validAccent = lazyre.New(`^#[0-9A-Fa-f]{6}$`)
 
 // providerID is how a provider's id is spelled: lower-case letters, digits
 // and dashes, as provider.Slug derives it (a custom provider's id is the
@@ -2085,6 +2087,9 @@ func saveOwn(s Settings, recording, reads bool) error {
 	}
 	if !slices.Contains(Themes, s.Theme) {
 		return fmt.Errorf("theme must be one of %v, not %q", Themes, s.Theme)
+	}
+	if s.Accent != "" && !validAccent.MatchString(s.Accent) {
+		return fmt.Errorf("accent must be a colour as #rrggbb, not %q", s.Accent)
 	}
 	if !slices.Contains(Langs, s.Lang) {
 		return fmt.Errorf("language must be one of %v, not %q", Langs, s.Lang)

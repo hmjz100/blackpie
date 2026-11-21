@@ -2115,7 +2115,8 @@ type weighing struct {
 	// price is what each seat's model costs at the request's time, by
 	// restID (a group's heads can be two models on one key): filled only
 	// when the routing weighs by it (routes.Strategy.ByPrice)
-	price map[string]seatPrice
+	price  map[string]seatPrice
+	window map[string]int
 }
 
 // seatPrice is a seat's price at the request's time, as Cheapest weighed
@@ -2310,6 +2311,14 @@ func weighRouted(p provider.Provider, cs []candidate, model string, from provide
 			pr = pr.In(at)
 			seats[i].Priced, seats[i].Cost, seats[i].CacheCost = true, pr.Input+pr.Output, pr.CacheRead
 			wg.price[c.restID()] = seatPrice{in: pr.Input, out: pr.Output, cache: pr.CacheRead, peak: peak}
+		}
+	}
+	if st.ByWindow {
+		served := sync.OnceValue(provider.Served)
+		wg.window = map[string]int{}
+		for i, c := range cs {
+			seats[i].Window = windowIn(served, c.p, c.model)
+			wg.window[c.restID()] = seats[i].Window
 		}
 	}
 	order := routes.Apply(st, p.ID, seats)

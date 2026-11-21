@@ -1,5 +1,10 @@
 # Providers and accounts
 
+The model pickers mark a model as free when the provider itself lists it at
+zero, or the user explicitly sets a zero price. `Provider.PricedFree` excludes
+unknown prices, a maker's price for a relay and subscription plan catalog
+prices; this display classification does not change `FreeModel` routing.
+
 The gateway can send a request to three kinds of upstream:
 
 - A **provider** in `providers.json`: an endpoint with one or more API keys. Google Vertex AI's has no key: it is signed with the user's Google credentials.

@@ -45,6 +45,8 @@ const (
 	// (routes.Cheapest). A group's only: a provider's keys and accounts
 	// all bill its one price.
 	Cheapest = "cheap"
+	// SmallFirst is a group's routing by the smallest known context window.
+	SmallFirst = "fit"
 	// Drain stays on one key or account until it is used up, then goes
 	// on to the next in the listed order, and stays on that one: one
 	// before it that renews meanwhile doesn't take its requests back

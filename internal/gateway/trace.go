@@ -308,11 +308,12 @@ type Weighed struct {
 	Free     bool              `json:"free,omitempty"`     // its model costs nothing there (free first)
 	LateTTFT float64           `json:"lateTtft,omitempty"` // speed first: its ms to the first token lately, 0 if not measured (speed.go)
 	LateTPS  float64           `json:"lateTps,omitempty"`  // speed first: its tokens a second lately, 0 if not told
-	Price    *SeatPrice        `json:"price,omitempty"`    // cheapest first: what its model costs on it now, nil if not known
-	Turn     bool              `json:"turn,omitempty"`     // in turn: it was this one's turn
-	Fit      int               `json:"fit,omitempty"`      // keyFit
-	Speaks   provider.Protocol `json:"speaks,omitempty"`   // a key made for one protocol only
-	Rest     *Rest             `json:"rest,omitempty"`     // resting after a failure, when the request came
+	Context  int               `json:"context,omitempty"`
+	Price    *SeatPrice        `json:"price,omitempty"`  // cheapest first: what its model costs on it now, nil if not known
+	Turn     bool              `json:"turn,omitempty"`   // in turn: it was this one's turn
+	Fit      int               `json:"fit,omitempty"`    // keyFit
+	Speaks   provider.Protocol `json:"speaks,omitempty"` // a key made for one protocol only
+	Rest     *Rest             `json:"rest,omitempty"`   // resting after a failure, when the request came
 	Unlisted bool              `json:"unlisted,omitempty"`
 	// Window: left out as the request is longer than this, its model's
 	// context window (roomy), unless every one with room is out of its
@@ -565,6 +566,9 @@ func weighed(c candidate, p provider.Provider, wg weighing, fallback bool, from 
 	}
 	if pr, ok := wg.price[c.restID()]; ok {
 		w.Price = &SeatPrice{Input: pr.in, Output: pr.out, CacheRead: pr.cache, Peak: pr.peak}
+	}
+	if n, ok := wg.window[c.restID()]; ok {
+		w.Context = n
 	}
 	if sinks(p.Sink, p.Routing) {
 		markSunk(&w, c)

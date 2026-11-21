@@ -1970,33 +1970,44 @@ var makerCatalogs = sync.OnceValue(func() []string {
 // auto-review through the Codex subscription costs nothing too, as OpenAI
 // serves it a ChatGPT sign-in (codexReviewFree).
 func (p Provider) ListPrice(model string) (catalog.Price, bool) {
+	pr, ok, _ := p.listPriceSource(model)
+	return pr, ok
+}
+
+func (p Provider) listPriceSource(model string) (catalog.Price, bool, int) {
 	if own := p.OwnModelID(model); own != model {
 		// Listed IDs map directly to vendor IDs. A vendor ID can also
 		// be another model's listed ID, so never resolve it a second time.
-		if pr, ok := p.listPrice(own); ok {
-			return pr, true
+		if pr, ok, source := p.listPrice(own); ok {
+			return pr, true, source
 		}
 	}
 	return p.listPrice(model)
 }
 
+const (
+	pricedOwn = iota
+	pricedCatalog
+	pricedMaker
+)
+
 // listPrice looks up a vendor model without resolving its listed alias again.
-func (p Provider) listPrice(model string) (catalog.Price, bool) {
+func (p Provider) listPrice(model string) (catalog.Price, bool, int) {
 	if pr, ok := p.remoteOwnPrice(model); ok {
-		return pr, true
+		return pr, true, pricedOwn
 	}
 	if p.clineOwnFreeModel(model) || p.kiloOwnFreeModel(model) || p.codexReviewFree(model) {
 		// served at no cost: not at the price of the model it is free of
-		return catalog.Price{}, true
+		return catalog.Price{}, true, pricedOwn
 	}
 	if pr, ok := p.cursorFastPrice(model); ok {
-		return pr, true
+		return pr, true, pricedOwn
 	}
 	if pr, ok := p.factoryFastPrice(model); ok {
-		return pr, true
+		return pr, true, pricedOwn
 	}
 	if pr, ok := p.grokFastPrice(model); ok {
-		return pr, true
+		return pr, true, pricedOwn
 	}
 	names := pricedNames(model)
 	if p.kimiCodeMember() {
@@ -2010,29 +2021,70 @@ func (p Provider) listPrice(model string) (catalog.Price, bool) {
 	}
 	for _, m := range names {
 		if pr, ok := catalog.PricedBy(priceCatalogs(cats), m); ok {
-			return pr, true
+			return pr, true, pricedCatalog
 		}
 		if pr, ok := makerListPrice(m); ok {
-			return pr, true
+			return pr, true, pricedMaker
 		}
 	}
 	if slices.Contains(cats, "anthropic") {
 		// a gated Claude model models.dev prices nowhere (Claude Mythos
 		// 5.1): Anthropic's price, as it told Claude Code
 		if pr, ok := claudeCodePrice(model); ok {
-			return pr, true
+			return pr, true, pricedMaker
 		}
 	}
 	if pr, ok := p.vendorListPrice(model); ok {
-		return pr, true
+		return pr, true, pricedOwn
 	}
 	if pr, ok := p.pluginListPrice(model); ok {
-		return pr, true
+		return pr, true, pricedOwn
 	}
 	if p.pluginFree(model) {
-		return catalog.Price{}, true
+		return catalog.Price{}, true, pricedOwn
 	}
-	return catalog.Price{}, false
+	return catalog.Price{}, false, pricedOwn
+}
+
+// PricedFree reports a zero price explicitly set by the user or this provider.
+// A maker's price and a subscription catalog's per-token price are not proof.
+func (p Provider) PricedFree(s settings.Settings, model string) bool {
+	if pr, ok := userPrice(s, p, model); ok {
+		return zeroPrice(pr)
+	}
+	pr, ok, source := p.listPriceSource(model)
+	if !ok || !zeroPrice(pr) || source == pricedMaker {
+		return false
+	}
+	if source != pricedCatalog {
+		return true
+	}
+	cats := p.Catalogs()
+	if c := p.EndpointCatalog(); c != "" {
+		cats = []string{c}
+	}
+	cats = slices.DeleteFunc(priceCatalogs(cats), func(c string) bool { return strings.Contains(c, "-plan") })
+	own := p.OwnModelID(model)
+	for _, id := range []string{own, model} {
+		for _, name := range pricedNames(id) {
+			if pr, ok := catalog.PricedBy(cats, name); ok {
+				return zeroPrice(pr)
+			}
+		}
+	}
+	return false
+}
+
+func zeroPrice(pr catalog.Price) bool {
+	if pr.Input != 0 || pr.Output != 0 || pr.CacheRead != 0 || pr.CacheWrite != 0 || pr.CacheWrite1h != 0 {
+		return false
+	}
+	for _, tier := range pr.Tiers {
+		if tier.Input != 0 || tier.Output != 0 || tier.CacheRead != 0 || tier.CacheWrite != 0 {
+			return false
+		}
+	}
+	return true
 }
 
 // vendorCatalogs are the models.dev catalogs of the vendors a moved
@@ -2194,7 +2246,7 @@ func (p Provider) grokFastPrice(model string) (catalog.Price, bool) {
 	if !ok {
 		return catalog.Price{}, false
 	}
-	pr, ok := p.listPrice(base)
+	pr, ok, _ := p.listPrice(base)
 	if !ok {
 		return catalog.Price{}, false
 	}
@@ -2252,7 +2304,7 @@ func (p Provider) factoryFastPrice(model string) (catalog.Price, bool) {
 	if !ok || times == 0 {
 		return catalog.Price{}, false
 	}
-	pr, ok := p.listPrice(base)
+	pr, ok, _ := p.listPrice(base)
 	if !ok {
 		return catalog.Price{}, false
 	}
@@ -2448,22 +2500,11 @@ func (p Provider) PriceAt(s settings.Settings, model string, at time.Time) (cata
 // a vendor that bills by the hour (PeakOf).
 func tariffOf(s settings.Settings, p Provider, known bool, model string) (catalog.Price, bool) {
 	id := p.ID
-	// then what they said the model costs from any provider (*/model):
-	// still the user's word, so before any list price
-	for _, key := range [...]string{id + "/" + model, id + "/*", AnyPriceKey(model)} {
-		if m, ok := s.ModelPrices[key]; ok {
-			if pr, bad := m.Price(); bad == "" {
-				// a Claude model's 1-hour cache write left out: 2× input
-				catalog.OneHourFor(model, &pr)
-				// a vendor that bills by the hour doubles any price in its
-				// peak hours: the user's is the off-peak one, as its list
-				// price is, so setting one keeps the split (treeman on
-				// Discord)
-				pr.Peak = p.PeakOf(model)
-				return pr, true
-			}
-		}
+	if pr, ok := userPrice(s, p, model); ok {
+		pr.Peak = p.PeakOf(model)
+		return pr, true
 	}
+
 	if !known {
 		if p.codexReviewFree(model) { // signed out since: still a ChatGPT sign-in's
 			return catalog.Price{}, true
@@ -2492,6 +2533,18 @@ func tariffOf(s settings.Settings, p Provider, known bool, model string) (catalo
 		pr = pr.Times(p.PriceRate)
 	}
 	return pr, ok
+}
+
+func userPrice(s settings.Settings, p Provider, model string) (catalog.Price, bool) {
+	for _, key := range [...]string{p.ID + "/" + model, p.ID + "/*", AnyPriceKey(model)} {
+		if m, ok := s.ModelPrices[key]; ok {
+			if pr, bad := m.Price(); bad == "" {
+				catalog.OneHourFor(model, &pr)
+				return pr, true
+			}
+		}
+	}
+	return catalog.Price{}, false
 }
 
 // EntryPriceIn is what a call to an entry of the catalog costs the user,

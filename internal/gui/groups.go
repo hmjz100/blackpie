@@ -172,6 +172,8 @@ type modelRef struct {
 	// whichever is named (a ChatGPT account's, #1865), which Settings ›
 	// Images says
 	VendorPicks bool `json:"vendorPicks,omitempty"`
+	Free        bool `json:"free,omitempty"`
+	Zero        bool `json:"zero,omitempty"`
 }
 
 // servedRef is a served model as the Routing page lists it
@@ -277,12 +279,14 @@ func groupsState() groupsJSON {
 		named[g.Classifier] = true
 	}
 	for _, e := range provider.OfferedDeciders(func(id string) bool { return named[id] }) {
-		out.Deciders = append(out.Deciders, modelRef{ID: e.ID, Name: e.Name, Provider: e.Provider.ID, PName: e.Provider.Name, Icon: e.Provider.Icon, Sub: e.Provider.Account != nil})
+		out.Deciders = append(out.Deciders, modelRef{ID: e.ID, Name: e.Name, Provider: e.Provider.ID, PName: e.Provider.Name, Icon: e.Provider.Icon, Sub: e.Provider.Account != nil, Free: e.Free, Zero: !e.Free && e.Provider.PricedFree(def, e.Model)})
 	}
 	served := provider.Served()
 	for _, e := range served {
 		if e.Group == "" {
-			out.Models = append(out.Models, servedRef(e))
+			m := servedRef(e)
+			m.Free, m.Zero = e.Free, !e.Free && e.Provider.PricedFree(def, e.Model)
+			out.Models = append(out.Models, m)
 		}
 	}
 	// every provider's models read once for the groups, not once a group

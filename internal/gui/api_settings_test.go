@@ -302,6 +302,44 @@ func TestSettingsColorblindMode(t *testing.T) {
 	}
 }
 
+func TestSettingsAccent(t *testing.T) {
+	h := t.TempDir()
+	t.Setenv("HOME", h)
+	t.Setenv("USERPROFILE", h)
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(h, ".config"))
+	t.Setenv("XDG_CACHE_HOME", filepath.Join(h, ".cache"))
+	handler := Handler(nil, nil)
+	post := func(body string) *httptest.ResponseRecorder {
+		t.Helper()
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, httptest.NewRequest("POST", "/api/settings", strings.NewReader(body)))
+		return rec
+	}
+	if rec := post(`{"theme":"dark","accent":"#0d9488"}`); rec.Code != http.StatusOK {
+		t.Fatalf("save: %d %s", rec.Code, rec.Body)
+	}
+	if rec := post(`{"theme":"light"}`); rec.Code != http.StatusOK {
+		t.Fatalf("old page save: %d %s", rec.Code, rec.Body)
+	}
+	if got := settings.Load().Accent; got != "#0d9488" {
+		t.Fatalf("omitted accent changed to %q", got)
+	}
+	boot := httptest.NewRecorder()
+	handler.ServeHTTP(boot, httptest.NewRequest("GET", "/boot.js", nil))
+	if !strings.Contains(boot.Body.String(), `"accent":"#0d9488"`) {
+		t.Fatalf("boot missing accent: %s", boot.Body)
+	}
+	if rec := post(`{"theme":"light","accent":"red;bad"}`); rec.Code == http.StatusOK {
+		t.Fatal("invalid color accepted")
+	}
+	if got := settings.Load().Accent; got != "#0d9488" {
+		t.Fatalf("invalid color changed saved accent to %q", got)
+	}
+	if rec := post(`{"theme":"light","accent":""}`); rec.Code != http.StatusOK || settings.Load().Accent != "" {
+		t.Fatalf("reset: %d %s", rec.Code, rec.Body)
+	}
+}
+
 // Masked words in any case is the Privacy page's: a page from before it
 // sends no redactWordsAnyCase, and its save leaves the user's choice as it
 // was; a page that sends it sets it (ZoeCats on Discord).

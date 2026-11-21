@@ -139,6 +139,12 @@ func replyLeft(msg []byte) int {
 	} else if m := inputPlusReply.FindSubmatch(msg); m != nil {
 		prompt, _ = strconv.Atoi(string(m[1]))
 		window, _ = strconv.Atoi(string(m[2]))
+	} else if m := routerWindow.FindSubmatch(msg); m != nil {
+		window, _ = strconv.Atoi(string(m[1]))
+		for _, part := range routerInput.FindAllSubmatch(m[2], -1) {
+			n, _ := strconv.Atoi(string(part[1]))
+			prompt += n
+		}
 	}
 	if window <= 0 || prompt <= 0 || prompt >= window {
 		return 0
@@ -152,6 +158,9 @@ func replyLeft(msg []byte) int {
 // tokens".
 var windowAndPrompt = lazyre.New(`(?is)maximum context length is (\d+) tokens.{0,200}?(?:\((\d+) in the messages, \d+ in the completion\)|your prompt contains at least (\d+) input tokens)`)
 
+var routerWindow = lazyre.New(`(?is)maximum context length is (\d+) tokens\..{0,100}?requested about \d+ tokens \(([^)]{0,200}?\d+ in the output)\)`)
+var routerInput = lazyre.New(`(?i)(\d+) of [a-z ]{1,20}? input`)
+
 // inputPlusReply is Anthropic's words for the same, which an endpoint
 // speaking its API may answer with: "input length and `max_tokens` exceed
 // context limit: 197202 + 21333 > 200000".
@@ -161,6 +170,17 @@ var inputPlusReply = lazyre.New(`(?i)input length and .{0,3}max_tokens.{0,3} exc
 // for: less, and the conversation needs compacting, which the refusal
 // tells the agent as it is (DeepSeek's own default reply is 8K).
 const leastReplyLeft = 8192
+
+func roomedOutput(n, window, promptTokens int) int {
+	if n <= 0 || window <= 0 {
+		return n
+	}
+	room := window - promptTokens*5/4 - 1024
+	if room >= leastReplyLeft && room < n {
+		return room
+	}
+	return n
+}
 
 // withReplyCap is body asking for a reply of at most limit tokens, in
 // proto's words, whether or not it named a limit before: a request that
@@ -244,7 +264,7 @@ func withOwnOutput(p provider.Provider, model string, proto provider.Protocol, b
 	if !shortByDefault(p) || namesOutput(proto, body) {
 		return body
 	}
-	n := askedOutput(p, model)
+	n := roomedOutput(askedOutput(p, model), windowOf(p, model), len(body)/4)
 	if n <= 0 {
 		return body
 	}

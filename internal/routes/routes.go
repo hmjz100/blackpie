@@ -87,6 +87,7 @@ type Seat struct {
 	// costs 0. Cheapest goes by them.
 	Priced          bool
 	Cost, CacheCost float64
+	Window          int
 }
 
 // Strategy orders a pool.
@@ -113,7 +114,8 @@ type Strategy struct {
 	// prices each seat's model at the request's time, and the routing
 	// trace then shows it. Only when set: pricing reads each provider's
 	// model list and the user's prices.
-	ByPrice bool
+	ByPrice  bool
+	ByWindow bool
 }
 
 var reg = struct {

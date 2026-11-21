@@ -445,6 +445,31 @@ var Cheapest = Strategy{ByPrice: true, Order: func(_ string, seats []Seat) []int
 	return idx
 }}
 
+// SmallFirst keeps Smart's tiers and orders each by the model's window.
+var SmallFirst = Strategy{ByWindow: true, Order: func(pool string, seats []Seat) []int {
+	idx := Smart.Order(pool, seats)
+	rank := func(s Seat) int {
+		if tier(s.Used) == 2 {
+			return 2
+		}
+		return 1
+	}
+	sort.SliceStable(idx, func(a, b int) bool {
+		sa, sb := seats[idx[a]], seats[idx[b]]
+		if ra, rb := rank(sa), rank(sb); ra != rb {
+			return ra < rb
+		}
+		if sa.Window == sb.Window {
+			return false
+		}
+		if sa.Window <= 0 || sb.Window <= 0 {
+			return sb.Window <= 0
+		}
+		return sa.Window < sb.Window
+	})
+	return idx
+}}
+
 // sameCost: two prices within a millionth of each other, or of a cent a
 // million tokens, are the same price.
 func sameCost(a, b float64) bool {
@@ -458,13 +483,14 @@ func sameCost(a, b float64) bool {
 // Builtin are the routings besides Smart and their strategies, as
 // plugins/rotation registers them.
 var Builtin = map[string]Strategy{
-	provider.Ordered:   Ordered,
-	provider.Rotate:    Rotate,
-	provider.LeastUsed: LeastUsed,
-	provider.Pace:      Pace,
-	provider.Weighted:  Weighted,
-	provider.FreeFirst: FreeFirst,
-	provider.Fastest:   Fastest,
-	provider.Cheapest:  Cheapest,
-	provider.Drain:     Drain,
+	provider.Ordered:    Ordered,
+	provider.Rotate:     Rotate,
+	provider.LeastUsed:  LeastUsed,
+	provider.Pace:       Pace,
+	provider.Weighted:   Weighted,
+	provider.FreeFirst:  FreeFirst,
+	provider.Fastest:    Fastest,
+	provider.Cheapest:   Cheapest,
+	provider.SmallFirst: SmallFirst,
+	provider.Drain:      Drain,
 }

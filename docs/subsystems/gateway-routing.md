@@ -7,6 +7,12 @@ doesn't speak the agent's API, the gateway translates. When an upstream
 fails before any of the reply is sent, the gateway moves to the next
 candidate.
 
+A group can select `fit` (Small context first): among members that may
+hold the request, it prefers the smallest known model window, with unknown
+windows last and spent members behind the rest. Equal windows keep Smart's
+order. Existing routing choices are unchanged; disabling the rotation plugin
+leaves this strategy in listed order.
+
 In Settings → Models → Replies, *Longest wait an agent is told*
 (`retryAfterCap`, seconds) caps an error response's `Retry-After`: 1, 5 or
 15 minutes, or No limit (the default). This changes only the wait told to
