@@ -84,7 +84,6 @@ func TestIsBlackpie(t *testing.T) {
 		`C:\Users\u\blackpie.old-backup`:  false,
 		"/home/u/.local/bin/dial":         true,
 		"/usr/bin/python3":                false,
-		"/usr/bin/blackpies":              false,
 		"/tmp/other-server":               false,
 		`C:\Windows\System32\svchost.exe`: false,
 		"":                                false,

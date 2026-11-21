@@ -31,7 +31,7 @@ RUN apt-get update \
 COPY --from=build /out/blackpie /blackpie
 # blackpie on PATH, so `blackpie accounts add …` works in that terminal; blackpie
 # is the fork's name for the same binary
-RUN ln -s /blackpie /usr/local/bin/blackpie && ln -s /blackpie /usr/local/bin/blackpie
+RUN ln -s /blackpie /usr/local/bin/blackpie
 USER nonroot
 COPY --from=build --chown=65532:65532 /config /config
 
