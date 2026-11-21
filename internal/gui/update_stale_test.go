@@ -31,7 +31,7 @@ func TestStaleLatestIsNotUpToDate(t *testing.T) {
 	oldV := Version
 	Version = "0.1.1402"
 	defer func() { Version = oldV }()
-	u := &updater{} // nothing it may replace: a newer one is "available"
+	u := &updater{lang: "zh"} // nothing it may replace: a newer one is "available"
 	oldU := updates
 	updates = u
 	defer func() { updates = oldU }()
@@ -87,12 +87,12 @@ func TestStaleLatestIsNotUpToDate(t *testing.T) {
 	newest.Store("0.1.1402")
 	Version = "0.1.1517"
 	u.check()
-	if j := get("/api/update?fresh=1"); j.State != "latest" {
+	if j := get("/api/update?fresh=1&lang=zh"); j.State != "latest" {
 		t.Fatalf("checked by a click: %+v", j)
 	}
 	age()
 	n := asks.Load()
-	if j := get("/api/update?fresh=1"); j.State != "" {
+	if j := get("/api/update?fresh=1&lang=zh"); j.State != "" {
 		t.Fatalf("auto updates off, old answer: %+v", j)
 	}
 	if asks.Load() != n {
