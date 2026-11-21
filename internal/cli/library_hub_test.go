@@ -43,7 +43,7 @@ func TestLibraryMCPHub(t *testing.T) {
 		slices.Sort(out)
 		return out
 	}
-	if err := libraryCmd([]string{"library", "mcp", "add", "fs", "npx", "-y", "fs", "agents=claude"}); err != nil {
+	if err := libraryCmd([]string{"library", "mcp", "add", "fs", "fs-server", "agents=claude"}); err != nil {
 		t.Fatal(err)
 	}
 	if got := names(); !slices.Equal(got, []string{"fs"}) {
