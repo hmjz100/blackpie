@@ -80,7 +80,7 @@
  "stream_options": {
   "include_usage": true
  },
- "environment": "Here is some useful information about the environment you are running in:\n<env>\n  Working directory: /Users/user/runs/zencap/home/work\n  Workspace root folder: /Users/user/runs/zencap/home/work\n  Is directory a git repo: no\n  Platform: darwin\n  Prefer /private/tmp/opencode over generic system temporary directories such as /tmp; it is pre-created and approved for external access.\n</env>",
+ "environment": "Here is some useful information about the environment you are running in:\n<env>\n  Working directory: /Users/yetone/runs/zencap/home/work\n  Workspace root folder: /Users/yetone/runs/zencap/home/work\n  Is directory a git repo: no\n  Platform: darwin\n  Prefer /private/tmp/opencode over generic system temporary directories such as /tmp; it is pre-created and approved for external access.\n</env>",
  "tools": [
   {
    "type": "function",

@@ -139,7 +139,7 @@ func TestOpenCodeProjectIs225s(t *testing.T) {
 	c := loadOpenCode225(t)
 	if runtime.GOOS != "windows" {
 		// the folder 2.2.5 ran in, not a repository: the id it sent
-		if got := OpenCodeProject("/Users/user/runs/zencap/home/work"); got != c.header("x-opencode-project") {
+		if got := OpenCodeProject("/Users/yetone/runs/zencap/home/work"); got != c.header("x-opencode-project") {
 			t.Errorf("project %q, OpenCode sent %q", got, c.header("x-opencode-project"))
 		}
 	}
@@ -204,7 +204,7 @@ func TestOpenCodeEnvironmentIs225s(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "work")
 	os.MkdirAll(dir, 0o755)
 	want := c.Environment
-	want = strings.ReplaceAll(want, "/Users/user/runs/zencap/home/work", dir)
+	want = strings.ReplaceAll(want, "/Users/yetone/runs/zencap/home/work", dir)
 	want = strings.Replace(want, "Platform: darwin", "Platform: "+platform, 1)
 	want = strings.Replace(want, "/private/tmp/opencode", filepath.Join(realTmp, "opencode"), 1)
 	if got := OpenCodeEnvironment(dir); got != want {
