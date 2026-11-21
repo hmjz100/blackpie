@@ -1,4 +1,4 @@
-**[简体中文](README_zh.md)** · **English**
+**[简体中文](/)** · **English**
 
 <div align="center">
 <img src="site/public/img/icon-256.png" width="112" alt="blackpie">
