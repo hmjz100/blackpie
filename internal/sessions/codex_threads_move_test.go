@@ -156,6 +156,7 @@ func TestMoveCodexThreadsLeavesAnOpenThread(t *testing.T) {
 	if err != nil || len(moved) != 1 || moved[0].ID != free {
 		t.Fatalf("moved %+v, %v; want %s alone", moved, err, free)
 	}
+
 	if b, _ := os.ReadFile(openPath); !bytes.Equal(b, orig) {
 		t.Fatal("moved while a Codex had it open")
 	}
@@ -188,5 +189,44 @@ func TestMoveCodexThreadsLeavesAnOpenThread(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(old, "thread-writer-locks")); !errors.Is(err, fs.ErrNotExist) {
 		t.Errorf("thread-writer-locks made where Codex keeps none: %v", err)
+	}
+}
+
+func TestRelabelCodexThreadsLeavesAnOpenThread(t *testing.T) {
+	_, home := manageSetup(t)
+	const id = "019a0000-0000-7000-8000-0000000000a2"
+	path := cxRollout(t, home, "sessions", id, "openai", time.Now().Add(-24*time.Hour))
+	db := cxThreadRows(t, home, map[string]string{id: "openai"})
+	conn, err := sql.Open("sqlite", db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := conn.Exec(`UPDATE threads SET rollout_path = ? WHERE id = ?`, path, id); err != nil {
+		conn.Close()
+		t.Fatal(err)
+	}
+	if err := conn.Close(); err != nil {
+		t.Fatal(err)
+	}
+	before, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, letGo := holdThread(t, home, id)
+	moved, err := RelabelCodexThreads(home, "openai", "blackpie")
+	if err != nil || len(moved) != 0 {
+		t.Fatalf("relabel while open: %v, %v", moved, err)
+	}
+	after, err := os.ReadFile(path)
+	if err != nil || !bytes.Equal(before, after) {
+		t.Fatalf("open rollout changed: %v", err)
+	}
+	if got, _, _ := threadProvider(t, db, id); got != "openai" {
+		t.Fatalf("open thread's provider changed to %q", got)
+	}
+	letGo()
+	moved, err = RelabelCodexThreads(home, "openai", "blackpie")
+	if err != nil || len(moved) != 1 || moved[0] != id || codexMetaProvider(path) != "blackpie" {
+		t.Fatalf("relabel after close: %v, %v", moved, err)
 	}
 }

@@ -756,9 +756,8 @@ func codexIn(at place) *Agent {
 		if to == blackpieID {
 			return
 		}
-		// in place first where it can be (bringOver's, and those started
-		// on blackpie that Codex hasn't packed): no copy of each, no rewrite
-		if len(to) == len(blackpieID) {
+		// First relabel plain rollouts without keeping a backup of each.
+		if len(to) == len(blackpieID) || to == "openai" {
 			moved, err := sessions.RelabelCodexThreads(dir, blackpieID, to)
 			if len(moved) > 0 {
 				log.Printf("codex: %d thread(s) on blackpie moved back to %s, where Codex lists them", len(moved), to)
@@ -781,10 +780,11 @@ func codexIn(at place) *Agent {
 	// show the threads of the provider Codex is on alone, so with blackpie
 	// its provider (no ChatGPT sign-in, an API key, blackpie API, an account
 	// out of its allowance) `codex resume` said "No sessions yet" over a
-	// history that was all there (notnico64 on Discord). They move in
-	// place (RelabelCodexThreads): those Codex has packed, a week after
+	// history that was all there (notnico64 on Discord). They move
+	// using RelabelCodexThreads: those Codex has packed, a week after
 	// their last turn, stay on OpenAI, as a rewrite of every one would
-	// copy the whole history. bringBack moves them back as Codex leaves
+	// copy the whole history. Unequal-length provider names require an atomic
+	// copy of each plain rollout. bringBack moves them back as Codex leaves
 	// blackpie. Only OpenAI's, and only when Codex was on OpenAI before
 	// blackpie: threads of a provider of the user's (CC Switch's) stay, and
 	// so do OpenAI's when Codex was on another provider, whose threads

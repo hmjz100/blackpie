@@ -676,21 +676,19 @@ func moveCodexThread(path, id, to string) (bool, error) {
 }
 
 // RelabelCodexThreads moves the threads of a Codex folder its state
-// databases keep on the provider from to the provider to, where that can
-// be done in place: ids of one length (Codex's "openai" and blackpie's
-// "blackpie"), and a rollout Codex keeps as plain lines. The id in the
+// databases keep on the provider from to the provider to for plain rollouts.
+// Equal-length IDs can be changed in place; otherwise the rollout is rewritten
+// atomically, unless its paginated offsets would change. The id in the
 // first line's session_meta, which Codex's thread/list and resume picker
-// filter on, is written over byte for byte, the file's time kept, and the
-// thread's row follows. Nothing else of the file is read or written, so a
-// history of thousands of threads moves in moments where MoveCodexThreads
-// would copy and rewrite every one of them; moving it back is the undo,
-// and no copy is kept. Rollouts Codex has packed (.zst, a week after
+// filter on, is changed with the file's time kept, and the thread's row
+// follows. Moving it back is the undo, and no copy is kept. Rollouts Codex
+// has packed (.zst, a week after
 // their last turn) are left on from, and so is a thread written to in the
 // last minute, one whose file names another provider, and one outside the
 // folder's sessions. It says the ids it moved and the first error it met,
 // having gone on past it.
 func RelabelCodexThreads(home, from, to string) ([]string, error) {
-	if !codexProviderRe.MatchString(from) || !codexProviderRe.MatchString(to) || from == to || len(from) != len(to) {
+	if !codexProviderRe.MatchString(from) || !codexProviderRe.MatchString(to) || from == to {
 		return nil, fmt.Errorf("can't relabel Codex's threads from %q to %q", from, to)
 	}
 	type row struct{ db, id, path string }
@@ -737,33 +735,120 @@ func RelabelCodexThreads(home, from, to string) ([]string, error) {
 		if !filepath.IsAbs(path) || packed(path) || !strings.Contains(filepath.Base(path), r.id) || !sameDir(codexHomeOf(path), home) {
 			continue
 		}
-		fi, err := os.Lstat(path)
-		if err != nil || !fi.Mode().IsRegular() || now.Sub(fi.ModTime()) < ActiveWindow {
-			continue
-		}
-		// a packed twin beside it: Codex is packing it now
-		if _, err := os.Lstat(path + zstSuffix); err == nil {
-			continue
-		}
-		ok, err := relabelHead(path, from, to, fi.ModTime())
-		if err != nil {
-			fail(fmt.Errorf("thread %s: %w", r.id, err))
-			continue
-		}
-		if !ok {
-			continue
-		}
-		delete(cache, path)
-		if _, err := moveCodexThread(r.db, r.id, to); err != nil {
-			fail(fmt.Errorf("thread %s: the file moved, but Codex's %s didn't: %w", r.id, filepath.Base(r.db), err))
-			continue
-		}
-		moved = append(moved, r.id)
+		func() {
+			letGo, err := holdCodexThread(home, r.id)
+			if err != nil {
+				if !errors.Is(err, ErrActive) {
+					fail(fmt.Errorf("thread %s: %w", r.id, err))
+				}
+				return
+			}
+			defer letGo()
+			fi, err := os.Lstat(path)
+			if err != nil || !fi.Mode().IsRegular() || now.Sub(fi.ModTime()) < ActiveWindow {
+				return
+			}
+			// a packed twin beside it: Codex is packing it now
+			if _, err := os.Lstat(path + zstSuffix); err == nil {
+				return
+			}
+			var ok bool
+			if len(from) == len(to) {
+				ok, err = relabelHead(path, from, to, fi.ModTime())
+			} else {
+				ok, err = relabelHeadCopy(path, from, to, fi)
+			}
+			if err != nil {
+				fail(fmt.Errorf("thread %s: %w", r.id, err))
+				return
+			}
+			if !ok {
+				return
+			}
+			delete(cache, path)
+			if _, err := moveCodexThread(r.db, r.id, to); err != nil {
+				fail(fmt.Errorf("thread %s: the file moved, but Codex's %s didn't: %w", r.id, filepath.Base(r.db), err))
+				return
+			}
+			moved = append(moved, r.id)
+		}()
 	}
 	if len(moved) > 0 {
 		saveCache()
 	}
 	return moved, first
+}
+
+// relabelHeadCopy changes only the first line and publishes the copy atomically.
+func relabelHeadCopy(path, from, to string, fi os.FileInfo) (bool, error) {
+	in, err := os.Open(path)
+	if err != nil {
+		return false, err
+	}
+	defer in.Close()
+	reader := bufio.NewReaderSize(io.LimitReader(in, 1<<20), 64<<10)
+	line, err := reader.ReadBytes('\n')
+	if errors.Is(err, io.EOF) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	if gjson.GetBytes(line, "type").String() != "session_meta" {
+		return false, nil
+	}
+	provider := gjson.GetBytes(line, "payload.model_provider")
+	if provider.Type != gjson.String {
+		return false, nil
+	}
+	if provider.Str == to {
+		return true, nil
+	}
+	if provider.Str != from {
+		return false, nil
+	}
+	out, changed := setMetaProvider(line, to)
+	if !changed {
+		return false, nil
+	}
+	if paginated(line) {
+		var ok bool
+		out, ok = fitLine(line, out, true)
+		if !ok {
+			return false, fmt.Errorf("%s keeps its history by byte, and %q is longer than the provider it names", filepath.Base(path), to)
+		}
+	}
+	tmp, err := os.CreateTemp(filepath.Dir(path), ".blackpie-"+filepath.Base(path)+"-*")
+	if err != nil {
+		return false, err
+	}
+	defer os.Remove(tmp.Name())
+	defer tmp.Close()
+	if err := tmp.Chmod(fi.Mode().Perm()); err != nil {
+		return false, err
+	}
+	if _, err := tmp.Write(out); err != nil {
+		return false, err
+	}
+	if _, err := io.Copy(tmp, io.MultiReader(reader, in)); err != nil {
+		return false, err
+	}
+	if err := steady.Sync(tmp); err != nil {
+		return false, err
+	}
+	if err := tmp.Close(); err != nil {
+		return false, err
+	}
+	if err := in.Close(); err != nil {
+		return false, err
+	}
+	if err := os.Chtimes(tmp.Name(), fi.ModTime(), fi.ModTime()); err != nil {
+		return false, err
+	}
+	if err := os.Rename(tmp.Name(), path); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // relabelHead writes to over from as the model_provider of a rollout's

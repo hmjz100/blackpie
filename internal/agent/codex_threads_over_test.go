@@ -20,7 +20,7 @@ import (
 // picker: model_provider = "blackpie" listed the blackpie thread alone.
 //
 // Now the threads Codex started on OpenAI move to blackpie while it is
-// Codex's provider, in place (the id is one length), the file's time
+// Codex's provider, with the file's time
 // kept, and back at the Disconnect, with no copy of each. Threads Codex
 // has packed (.zst) stay, a provider of the user's stays, and OpenAI's
 // stay when Codex was on another provider before blackpie.
@@ -55,7 +55,7 @@ func TestCodexThreadsFollowBlackpieIn(t *testing.T) {
 			t.Fatalf("rollout still on OpenAI:\n%s", b)
 		}
 		after, _ := os.Stat(plainPath)
-		if !after.ModTime().Equal(before.ModTime()) || after.Size() != before.Size() {
+		if !after.ModTime().Equal(before.ModTime()) || after.Size() != before.Size()+int64(len("blackpie")-len("openai")) {
 			t.Fatalf("file changed beyond its provider: %v %d, was %v %d", after.ModTime(), after.Size(), before.ModTime(), before.Size())
 		}
 		// a sync leaves them so
@@ -76,7 +76,7 @@ func TestCodexThreadsFollowBlackpieIn(t *testing.T) {
 		if b2, _ := os.ReadFile(plainPath); string(b2) != strings.Replace(string(b), `"model_provider":"blackpie"`, `"model_provider":"openai"`, 1) {
 			t.Fatalf("rollout not as it was:\n%s", b2)
 		}
-		// moved in place both ways: no copy of the history in the trash
+		// No backup of the history is left in the trash.
 		if l, _ := filepath.Glob(filepath.Join(settings.Dir(), "trash", "codex-provider", "*"+plain)); len(l) > 0 {
 			t.Fatalf("copied: %v", l)
 		}

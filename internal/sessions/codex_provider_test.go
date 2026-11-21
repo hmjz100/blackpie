@@ -56,7 +56,7 @@ func threadProvider(t *testing.T, db, id string) (provider, title string, archiv
 // page says which provider each was made with and which Codex uses now;
 // MoveCodexProvider changes the provider in its files and in Codex's state
 // database and nothing else, keeps a copy of the files first, and moving
-// it back gives the files it had, byte for byte.
+// it back leaves only padding needed to preserve line offsets.
 func TestMoveCodexProvider(t *testing.T) {
 	_, codex := manageSetup(t)
 	main := filepath.Join(codex, "sessions", "2026", "09", "20", "rollout-2026-09-20T15-48-28-"+mgCX+".jsonl")
@@ -65,6 +65,8 @@ func TestMoveCodexProvider(t *testing.T) {
 		t.Fatal(err)
 	}
 	orig := bytes.Replace(b, []byte(`"model_provider":"openai"`), []byte(`"model_provider":"custom"`), 1)
+	// Windows checkouts can give the fixture CRLF; exercise that on every OS.
+	orig = bytes.ReplaceAll(bytes.ReplaceAll(orig, []byte("\r\n"), []byte("\n")), []byte("\n"), []byte("\r\n"))
 	old := time.Now().Add(-24 * time.Hour).Truncate(time.Second)
 	os.WriteFile(main, orig, 0o644)
 	os.Chtimes(main, old, old)
@@ -113,11 +115,20 @@ func TestMoveCodexProvider(t *testing.T) {
 		t.Fatalf("listed as %q after the move", m.Provider)
 	}
 
-	// undo: back to custom, the file as it was
+	// Undo keeps the longer line's byte offsets with trailing padding.
 	if _, err := MoveCodexProvider(mgCX, "custom"); err != nil {
 		t.Fatal(err)
 	}
-	if b, _ := os.ReadFile(main); !bytes.Equal(b, orig) {
+	back, err := os.ReadFile(main)
+	firstEnd := bytes.IndexByte(orig, '\n')
+	if firstEnd < 0 {
+		t.Fatal("fixture has no first line")
+	}
+	if firstEnd > 0 && orig[firstEnd-1] == '\r' {
+		firstEnd--
+	}
+	wantBack := append(append(append([]byte{}, orig[:firstEnd]...), ' ', ' '), orig[firstEnd:]...)
+	if err != nil || !bytes.Equal(back, wantBack) {
 		t.Fatal("moving back didn't give the file it was")
 	}
 	if p, _, _ := threadProvider(t, db, mgCX); p != "custom" {
@@ -130,11 +141,53 @@ func TestMoveCodexProvider(t *testing.T) {
 	if _, err := MoveCodexProvider(mgCX, "blackpie"); !errors.Is(err, ErrActive) {
 		t.Fatalf("err %v, want ErrActive", err)
 	}
-	if b, _ := os.ReadFile(main); !bytes.Equal(b, orig) {
+	if b, _ := os.ReadFile(main); !bytes.Equal(b, back) {
 		t.Fatal("a running session was changed")
 	}
 	if _, err := MoveCodexProvider(mgCX, "bad id"); err == nil {
 		t.Fatal("a provider id with a space was taken")
+	}
+}
+
+func TestRelabelHeadCopyPreservesHistory(t *testing.T) {
+	for _, paged := range []bool{false, true} {
+		t.Run(map[bool]string{false: "plain", true: "paginated"}[paged], func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "rollout.jsonl")
+			meta := `{"type":"session_meta","payload":{"model_provider":"openai"}}`
+			if paged {
+				meta = `{"type":"session_meta","payload":{"model_provider":"openai","history_mode":"paginated"}}`
+			}
+			original := meta + "\n" + strings.Repeat("history\n", 150000)
+			if err := os.WriteFile(path, []byte(original), 0o640); err != nil {
+				t.Fatal(err)
+			}
+			fi, err := os.Stat(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			ok, err := relabelHeadCopy(path, "openai", "blackpie", fi)
+			got, readErr := os.ReadFile(path)
+			if readErr != nil {
+				t.Fatal(readErr)
+			}
+			if paged {
+				if err == nil || ok || string(got) != original {
+					t.Fatalf("paginated history changed: ok=%v err=%v", ok, err)
+				}
+			} else if err != nil || !ok || string(got) != strings.Replace(original, `"openai"`, `"blackpie"`, 1) {
+				t.Fatalf("history changed beyond provider: ok=%v err=%v", ok, err)
+			}
+			if !paged {
+				fi, err := os.Stat(path)
+				if err != nil {
+					t.Fatal(err)
+				}
+				ok, err := relabelHeadCopy(path, "openai", "blackpie", fi)
+				if !ok || err != nil {
+					t.Fatalf("retry after file moved: ok=%v err=%v", ok, err)
+				}
+			}
+		})
 	}
 }
 

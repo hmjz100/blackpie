@@ -321,6 +321,14 @@ because there is nothing to pick. `blackpie aionui add` opens the link.
 
 ## Codex session handoff
 
+When Codex switches between OpenAI and blackpie, `RelabelCodexThreads`
+updates eligible plain rollouts and their state database rows. Their provider
+names differ in length, so the rollout is copied and atomically replaced;
+paginated histories that cannot preserve byte offsets are left unchanged and
+reported. Compressed or recently active rollouts are not relabeled. Where
+Codex provides writer locks, the thread is held during the rewrite and
+database update; an open thread is left for a later sync.
+
 Disconnecting Codex or switching it back to its own models uses
 `PortCodexRolloutsLeft`, including after disconnect on the next CLI start.
 For sessions made through blackpie only, unsealed reasoning is retained for
