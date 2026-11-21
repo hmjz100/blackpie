@@ -3,7 +3,39 @@ name: Test
 on:
   push:
     branches: [main]
+    paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - 'THIRD_PARTY_NOTICES'
+      - 'internal/**'
+      - 'plugins/**'
+      - 'build/**'
+      - 'site/**'
+      - '.github/scripts/**'
+      - '.github/workflows/test.yml'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/sync-upstream.yml'
+      - '!internal/gui/tests/README.md'
+      - '!site/public/docs/**'
   pull_request:
+    paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - 'THIRD_PARTY_NOTICES'
+      - 'internal/**'
+      - 'plugins/**'
+      - 'build/**'
+      - 'site/**'
+      - '.github/scripts/**'
+      - '.github/workflows/test.yml'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/sync-upstream.yml'
+      - '!internal/gui/tests/README.md'
+      - '!site/public/docs/**'
   workflow_dispatch:
     inputs:
       full_macos:

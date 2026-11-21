@@ -6,8 +6,11 @@ const api = (path) => JSON.parse(execFileSync('gh', ['api', path], { encoding: '
 const repo = process.env.GITHUB_REPOSITORY;
 const sha = git('rev-parse', 'HEAD');
 git('merge-base', '--is-ancestor', sha, 'origin/main');
-const runs = api(`repos/${repo}/actions/workflows/test.yml/runs?head_sha=${sha}&event=push&status=success&per_page=100`).workflow_runs;
-if (!runs.some((r) => r.head_sha === sha && r.head_branch === 'main' && r.head_repository?.full_name === repo && r.conclusion === 'success')) {
+const passed = ['push', 'workflow_dispatch'].some((event) => {
+  const runs = api(`repos/${repo}/actions/workflows/test.yml/runs?head_sha=${sha}&event=${event}&status=success&per_page=100`).workflow_runs;
+  return runs.some((r) => r.event === event && r.head_sha === sha && r.head_branch === 'main' && r.head_repository?.full_name === repo && r.conclusion === 'success');
+});
+if (!passed) {
   throw new Error(`Test has not passed for main commit ${sha}`);
 }
 let version = process.env.INPUT_VERSION || '';

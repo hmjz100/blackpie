@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: 'Main commit or tag to build (must have a green Test)'
+        description: 'Main commit or tag to build (must have a green push or manual Test)'
         type: string
         default: main
       version:

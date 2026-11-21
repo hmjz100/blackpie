@@ -7,11 +7,13 @@ on:
       - 'internal/gui/assets/**'
       - 'internal/gui/tests/**'
       - '.github/workflows/gui.yml'
+      - '!internal/gui/tests/README.md'
   pull_request:
     paths:
       - 'internal/gui/assets/**'
       - 'internal/gui/tests/**'
       - '.github/workflows/gui.yml'
+      - '!internal/gui/tests/README.md'
   workflow_dispatch:
 
 concurrency:

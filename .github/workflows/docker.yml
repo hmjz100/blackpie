@@ -4,8 +4,29 @@ on:
   push:
     branches: [main]
     tags: ['v*']
+    paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'THIRD_PARTY_NOTICES'
+      - 'internal/**'
+      - 'plugins/**'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - '.github/workflows/docker.yml'
+      - '!internal/gui/tests/README.md'
   pull_request:
-    paths: [Dockerfile, .dockerignore, .github/workflows/docker.yml]
+    paths:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'THIRD_PARTY_NOTICES'
+      - 'internal/**'
+      - 'plugins/**'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - '.github/workflows/docker.yml'
+      - '!internal/gui/tests/README.md'
   workflow_dispatch:
     inputs:
       version:

@@ -107,18 +107,23 @@ manually with `full_macos` enabled; the full suite and race detector share one
 Mac runner in a separate workflow queue.
 
 Browser tests run separately with Playwright. A release still requires the
-whole main-push Test workflow to pass for its exact commit, including the
+whole Test workflow to pass for its exact commit on main, including the
 macOS smoke check. Both Intel and Apple Silicon release builds remain native
 and must complete before publication.
 
 `.github/workflows/release.yml` runs only through **Actions → Release → Run workflow**.
-A push to `main` runs Test and Docker, but does not start a release build or
-publish a version. Select `main` as the workflow branch, set `ref` to the main
-commit to build (default `main`), and optionally set `version` to `0.1.N`:
+A push or PR runs Test or Docker when it changes that workflow's inputs;
+documentation-only changes do not. Tags still trigger Docker, and manual runs
+remain available. A push does not start a release build or publish a version.
+Select `main` as the workflow branch, set `ref` to the main commit to build
+(default `main`), and optionally set `version` to `0.1.N`:
 
-1. **prepare** checks the commit is on `main`, that Test passed for it as a
-   push, and allocates the next `0.1.N`. A manual run can supply a version. It also reuses the version of
-   a draft release left by a failed attempt instead of skipping the number.
+1. **prepare** checks the commit is on `main`, that Test passed for that exact
+   commit as a main push or manual run on main, and allocates the next `0.1.N`.
+   If a documentation-only commit has no Test run, run Test manually on main
+   before releasing it. A manual release can supply a version. It also reuses
+   the version of a draft release left by a failed attempt instead of skipping
+   the number.
    A commit that already has a published release is skipped, not rebuilt.
 2. **mac**, **cli**, **linux**, **windows-check** build the 15 application files
    and prove the Windows and Linux apps start and answer on the gateway.
@@ -130,7 +135,7 @@ commit to build (default `main`), and optionally set `version` to `0.1.N`:
    public. `--target` is retry metadata, not proof of the tag's commit.
 
 Runs are artifacts-only unless `publish` is ticked. To make a public release,
-tick it explicitly; the exact commit must already have a successful main-push
+tick it explicitly; the exact commit must already have a successful main
 Test run. A published release contains exactly the 16 files the updater looks
 for; anything else fails the run instead of shipping.
 
