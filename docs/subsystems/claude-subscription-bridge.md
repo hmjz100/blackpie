@@ -58,7 +58,7 @@ A saved account added by a setup-token (see [Providers and accounts](providers-a
 The helper offers each of the client's tools under `bridgeToolName`
 (`bridgeTools`), which Claude Code calls `mcp__blackpie__<name>`. Claude Code
 keeps only `[A-Za-z0-9_-]` of an MCP tool's name, so a name it would change
-(`spawn.agent`, `fs/read`), one longer than 51 (64 with the prefix) or one
+(`spawn.agent`, `fs/read`), one longer than 49 (64 with the prefix) or one
 ending as a changed name ends (`_` and 12 hex digits) is cut, made of those
 characters and given a hash of the whole name: unique (`a.b` and `a_b`
 stay apart), the same in every run, so a resumed session, the history

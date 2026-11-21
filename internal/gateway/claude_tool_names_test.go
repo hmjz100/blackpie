@@ -27,7 +27,7 @@ func TestClaudeToolNamesComeBackAsDeclared(t *testing.T) {
 		t.Skip("a shell script stands in for Claude Code")
 	}
 	long := "tools.example.com/" + strings.Repeat("very_long_segment.", 5) + "end"
-	declared := []string{"spawn.agent", "fs/read", "has space", long, "a.b", "a_b"}
+	declared := []string{"spawn.agent", "fs/read", "has space", long, "a.b", "a_b", strings.Repeat("a", 50)}
 
 	dir := t.TempDir()
 	offered := filepath.Join(dir, "offered")
@@ -94,7 +94,7 @@ done
 	}
 	paths := map[provider.Protocol]string{provider.Anthropic: "/v1/messages", provider.Chat: "/v1/chat/completions", provider.Responses: "/v1/responses"}
 	nameRe := regexp.MustCompile(`"name":"((?:[^"\\]|\\.)*)"`)
-	validRe := regexp.MustCompile(`^[A-Za-z0-9_-]{1,51}$`)
+	validRe := regexp.MustCompile(`^[A-Za-z0-9_-]{1,49}$`)
 	p := provider.Provider{ID: "claude", Account: &provider.Account{Agent: "claude", User: "u"}}
 	for _, from := range []provider.Protocol{provider.Anthropic, provider.Chat, provider.Responses} {
 		for _, stream := range []bool{false, true} {
@@ -127,7 +127,7 @@ done
 				seen := map[string]bool{}
 				for _, n := range names {
 					if !validRe.MatchString(n) || seen[n] {
-						t.Errorf("%s: Claude Code was offered %q, which isn't a valid, unique MCP tool name of at most 51: %q", what, n, names)
+						t.Errorf("%s: Claude Code was offered %q, which isn't a valid, unique MCP tool name of at most 49: %q", what, n, names)
 					}
 					seen[n] = true
 				}

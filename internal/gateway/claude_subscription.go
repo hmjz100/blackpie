@@ -3884,14 +3884,14 @@ func bridgeToolName(name string) string {
 	}
 	sum := sha256.Sum256([]byte(name))
 	short := bridgeToolNameBad.ReplaceAllString(name, "_")
-	if len(short) > 38 {
-		short = short[:38]
+	if len(short) > 36 {
+		short = short[:36]
 	}
 	return short + "_" + hex.EncodeToString(sum[:6])
 }
 
 var (
-	bridgeToolNameOK     = lazyre.New(`^[A-Za-z0-9_-]{1,51}$`)
+	bridgeToolNameOK     = lazyre.New(`^[A-Za-z0-9_-]{1,49}$`)
 	bridgeToolNameBad    = lazyre.New(`[^A-Za-z0-9_-]`)
 	bridgeToolNameHashed = lazyre.New(`_[0-9a-f]{12}$`)
 )
