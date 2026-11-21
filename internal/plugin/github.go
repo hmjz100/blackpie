@@ -432,7 +432,7 @@ func readTagged(pc context.Context, t Tagged, branch string) (Tagged, bool, bool
 			} `json:"page"`
 		} `json:"blackpie"`
 	}
-	if json.Unmarshal(pb, &pj) != nil || !pkgName.MatchString(pj.Name) {
+	if unmarshalManifest(pb, &pj) != nil || !pkgName.MatchString(pj.Name) {
 		return t, false, true, nil
 	}
 	t.Package, t.Version = pj.Name, pj.Version
@@ -476,7 +476,7 @@ func readTagged(pc context.Context, t Tagged, branch string) (Tagged, bool, bool
 	npmNames := false
 	if err == nil {
 		var l npmLatest
-		if json.Unmarshal(b, &l) == nil && l.Version != "" && strings.EqualFold(githubRepo(repoURL(l.Repository)), t.Repo) {
+		if unmarshalManifest(b, &l) == nil && l.Version != "" && strings.EqualFold(githubRepo(repoURL(l.Repository)), t.Repo) {
 			t.Spec, t.Version = pj.Name, l.Version
 			npmNames = l.Main != "" || len(l.Exports) > 0
 		}

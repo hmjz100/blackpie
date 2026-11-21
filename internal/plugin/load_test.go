@@ -26,11 +26,12 @@ func TestPluginReportsModelLoad(t *testing.T) {
 		t.Fatal(err)
 	}
 	src := `export default async (input) => {
+	  if (input.blackpie !== input.magpie) throw new Error("legacy input differs")
   let threw = 0
   for (const bad of [[5, {}], ["loadco", null], ["loadco", [1]], ["", {}]]) {
     try { input.blackpie.load(...bad) } catch (e) { if (e instanceof TypeError) threw++ }
   }
-  const n = input.blackpie.load("loadco", { Big: 87.5, small: 0, over: 250, huge: 1e9, under: -3, word: "busy", nan: NaN, inf: Infinity, threw })
+  const n = input.magpie.load("loadco", { Big: 87.5, small: 0, over: 250, huge: 1e9, under: -3, word: "busy", nan: NaN, inf: Infinity, threw })
   input.blackpie.load("loadco", { taken: n })
   setTimeout(() => input.blackpie.load("loadco", { small: null, later: 12 }), 50)
   return {}

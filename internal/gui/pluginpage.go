@@ -347,7 +347,7 @@ func servePluginPage(rw http.ResponseWriter, r *http.Request, web bool) {
 	// origin of its own, its own files are another origin's, and
 	// same-origin (or same-site) would block every one of them
 	h.Set("Cache-Control", "no-cache")
-	if rel == pluginBridgePath {
+	if rel == pluginBridgePath || rel == "_magpie/bridge.js" {
 		h.Set("Content-Type", "text/javascript; charset=utf-8")
 		http.ServeContent(rw, r, "bridge.js", time.Time{}, strings.NewReader(string(pageBridgeJS)))
 		return

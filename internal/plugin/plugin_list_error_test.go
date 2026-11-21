@@ -15,7 +15,7 @@ import (
 // (gnayiab on X: Cursor in WSL listing Auto alone, with nothing saying
 // its list had failed). Its list come in, nothing is said.
 func TestFallenBackListSaysWhy(t *testing.T) {
-	for _, throws := range []string{"", "1", "own"} {
+	for _, throws := range []string{"", "1", "own", "legacy"} {
 		t.Run("throws="+throws, func(t *testing.T) { listSaysWhy(t, throws) })
 	}
 }

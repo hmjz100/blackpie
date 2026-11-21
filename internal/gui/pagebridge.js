@@ -65,7 +65,10 @@
     // the frame's canvas matches the window's, not a white sheet in dark
     root.style.colorScheme = theme.dark ? "dark" : "light";
     root.lang = theme.lang || "en";
-    for (const [k, v] of Object.entries(theme.tokens || {})) root.style.setProperty("--blackpie-" + k, v);
+    for (const [k, v] of Object.entries(theme.tokens || {})) {
+      root.style.setProperty("--blackpie-" + k, v);
+      root.style.setProperty("--magpie-" + k, v);
+    }
   }
   addEventListener("message", (e) => {
     if (e.source !== parent) return;
@@ -187,4 +190,5 @@
 `;
   (document.head || document.documentElement).prepend(base);
   window.blackpie = api;
+  window.magpie = api;
 })();

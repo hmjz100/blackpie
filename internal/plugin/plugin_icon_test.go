@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -21,6 +22,7 @@ func TestPluginOwnIconAndKeyHint(t *testing.T) {
 	if _, err := Add(ctx, abs); err != nil {
 		t.Fatal(err)
 	}
+
 	ps, err := Providers(ctx)
 	if err != nil {
 		t.Fatal(err)
@@ -68,4 +70,38 @@ func TestPluginOwnIconAndKeyHint(t *testing.T) {
 			t.Errorf("cached icon = %.60q", p.Icon)
 		}
 	}
+}
+
+func TestCommunityManifestHostMetadata(t *testing.T) {
+	sandbox(t)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	dir := t.TempDir()
+	src, err := os.ReadFile("testdata/ownicon/index.js")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "index.js"), src, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	pkg := `{"name":"opencode-ownicon-auth","type":"module","main":"index.js","magpie":{"icon":"https://legacy.example/icon.png","maxConcurrency":7,"maxAccounts":6}}`
+	if err := os.WriteFile(filepath.Join(dir, "package.json"), []byte(pkg), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Add(ctx, dir); err != nil {
+		t.Fatal(err)
+	}
+	ps, err := Providers(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, p := range ps {
+		if p.ID == "lime" {
+			if p.Icon != "https://legacy.example/icon.png" || p.MaxConcurrency != 7 || p.MaxAccounts != 6 {
+				t.Fatalf("legacy host metadata: %+v", p)
+			}
+			return
+		}
+	}
+	t.Fatalf("lime provider missing: %+v", ps)
 }

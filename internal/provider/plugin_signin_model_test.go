@@ -55,6 +55,16 @@ func TestPluginModel401KeepsSignIn(t *testing.T) {
 			t.Fatalf("the body after the check: %q, %v; want %q", got, err, body)
 		}
 	}
+	resp := &http.Response{StatusCode: http.StatusOK, Header: http.Header{"X-Magpie-Sign-In": {"expired"}}, Body: io.NopCloser(strings.NewReader("{}"))}
+	notePluginSignIn(pp, key, resp)
+	if !lapsed() || resp.Header.Get("X-Magpie-Sign-In") != "" {
+		t.Fatal("legacy sign-in header was not consumed")
+	}
+	resp = &http.Response{StatusCode: http.StatusUnauthorized, Header: http.Header{"X-Magpie-Sign-In": {"expired"}, SignInHeader: {"renewed"}}, Body: io.NopCloser(strings.NewReader("{}"))}
+	notePluginSignIn(pp, key, resp)
+	if lapsed() || resp.Header.Get("X-Magpie-Sign-In") != "" || resp.Header.Get(SignInHeader) != "" {
+		t.Fatal("blackpie sign-in header did not take precedence")
+	}
 	for _, body := range []string{
 		`{"error":{"message":"The model claude-opus-5 is not available on your plan"}}`,
 		`{"error":{"code":"model_not_found","message":"unknown model"}}`,

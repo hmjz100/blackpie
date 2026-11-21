@@ -1,5 +1,11 @@
 # Plugin runtime
 
+Community page plugins can continue to load `_magpie/bridge.js`, use
+`window.magpie`, and read `--magpie-*` theme tokens. These alias the same
+sandboxed bridge, API and theme as the blackpie spellings; they do not grant
+additional permissions. A `magpie` package metadata block is accepted only
+when the package has no `blackpie` block.
+
 blackpie's built-in plugins are the parts of blackpie not everyone needs, each
 one a package under `plugins/` that the user can switch off. The runtime in
 `internal/pluginrt` keeps their registry, applies the ones that are on in the

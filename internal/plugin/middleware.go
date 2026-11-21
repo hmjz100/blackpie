@@ -38,7 +38,7 @@ func Middleware(target string) (file string, only bool) {
 			Gateway    string `json:"gateway"`
 		} `json:"blackpie"`
 	}
-	if json.Unmarshal(b, &pkg) != nil {
+	if unmarshalManifest(b, &pkg) != nil {
 		return "", false
 	}
 	name := strings.TrimSpace(pkg.Blackpie.Middleware)
@@ -68,7 +68,7 @@ func OptionsExample(target string) map[string]any {
 			Options map[string]any `json:"options"`
 		} `json:"blackpie"`
 	}
-	if json.Unmarshal(b, &pkg) != nil {
+	if unmarshalManifest(b, &pkg) != nil {
 		return nil
 	}
 	return pkg.Blackpie.Options

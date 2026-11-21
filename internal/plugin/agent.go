@@ -34,7 +34,7 @@ func Agent(target string) (file string, only bool) {
 			Agent string `json:"agent"`
 		} `json:"blackpie"`
 	}
-	if json.Unmarshal(b, &pkg) != nil || strings.TrimSpace(pkg.Blackpie.Agent) == "" {
+	if unmarshalManifest(b, &pkg) != nil || strings.TrimSpace(pkg.Blackpie.Agent) == "" {
 		return "", false
 	}
 	file = filepath.Join(target, filepath.FromSlash(strings.TrimSpace(pkg.Blackpie.Agent)))

@@ -52,10 +52,11 @@ const policy = (tok) => {
 
 // a page that tries every way out it has, and tells the window what came
 // of each (its message has no blackpie:1, so the window's bridge ignores it)
-const PROBE_HTML = `<!doctype html><meta charset="utf-8"><script src="_blackpie/bridge.js"></script><script src="probe.js"></script><style>.own { border-radius: 2px; }</style><h1>probe</h1><p id="p">probe</p><button id="b">b</button><button class="own">o</button>`;
+const PROBE_HTML = `<!doctype html><meta charset="utf-8"><script src="_magpie/bridge.js"></script><script src="probe.js"></script><style>.own { border-radius: 2px; }</style><h1>probe</h1><p id="p">probe</p><button id="b">b</button><button class="own">o</button>`;
 const PROBE_JS = `(async () => {
   const out = {};
-  await blackpie.ready;
+  await magpie.ready;
+  out.compat = magpie === blackpie && document.documentElement.style.getPropertyValue("--magpie-bg") === document.documentElement.style.getPropertyValue("--blackpie-bg") && !!document.documentElement.style.getPropertyValue("--magpie-bg");
   out.service = blackpie.service;
   try { const r = await fetch("/api/state?probe=1"); out.fetch = "status " + r.status; } catch (e) { out.fetch = "refused"; }
   try { out.storage = typeof localStorage.length; } catch (e) { out.storage = "refused"; }
@@ -108,7 +109,7 @@ function server(lang, seen, plugins) {
       if (tok !== OPEN) headers["Content-Security-Policy"] = policy(tok);
       const type = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml" }[path.extname(rel)];
       let body;
-      if (rel === "_blackpie/bridge.js") body = await fs.readFile(bridge);
+      if (rel === "_blackpie/bridge.js" || rel === "_magpie/bridge.js") body = await fs.readFile(bridge);
       else if (tok === GLANCE) body = await fs.readFile(path.join(example, rel)).catch(() => null);
       else if ((tok === PROBE || tok === OPEN) && rel === "index.html") body = PROBE_HTML;
       else if ((tok === PROBE || tok === OPEN) && rel === "probe.js") body = PROBE_JS;
@@ -197,6 +198,7 @@ for (const engine of (process.env.BROWSER ? [process.env.BROWSER] : ["chromium",
           const got = page.evaluate(() => new Promise((res) => addEventListener("message", (e) => { if (e.data?.probe) res(e.data.probe); })));
           await page.evaluate(() => show("plugin-probe"));
           const probe = await got;
+          assert.equal(probe.compat, true, `${where}: legacy page bridge and theme`);
           assert.equal(probe.fetch, "refused", `${where}: the policy stops a fetch of /api`);
           assert.equal(probe.storage, "refused", `${where}: no storage`);
           assert.equal(probe.cookie, "refused", `${where}: no cookie`);

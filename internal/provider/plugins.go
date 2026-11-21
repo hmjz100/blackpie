@@ -670,6 +670,14 @@ func pluginFetch(pp plugin.Provider, account string, req *http.Request) (*http.R
 			h[strings.ToLower(k)] = vs[0]
 		}
 	}
+	delete(h, "x-magpie-conversation")
+	for _, name := range []string{"work-dir", "work-git", "fallback"} {
+		legacy := "x-magpie-" + name
+		delete(h, legacy)
+		if value, ok := h["x-blackpie-"+name]; ok {
+			h[legacy] = value
+		}
+	}
 	resp, err := plugin.Fetch(ctx, plugin.FetchRequest{
 		Provider: pp.ID, Account: account, Model: api, NPM: m.NPM, URL: url, Method: req.Method,
 		Headers: h, Body: body, Session: req.Header.Get(ConversationHeader),
@@ -756,7 +764,11 @@ func modelOnly401(resp *http.Response) bool {
 // that is about the model alone leaves the account as it is (kept).
 func notePluginSignIn(pp plugin.Provider, account string, resp *http.Response) {
 	said := strings.ToLower(strings.TrimSpace(resp.Header.Get(SignInHeader)))
+	if said == "" {
+		said = strings.ToLower(strings.TrimSpace(resp.Header.Get("X-Magpie-Sign-In")))
+	}
 	resp.Header.Del(SignInHeader)
+	resp.Header.Del("X-Magpie-Sign-In")
 	if said == "" && modelOnly401(resp) {
 		said = "kept"
 	}

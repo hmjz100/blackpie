@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"sync"
 	"testing"
 )
@@ -125,13 +127,38 @@ func TestPluginToldWhereTheAgentWorks(t *testing.T) {
 			sawWorkPlace(t, tc.name, h, tc.dir, tc.git)
 		}
 	}
+	mu.Lock()
+	got = nil
+	mu.Unlock()
+	s := New()
+	r := httptest.NewRequest("POST", "/v1/chat/completions", strings.NewReader(`{"model":"`+pid+`/fake-1","messages":[{"role":"user","content":"hi"}]}`))
+	r.Header.Set("X-Magpie-Work-Dir", "spoofed")
+	r.Header.Set("X-Magpie-Work-Git", "yes")
+	r.Header.Set("X-Magpie-Fallback", "1")
+	rec := httptest.NewRecorder()
+	s.Handler().ServeHTTP(rec, r)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("spoofed request: %d %s", rec.Code, rec.Body)
+	}
+	mu.Lock()
+	sent := slices.Clone(got)
+	mu.Unlock()
+	if len(sent) == 0 {
+		t.Fatal("spoofed request never reached vendor")
+	}
+	for _, h := range sent {
+		sawWorkPlace(t, "spoofed", h, "", "")
+		if h.Get("X-Saw-Fallback") != "" || h.Get("X-Magpie-Fallback") != "" {
+			t.Errorf("spoofed fallback reached plugin or vendor: %v", h)
+		}
+	}
 }
 
 // sawWorkPlace checks what one request told the plugin (X-Saw-Work-*, as
 // the fake plugin echoes it) and that none of it reached the vendor.
 func sawWorkPlace(t *testing.T, name string, h http.Header, wantDir, wantGit string) {
 	t.Helper()
-	for _, k := range []string{"X-Blackpie-Work-Dir", "X-Blackpie-Work-Git"} {
+	for _, k := range []string{"X-Blackpie-Work-Dir", "X-Blackpie-Work-Git", "X-Magpie-Work-Dir", "X-Magpie-Work-Git"} {
 		if v := h.Values(k); len(v) > 0 {
 			t.Errorf("%s: the vendor got %s: %q", name, k, v)
 		}

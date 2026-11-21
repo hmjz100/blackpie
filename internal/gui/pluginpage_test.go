@@ -125,8 +125,10 @@ func TestPluginPageServedShutIn(t *testing.T) {
 	if w.Header().Get("X-Content-Type-Options") != "nosniff" {
 		t.Error("no nosniff")
 	}
-	if w := do(h, httptest.NewRequest("GET", pluginPagePrefix+tok+"/"+pluginBridgePath, nil)); w.Code != 200 || !strings.Contains(w.Body.String(), "postMessage") {
-		t.Errorf("the bridge: %d", w.Code)
+	for _, bridge := range []string{pluginBridgePath, "_magpie/bridge.js"} {
+		if w := do(h, httptest.NewRequest("GET", pluginPagePrefix+tok+"/"+bridge, nil)); w.Code != 200 || !strings.Contains(w.Body.String(), "postMessage") {
+			t.Errorf("the bridge %s: %d", bridge, w.Code)
+		}
 	}
 	// out of the page's folder, through a link, by another token
 	for _, path := range []string{

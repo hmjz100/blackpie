@@ -47,8 +47,8 @@ func TestTaggedHooksAlone(t *testing.T) {
 		mu.Unlock()
 		return readTagged(context.Background(), Tagged{Spec: "github:" + repo, Repo: repo}, "main")
 	}
-	got, keep, known, err := read("IvanXxxxyyuffff/blackpie-system-prompt-file")
-	if !keep || !known || err != nil || got.Kind != "hooks" || got.Spec != "github:IvanXxxxyyuffff/blackpie-system-prompt-file" ||
+	got, keep, known, err := read("IvanXxxxyyuffff/magpie-system-prompt-file")
+	if !keep || !known || err != nil || got.Kind != "hooks" || got.Spec != "github:IvanXxxxyyuffff/magpie-system-prompt-file" ||
 		got.Package != "blackpie-system-prompt-file" || got.Version != "0.3.0" {
 		t.Fatalf("hooks alone: %+v, kept %v, known %v, %v", got, keep, known, err)
 	}
@@ -56,7 +56,7 @@ func TestTaggedHooksAlone(t *testing.T) {
 	mu.Lock()
 	a := slices.Clone(asked)
 	mu.Unlock()
-	if !slices.Contains(a, "/raw/IvanXxxxyyuffff/blackpie-system-prompt-file/main/system-prompt.hooks.mjs") || slices.ContainsFunc(a, func(p string) bool { return strings.HasSuffix(p, "/index.js") }) {
+	if !slices.Contains(a, "/raw/IvanXxxxyyuffff/magpie-system-prompt-file/main/system-prompt.hooks.mjs") || slices.ContainsFunc(a, func(p string) bool { return strings.HasSuffix(p, "/index.js") }) {
 		t.Fatalf("asked %v", a)
 	}
 

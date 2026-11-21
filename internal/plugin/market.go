@@ -477,7 +477,7 @@ func npmAsk(ctx context.Context, name string) (NPM, error) {
 			return
 		}
 		var l npmLatest
-		if err := json.Unmarshal(b, &l); err != nil {
+		if err := unmarshalManifest(b, &l); err != nil {
 			latestErr = err
 			return
 		}
@@ -766,7 +766,7 @@ func installedOwn(spec string) (own struct {
 	var p struct {
 		Blackpie json.RawMessage `json:"blackpie"`
 	}
-	if json.Unmarshal(b, &p) != nil || json.Unmarshal(p.Blackpie, &own) != nil {
+	if unmarshalManifest(b, &p) != nil || json.Unmarshal(p.Blackpie, &own) != nil {
 		own.Icon, own.Name = "", ""
 	}
 	return own

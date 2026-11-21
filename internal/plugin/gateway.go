@@ -39,7 +39,7 @@ func Gateway(target string) string {
 		} `json:"blackpie"`
 	}
 	b, err := os.ReadFile(filepath.Join(target, "package.json"))
-	if err != nil || json.Unmarshal(b, &pkg) != nil || strings.TrimSpace(pkg.Blackpie.Hooks) == "" {
+	if err != nil || unmarshalManifest(b, &pkg) != nil || strings.TrimSpace(pkg.Blackpie.Hooks) == "" {
 		return ""
 	}
 	return filepath.Join(target, filepath.FromSlash(strings.TrimSpace(pkg.Blackpie.Hooks)))

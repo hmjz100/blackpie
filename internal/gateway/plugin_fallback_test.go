@@ -29,6 +29,9 @@ func TestPluginToldAnotherFollows(t *testing.T) {
 		if v := r.Header.Values(provider.FallbackHeader); len(v) > 0 {
 			leaked = append(leaked, v...)
 		}
+		if v := r.Header.Values("X-Magpie-Fallback"); len(v) > 0 {
+			leaked = append(leaked, v...)
+		}
 		mu.Unlock()
 		if r.Header.Get("X-Saw-Fallback") == "1" {
 			// as Qoder's plugin answers its queue when told another follows

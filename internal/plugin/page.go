@@ -173,7 +173,7 @@ func Window(target string) (w *WindowSpec, only bool) {
 			Permissions []string `json:"permissions"`
 		} `json:"blackpie"`
 	}
-	if json.Unmarshal(b, &pkg) != nil {
+	if unmarshalManifest(b, &pkg) != nil {
 		return nil, false
 	}
 	w = &WindowSpec{}

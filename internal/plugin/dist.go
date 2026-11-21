@@ -269,7 +269,7 @@ func distInfo(ctx context.Context, name string) (NPM, bool, error) {
 		return NPM{}, false, nil
 	}
 	var l npmLatest
-	if json.Unmarshal(v.Manifest, &l) != nil {
+	if unmarshalManifest(v.Manifest, &l) != nil {
 		return NPM{}, false, nil
 	}
 	info := npmOf(l)

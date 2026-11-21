@@ -222,12 +222,12 @@ export const FakePlugin = async ({ client }) => ({
         // where blackpie said the agent works, as the plugin read it; its own
         // headers go on too, as a plugin that sends on what it got sends
         // them, for the host to take off
-        for (const k of ["x-blackpie-work-dir", "x-blackpie-work-git", "x-blackpie-fallback"]) if (h.has(k)) h.set("x-saw-" + k.slice(9), h.get(k))
+        for (const k of ["x-magpie-work-dir", "x-magpie-work-git", "x-magpie-fallback"]) if (h.has(k)) h.set("x-saw-" + k.slice("x-magpie-".length), h.get(k))
         // $FAKE_QUEUE: that model is queued at the vendor, as Qoder's free
         // models are: waited out (here until blackpie gives up) unless blackpie
         // said it needn't be, then said at once with the queue's 503
         if (process.env.FAKE_QUEUE && typeof init.body === "string" && JSON.parse(init.body).model === process.env.FAKE_QUEUE) {
-          if (h.get("x-blackpie-fallback") === "1") {
+          if (h.get("x-magpie-fallback") === "1") {
             return new Response(JSON.stringify({ error: { message: `FakeCo queued the request for ${process.env.FAKE_QUEUE}; try again in 30s`, type: "queued" } }), { status: 503, headers: { "content-type": "application/json", "retry-after": "30" } })
           }
           await new Promise((_, no) => {
@@ -409,6 +409,8 @@ export const FakePlugin = async ({ client }) => ({
         // Command Code's Go and ZCode do
         if (r === null && process.env.FAKE_MODELS_THROW === "own")
           return { "fake-1": { ...p.models["fake-1"] }, [Symbol.for("blackpie.fellBack")]: true }
+        if (r === null && process.env.FAKE_MODELS_THROW === "legacy")
+          return { "fake-1": { ...p.models["fake-1"] }, [Symbol.for("magpie.fellBack")]: true }
         if (r) p.models["fake-" + r] = { ...p.models["fake-1"], id: "fake-" + r, name: r }
       }
       return p.models

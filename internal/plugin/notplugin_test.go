@@ -18,7 +18,7 @@ func TestCommandOnlyPackageIsNoPlugin(t *testing.T) {
 	sandbox(t)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
-	abs, _ := filepath.Abs("testdata/notplugin/blackpie-x-search")
+	abs, _ := filepath.Abs("testdata/notplugin/magpie-x-search")
 	_, err := Add(ctx, abs)
 	if err == nil || !strings.Contains(err.Error(), "blackpie-x-search isn't an OpenCode or blackpie plugin") || !strings.Contains(err.Error(), "Library → MCP servers") {
 		t.Fatalf("Add = %v", err)

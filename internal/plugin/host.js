@@ -585,7 +585,7 @@ function asked(input, init) {
 // and that a queue needn't be waited out (FallbackHeader): for the plugin
 // to read, never for its vendor, so a plugin that sends on the headers it
 // was given sends them nowhere.
-const BLACKPIE_ONLY = ["x-blackpie-work-dir", "x-blackpie-work-git", "x-blackpie-fallback"]
+const BLACKPIE_ONLY = ["x-blackpie-work-dir", "x-blackpie-work-git", "x-blackpie-fallback", "x-magpie-work-dir", "x-magpie-work-git", "x-magpie-fallback"]
 
 function unsaid(input, init) {
   if (input instanceof Request && BLACKPIE_ONLY.some((k) => input.headers.has(k))) {
@@ -1253,6 +1253,7 @@ function servers(mod) {
 }
 
 async function loadPlugins(list) {
+  const own = { option: optionValue, options: optionValues, load: reportLoad }
   const input = {
     client: makeClient(),
     project: { id: "blackpie", worktree: directory, vcs: undefined, time: { created: Date.now() } },
@@ -1264,7 +1265,8 @@ async function loadPlugins(list) {
     // blackpie's own (OpenCode has none): the plugin's options as the user
     // set them in blackpie, read when wanted, so a change reaches the
     // plugin without a restart (#2038)
-    blackpie: { option: optionValue, options: optionValues, load: reportLoad },
+    blackpie: own,
+    magpie: own,
   }
   // pi's packages and extensions are loaded as pi loads them (pi.js)
   let pi
@@ -1838,7 +1840,7 @@ async function info(id, key, strict, limit) {
       // whose fetch failed keeps the one it fetched last; so does one that
       // says so, handing back a list of its own (Symbol.for("blackpie.fellBack")
       // on it: Command Code's Go table, ZCode's models)
-      out.fellBack = (next === given.models && l.tried && !l.lastOk) || next?.[Symbol.for("blackpie.fellBack")] === true
+      out.fellBack = (next === given.models && l.tried && !l.lastOk) || next?.[Symbol.for("blackpie.fellBack")] === true || next?.[Symbol.for("magpie.fellBack")] === true
       // why, as far as the host saw it: the editor says so rather than
       // show the plugin's short defaults as if they were the account's
       if (out.fellBack) out.listError = l.said || "the plugin couldn't get its vendor's list"
@@ -2005,6 +2007,11 @@ function methods(auth) {
 // (OpenCode's providers have none): the auth hook's icon, else
 // package.json's blackpie.icon. An https URL or a data:image URI; blackpie
 // checks and keeps it (internal/provider), nothing is fetched here.
+function ownManifest(dir) {
+  const pkg = readJSON(path.join(dir, "package.json"))
+  return pkg && Object.hasOwn(pkg, "blackpie") ? pkg.blackpie : pkg?.magpie
+}
+
 function iconOf(a) {
   const ok = (v) => {
     const s = typeof v === "string" ? v.trim() : ""
@@ -2014,7 +2021,7 @@ function iconOf(a) {
   const own = ok(a.auth.icon)
   if (own || !a.target) return own
   const dir = fs.statSync(a.target, { throwIfNoEntry: false })?.isDirectory() ? a.target : path.dirname(a.target)
-  return ok(readJSON(path.join(dir, "package.json"))?.blackpie?.icon)
+  return ok(ownManifest(dir)?.icon)
 }
 
 // concurrencyOf is how many requests the plugin says each of its accounts
@@ -2040,7 +2047,7 @@ function declared(a, key) {
   const own = ok(a.auth[key])
   if (own || !a.target) return own
   const dir = fs.statSync(a.target, { throwIfNoEntry: false })?.isDirectory() ? a.target : path.dirname(a.target)
-  return ok(readJSON(path.join(dir, "package.json"))?.blackpie?.[key])
+  return ok(ownManifest(dir)?.[key])
 }
 
 // rateOf reads a model's credit rate as a plugin gives it: a number (0.5)
