@@ -131,7 +131,7 @@ func TestRegisterSchemeBindsAnOlderEntry(t *testing.T) {
 	}
 	dir := filepath.Join(data, "applications")
 	path := filepath.Join(dir, "blackpie.desktop")
-	older := "[Desktop Entry]\nType=Application\nName=blackpie\nComment=Every agent's model. One place.\nExec=" + exe +
+	older := "[Desktop Entry]\nType=Application\nName=magpie\nComment=Every agent's model. One place.\nExec=" + exe +
 		" %u\nIcon=blackpie\nStartupWMClass=" + programName + "\nCategories=Development;Utility;\nMimeType=x-scheme-handler/blackpie;\nTerminal=false\n"
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)

@@ -89,5 +89,5 @@ test('asset manifest accepts all 15 blackpie builds and rejects upstream names',
   runInNewContext(script('release-assets.mjs'), adapters);
   assert.equal(written.path, 'dist/SHA256SUMS');
   assert.deepEqual(written.text.trim().split('\n').map((line) => line.split('  ')[1]), assets);
-  assert.throws(() => runInNewContext(script('release-assets.mjs'), { ...adapters, readdirSync: () => assets.map((a) => a.replace('blackpie-', 'blackpie-')) }), /Expected exactly 15/);
+  assert.throws(() => runInNewContext(script('release-assets.mjs'), { ...adapters, readdirSync: () => assets.map((a) => a.replace('blackpie-', 'magpie-')) }), /Expected exactly 15/);
 });
